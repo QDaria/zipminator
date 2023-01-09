@@ -1,5 +1,5 @@
-from zipit import Zipndel
-from unzipit import Unzipndel
+from zipminator.zipit import Zipndel
+from zipminator.unzipit import Unzipndel
 
 
 def main():
