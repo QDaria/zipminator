@@ -1,4 +1,3 @@
-# Does the test_zipminator.py looks correct? If not what else do we miss out here?
 import string
 import random
 import unittest
