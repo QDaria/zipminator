@@ -1,4 +1,3 @@
-# Modify this zipminator/unzipit.py to make the test pass:
 import pandas as pd
 import getpass
 import zipfile
