@@ -1,4 +1,4 @@
-# modify __main__.py to be correct?
+# zipminator/__main__.py 
 
 import string
 import random
