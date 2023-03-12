@@ -1,43 +1,41 @@
+# zipminator/unzipit.py
 import pandas as pd
-import getpass
-import zipfile
-import os
+import pyzipper
 import time
-import datetime
+import threading
+import getpass
+import os
+import hashlib
+import random
+import string
+import re
 
+
+# zipminator/unzipit.py
 
 class Unzipndel:
-    def __init__(self, file_name: str = 'df', file_format: str = 'csv'):
-        """
-        Initialize Unzipndel object.
-        Parameters:
-        file_name (str): the name of the file to be extracted, default is 'df'
-        file_format (str): the file format of the file to be extracted, default is 'csv'
-        """
+
+    def __init__(self, file_name='df', file_format='csv'):
         self.file_name = file_name
         self.file_format = file_format
 
-    def unzipit(self) -> pd.DataFrame:
-        """
-        Unzip the zip file, extract the written file, read the extracted file into a DataFrame, and delete the extracted file.
+    def unzipit(self):
+        """Unzip the file, read it using pandas, and delete the unzipped file.
+
         Returns:
-        df (pd.DataFrame): the dataframe extracted from the zip file
-        Example:
-        >>> df = Unzipndel().unzipit()
+            pd.DataFrame: A pandas dataframe containing the unzipped and read data.
+
+        Raises:
+            RuntimeError: If the password is incorrect or the file cannot be unzipped.
         """
-        # prompt user for password
-        passwd = getpass.getpass('Password:')
+        password = getpass.getpass('Password: ')
+        with pyzipper.AESZipFile(f"{self.file_name}.zip") as zf:
+            zf.setpassword(password.encode())
+            zf.extract(self.file_name)
 
-        # unzip zip file and extract written file
-        df_zip = f"{self.file_name}.zip"
-        zf = zipfile.ZipFile(df_zip, mode='r')
-        zf.extractall(pwd=passwd.encode())
-
-        # read extracted file into a DataFrame
         read_func = getattr(pd, f'read_{self.file_format}')
         df = read_func(self.file_name)
 
-        # delete extracted file
         os.remove(self.file_name)
 
         return df

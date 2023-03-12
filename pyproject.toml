@@ -1,8 +1,9 @@
+Pyproject looks like this but want to update to version 0.3.0 and add 
 [tool.poetry]
 name = "zipminator"
 version = "0.2.0"
 description = "zipminator is a lightweight python package with two main functionalities; Zipndel or Unzipndel, for zipping or unzipping a password-protected pandas DataFrame file, and then deleting the original file."
-authors = ["QDaria <mo@qdaria.com>"]
+authors = ["Daniel Mo Houshmand - <mo@qdaria.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
@@ -10,6 +11,8 @@ python = "^3.8"
 pandas = "^1.5.2"
 numpy = "^1.24.1"
 pytest = "6.2.5"
+pyzipper = "^0.3.6"
+jupyter-sphinx = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 

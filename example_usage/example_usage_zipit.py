@@ -1,4 +1,4 @@
-from zipminator.zipit import Zipndel
+from src.zipit import Zipndel
 import pandas as pd
 import getpass
 import zipfile

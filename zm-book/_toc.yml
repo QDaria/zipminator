@@ -1,0 +1,19 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: index
+parts:
+  - caption: Intro
+    #numbered: True  # Only ap
+    chapters:  
+    - file: content/intro 
+  - caption: Getting Started
+    #numbered: True  # Only ap
+    chapters:  
+    - file: content/getting_started  
+  - caption: Manual
+    #numbered: True  # Only applies to chapters in Part 1.
+    chapters:  
+    - file: content/reference_manual 
+    - file: Appendix

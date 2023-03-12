@@ -1,0 +1,94 @@
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+
+title: Zipminator
+author: Daniel Mo Houshmand - QDaria
+logo: zipminator-logo.png
+
+only_build_toc_files: true
+
+# Force re-execution of notebooks on each build.
+# See https://jupyterbook.org/content/execute.html
+execute:
+  execute_notebooks: force
+  #execute_notebooks: auto
+  exclude_patterns:
+    - '_build'
+    - 'Thumbs.db'
+    - '.DS_Store'
+    - '*pattern3withwildcard'
+    - 'dsData.zip'
+#    - 'programming-dp'
+
+# Parse and render settings
+parse:
+  myst_enable_extensions:  # default extensions to enable in the myst parser. See https://myst-parser.readthedocs.io/en/latest/using/syntax-optional.html
+    - amsmath
+    - colon_fence
+    - deflist
+    - dollarmath
+    - html_admonition
+    - html_image
+    - linkify
+    - replacements
+    - smartquotes
+    - substitution
+    - tasklist
+
+  myst_url_schemes: [mailto, http, https] # URI schemes that will be recognised as external URLs in Markdown links
+  myst_dmath_double_inline: true  # Allow display math ($$) within an inline context
+
+# Sphinx-specific settings
+sphinx:
+  extra_extensions:
+    #- myst_parser
+    - sphinx_design
+    - sphinx_inline_tabs
+    - sphinx_jupyterbook_latex
+    - sphinx_exercise
+    - myst_nb
+    - sphinx_copybutton
+    - sphinx.ext.autodoc
+    - sphinx.ext.napoleon
+    - jupyter_sphinx 
+
+
+  config:
+    expand_subsections: True
+    nb_execution_show_tb: True
+    #html_theme: renku
+    # html_theme: pydata_sphinx_theme
+    #html_theme: sphinx_pdj_theme
+    #html_theme: sphinx_book_theme
+    html_theme: sphinx_rtd_theme
+    #html_theme: quantecon_book_theme
+    pygments_style: monokai
+    html_title: Daniel Mo Houshmand
+    html_static_path: ['_static']
+    # CSS files
+    html_css_files: ['mo.css']
+    # JS files
+    #html_js_files: custom.js
+    html_sidebars:  globaltoc.html, relations.html, sourcelink.html, searchbox.html, localtoc.html, 
+    html_theme_options:
+      logo_only: true
+      use_download_button: True
+      repository_url: https://github.com/MoHoushmand/MoHoushmand.github.io
+      #use_issues_button: True
+      #use_repository_button: True
+      #use_edit_page_button: True
+      
+      #'analytics_id': 'G-XXXXXXXXXX',  #  Provided by Google in your dashboard
+      #'analytics_anonymize_ip': False,
+      #'logo_only': False,
+      display_version: True
+      prev_next_buttons_location': bottom
+      #'style_external_links': False,
+      #'vcs_pageview_mode': '',
+      #style
+
+
+
+
+
+    

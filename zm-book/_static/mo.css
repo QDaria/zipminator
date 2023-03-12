@@ -1,0 +1,32 @@
+/*********************************************
+* Change the color of orange named objects *
+*********************************************/
+:root {
+    --background-color: rgba(253, 152, 20, 0.884);
+    --border-color: rgba(253, 20, 230, 0.626);
+}
+
+div.orange {
+    background-color: var(--background-color);
+    border-color: var(--border-color);
+}
+
+div.orange p.admonition-title {
+    background-color: var(--background-color);
+}
+
+menu background .wy-side-scroll {
+    background-color: #f71616;
+}
+
+.wy-nav-content-wrap {
+    background: linear-gradient(17deg, rgba(255, 255, 255, 0.875) 0%, rgba(233, 233, 233, 0.915) 99%);
+}
+
+.wy-side-scroll {
+    background: linear-gradient(17deg, rgb(14, 15, 15) 0%, rgba(144, 144, 152, 0.553) 99%);
+}
+
+.wy-side-nav-search {
+    background: linear-gradient(17deg, rgba(6, 191, 226, 1) 0%, rgba(5, 22, 245, 1) 99%);
+}
