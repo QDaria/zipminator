@@ -6,7 +6,7 @@ authors = ["Daniel Mo Houshmand <mo@qdaria.com>"]
 license = "MIT"
 homepage = "https://qdaria.github.io/zipminator/"
 repository = "https://github.com/QDaria/zipminator"
-documentation = "https://qdaria.github.io/zipminator/docs/"
+documentation = "https://qdaria.github.io/zipminator/"
 readme = "README.md"
 keywords = ["pandas", "compression", "encryption", "data-security"]
 
