@@ -30,7 +30,7 @@
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-        <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+        <script src="../_static/scripts/sphinx-book-theme.js?digest=8bf782fb4ee92b3d3646425e50f299c4e1fd152d"></script>
         <script src="../_static/tabs.js"></script>
         <script src="../_static/thebelab-helper.js"></script>
         <script>let toggleHintShow = 'Click to show';</script>
@@ -124,6 +124,191 @@ const thebe_selector_output = ".output, .cell_output"
 <p><strong><code class="docutils literal notranslate"><span class="pre">__init__(self,</span> <span class="pre">file_name:</span> <span class="pre">str,</span> <span class="pre">file_format:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'csv'):</span></code></strong> <br> Initializes a new instance of the Zipndel class with the specified file name and format. The file_name parameter is required and specifies the name of the file to be zipped. The file_format parameter is optional and specifies the format of the file to be zipped. If no format is specified, it defaults to <code class="docutils literal notranslate"><span class="pre">csv</span></code>.
 <strong><code class="docutils literal notranslate"><span class="pre">zipit(self,</span> <span class="pre">df:</span> <span class="pre">pd.DataFrame,</span> <span class="pre">password:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">delete_original:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True)</span> <span class="pre">-&gt;</span> <span class="pre">None:</span></code></strong> <br> Zips a Pandas DataFrame with optional password protection and file deletion. The <code class="docutils literal notranslate"><span class="pre">df</span></code> parameter is required and specifies the DataFrame to be zipped. The password parameter is optional and specifies the password to be used for encryption. If no password is specified, the user will be prompted to enter one. The delete_original parameter is optional and specifies whether or not to delete the original file after it has been zipped. If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the original file will be deleted.
 To create an instance of the Zipndel class, you need to specify the name of the file to be zipped:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zipminator.zipit.</span></span><span class="sig-name descname"><span class="pre">Zipndel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'df'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_destruct_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(672,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encryption_algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AES'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anonymize_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compliance_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audit_trail</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zipminator.zipit.Zipndel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for compressing and encrypting Pandas DataFrames and deleting the original file.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.file_name">
+<span class="sig-name descname"><span class="pre">file_name</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.file_name" title="Permalink to this definition"></a></dt>
+<dd><p>The name of the file to be written, default is ‘df’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.file_format">
+<span class="sig-name descname"><span class="pre">file_format</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.file_format" title="Permalink to this definition"></a></dt>
+<dd><p>The file format of the file to be written, default is ‘csv’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.self_destruct_time">
+<span class="sig-name descname"><span class="pre">self_destruct_time</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.self_destruct_time" title="Permalink to this definition"></a></dt>
+<dd><p>A tuple of (hours, minutes, seconds) until self-destruct, default is (672, 0, 0).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.password">
+<span class="sig-name descname"><span class="pre">password</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.password" title="Permalink to this definition"></a></dt>
+<dd><p>The password to use for the zip file, default is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.encryption_algorithm">
+<span class="sig-name descname"><span class="pre">encryption_algorithm</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.encryption_algorithm" title="Permalink to this definition"></a></dt>
+<dd><p>The encryption algorithm to use for the zip file, default is ‘AES’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.mask_columns">
+<span class="sig-name descname"><span class="pre">mask_columns</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.mask_columns" title="Permalink to this definition"></a></dt>
+<dd><p>The list of columns to mask, default is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.anonymize_columns">
+<span class="sig-name descname"><span class="pre">anonymize_columns</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.anonymize_columns" title="Permalink to this definition"></a></dt>
+<dd><p>The list of columns to anonymize, default is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.compliance_check">
+<span class="sig-name descname"><span class="pre">compliance_check</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.compliance_check" title="Permalink to this definition"></a></dt>
+<dd><p>Whether to perform a compliance check on the data, default is False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.audit_trail">
+<span class="sig-name descname"><span class="pre">audit_trail</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.audit_trail" title="Permalink to this definition"></a></dt>
+<dd><p>Whether to keep an audit trail, default is False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">mask_columns(df</span></span></dt>
+<dd><p>pd.DataFrame, columns: List[str]) -&gt; pd.DataFrame:
+Mask sensitive data in the specified DataFrame columns by applying a SHA-256 hash function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">anonymize_columns(df</span></span></dt>
+<dd><p>pd.DataFrame, columns: List[str]) -&gt; pd.DataFrame:
+Anonymize sensitive data in the specified DataFrame columns by replacing it with random characters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">zipit(df</span></span></dt>
+<dd><p>pd.DataFrame) -&gt; None:
+Write the input DataFrame to a file, create a zip file with the written file, set a password for the zip file,
+and delete the written file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">self_destruct(hours</span></span></dt>
+<dd><p>int, minutes: int, seconds: int) -&gt; None:
+Delete the compressed and encrypted file after a specified amount of time.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.decompress_and_read">
+<span class="sig-name descname"><span class="pre">decompress_and_read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pd.DataFrame</span></span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.decompress_and_read" title="Permalink to this definition"></a></dt>
+<dd><p>Unzip the file, read it using pandas, and delete the unzipped file.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Zipndel</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;my_file&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;my_password&#39;</span><span class="p">,</span> <span class="n">mask_columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">],</span> <span class="n">anonymize_columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">zipit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">audit_trail</span></span><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the Zipndel object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<em>str</em>) – The name of the file to be written, default is ‘df’.</p></li>
+<li><p><strong>file_format</strong> (<em>str</em>) – The file format of the file to be written, default is ‘csv’.</p></li>
+<li><p><strong>self_destruct_time</strong> (<em>tuple</em>) – A tuple of (hours, minutes, seconds) until self-destruct, default is (672, 0, 0).</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – The password to use for the zip file, default is None.</p></li>
+<li><p><strong>encryption_algorithm</strong> (<em>str</em>) – The encryption algorithm to use for the zip file, default is ‘AES’.</p></li>
+<li><p><strong>mask_columns</strong> (<em>list</em>) – The list of columns to mask, default is None.</p></li>
+<li><p><strong>anonymize_columns</strong> (<em>list</em>) – The list of columns to anonymize, default is None.</p></li>
+<li><p><strong>compliance_check</strong> (<em>bool</em>) – Whether to perform a compliance check on the data, default is False.</p></li>
+<li><p><strong>audit_trail</strong> (<em>bool</em>) – Whether to keep an audit trail, default is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.zipit">
+<span class="sig-name descname"><span class="pre">zipit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.zipit" title="Permalink to this definition"></a></dt>
+<dd><p>Write the input DataFrame to a file, create a zip file with the written file, set a password for the zip file,
+and delete the written file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The DataFrame to compress and encrypt.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <p>The Zipndel class is a Python class that provides a simple way to compress, encrypt and delete Pandas DataFrames.</p>
 <p><strong>Attributes</strong>
 <code class="docutils literal notranslate"><span class="pre">file_name</span> <span class="pre">(str):</span></code> The name of the file to be written, default is ‘df’.
@@ -153,7 +338,7 @@ To create an instance of the Zipndel class, you need to specify the name of the 
 
 
 <span class="k">class</span> <span class="nc">Zipndel</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for compressing and encrypting Pandas DataFrames and deleting the original file.</span>
+    <span class="sd">&quot;&quot;&quot;Class for compressing and encrypting Pandas DataFrames and deleting the original file.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        file_name (str): The name of the file to be written, default is &#39;df&#39;.</span>
@@ -197,7 +382,7 @@ To create an instance of the Zipndel class, you need to specify the name of the 
         <span class="bp">self</span><span class="o">.</span><span class="n">audit_trail</span> <span class="o">=</span> <span class="n">audit_trail</span>
 
     <span class="k">def</span> <span class="nf">zipit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compresses and encrypts the given pandas DataFrame and writes it to a zip file.</span>
 
 <span class="sd">        Args:</span>
@@ -237,7 +422,7 @@ To create an instance of the Zipndel class, you need to specify the name of the 
             <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">self_destruct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hours</span><span class="p">,</span> <span class="n">minutes</span><span class="p">,</span> <span class="n">seconds</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes the compressed file after a specified amount of time has elapsed.</span>
+        <span class="sd">&quot;&quot;&quot;Deletes the compressed file after a specified amount of time has elapsed.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            hours (int): The number of hours until file deletion.</span>
@@ -256,7 +441,7 @@ To create an instance of the Zipndel class, you need to specify the name of the 
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Masks sensitive data in the specified DataFrame columns by applying a SHA-256 hash function.</span>
+        <span class="sd">&quot;&quot;&quot;Masks sensitive data in the specified DataFrame columns by applying a SHA-256 hash function.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            df (pandas.DataFrame): The DataFrame to mask sensitive data in.</span>
@@ -272,7 +457,7 @@ To create an instance of the Zipndel class, you need to specify the name of the 
         <span class="k">return</span> <span class="n">df</span>
 
     <span class="k">def</span> <span class="nf">anonymize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Anonymizes sensitive data in the specified DataFrame columns by replacing it with random characters.</span>
+        <span class="sd">&quot;&quot;&quot;Anonymizes sensitive data in the specified DataFrame columns by replacing it with random characters.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            df (pandas.DataFrame): The DataFrame to anonymize sensitive data in.</span>
@@ -290,6 +475,29 @@ To create an instance of the Zipndel class, you need to specify the name of the 
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="unzipndel-class">
 <h1>Unzipndel class<a class="headerlink" href="#unzipndel-class" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="zipminator.unzipit.Unzipndel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zipminator.unzipit.</span></span><span class="sig-name descname"><span class="pre">Unzipndel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'df'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csv'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zipminator.unzipit.Unzipndel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zipminator.unzipit.Unzipndel.unzipit">
+<span class="sig-name descname"><span class="pre">unzipit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#zipminator.unzipit.Unzipndel.unzipit" title="Permalink to this definition"></a></dt>
+<dd><p>Unzip the file, read it using pandas, and delete the unzipped file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pandas dataframe containing the unzipped and read data.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If the password is incorrect or the file cannot be unzipped.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pyzipper</span>
 <span class="kn">import</span> <span class="nn">time</span>
@@ -317,7 +525,7 @@ To create an instance of the Zipndel class, you need to specify the name of the 
         <span class="bp">self</span><span class="o">.</span><span class="n">file_format</span> <span class="o">=</span> <span class="n">file_format</span>
 
     <span class="k">def</span> <span class="nf">unzipit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unzip the file, read it using pandas, and delete the unzipped file.</span>
+        <span class="sd">&quot;&quot;&quot;Unzip the file, read it using pandas, and delete the unzipped file.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            pd.DataFrame: A pandas dataframe containing the unzipped and read data.</span>
