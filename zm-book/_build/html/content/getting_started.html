@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Package overview &mdash; Daniel Mo Houshmand</title>
@@ -9,13 +9,13 @@
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx-thebe.css" type="text/css" />
       <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
       <link rel="stylesheet" href="../_static/exercise.css" type="text/css" />
       <link rel="stylesheet" href="../_static/jupyter-sphinx.css" type="text/css" />
       <link rel="stylesheet" href="../_static/thebelab.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" type="text/css" />
       <link rel="stylesheet" href="../_static/mo.css" type="text/css" />
       <link rel="stylesheet" href="../_static/mo.css" type="text/css" />
       <link rel="stylesheet" href="../_static/mo.css" type="text/css" />
@@ -26,21 +26,20 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-        <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+        <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
         <script src="../_static/tabs.js"></script>
         <script src="../_static/thebelab-helper.js"></script>
         <script>let toggleHintShow = 'Click to show';</script>
         <script>let toggleHintHide = 'Click to hide';</script>
         <script>let toggleOpenOnPrint = 'true';</script>
         <script src="../_static/togglebutton.js"></script>
-        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
         <script src="../_static/design-tabs.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
         <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
 const thebe_selector_input = "pre"
@@ -120,75 +119,102 @@ const thebe_selector_output = ".output, .cell_output"
            <div itemprop="articleBody">
              
   <section class="tex2jax_ignore mathjax_ignore" id="package-overview">
-<h1>Package overview<a class="headerlink" href="#package-overview" title="Permalink to this heading"></a></h1>
+<h1>Package overview<a class="headerlink" href="#package-overview" title="Permalink to this headline"></a></h1>
 <p>Zipminator is a Python package that provides a simple and convenient way to create and extract password-protected zip files. The package includes two main classes, <code class="docutils literal notranslate"><span class="pre">Zipndel</span></code> and <code class="docutils literal notranslate"><span class="pre">Unzipndel</span></code>, which respectively handle the creation and extraction of zip files.</p>
 <p>The Zipndel class allows users to create password-protected zip files from data stored in pandas dataframes. The <code class="docutils literal notranslate"><span class="pre">Unzipndel</span></code> class can be used to extract data from password-protected zip files and convert it into a pandas dataframe.</p>
 <p>Zipminator is designed to be simple and easy to use, with minimal configuration required. The package is compatible with Python 3.8 and above, and can be installed via pip or conda.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>.
-├──<span class="w"> </span>LICENSE
-├──<span class="w"> </span>README.md
-├──<span class="w"> </span>poetry.lock
-├──<span class="w"> </span>pyproject.toml
-├──<span class="w"> </span>tests
-│<span class="w">   </span>├──<span class="w"> </span>__init__.py
-│<span class="w">   </span>└──<span class="w"> </span>test_zipminator.py
-├──<span class="w"> </span>zipminator
-│<span class="w">   </span>├──<span class="w"> </span>__init__.py
-│<span class="w">   </span>├──<span class="w"> </span>__version__.py
-│<span class="w">   </span>├──<span class="w"> </span>unzipit.py
-│<span class="w">   </span>└──<span class="w"> </span>zipit.py
+├── LICENSE
+├── README.md
+├── poetry.lock
+├── pyproject.toml
+├── tests
+│   ├── __init__.py
+│   └── test_zipminator.py
+├── zipminator
+│   ├── __init__.py
+│   ├── __version__.py
+│   ├── unzipit.py
+│   └── zipit.py
 </pre></div>
 </div>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="installation-with-pip">
-<h1>Installation with pip<a class="headerlink" href="#installation-with-pip" title="Permalink to this heading"></a></h1>
+<h1>Installation with pip<a class="headerlink" href="#installation-with-pip" title="Permalink to this headline"></a></h1>
 <p>To install zipminator using pip, run the following command in your terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>zipminator
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install zipminator
 </pre></div>
 </div>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="installation-with-conda">
-<h1>Installation with conda<a class="headerlink" href="#installation-with-conda" title="Permalink to this heading"></a></h1>
+<h1>Installation with conda<a class="headerlink" href="#installation-with-conda" title="Permalink to this headline"></a></h1>
 <p>To install zipminator using conda, run the following command in your terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>zipminator
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge zipminator
 </pre></div>
 </div>
 <p>Note that conda installation will install additional dependencies required by the package, while pip installation assumes that these dependencies are already installed in your system.</p>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="installation-from-source">
-<h1>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this heading"></a></h1>
+<h1>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this headline"></a></h1>
 <p>Alternatively, you can also install zipminator from source by cloning the GitHub repository and running the following command in your terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup.py<span class="w"> </span>install
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python setup.py install
 </pre></div>
 </div>
 <p>This will install the package and its dependencies in your system.</p>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="id1">
-<h1>Package overview<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h1>
+<h1>Package overview<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
 <p>Zipminator is a Python package that provides a simple and convenient way to create and extract password-protected zip files. The package includes two main classes, <code class="docutils literal notranslate"><span class="pre">Zipndel</span></code> and <code class="docutils literal notranslate"><span class="pre">Unzipndel</span></code>, which respectively handle the creation and extraction of zip files.</p>
 <p>The Zipndel class allows users to create password-protected zip files from data stored in pandas dataframes. The <code class="docutils literal notranslate"><span class="pre">Unzipndel</span></code> class can be used to extract data from password-protected zip files and convert it into a pandas dataframe.</p>
 <p>Zipminator is designed to be simple and easy to use, with minimal configuration required. The package is compatible with Python 3.8 and above, and can be installed via pip or conda.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>.
-├──<span class="w"> </span>LICENSE
-├──<span class="w"> </span>README.md
-├──<span class="w"> </span>poetry.lock
-├──<span class="w"> </span>pyproject.toml
-├──<span class="w"> </span>tests
-│<span class="w">   </span>├──<span class="w"> </span>__init__.py
-│<span class="w">   </span>└──<span class="w"> </span>test_zipminator.py
-├──<span class="w"> </span>zipminator
-│<span class="w">   </span>├──<span class="w"> </span>__init__.py
-│<span class="w">   </span>├──<span class="w"> </span>__version__.py
-│<span class="w">   </span>├──<span class="w"> </span>unzipit.py
-│<span class="w">   </span>└──<span class="w"> </span>zipit.py
+├── LICENSE
+├── README.md
+├── poetry.lock
+├── pyproject.toml
+├── tests
+│   ├── __init__.py
+│   └── test_zipminator.py
+├── zipminator
+│   ├── __init__.py
+│   ├── __version__.py
+│   ├── unzipit.py
+│   └── zipit.py
 </pre></div>
 </div>
 <section id="zipndel-class">
-<h2>Zipndel class<a class="headerlink" href="#zipndel-class" title="Permalink to this heading"></a></h2>
+<h2>Zipndel class<a class="headerlink" href="#zipndel-class" title="Permalink to this headline"></a></h2>
 <p>The Zipndel class is used to create an encrypted zip file from a Pandas DataFrame, and optionally delete the original file. The class contains the following methods:</p>
 <p><code class="docutils literal notranslate"><span class="pre">__init__</span></code>(self, file_name: str, file_format: str = ‘csv’): Initializes a new instance of the Zipndel class with the specified file name and format. The file_name parameter is required and specifies the name of the file to be zipped. The file_format parameter is optional and specifies the format of the file to be zipped. If no format is specified, it defaults to csv.
 zipit(self, df: pd.DataFrame, password: str = None, delete_original: bool = True) -&gt; None: Zips a Pandas DataFrame with optional password protection and file deletion. The df parameter is required and specifies the DataFrame to be zipped. The password parameter is optional and specifies the password to be used for encryption. If no password is specified, the user will be prompted to enter one. The delete_original parameter is optional and specifies whether or not to delete the original file after it has been zipped. If True, the original file will be deleted.
 To create an instance of the Zipndel class, you need to specify the name of the file to be zipped:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zipminator.zipit.</span></span><span class="sig-name descname"><span class="pre">Zipndel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'df'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_destruct_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zipminator.zipit.Zipndel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.self_destruct">
+<span class="sig-name descname"><span class="pre">self_destruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.self_destruct" title="Permalink to this definition"></a></dt>
+<dd><p>Set the self-destruct timer for the zip file.</p>
+<p>Parameters:
+hours (int): number of hours until self-destruct
+minutes (int): number of minutes until self-destruct
+seconds (int): number of seconds until self-destruct</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.zipit">
+<span class="sig-name descname"><span class="pre">zipit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.zipit" title="Permalink to this definition"></a></dt>
+<dd><p>Write the input dataframe to a file, create a zip file with the written file, set a password for the zip file, and delete the written file.</p>
+<p>Parameters:
+df (pd.DataFrame): the input dataframe to be written to file and zipped</p>
+<p>Example:
+&gt;&gt;&gt; df = pd.DataFrame({‘A’: [1, 2, 3], ‘B’: [4, 5, 6], ‘C’: [7, 8, 9]})
+&gt;&gt;&gt; Zipndel().zipit(df)</p>
+</dd></dl>
+
+</dd></dl>
+
 <p>… autoclass:: zipminator.zipit.Zipndel
 :members:</p>
 <div class="toggle docutils container">
@@ -288,7 +314,7 @@ class Zipndel:
 
 <span class="k">class</span> <span class="nc">Zipndel</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;df&#39;</span><span class="p">,</span> <span class="n">file_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="n">self_destruct_time</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">672</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize Zipndel object.</span>
 
 <span class="sd">        Parameters:</span>
@@ -303,7 +329,7 @@ class Zipndel:
         <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
 
     <span class="k">def</span> <span class="nf">zipit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write the input dataframe to a file, create a zip file with the written file, set a password for the zip file,</span>
 <span class="sd">        and delete the written file.</span>
 
@@ -336,7 +362,7 @@ class Zipndel:
             <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">self_destruct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hours</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">minutes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the self-destruct timer for the zip file.</span>
 
 <span class="sd">        Parameters:</span>
@@ -363,6 +389,33 @@ class Zipndel:
 :members:
 :undoc-members:
 :show-inheritance:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zipminator.zipit.</span></span><span class="sig-name descname"><span class="pre">Zipndel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'df'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_destruct_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zipminator.zipit.Zipndel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.self_destruct">
+<span class="sig-name descname"><span class="pre">self_destruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.self_destruct" title="Permalink to this definition"></a></dt>
+<dd><p>Set the self-destruct timer for the zip file.</p>
+<p>Parameters:
+hours (int): number of hours until self-destruct
+minutes (int): number of minutes until self-destruct
+seconds (int): number of seconds until self-destruct</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.zipit">
+<span class="sig-name descname"><span class="pre">zipit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.zipit" title="Permalink to this definition"></a></dt>
+<dd><p>Write the input dataframe to a file, create a zip file with the written file, set a password for the zip file, and delete the written file.</p>
+<p>Parameters:
+df (pd.DataFrame): the input dataframe to be written to file and zipped</p>
+<p>Example:
+&gt;&gt;&gt; df = pd.DataFrame({‘A’: [1, 2, 3], ‘B’: [4, 5, 6], ‘C’: [7, 8, 9]})
+&gt;&gt;&gt; Zipndel().zipit(df)</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
