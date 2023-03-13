@@ -30,7 +30,7 @@
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-        <script src="../_static/scripts/sphinx-book-theme.js?digest=8bf782fb4ee92b3d3646425e50f299c4e1fd152d"></script>
+        <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
         <script src="../_static/tabs.js"></script>
         <script src="../_static/thebelab-helper.js"></script>
         <script>let toggleHintShow = 'Click to show';</script>
@@ -50,7 +50,6 @@ const thebe_selector_output = ".output, .cell_output"
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Wifi data forespørsel - Oppsummering" href="../Appendix.html" />
     <link rel="prev" title="Package overview" href="getting_started.html" /> 
 </head>
 
@@ -93,9 +92,6 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="#unzipndel-class">Unzipndel class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#appendix">Appendix</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Appendix.html">Wifi data forespørsel - Oppsummering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Appendix.html#beskrivelse-av-teknisk-losning">Beskrivelse av teknisk løsning</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Appendix.html#risikovurdering-av-plattform">Risikovurdering av plattform</a></li>
 </ul>
 
         </div>
@@ -128,227 +124,6 @@ const thebe_selector_output = ".output, .cell_output"
 <p><strong><code class="docutils literal notranslate"><span class="pre">__init__(self,</span> <span class="pre">file_name:</span> <span class="pre">str,</span> <span class="pre">file_format:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'csv'):</span></code></strong> <br> Initializes a new instance of the Zipndel class with the specified file name and format. The file_name parameter is required and specifies the name of the file to be zipped. The file_format parameter is optional and specifies the format of the file to be zipped. If no format is specified, it defaults to <code class="docutils literal notranslate"><span class="pre">csv</span></code>.
 <strong><code class="docutils literal notranslate"><span class="pre">zipit(self,</span> <span class="pre">df:</span> <span class="pre">pd.DataFrame,</span> <span class="pre">password:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">delete_original:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True)</span> <span class="pre">-&gt;</span> <span class="pre">None:</span></code></strong> <br> Zips a Pandas DataFrame with optional password protection and file deletion. The <code class="docutils literal notranslate"><span class="pre">df</span></code> parameter is required and specifies the DataFrame to be zipped. The password parameter is optional and specifies the password to be used for encryption. If no password is specified, the user will be prompted to enter one. The delete_original parameter is optional and specifies whether or not to delete the original file after it has been zipped. If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the original file will be deleted.
 To create an instance of the Zipndel class, you need to specify the name of the file to be zipped:</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zipminator.zipit.</span></span><span class="sig-name descname"><span class="pre">Zipndel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'df'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_destruct_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(672,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encryption_algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AES'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anonymize_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compliance_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audit_trail</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zipminator.zipit.Zipndel" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for compressing and encrypting Pandas DataFrames and deleting the original file.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.file_name">
-<span class="sig-name descname"><span class="pre">file_name</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.file_name" title="Permalink to this definition"></a></dt>
-<dd><p>The name of the file to be written, default is ‘df’.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.file_format">
-<span class="sig-name descname"><span class="pre">file_format</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.file_format" title="Permalink to this definition"></a></dt>
-<dd><p>The file format of the file to be written, default is ‘csv’.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.self_destruct_time">
-<span class="sig-name descname"><span class="pre">self_destruct_time</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.self_destruct_time" title="Permalink to this definition"></a></dt>
-<dd><p>A tuple of (hours, minutes, seconds) until self-destruct, default is (672, 0, 0).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.password">
-<span class="sig-name descname"><span class="pre">password</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.password" title="Permalink to this definition"></a></dt>
-<dd><p>The password to use for the zip file, default is None.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.encryption_algorithm">
-<span class="sig-name descname"><span class="pre">encryption_algorithm</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.encryption_algorithm" title="Permalink to this definition"></a></dt>
-<dd><p>The encryption algorithm to use for the zip file, default is ‘AES’.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.mask_columns">
-<span class="sig-name descname"><span class="pre">mask_columns</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.mask_columns" title="Permalink to this definition"></a></dt>
-<dd><p>The list of columns to mask, default is None.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.anonymize_columns">
-<span class="sig-name descname"><span class="pre">anonymize_columns</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.anonymize_columns" title="Permalink to this definition"></a></dt>
-<dd><p>The list of columns to anonymize, default is None.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.compliance_check">
-<span class="sig-name descname"><span class="pre">compliance_check</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.compliance_check" title="Permalink to this definition"></a></dt>
-<dd><p>Whether to perform a compliance check on the data, default is False.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.audit_trail">
-<span class="sig-name descname"><span class="pre">audit_trail</span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.audit_trail" title="Permalink to this definition"></a></dt>
-<dd><p>Whether to keep an audit trail, default is False.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">mask_columns(df</span></span></dt>
-<dd><p>pd.DataFrame, columns: List[str]) -&gt; pd.DataFrame:
-Mask sensitive data in the specified DataFrame columns by applying a SHA-256 hash function.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">anonymize_columns(df</span></span></dt>
-<dd><p>pd.DataFrame, columns: List[str]) -&gt; pd.DataFrame:
-Anonymize sensitive data in the specified DataFrame columns by replacing it with random characters.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">zipit(df</span></span></dt>
-<dd><p>pd.DataFrame) -&gt; None:
-Write the input DataFrame to a file, create a zip file with the written file, set a password for the zip file,
-and delete the written file.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">self_destruct(hours</span></span></dt>
-<dd><p>int, minutes: int, seconds: int) -&gt; None:
-Delete the compressed and encrypted file after a specified amount of time.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.decompress_and_read">
-<span class="sig-name descname"><span class="pre">decompress_and_read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pd.DataFrame</span></span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.decompress_and_read" title="Permalink to this definition"></a></dt>
-<dd><p>Unzip the file, read it using pandas, and delete the unzipped file.</p>
-</dd></dl>
-
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Zipndel</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;my_file&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;my_password&#39;</span><span class="p">,</span> <span class="n">mask_columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">],</span> <span class="n">anonymize_columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">zipit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">anonymize_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
-<dd><p>Anonymize sensitive data in the specified DataFrame columns by replacing it with random characters.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The DataFrame to anonymize sensitive data in.</p></li>
-<li><p><strong>columns</strong> (<em>list</em>) – A list of strings specifying the names of the columns to anonymize.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A copy of the input DataFrame with the specified columns anonymized.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pandas.DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">mask_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
-<dd><p>Mask sensitive data in the specified DataFrame columns by applying a SHA-256 hash function.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The DataFrame to mask sensitive data in.</p></li>
-<li><p><strong>columns</strong> (<em>list</em>) – A list of strings specifying the names of the columns to mask.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A copy of the input DataFrame with the specified columns masked.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pandas.DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.self_destruct">
-<span class="sig-name descname"><span class="pre">self_destruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minutes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.self_destruct" title="Permalink to this definition"></a></dt>
-<dd><p>Delete the compressed and encrypted file after a specified amount of time has elapsed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>hours</strong> (<em>int</em>) – The number of hours until file deletion.</p></li>
-<li><p><strong>minutes</strong> (<em>int</em>) – The number of minutes until file deletion.</p></li>
-<li><p><strong>seconds</strong> (<em>int</em>) – The number of seconds until file deletion.</p></li>
-</ul>
-</dd>
-</dl>
-<p>Returns:
-None</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="zipminator.zipit.Zipndel.zipit">
-<span class="sig-name descname"><span class="pre">zipit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#zipminator.zipit.Zipndel.zipit" title="Permalink to this definition"></a></dt>
-<dd><p>Write the input DataFrame to a file, create a zip file with the written file, set a password for the zip file,
-and delete the written file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The DataFrame to compress and encrypt.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong> – </p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 <p>The Zipndel class is a Python class that provides a simple way to compress, encrypt and delete Pandas DataFrames.</p>
 <p><strong>Attributes</strong>
 <code class="docutils literal notranslate"><span class="pre">file_name</span> <span class="pre">(str):</span></code> The name of the file to be written, default is ‘df’.
@@ -378,7 +153,7 @@ and delete the written file.</p>
 
 
 <span class="k">class</span> <span class="nc">Zipndel</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Class for compressing and encrypting Pandas DataFrames and deleting the original file.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for compressing and encrypting Pandas DataFrames and deleting the original file.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        file_name (str): The name of the file to be written, default is &#39;df&#39;.</span>
@@ -422,7 +197,7 @@ and delete the written file.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">audit_trail</span> <span class="o">=</span> <span class="n">audit_trail</span>
 
     <span class="k">def</span> <span class="nf">zipit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compresses and encrypts the given pandas DataFrame and writes it to a zip file.</span>
 
 <span class="sd">        Args:</span>
@@ -462,7 +237,7 @@ and delete the written file.</p>
             <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">self_destruct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hours</span><span class="p">,</span> <span class="n">minutes</span><span class="p">,</span> <span class="n">seconds</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Deletes the compressed file after a specified amount of time has elapsed.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes the compressed file after a specified amount of time has elapsed.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            hours (int): The number of hours until file deletion.</span>
@@ -481,7 +256,7 @@ and delete the written file.</p>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Masks sensitive data in the specified DataFrame columns by applying a SHA-256 hash function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Masks sensitive data in the specified DataFrame columns by applying a SHA-256 hash function.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            df (pandas.DataFrame): The DataFrame to mask sensitive data in.</span>
@@ -497,7 +272,7 @@ and delete the written file.</p>
         <span class="k">return</span> <span class="n">df</span>
 
     <span class="k">def</span> <span class="nf">anonymize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Anonymizes sensitive data in the specified DataFrame columns by replacing it with random characters.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Anonymizes sensitive data in the specified DataFrame columns by replacing it with random characters.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            df (pandas.DataFrame): The DataFrame to anonymize sensitive data in.</span>
@@ -515,58 +290,6 @@ and delete the written file.</p>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="unzipndel-class">
 <h1>Unzipndel class<a class="headerlink" href="#unzipndel-class" title="Permalink to this heading"></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="zipminator.unzipit.Unzipndel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zipminator.unzipit.</span></span><span class="sig-name descname"><span class="pre">Unzipndel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'df'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csv'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zipminator.unzipit.Unzipndel" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for unzipping and reading a file using Zipminator.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.unzipit.Unzipndel.file_name">
-<span class="sig-name descname"><span class="pre">file_name</span></span><a class="headerlink" href="#zipminator.unzipit.Unzipndel.file_name" title="Permalink to this definition"></a></dt>
-<dd><p>The name of the file to be unzipped and read, default is ‘df’.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="zipminator.unzipit.Unzipndel.file_format">
-<span class="sig-name descname"><span class="pre">file_format</span></span><a class="headerlink" href="#zipminator.unzipit.Unzipndel.file_format" title="Permalink to this definition"></a></dt>
-<dd><p>The file format of the file to be unzipped and read, default is ‘csv’.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="zipminator.unzipit.Unzipndel.unzipit">
-<span class="sig-name descname"><span class="pre">unzipit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#zipminator.unzipit.Unzipndel.unzipit" title="Permalink to this definition"></a></dt>
-<dd><p>Unzip the file, read it using pandas, and delete the unzipped file.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">unzipit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
-<dd><p>Unzip the file, read it using pandas, and delete the unzipped file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A pandas dataframe containing the unzipped and read data.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>pd.DataFrame</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>RuntimeError</strong> – If the password is incorrect or the file cannot be unzipped.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pyzipper</span>
 <span class="kn">import</span> <span class="nn">time</span>
@@ -594,7 +317,7 @@ and delete the written file.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_format</span> <span class="o">=</span> <span class="n">file_format</span>
 
     <span class="k">def</span> <span class="nf">unzipit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Unzip the file, read it using pandas, and delete the unzipped file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unzip the file, read it using pandas, and delete the unzipped file.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            pd.DataFrame: A pandas dataframe containing the unzipped and read data.</span>
@@ -647,60 +370,9 @@ and delete the written file.</p>
 <li><p>Data minimization</p></li>
 <li><p>Data retention</p></li>
 <li><p>Data deletion</p></li>
-<li><p>Data destruction</p></li>
+<li><p>Self destruction</p></li>
 <li><p>Data obfuscation</p></li>
-<li><p>Data aggregation</p></li>
-<li><p>Data generalization</p></li>
-<li><p>Data suppression</p></li>
-<li><p>Data masking</p></li>
-<li><p>Data tokenization</p></li>
-<li><p>Data encryption</p></li>
-<li><p>Data hashing</p></li>
-<li><p>Data pseudonymization</p></li>
-<li><p>Data de-identification</p></li>
 </ul>
-<p>Her skulle vi nevnte bakgrunnen (restrisiko er akseptert fra Hans Petter + dette gjelder pilot om tilstedeværelse i bygg + hvilke datafelter trenger vi + begrensninger i uttrekkene.</p>
-<p>Here is a breakdown of the fields in the provided dictionary:</p>
-<p>_id: This is an identifier assigned by MongoDB to uniquely identify the document.
-client: This is a dictionary containing information about the WiFi client.
-clientmac: This is the MAC address of the client device.
-details: This is a list containing additional details about the client’s WiFi connection.
-seenonap: This is the name of the access point (AP) on which the client was last seen.
-ssid: This is the Service Set Identifier (SSID) of the wireless network that the client was connected to.
-clientip: This is the IP address assigned to the client device by the network.
-username: This is the username associated with the client device, if applicable.
-lastSeen: This is the timestamp indicating when the client was last seen on the network.
-It seems like the dictionary contains information about a specific WiFi client, including details about their connection to the network, such as the access point they were last seen on, the SSID of the network they were connected to, their IP address, and the timestamp of their last connection.</p>
-<p><strong><code class="docutils literal notranslate"><span class="pre">Det</span> <span class="pre">bes</span> <span class="pre">om</span> <span class="pre">Wifi</span> <span class="pre">data</span> <span class="pre">av</span> <span class="pre">typen:</span></code></strong></p>
-<p>{‘_id’: ObjectId(‘6335d2cc454b6283b947e2c3’), ‘client’: {‘clientmac’: ‘046c.59d9.115b’, ‘details’: [{‘seenonap’: ‘NAV-B06-09’, ‘ssid’: ‘NAV’, ‘clientip’: ‘172.28.160.196’, ‘username’: ‘navn&#64;nav.no’, ‘lastSeen’: ‘2022-09-29 19:15:05’}]}}</p>
-<p><strong><code class="docutils literal notranslate"><span class="pre">Formål:</span></code></strong> <em>Pilot om tilstedeværelse i bygg.</em> Hennsikten med forespørselen er å kartlegge tilstedeværelse i alle oppholdsrom Fystikkalleen 1 for å gi økt innsikt til beslutningstøtte og optimalisering av ressurser. Derfor er vi mere opptatt av aggregerte data, pseudoanonymisert, anonymisert eller maskerte personopplysninger med tidspunkt, lokasjon på NAV ansatte på dedikerte ansatt-wifi og ikke noe interesse i NAV-guest for eksempel. Nedenfor gis nivå av viktighet hva de forskjellige feltene er for oss fra 1-10, der 1 har bortimot ingen viktighet og 10 er kritisk viktig <br>
-<strong><code class="docutils literal notranslate"><span class="pre">Gjennomføring</span></code>:</strong> <br> Wifi data ønskes overført fra Flowscape til Azure plattformen for renskning, behandling og preparering til maskinlæringsalgoritmer, analyser og eller visualisering. <br>
-<strong><code class="docutils literal notranslate"><span class="pre">Periode</span></code>:</strong> <br> 2. januar 2023 - DD og fremtiden <br>
-<strong><code class="docutils literal notranslate"><span class="pre">Risikoeier:</span></code></strong> Hans Petter … (Har godkjent restrisiko) <br>
-<strong><code class="docutils literal notranslate"><span class="pre">Prosjektleder:</span></code></strong> Eric Bortzmeyer <br>
-<strong><code class="docutils literal notranslate"><span class="pre">Teamleder:</span></code></strong> Lars Røed Hansen <br>
-<strong><code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Scientist:</span></code></strong> Daniel Mo Houshmand <br>
-<strong><code class="docutils literal notranslate"><span class="pre">Begrensninger</span> <span class="pre">i</span> <span class="pre">uttrekkene:</span> <span class="pre">-</span> <span class="pre">Hva</span> <span class="pre">er</span> <span class="pre">det</span> <span class="pre">vi</span> <span class="pre">trenger</span> <span class="pre">å</span> <span class="pre">vite</span> <span class="pre">om:</span></code></strong> <br>
-* <strong>brukeren?</strong> <code class="docutils literal notranslate"><span class="pre">1/10</span></code> <br>
-* <strong>tilstedeværelsen?</strong> <code class="docutils literal notranslate"><span class="pre">10/10</span></code> <br>
-* <strong>bygget?</strong> <code class="docutils literal notranslate"><span class="pre">10/10</span></code><br>
-* <strong>tilgangspunktet?</strong> <code class="docutils literal notranslate"><span class="pre">10/10</span></code><br>
-* <strong>nettverket?</strong> <code class="docutils literal notranslate"><span class="pre">8/10</span></code><br>
-* <strong>IP-adressen?</strong> <code class="docutils literal notranslate"><span class="pre">3/10</span></code><br>
-* <strong>brukernavnet?</strong> <code class="docutils literal notranslate"><span class="pre">1/10</span></code><br>
-* <strong>datoen og klokkeslettet?</strong><code class="docutils literal notranslate"><span class="pre">9/10</span></code> <br></p>
-<p><strong>Jeg ber om tilgang til wifi data av formen:</strong>
-{<code class="docutils literal notranslate"><span class="pre">'_id'</span></code>: ObjectId(‘6335d2cc454b6283b947e2c3’), <code class="docutils literal notranslate"><span class="pre">'client':</span></code> {<code class="docutils literal notranslate"><span class="pre">'clientmac':</span></code> ‘046c.59d9.115b’, <code class="docutils literal notranslate"><span class="pre">'details':</span></code> [{<code class="docutils literal notranslate"><span class="pre">'seenonap':</span></code> ‘NAV-B06-09’, <code class="docutils literal notranslate"><span class="pre">ssid':</span></code> ‘NAV-gjest’, <code class="docutils literal notranslate"><span class="pre">'clientip':</span></code> ‘172.28.160.196’, <code class="docutils literal notranslate"><span class="pre">'username':</span></code> ‘navn&#64;nav.no’, <code class="docutils literal notranslate"><span class="pre">'lastSeen':</span></code> ‘2022-09-29 19:15:05’}]}} <br></p>
-<p><code class="docutils literal notranslate"><span class="pre">'_id':</span></code> ObjectId(‘6335d2cc454b6283b947e2c3’) <br>
-Dette feltet kan ignoreres da det bare er en unik identifikator generert av databasen. <br></p>
-<p><code class="docutils literal notranslate"><span class="pre">'client':</span></code> {‘clientmac’: ‘046c.59d9.115b’, ‘details’: [{‘seenonap’: ‘NAV-B06-09’, ‘ssid’: ‘NAV’<br>
-<code class="docutils literal notranslate"><span class="pre">'clientip':</span></code> ‘172.28.160.196’, ‘username’: ‘navn&#64;nav.no’, ‘lastSeen’: ‘2022-09-29 19:15:05’}]} <br>
-<code class="docutils literal notranslate"><span class="pre">'clientmac'</span></code> er MAC-adressen til enheten som brukte Wi-Fi-tilgangspunktet. <br>
-<code class="docutils literal notranslate"><span class="pre">'seenonap'</span></code> er navnet på tilgangspunktet enheten var tilkoblet. <br>
-<code class="docutils literal notranslate"><span class="pre">'ssid'</span></code> er navnet på Wi-Fi-nettverket som enheten brukte. <br>
-<code class="docutils literal notranslate"><span class="pre">'clientip'</span></code> er IP-adressen som enheten ble tildelt av Wi-Fi-tilgangspunktet. <br>
-<code class="docutils literal notranslate"><span class="pre">'username'</span></code> er brukernavnet til personen som er knyttet til enheten. <br>
-<code class="docutils literal notranslate"><span class="pre">'lastSeen'</span></code> er datoen og klokkeslettet for når enheten sist ble observert på Wi-Fi-tilgangspunktet <br></p>
 </section>
 
     <script type="text/x-thebe-config">
@@ -727,7 +399,6 @@ Dette feltet kan ignoreres da det bare er en unik identifikator generert av data
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="getting_started.html" class="btn btn-neutral float-left" title="Package overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../Appendix.html" class="btn btn-neutral float-right" title="Wifi data forespørsel - Oppsummering" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

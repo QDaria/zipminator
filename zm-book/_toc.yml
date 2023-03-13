@@ -16,4 +16,3 @@ parts:
     #numbered: True  # Only applies to chapters in Part 1.
     chapters:  
     - file: content/reference_manual 
-    - file: Appendix

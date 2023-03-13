@@ -251,88 +251,22 @@ Zipndel(file_name='my_file', password='my_password', mask_columns=['B'], anonymi
 
 https://www.datatilsynet.no/globalassets/global/dokumenter-pdfer-skjema-ol/regelverk/veiledere/anonymisering-veileder-041115.pdf
 
-
-* Differential Privacy
-* k-anonymity
-* l-diversity
-* t-closeness
-* Generalization
-* Suppression
-* Aggregation
-* Pseudonymization
-* Encryption
-* Hashing
-* Tokenization
-* Masking
-* De-identification
-* Anonymization
-* Data minimization
-* Data retention
-* Data deletion
-* Data destruction
-* Data obfuscation
-* Data aggregation
-* Data generalization
-* Data suppression
-* Data masking
-* Data tokenization
-* Data encryption
-* Data hashing
-* Data pseudonymization
-* Data de-identification
-
-
-
-Her skulle vi nevnte bakgrunnen (restrisiko er akseptert fra Hans Petter + dette gjelder pilot om tilstedeværelse i bygg + hvilke datafelter trenger vi + begrensninger i uttrekkene.
-
-Here is a breakdown of the fields in the provided dictionary:
-
-_id: This is an identifier assigned by MongoDB to uniquely identify the document.
-client: This is a dictionary containing information about the WiFi client.
-clientmac: This is the MAC address of the client device.
-details: This is a list containing additional details about the client's WiFi connection.
-seenonap: This is the name of the access point (AP) on which the client was last seen.
-ssid: This is the Service Set Identifier (SSID) of the wireless network that the client was connected to.
-clientip: This is the IP address assigned to the client device by the network.
-username: This is the username associated with the client device, if applicable.
-lastSeen: This is the timestamp indicating when the client was last seen on the network.
-It seems like the dictionary contains information about a specific WiFi client, including details about their connection to the network, such as the access point they were last seen on, the SSID of the network they were connected to, their IP address, and the timestamp of their last connection.
-
-
-
-**`Det bes om Wifi data av typen:`** 
-
-{'_id': ObjectId('6335d2cc454b6283b947e2c3'), 'client': {'clientmac': '046c.59d9.115b', 'details': [{'seenonap': 'NAV-B06-09', 'ssid': 'NAV', 'clientip': '172.28.160.196', 'username': 'navn@nav.no', 'lastSeen': '2022-09-29 19:15:05'}]}}
-
-**`Formål:`** *Pilot om tilstedeværelse i bygg.* Hennsikten med forespørselen er å kartlegge tilstedeværelse i alle oppholdsrom Fystikkalleen 1 for å gi økt innsikt til beslutningstøtte og optimalisering av ressurser. Derfor er vi mere opptatt av aggregerte data, pseudoanonymisert, anonymisert eller maskerte personopplysninger med tidspunkt, lokasjon på NAV ansatte på dedikerte ansatt-wifi og ikke noe interesse i NAV-guest for eksempel. Nedenfor gis nivå av viktighet hva de forskjellige feltene er for oss fra 1-10, der 1 har bortimot ingen viktighet og 10 er kritisk viktig <br>
-**`Gjennomføring`:** <br> Wifi data ønskes overført fra Flowscape til Azure plattformen for renskning, behandling og preparering til maskinlæringsalgoritmer, analyser og eller visualisering. <br>
-**`Periode`:** <br> 2. januar 2023 - DD og fremtiden <br>
-**`Risikoeier:`** Hans Petter ... (Har godkjent restrisiko) <br>
-**`Prosjektleder:`** Eric Bortzmeyer <br>
-**`Teamleder:`** Lars Røed Hansen <br>
-**`Data Scientist:`** Daniel Mo Houshmand <br>
-**`Begrensninger i uttrekkene: - Hva er det vi trenger å vite om:`** <br>
-    * **brukeren?** `1/10` <br>
-    * **tilstedeværelsen?** `10/10` <br>
-    * **bygget?** `10/10`<br>
-    * **tilgangspunktet?** `10/10`<br>
-    * **nettverket?** `8/10`<br>
-    * **IP-adressen?** `3/10`<br>
-    * **brukernavnet?** `1/10`<br>
-    * **datoen og klokkeslettet?**`9/10` <br>
-
-**Jeg ber om tilgang til wifi data av formen:**
-{`'_id'`: ObjectId('6335d2cc454b6283b947e2c3'), `'client':` {`'clientmac':` '046c.59d9.115b', `'details':` [{`'seenonap':` 'NAV-B06-09', `ssid':` 'NAV-gjest', `'clientip':` '172.28.160.196', `'username':` 'navn@nav.no', `'lastSeen':` '2022-09-29 19:15:05'}]}} <br>
-
-
-`'_id':` ObjectId('6335d2cc454b6283b947e2c3') <br>
-Dette feltet kan ignoreres da det bare er en unik identifikator generert av databasen. <br>
-
-`'client':` {'clientmac': '046c.59d9.115b', 'details': [{'seenonap': 'NAV-B06-09', 'ssid': 'NAV'<br>
-`'clientip':` '172.28.160.196', 'username': 'navn@nav.no', 'lastSeen': '2022-09-29 19:15:05'}]} <br>
-`'clientmac'` er MAC-adressen til enheten som brukte Wi-Fi-tilgangspunktet. <br>
-`'seenonap'` er navnet på tilgangspunktet enheten var tilkoblet. <br>
-`'ssid'` er navnet på Wi-Fi-nettverket som enheten brukte. <br>
-`'clientip'` er IP-adressen som enheten ble tildelt av Wi-Fi-tilgangspunktet. <br>
-`'username'` er brukernavnet til personen som er knyttet til enheten. <br>
-`'lastSeen'` er datoen og klokkeslettet for når enheten sist ble observert på Wi-Fi-tilgangspunktet <br>
+- Differential Privacy
+- k-anonymity
+- l-diversity
+- t-closeness
+- Generalization
+- Suppression
+- Aggregation
+- Pseudonymization
+- Encryption
+- Hashing
+- Tokenization
+- Masking
+- De-identification
+- Anonymization
+- Data minimization
+- Data retention
+- Data deletion
+- Self destruction
+- Data obfuscation
