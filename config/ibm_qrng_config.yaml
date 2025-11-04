@@ -1,0 +1,85 @@
+# IBM Quantum QRNG Harvester Configuration
+# ==========================================
+
+# Quantum job configuration
+shots_per_job: 1000  # Number of quantum measurements per job
+num_bits: 8          # Number of qubits (8 = 1 byte per shot)
+
+# Backend selection
+backend_preferences:
+  # Preferred backends (least_busy will be auto-selected)
+  - ibm_brisbane
+  - ibm_sherbrooke
+  - ibm_kyoto
+  min_qubits: 8      # Minimum qubits required
+  simulator: false   # Use real quantum hardware only
+  operational: true  # Only operational backends
+
+# Batch configuration (for harvesting multiple jobs)
+batch_jobs: 5          # Number of jobs to run in sequence
+batch_delay_sec: 10    # Delay between batch jobs
+
+# Error handling
+max_retries: 3         # Maximum retry attempts per job
+retry_delay: 5         # Initial retry delay (seconds, exponential backoff)
+timeout_sec: 900       # Job timeout (15 minutes)
+
+# Output configuration
+output_dir: "data/quantum_entropy"
+output_format: "binary"  # binary, hex, or both
+encrypt_output: true     # Encrypt entropy files
+compression: false       # Compress output files
+
+# Security
+encryption:
+  method: "Fernet"       # AES-128-CBC via Fernet
+  key_derivation: "PBKDF2"
+  iterations: 100000
+  # Set encryption key via environment variable: QRNG_ENCRYPTION_KEY
+
+# Health checks (NIST SP 800-90B)
+run_health_checks: true
+health_check_thresholds:
+  repetition_count_cutoff: 5      # Max allowed repetitions
+  adaptive_proportion_cutoff: 0.6 # Max proportion of most common value
+  min_entropy: 7.5                # Minimum bits of entropy per byte
+
+# Monitoring and logging
+logging:
+  level: "INFO"        # DEBUG, INFO, WARNING, ERROR
+  file: "logs/ibm_qrng_harvester.log"
+  console: true
+  save_job_metadata: true
+
+# Performance optimization
+optimization:
+  circuit_optimization_level: 3  # 0-3, higher = more optimized
+  use_session: true              # Use IBM Session for faster execution
+  prefer_least_busy: true        # Auto-select least busy backend
+
+# Free tier limits
+free_tier:
+  max_runtime_minutes: 10        # IBM free tier limit
+  max_jobs_per_month: 100        # Estimated free tier job limit
+  warn_on_exceed: true
+
+# Cost estimation
+cost_model:
+  credit_per_second: 0.016       # ~1 credit per minute
+  queue_time_low: 120            # 2 minutes
+  queue_time_medium: 300         # 5 minutes
+  queue_time_high: 600           # 10 minutes
+
+# Token management
+token:
+  # Set via environment variable: IBM_QUANTUM_TOKEN
+  # Or pass via command line: --token YOUR_TOKEN
+  validate_on_startup: true
+  refresh_url: "https://quantum.ibm.com/account"
+
+# Advanced features
+advanced:
+  save_circuit_diagrams: false
+  save_job_statistics: true
+  enable_real_time_monitoring: true
+  export_raw_counts: false

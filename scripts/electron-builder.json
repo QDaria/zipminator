@@ -1,0 +1,159 @@
+{
+  "appId": "com.qdaria.qrng",
+  "productName": "QDaria-QRNG",
+  "copyright": "Copyright © 2024 QDaria",
+  "directories": {
+    "buildResources": "build",
+    "output": "dist"
+  },
+  "files": [
+    "build/bin/**/*",
+    "build/packages/**/*",
+    "config/**/*",
+    "examples/**/*",
+    "LICENSE",
+    "README.md"
+  ],
+  "extraMetadata": {
+    "main": "build/main.js"
+  },
+  "mac": {
+    "category": "public.app-category.developer-tools",
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "zip",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "icon": "docs/icons/icon.icns",
+    "entitlements": "build/entitlements.plist",
+    "entitlementsInherit": "build/entitlements.plist",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "darkModeSupport": true,
+    "minimumSystemVersion": "10.13.0",
+    "type": "distribution",
+    "identity": null
+  },
+  "dmg": {
+    "title": "QDaria QRNG ${version}",
+    "icon": "docs/icons/icon.icns",
+    "background": "docs/dmg-background.png",
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 400
+    }
+  },
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64", "ia32"]
+      },
+      {
+        "target": "msi",
+        "arch": ["x64"]
+      },
+      {
+        "target": "portable",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "docs/icons/icon.ico",
+    "publisherName": "QDaria",
+    "verifyUpdateCodeSignature": false,
+    "sign": null,
+    "certificateFile": null,
+    "certificatePassword": null
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": true,
+    "allowElevation": true,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "docs/icons/icon.ico",
+    "uninstallerIcon": "docs/icons/icon.ico",
+    "installerHeaderIcon": "docs/icons/icon.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "QDaria QRNG",
+    "runAfterFinish": false,
+    "license": "LICENSE",
+    "include": "build/installer.nsh"
+  },
+  "msi": {
+    "oneClick": false,
+    "perMachine": true,
+    "runAfterFinish": false,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "upgradeCode": "12345678-1234-1234-1234-123456789012"
+  },
+  "linux": {
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64"]
+      },
+      {
+        "target": "rpm",
+        "arch": ["x64"]
+      },
+      {
+        "target": "tar.gz",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "docs/icons",
+    "category": "Science",
+    "packageCategory": "science",
+    "vendor": "QDaria",
+    "maintainer": "QDaria <support@qdaria.com>",
+    "synopsis": "Quantum Random Number Generator",
+    "description": "Enterprise-grade quantum random number generation with post-quantum cryptography",
+    "desktop": {
+      "Name": "QDaria QRNG",
+      "Comment": "Quantum Random Number Generator",
+      "Categories": "Science;Utility;Development;",
+      "Terminal": "false",
+      "Type": "Application"
+    }
+  },
+  "deb": {
+    "depends": ["libssl3", "libusb-1.0-0", "python3 (>= 3.8)"],
+    "recommends": ["python3-pip", "python3-venv"],
+    "priority": "optional",
+    "afterInstall": "scripts/postinstall.sh",
+    "afterRemove": "scripts/preuninstall.sh"
+  },
+  "rpm": {
+    "depends": ["openssl-libs", "libusb", "python3 >= 3.8"],
+    "recommends": ["python3-pip"],
+    "fpm": ["--rpm-rpmbuild-define=_build_id_links none"]
+  },
+  "appImage": {
+    "license": "LICENSE",
+    "category": "Science"
+  },
+  "publish": null
+}

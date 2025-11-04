@@ -1,0 +1,282 @@
+name: Production Build and Test
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'production/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # C++ Build and Test
+  build-cpp:
+    name: Build and Test C++ Implementation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ make cmake libusb-1.0-0-dev valgrind
+
+      - name: Build C++
+        run: |
+          cd src/cpp
+          make clean
+          make release
+
+      - name: Run unit tests
+        run: |
+          cd src/cpp
+          make test
+
+      - name: Run NIST KAT validation
+        run: |
+          cd tests/cpp
+          ./nist_kat_kyber768
+
+      - name: Run constant-time tests
+        run: |
+          cd tests/constant_time
+          make test-cpp
+
+      - name: Memory leak check with Valgrind
+        run: |
+          cd tests/cpp
+          valgrind --leak-check=full --error-exitcode=1 ./nist_kat_kyber768
+
+      - name: Build Docker image
+        run: |
+          docker build -f production/deployment/Dockerfile.cpp \
+            -t zipminator-cpp:${{ github.sha }} .
+
+      - name: Test Docker image
+        run: |
+          docker run --rm zipminator-cpp:${{ github.sha }} \
+            /usr/bin/zipminator-server --version
+
+  # Rust Build and Test
+  build-rust:
+    name: Build and Test Rust Implementation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          components: rustfmt, clippy
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache Cargo build
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Check formatting
+        run: cd src/rust && cargo fmt -- --check
+
+      - name: Run clippy
+        run: cd src/rust && cargo clippy -- -D warnings
+
+      - name: Build Rust
+        run: cd src/rust && cargo build --release
+
+      - name: Run unit tests
+        run: cd src/rust && cargo test --release
+
+      - name: Run NIST KAT validation
+        run: cd src/rust && cargo test --release nist_kat
+
+      - name: Run constant-time tests
+        run: cd src/rust && cargo test --release constant_time
+
+      - name: Build Docker image
+        run: |
+          docker build -f production/deployment/Dockerfile.rust \
+            -t zipminator-rust:${{ github.sha }} .
+
+      - name: Test Docker image
+        run: |
+          docker run --rm zipminator-rust:${{ github.sha }} \
+            /usr/bin/zipminator --version
+
+  # Security Scanning
+  security-scan:
+    name: Security Vulnerability Scan
+    runs-on: ubuntu-latest
+    needs: [build-cpp, build-rust]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build images for scanning
+        run: |
+          docker build -f production/deployment/Dockerfile.cpp -t zipminator-cpp:scan .
+          docker build -f production/deployment/Dockerfile.rust -t zipminator-rust:scan .
+
+      - name: Run Trivy scan on C++ image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: zipminator-cpp:scan
+          format: 'sarif'
+          output: 'trivy-cpp-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Run Trivy scan on Rust image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: zipminator-rust:scan
+          format: 'sarif'
+          output: 'trivy-rust-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: '.'
+
+      - name: Cargo audit (Rust dependencies)
+        run: |
+          cargo install cargo-audit
+          cd src/rust && cargo audit
+
+  # Benchmarking
+  benchmark:
+    name: Performance Benchmarking
+    runs-on: ubuntu-latest
+    needs: [build-cpp, build-rust]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ make cmake
+
+      - name: Run C++ benchmarks
+        run: |
+          cd benchmarks
+          make benchmark-cpp
+          cat results/cpp_benchmark_results.txt
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Run Rust benchmarks
+        run: |
+          cd src/rust
+          cargo bench --no-fail-fast
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-results
+          path: |
+            benchmarks/results/
+            src/rust/target/criterion/
+
+  # Kubernetes validation
+  k8s-validate:
+    name: Validate Kubernetes Manifests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Validate Kubernetes manifests
+        run: |
+          kubectl apply --dry-run=client -f production/deployment/k8s/
+
+      - name: Lint Helm chart
+        uses: azure/setup-helm@v3
+      - run: |
+          helm lint production/deployment/helm/zipminator
+
+  # Build and push production images (only on main branch)
+  publish:
+    name: Build and Publish Images
+    runs-on: ubuntu-latest
+    needs: [build-cpp, build-rust, security-scan, k8s-validate]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta-cpp
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-cpp
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=sha
+
+      - name: Build and push C++ image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: production/deployment/Dockerfile.cpp
+          push: true
+          tags: ${{ steps.meta-cpp.outputs.tags }}
+          labels: ${{ steps.meta-cpp.outputs.labels }}
+
+      - name: Extract metadata (Rust)
+        id: meta-rust
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-rust
+
+      - name: Build and push Rust image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: production/deployment/Dockerfile.rust
+          push: true
+          tags: ${{ steps.meta-rust.outputs.tags }}
+          labels: ${{ steps.meta-rust.outputs.labels }}

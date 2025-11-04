@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=QDaria QRNG
+GenericName=Quantum Random Number Generator
+Comment=Enterprise-grade quantum random number generation
+Icon=qdaria-qrng
+Exec=qrng-harvester %U
+Terminal=false
+Categories=Science;Utility;Development;
+MimeType=application/x-qrng-config;
+Keywords=quantum;random;cryptography;security;entropy;
+StartupNotify=true
+StartupWMClass=qdaria-qrng

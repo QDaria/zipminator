@@ -1,0 +1,81 @@
+# Production environment overrides
+environment: production
+
+replicaCount: 3
+
+image:
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+  hosts:
+    - host: api.zipminator.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: zipminator-prod-tls
+      hosts:
+        - api.zipminator.com
+
+config:
+  logLevel: "info"
+  qrngDevice: "/dev/qrng0"
+  server:
+    workers: 4
+    maxConnections: 1000
+  kyber768:
+    enabled: true
+    keyRotationInterval: 3600
+    maxKeyAge: 86400
+
+monitoring:
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+  grafana:
+    enabled: true
+    dashboards:
+      enabled: true
+
+# Production-specific settings
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+
+# Use external secrets management
+secrets:
+  externalSecrets:
+    enabled: true
+    backend: "aws-sm"  # AWS Secrets Manager

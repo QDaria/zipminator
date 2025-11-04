@@ -1,0 +1,601 @@
+# qBraid Quantum Providers Configuration
+# Last Updated: 2025-10-30
+# Purpose: Production configuration for multi-provider quantum hardware access
+
+# ============================================================================
+# ACCOUNT CONFIGURATION
+# ============================================================================
+account:
+  platform: "qbraid"
+  api_key_env: "QBRAID_API_KEY"  # Environment variable name
+  base_url: "https://api.qbraid.com"
+  version: "v1"
+
+  credits:
+    total: 1000
+    currency: "qBraid credits"
+    value_usd: 10.00
+    expiration_warning: true
+    alert_threshold: 100  # Alert when < 100 credits remain
+
+# ============================================================================
+# PROVIDER DEFINITIONS
+# ============================================================================
+providers:
+
+  # ------------------------------------------------------------------------
+  # IonQ Providers (Trapped-Ion Quantum Computers)
+  # ------------------------------------------------------------------------
+  ionq_harmony:
+    display_name: "IonQ Harmony"
+    provider: "IonQ"
+    backend_id: "ionq_harmony"
+    access_method: "direct_qbraid"
+
+    hardware:
+      qubits: 11
+      algorithmic_qubits: 9
+      technology: "trapped_ion"
+      topology: "all_to_all"
+
+    performance:
+      single_qubit_fidelity: 0.999
+      two_qubit_fidelity: 0.995
+      readout_fidelity: 0.998
+      t1_coherence: 10.0  # seconds
+      t2_coherence: 1.0   # seconds
+
+    pricing:
+      per_shot: 1         # credits
+      per_task: 30        # credits
+      per_minute: 0       # no per-minute charges
+
+    queue:
+      avg_wait_time: 180  # seconds (3 minutes avg)
+      max_wait_time: 300  # seconds (5 minutes max)
+      availability: 0.99  # 99% uptime
+
+    limits:
+      max_shots_per_job: 10000
+      max_circuit_depth: 1000
+      max_qubits_usable: 11
+
+    qrng:
+      recommended: true
+      optimal_qubits: 8
+      quality_score: 5    # out of 5
+      cost_efficiency: 5  # out of 5
+
+    status: "active"
+
+  ionq_aria:
+    display_name: "IonQ Aria"
+    provider: "IonQ"
+    backend_id: "ionq_aria"
+    access_method: "direct_qbraid"
+
+    hardware:
+      qubits: 25
+      algorithmic_qubits: 23
+      technology: "trapped_ion"
+      topology: "all_to_all"
+
+    performance:
+      single_qubit_fidelity: 0.9998
+      two_qubit_fidelity: 0.997
+      readout_fidelity: 0.999
+      t1_coherence: 15.0
+      t2_coherence: 2.0
+
+    pricing:
+      per_shot: 5
+      per_task: 30
+      per_minute: 0
+
+    error_mitigation:
+      available: true
+      min_shots_required: 2500
+      cost_multiplier: 1.0  # no additional cost, but requires min shots
+
+    queue:
+      avg_wait_time: 600   # 10 minutes
+      max_wait_time: 900   # 15 minutes
+      availability: 0.95
+
+    limits:
+      max_shots_per_job: 10000
+      max_circuit_depth: 1500
+      max_qubits_usable: 25
+
+    qrng:
+      recommended: false  # too expensive for 1000 credits
+      optimal_qubits: 8
+      quality_score: 5
+      cost_efficiency: 2
+
+    status: "active"
+
+  ionq_forte:
+    display_name: "IonQ Forte"
+    provider: "IonQ"
+    backend_id: "ionq_forte"
+    access_method: "direct_qbraid"
+
+    hardware:
+      qubits: 32
+      algorithmic_qubits: 29
+      technology: "trapped_ion"
+      topology: "all_to_all"
+
+    performance:
+      single_qubit_fidelity: 0.9998
+      two_qubit_fidelity: 0.997
+      readout_fidelity: 0.999
+
+    pricing:
+      per_shot: 8  # estimated
+      per_task: 30
+      per_minute: 0
+
+    qrng:
+      recommended: false
+      quality_score: 5
+      cost_efficiency: 1
+
+    status: "limited_access"  # May require special authorization
+
+  # ------------------------------------------------------------------------
+  # Rigetti Providers (Superconducting Quantum Computers)
+  # ------------------------------------------------------------------------
+  rigetti_aspen_8:
+    display_name: "Rigetti Aspen-8"
+    provider: "Rigetti"
+    backend_id: "rigetti_aspen_8"
+    access_method: "aws_braket"
+
+    hardware:
+      qubits: 32
+      technology: "superconducting"
+      topology: "octagonal"
+
+    performance:
+      single_qubit_fidelity: 0.995
+      two_qubit_fidelity: 0.96
+      readout_fidelity: 0.96
+      t1_coherence: 0.00008  # 80 microseconds
+      t2_coherence: 0.00006  # 60 microseconds
+
+    pricing:
+      per_shot: 3
+      per_task: 30
+      per_minute: 0
+
+    queue:
+      avg_wait_time: 300
+      availability: 0.90
+
+    limits:
+      max_shots_per_job: 10000
+      max_circuit_depth: 100
+
+    qrng:
+      recommended: false  # lower fidelity, more expensive
+      optimal_qubits: 8
+      quality_score: 3
+      cost_efficiency: 3
+
+    status: "active"
+
+  rigetti_aspen_11:
+    display_name: "Rigetti Aspen-11"
+    provider: "Rigetti"
+    backend_id: "rigetti_aspen_11"
+    access_method: "aws_braket"
+
+    hardware:
+      qubits: 40
+      technology: "superconducting"
+      topology: "octagonal"
+      clops: 844
+
+    performance:
+      single_qubit_fidelity: 0.995
+      two_qubit_fidelity: 0.96
+      readout_fidelity: 0.96
+
+    pricing:
+      per_shot: 4
+      per_task: 30
+
+    qrng:
+      recommended: false
+      quality_score: 3
+      cost_efficiency: 2
+
+    status: "active"
+
+  rigetti_aspen_m:
+    display_name: "Rigetti Aspen-M"
+    provider: "Rigetti"
+    backend_id: "rigetti_aspen_m"
+    access_method: "aws_braket"
+
+    hardware:
+      qubits: 80
+      technology: "superconducting"
+      topology: "multi_chip_octagonal"
+
+    performance:
+      single_qubit_fidelity: 0.99
+      two_qubit_fidelity: 0.96
+      readout_fidelity: 0.96
+
+    pricing:
+      per_shot: 5
+      per_task: 30
+
+    qrng:
+      recommended: false
+      quality_score: 3
+      cost_efficiency: 2
+
+    status: "active"
+
+  rigetti_ankaa_3:
+    display_name: "Rigetti Ankaa-3"
+    provider: "Rigetti"
+    backend_id: "rigetti_ankaa_3"
+    access_method: "azure_quantum"
+
+    hardware:
+      qubits: 84
+      technology: "superconducting"
+
+    performance:
+      single_qubit_fidelity: 0.99
+      two_qubit_fidelity: 0.98
+
+    pricing:
+      per_shot: 6
+      per_task: 30
+      per_minute: "variable"  # COMPLEX PRICING
+      note: "Per-minute charges make cost estimation difficult"
+
+    qrng:
+      recommended: false  # unpredictable costs
+      quality_score: 4
+      cost_efficiency: 1
+
+    status: "active"
+    warning: "Per-minute billing - use caution"
+
+  # ------------------------------------------------------------------------
+  # Oxford Quantum Circuits (OQC)
+  # ------------------------------------------------------------------------
+  oqc_lucy:
+    display_name: "OQC Lucy"
+    provider: "Oxford Quantum Circuits"
+    backend_id: "oqc_lucy"
+    access_method: "direct_qbraid"
+
+    hardware:
+      qubits: 8
+      technology: "superconducting_coaxmon"
+
+    performance:
+      single_qubit_fidelity: 0.99
+      two_qubit_fidelity: 0.97
+      readout_fidelity: 0.96
+
+    pricing:
+      per_shot: 8  # EXPENSIVE
+      per_task: 30
+
+    qrng:
+      recommended: false  # too expensive
+      quality_score: 3
+      cost_efficiency: 1
+
+    status: "active"
+    warning: "Premium pricing - 8x more expensive than IonQ Harmony"
+
+  # ------------------------------------------------------------------------
+  # QuEra (Neutral Atom)
+  # ------------------------------------------------------------------------
+  quera_aquila:
+    display_name: "QuEra Aquila"
+    provider: "QuEra"
+    backend_id: "quera_aquila"
+    access_method: "aws_braket"
+
+    hardware:
+      qubits: 256
+      technology: "neutral_atom"
+      mode: "analog_simulation"
+
+    pricing:
+      model: "per_task_and_duration"
+      note: "Not shot-based, not suitable for QRNG"
+
+    qrng:
+      recommended: false
+      suitable: false
+      reason: "Analog quantum simulation, not gate-based"
+
+    status: "active"
+
+# ============================================================================
+# PROVIDER SELECTION RULES
+# ============================================================================
+selection_rules:
+  default_provider: "ionq_harmony"
+
+  criteria:
+    cost_optimized:
+      provider: "ionq_harmony"
+      reason: "Lowest per-shot cost (1 credit)"
+
+    quality_optimized:
+      provider: "ionq_aria"
+      reason: "Highest fidelity, error mitigation"
+      note: "Requires 2500 shots minimum"
+
+    qubit_count:
+      max_qubits: 11
+      provider: "ionq_harmony"
+
+    budget_constrained:
+      max_cost_per_shot: 3
+      providers:
+        - "ionq_harmony"
+        - "rigetti_aspen_8"
+
+  fallback_order:
+    - "ionq_harmony"      # 1st choice
+    - "rigetti_aspen_8"   # 2nd choice
+    - "rigetti_aspen_11"  # 3rd choice
+    - "ionq_aria"         # 4th choice (expensive)
+
+# ============================================================================
+# QRNG OPTIMIZATION
+# ============================================================================
+qrng_config:
+  recommended_provider: "ionq_harmony"
+
+  circuit:
+    type: "hadamard_measurement"
+    qubits: 8  # byte-aligned
+    depth: 1
+    gates:
+      - type: "H"
+        qubits: [0, 1, 2, 3, 4, 5, 6, 7]
+    measurements:
+      - qubits: [0, 1, 2, 3, 4, 5, 6, 7]
+        classical_bits: [0, 1, 2, 3, 4, 5, 6, 7]
+
+  optimization:
+    target: "maximize_entropy_per_credit"
+    strategy: "single_large_job"  # minimize overhead
+
+  budget_allocation:
+    test_job:
+      shots: 20
+      cost: 50
+      purpose: "validation"
+
+    production_job:
+      shots: 920  # (1000 - 30 task fee - 50 test)
+      cost: 950
+      entropy_bytes: 920
+
+    reserve:
+      credits: 0
+      note: "All credits allocated to maximize entropy"
+
+# ============================================================================
+# ACCESS METHOD CONFIGURATION
+# ============================================================================
+access_methods:
+  direct_qbraid:
+    enabled: true
+    base_url: "https://api.qbraid.com"
+    auth_method: "api_key"
+    providers:
+      - "ionq_harmony"
+      - "ionq_aria"
+      - "ionq_forte"
+      - "oqc_lucy"
+
+  aws_braket:
+    enabled: false  # Enable if AWS credentials available
+    region: "us-east-1"
+    auth_method: "aws_credentials"
+    providers:
+      - "rigetti_aspen_8"
+      - "rigetti_aspen_11"
+      - "rigetti_aspen_m"
+      - "quera_aquila"
+    note: "Requires AWS account and credentials"
+
+  azure_quantum:
+    enabled: false  # Enable if Azure subscription available
+    subscription_id: null
+    resource_group: null
+    auth_method: "azure_credentials"
+    providers:
+      - "rigetti_ankaa_3"
+      - "ionq_aria"  # Also available via Azure
+    free_tier:
+      ionq_credits: 500  # USD
+      rigetti_credits: 500  # USD
+    note: "New users get $500 free credits per provider"
+
+# ============================================================================
+# MONITORING & ALERTS
+# ============================================================================
+monitoring:
+  enabled: true
+
+  credit_alerts:
+    low_balance: 100    # Alert at 100 credits
+    critical_balance: 50  # Critical alert
+
+  job_tracking:
+    enabled: true
+    log_file: "logs/qbraid_jobs.log"
+    metrics:
+      - "job_id"
+      - "provider"
+      - "backend"
+      - "shots"
+      - "cost"
+      - "status"
+      - "queue_time"
+      - "execution_time"
+
+  performance_tracking:
+    enabled: true
+    metrics:
+      - "entropy_generated"
+      - "cost_per_byte"
+      - "job_success_rate"
+      - "average_queue_time"
+
+# ============================================================================
+# ERROR HANDLING
+# ============================================================================
+error_handling:
+  retry_policy:
+    max_retries: 2
+    retry_delay: 300  # seconds (5 minutes)
+    retry_on:
+      - "backend_unavailable"
+      - "queue_timeout"
+      - "network_error"
+
+  fallback_strategy:
+    enabled: true
+    on_failure: "try_next_provider"
+    fallback_order:
+      - "ionq_harmony"
+      - "rigetti_aspen_8"
+      - "ionq_aria"
+
+  insufficient_credits:
+    action: "abort"
+    notify: true
+    message: "Insufficient credits for job"
+
+# ============================================================================
+# INTEGRATION
+# ============================================================================
+integration:
+  entropy_pool:
+    storage_path: "/secure/entropy_pool/"
+    filename_format: "qbraid_qrng_{provider}_{timestamp}.bin"
+    permissions: "0600"
+    encryption: "AES256"
+
+  coordination:
+    with_ibm: true  # Coordinate with IBM Quantum
+    with_aws: false
+    with_azure: false
+    priority: "qbraid_first"
+
+  api_compatibility:
+    qbraid_sdk: true
+    qiskit: false  # Not needed for qBraid
+    cirq: false
+    pyquil: false
+
+# ============================================================================
+# VALIDATION & QUALITY
+# ============================================================================
+quality_assurance:
+  entropy_validation:
+    enabled: true
+    tests:
+      - "frequency"
+      - "runs"
+      - "chi_square"
+    min_entropy_rate: 0.95
+    max_bias: 0.02
+
+  job_validation:
+    check_before_submit: true
+    validate_budget: true
+    validate_parameters: true
+
+  output_validation:
+    verify_shot_count: true
+    check_measurement_distribution: true
+
+# ============================================================================
+# COST TRACKING
+# ============================================================================
+cost_tracking:
+  enabled: true
+
+  budget:
+    total_credits: 1000
+    allocated: 1000
+    reserve: 0
+
+  spending:
+    test_jobs: 0
+    production_jobs: 0
+    failed_jobs: 0
+
+  reporting:
+    generate_reports: true
+    report_frequency: "daily"
+    metrics:
+      - "total_spent"
+      - "credits_remaining"
+      - "cost_per_kb"
+      - "entropy_generated"
+      - "cost_efficiency"
+
+# ============================================================================
+# NOTES & WARNINGS
+# ============================================================================
+notes:
+  - "1000 credits = $10.00 USD value"
+  - "Credits likely non-renewable (one-time promotional)"
+  - "IBM Quantum NOT available via qBraid (use separately)"
+  - "IonQ Harmony recommended for cost-optimized QRNG"
+  - "Single large job minimizes task overhead"
+  - "8-qubit circuits provide byte-aligned output"
+  - "Cost is per shot, not per qubit (maximize qubits!)"
+
+warnings:
+  - "Rigetti Ankaa-3 has per-minute charges (unpredictable costs)"
+  - "IonQ Aria requires 2500 shots minimum for error mitigation"
+  - "Oxford Lucy is 8x more expensive than IonQ Harmony"
+  - "Check credit expiration date before large jobs"
+  - "AWS Braket and Azure Quantum require separate accounts"
+
+# ============================================================================
+# SUPPORT & RESOURCES
+# ============================================================================
+support:
+  qbraid_support: "support@qbraid.com"
+  documentation: "https://docs.qbraid.com"
+  sdk_github: "https://github.com/qBraid/qBraid"
+  pricing_page: "https://www.qbraid.com/pricing"
+
+  provider_docs:
+    ionq: "https://ionq.com/docs"
+    rigetti: "https://qcs.rigetti.com/docs"
+    oqc: "https://docs.oqc.tech"
+    quera: "https://www.quera.com/aquila"
+
+# ============================================================================
+# VERSION INFO
+# ============================================================================
+version: "1.0.0"
+last_updated: "2025-10-30"
+schema_version: "2025.1"
+compatible_with:
+  qbraid_sdk: ">=0.4.0"
+  python: ">=3.8"

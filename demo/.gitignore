@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+backend/venv/
+backend/__pycache__/
+
+# Build outputs
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Sample data generated files
+sample_data/encrypted_*
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Electron
+out/

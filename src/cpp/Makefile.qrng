@@ -1,0 +1,139 @@
+# Makefile for QRNG Integration
+# Extension to existing Kyber-768 Makefile
+
+# Compiler settings
+CXX := g++
+CXXFLAGS := -std=c++17 -O3 -march=native -Wall -Wextra -Wpedantic
+CXXFLAGS += -fstack-protector-strong -D_FORTIFY_SOURCE=2
+LDFLAGS := -pthread
+
+# Check for libusb-1.0
+LIBUSB_CFLAGS := $(shell pkg-config --cflags libusb-1.0 2>/dev/null)
+LIBUSB_LIBS := $(shell pkg-config --libs libusb-1.0 2>/dev/null)
+
+ifneq ($(LIBUSB_LIBS),)
+    CXXFLAGS += $(LIBUSB_CFLAGS) -DHAVE_LIBUSB
+    LDFLAGS += $(LIBUSB_LIBS)
+    HAVE_LIBUSB := 1
+    $(info Found libusb-1.0 - hardware QRNG support enabled)
+else
+    HAVE_LIBUSB := 0
+    $(info libusb-1.0 not found - hardware QRNG support disabled)
+endif
+
+# Directories
+QRNG_DIR := qrng
+BUILD_DIR := build
+TEST_DIR := ../../tests/cpp
+
+# QRNG Source files
+QRNG_SOURCES := $(QRNG_DIR)/mock_qrng.cpp \
+                $(QRNG_DIR)/entropy_pool.cpp
+
+ifeq ($(HAVE_LIBUSB),1)
+    QRNG_SOURCES += $(QRNG_DIR)/id_quantique_usb.cpp
+endif
+
+# Kyber QRNG integration
+KYBER_QRNG_SOURCES := kyber768_qrng.cpp
+
+# Object files
+QRNG_OBJECTS := $(QRNG_SOURCES:%.cpp=$(BUILD_DIR)/%.o)
+KYBER_QRNG_OBJECTS := $(KYBER_QRNG_SOURCES:%.cpp=$(BUILD_DIR)/%.o)
+
+# Libraries
+QRNG_LIB := $(BUILD_DIR)/libqrng.a
+KYBER_QRNG_LIB := $(BUILD_DIR)/libkyber_qrng.a
+
+# Test executables
+TEST_QRNG := $(BUILD_DIR)/test_qrng_integration
+
+# Targets
+.PHONY: all clean qrng test install
+
+all: qrng
+
+qrng: $(QRNG_LIB) $(KYBER_QRNG_LIB)
+
+test: $(TEST_QRNG)
+	@echo "Running QRNG integration tests..."
+	@$(TEST_QRNG)
+
+# Build directories
+$(BUILD_DIR) $(BUILD_DIR)/$(QRNG_DIR):
+	@mkdir -p $@
+
+# QRNG Library
+$(QRNG_LIB): $(QRNG_OBJECTS) | $(BUILD_DIR)
+	@echo "Creating QRNG library..."
+	@ar rcs $@ $^
+
+# Kyber QRNG Library
+$(KYBER_QRNG_LIB): $(KYBER_QRNG_OBJECTS) $(QRNG_LIB) | $(BUILD_DIR)
+	@echo "Creating Kyber QRNG library..."
+	@ar rcs $@ $(KYBER_QRNG_OBJECTS)
+
+# Object files
+$(BUILD_DIR)/$(QRNG_DIR)/%.o: $(QRNG_DIR)/%.cpp | $(BUILD_DIR)/$(QRNG_DIR)
+	@echo "Compiling $<..."
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.o: %.cpp | $(BUILD_DIR)
+	@echo "Compiling $<..."
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Test executable
+$(TEST_QRNG): $(TEST_DIR)/test_qrng_integration.cpp $(QRNG_LIB) $(KYBER_QRNG_LIB) \
+              kyber768.cpp shake.cpp ntt_avx2.cpp poly_avx2.cpp | $(BUILD_DIR)
+	@echo "Building QRNG integration tests..."
+	@$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) \
+	    -I. -I$(QRNG_DIR) -L$(BUILD_DIR) -lkyber_qrng -lqrng
+
+# Installation
+INSTALL_PREFIX ?= /usr/local
+INSTALL_LIB_DIR := $(INSTALL_PREFIX)/lib
+INSTALL_INCLUDE_DIR := $(INSTALL_PREFIX)/include/qrng
+
+install: $(QRNG_LIB) $(KYBER_QRNG_LIB)
+	@echo "Installing QRNG libraries..."
+	@install -d $(INSTALL_LIB_DIR)
+	@install -m 644 $(QRNG_LIB) $(INSTALL_LIB_DIR)
+	@install -m 644 $(KYBER_QRNG_LIB) $(INSTALL_LIB_DIR)
+	@echo "Installing QRNG headers..."
+	@install -d $(INSTALL_INCLUDE_DIR)
+	@install -m 644 $(QRNG_DIR)/qrng_interface.h $(INSTALL_INCLUDE_DIR)
+	@install -m 644 $(QRNG_DIR)/mock_qrng.h $(INSTALL_INCLUDE_DIR)
+	@install -m 644 $(QRNG_DIR)/entropy_pool.h $(INSTALL_INCLUDE_DIR)
+ifeq ($(HAVE_LIBUSB),1)
+	@install -m 644 $(QRNG_DIR)/id_quantique_usb.h $(INSTALL_INCLUDE_DIR)
+endif
+	@echo "Installation complete"
+
+# Clean
+clean:
+	@echo "Cleaning build artifacts..."
+	@rm -rf $(BUILD_DIR)
+
+# Help
+help:
+	@echo "QRNG Integration Makefile"
+	@echo ""
+	@echo "Targets:"
+	@echo "  all      - Build QRNG libraries (default)"
+	@echo "  qrng     - Build QRNG libraries"
+	@echo "  test     - Build and run QRNG tests"
+	@echo "  install  - Install libraries and headers"
+	@echo "  clean    - Remove build artifacts"
+	@echo "  help     - Show this help message"
+	@echo ""
+	@echo "Configuration:"
+	@echo "  HAVE_LIBUSB=$(HAVE_LIBUSB)"
+	@echo "  INSTALL_PREFIX=$(INSTALL_PREFIX)"
+
+# Dependencies
+-include $(QRNG_OBJECTS:.o=.d)
+-include $(KYBER_QRNG_OBJECTS:.o=.d)
+
+# Generate dependency files
+$(BUILD_DIR)/%.d: %.cpp | $(BUILD_DIR)
+	@$(CXX) $(CXXFLAGS) -MM -MT $(patsubst %.d,%.o,$@) $< -MF $@

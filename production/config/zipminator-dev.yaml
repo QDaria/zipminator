@@ -1,0 +1,73 @@
+# Zipminator Development Configuration
+# SPDX-License-Identifier: Apache-2.0
+
+version: "0.1.0"
+environment: "development"
+
+# QRNG Device Configuration (more lenient for testing)
+qrng:
+  device_type: "id_quantique_usb"
+  device_path: ""
+  fallback_enabled: true
+  health_check_interval: 30s
+  entropy_pool_size: 262144  # 256 KB (smaller for dev)
+  continuous_testing: true
+  min_entropy_rate: 7.5  # Slightly lower for testing
+  startup_tests_samples: 10000  # Faster startup
+
+# Performance Optimization (relaxed for development)
+performance:
+  entropy_pool_size: 262144
+  worker_threads: 2
+  enable_prefetch: true
+  enable_batch_operations: false  # Disable for easier debugging
+  batch_size: 10
+  enable_caching: false
+  cache_size: 0
+  cache_ttl: 60s
+
+# Security Settings (relaxed for development)
+security:
+  constant_time_validation: true
+  side_channel_protections: false  # Can disable for debugging
+  secure_memory: false
+  memory_locking: false
+  key_rotation_interval: 3600s  # 1 hour
+  auto_key_rotation: false
+  audit_logging: false  # Reduce noise in dev
+  audit_crypto_operations: false
+
+# Network Configuration
+network:
+  bind_address: "127.0.0.1"
+  port: 8080  # Non-TLS for local dev
+  enable_tls: false
+  cert_file: ""
+  key_file: ""
+  ca_file: ""
+
+# Monitoring and Observability (verbose for development)
+monitoring:
+  enabled: true
+  enable_metrics: true
+  enable_health_checks: true
+  enable_profiling: true  # Enable profiling in dev
+  metrics_endpoint: "/metrics"
+  health_endpoint: "/health"
+  metrics_update_interval: 5s
+  health_check_interval: 30s
+
+# Logging Configuration (verbose for development)
+logging:
+  level: "DEBUG"
+  use_json_format: false  # Pretty format for readability
+  log_to_console: true
+  log_to_file: true
+  log_to_syslog: false
+  log_file_path: "./logs/zipminator-dev.log"
+  max_file_size: 5242880  # 5 MB
+  max_files: 3
+  sensitive_data_masking: false  # Show full data for debugging
+  include_thread_id: true
+  include_process_id: true
+  include_source_location: true

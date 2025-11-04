@@ -1,0 +1,369 @@
+{
+  "dashboard": {
+    "title": "Zipminator - Post-Quantum KEM Monitor",
+    "tags": ["zipminator", "post-quantum", "kem", "qrng"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "10s",
+
+    "panels": [
+      {
+        "id": 1,
+        "title": "Overall System Health",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+        "targets": [{
+          "expr": "zipminator_health_status",
+          "legendFormat": "Health Status"
+        }],
+        "options": {
+          "graphMode": "none",
+          "colorMode": "background",
+          "textMode": "value_and_name"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 1, "color": "green"}
+              ]
+            },
+            "mappings": [
+              {"value": 0, "text": "Unhealthy"},
+              {"value": 1, "text": "Healthy"}
+            ]
+          }
+        }
+      },
+
+      {
+        "id": 2,
+        "title": "Operations Per Second",
+        "type": "graph",
+        "gridPos": {"x": 6, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(zipminator_operations_total{operation=\"keygen\"}[1m])",
+            "legendFormat": "Key Generation"
+          },
+          {
+            "expr": "rate(zipminator_operations_total{operation=\"encaps\"}[1m])",
+            "legendFormat": "Encapsulation"
+          },
+          {
+            "expr": "rate(zipminator_operations_total{operation=\"decaps\"}[1m])",
+            "legendFormat": "Decapsulation"
+          }
+        ],
+        "yaxes": [
+          {"format": "ops", "label": "Operations/sec"},
+          {"show": false}
+        ]
+      },
+
+      {
+        "id": 3,
+        "title": "QRNG Health Score",
+        "type": "gauge",
+        "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+        "targets": [{
+          "expr": "zipminator_qrng_health_score",
+          "legendFormat": "Health Score"
+        }],
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 70, "color": "yellow"},
+                {"value": 90, "color": "green"}
+              ]
+            },
+            "unit": "percent"
+          }
+        }
+      },
+
+      {
+        "id": 4,
+        "title": "Operation Latency (p95)",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, zipminator_operation_duration_seconds_bucket{operation=\"keygen\"})",
+            "legendFormat": "KeyGen p95"
+          },
+          {
+            "expr": "histogram_quantile(0.95, zipminator_operation_duration_seconds_bucket{operation=\"encaps\"})",
+            "legendFormat": "Encaps p95"
+          },
+          {
+            "expr": "histogram_quantile(0.95, zipminator_operation_duration_seconds_bucket{operation=\"decaps\"})",
+            "legendFormat": "Decaps p95"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Latency (seconds)"},
+          {"show": false}
+        ]
+      },
+
+      {
+        "id": 5,
+        "title": "Error Rate",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(zipminator_errors_total[5m])",
+            "legendFormat": "{{error_type}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "errors/s", "label": "Errors per second"},
+          {"show": false}
+        ],
+        "alert": {
+          "conditions": [{
+            "evaluator": {"type": "gt", "params": [10]},
+            "operator": {"type": "and"},
+            "query": {"params": ["A", "5m", "now"]},
+            "reducer": {"type": "avg"},
+            "type": "query"
+          }],
+          "executionErrorState": "alerting",
+          "frequency": "60s",
+          "handler": 1,
+          "name": "High Error Rate",
+          "noDataState": "no_data",
+          "notifications": []
+        }
+      },
+
+      {
+        "id": 6,
+        "title": "Entropy Pool Status",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 16, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "zipminator_entropy_pool_size_bytes",
+            "legendFormat": "Pool Size"
+          },
+          {
+            "expr": "zipminator_entropy_available_bytes",
+            "legendFormat": "Available"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes"
+          }
+        }
+      },
+
+      {
+        "id": 7,
+        "title": "Entropy Quality Metrics",
+        "type": "graph",
+        "gridPos": {"x": 6, "y": 16, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "zipminator_entropy_rate_bits_per_byte",
+            "legendFormat": "Entropy Rate"
+          },
+          {
+            "expr": "zipminator_entropy_chi_square",
+            "legendFormat": "Chi-Square"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Bits per byte / Test score"},
+          {"show": false}
+        ]
+      },
+
+      {
+        "id": 8,
+        "title": "Memory Usage",
+        "type": "graph",
+        "gridPos": {"x": 18, "y": 16, "w": 6, "h": 8},
+        "targets": [
+          {
+            "expr": "zipminator_memory_usage_bytes{type=\"heap\"}",
+            "legendFormat": "Heap"
+          },
+          {
+            "expr": "zipminator_memory_usage_bytes{type=\"secure\"}",
+            "legendFormat": "Secure Memory"
+          }
+        ],
+        "yaxes": [
+          {"format": "bytes", "label": "Memory"},
+          {"show": false}
+        ]
+      },
+
+      {
+        "id": 9,
+        "title": "Component Health Matrix",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8},
+        "targets": [{
+          "expr": "zipminator_component_health",
+          "format": "table",
+          "instant": true
+        }],
+        "transformations": [{
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "component": "Component",
+              "Value": "Status"
+            }
+          }
+        }],
+        "options": {
+          "showHeader": true,
+          "sortBy": [{"displayName": "Component"}]
+        },
+        "fieldConfig": {
+          "overrides": [{
+            "matcher": {"id": "byName", "options": "Status"},
+            "properties": [{
+              "id": "custom.cellOptions",
+              "value": {
+                "type": "color-background"
+              }
+            }, {
+              "id": "mappings",
+              "value": [
+                {"type": "value", "options": {"0": {"text": "Unhealthy", "color": "red"}}},
+                {"type": "value", "options": {"1": {"text": "Healthy", "color": "green"}}},
+                {"type": "value", "options": {"2": {"text": "Degraded", "color": "yellow"}}}
+              ]
+            }]
+          }]
+        }
+      },
+
+      {
+        "id": 10,
+        "title": "Recent Errors",
+        "type": "logs",
+        "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8},
+        "targets": [{
+          "expr": "{job=\"zipminator\"} |= \"ERROR\"",
+          "refId": "A"
+        }],
+        "options": {
+          "showLabels": false,
+          "showTime": true,
+          "sortOrder": "Descending",
+          "wrapLogMessage": true
+        }
+      },
+
+      {
+        "id": 11,
+        "title": "System Uptime",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 32, "w": 6, "h": 4},
+        "targets": [{
+          "expr": "zipminator_uptime_seconds",
+          "legendFormat": "Uptime"
+        }],
+        "options": {
+          "graphMode": "none",
+          "colorMode": "value",
+          "textMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s"
+          }
+        }
+      },
+
+      {
+        "id": 12,
+        "title": "Key Generation Rate vs Target",
+        "type": "gauge",
+        "gridPos": {"x": 6, "y": 32, "w": 6, "h": 4},
+        "targets": [{
+          "expr": "rate(zipminator_operations_total{operation=\"keygen\"}[1m])",
+          "legendFormat": "Current Rate"
+        }],
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 1000,
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 100, "color": "yellow"},
+                {"value": 500, "color": "green"}
+              ]
+            },
+            "unit": "ops"
+          }
+        }
+      }
+    ],
+
+    "templating": {
+      "list": [
+        {
+          "name": "instance",
+          "type": "query",
+          "query": "label_values(zipminator_operations_total, instance)",
+          "multi": false,
+          "includeAll": false
+        },
+        {
+          "name": "operation",
+          "type": "custom",
+          "query": "keygen,encaps,decaps",
+          "multi": true,
+          "includeAll": true
+        }
+      ]
+    },
+
+    "annotations": {
+      "list": [
+        {
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "changes(zipminator_config_reload_timestamp[5m]) > 0",
+          "name": "Config Reloads",
+          "titleFormat": "Configuration Reloaded"
+        }
+      ]
+    },
+
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    }
+  }
+}

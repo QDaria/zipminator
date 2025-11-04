@@ -1,0 +1,38 @@
+{
+  "name": "qdaria-qrng-demo",
+  "version": "1.0.0",
+  "description": "Qdaria QRNG Investor Demo - Quantum Entropy, Zipminator, Kyber768",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "install-deps": "npm install && cd backend && pip3 install -r requirements.txt"
+  },
+  "keywords": ["quantum", "encryption", "kyber768", "qrng", "zipminator"],
+  "author": "Qdaria",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^28.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "chart.js": "^4.4.0",
+    "react-chartjs-2": "^5.2.0",
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.0",
+    "@babel/preset-react": "^7.23.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.qdaria.qrng-demo",
+    "productName": "Qdaria QRNG Demo",
+    "files": [
+      "src/**/*",
+      "backend/**/*",
+      "assets/**/*",
+      "sample_data/**/*"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+# Include Python package metadata files
+include README.md
+include LICENSE
+include CHANGELOG.md
+recursive-include src/python *.py
+recursive-include src/python *.pyx
+recursive-include src/python *.pxd
+recursive-include src/rust *.rs
+recursive-include src/rust *.toml
+recursive-include docs *.md
+recursive-include examples *.py
+
+# Exclude unnecessary files
+global-exclude .git
+global-exclude .github
+global-exclude .gitignore
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude *.dylib
+global-exclude *.o
+global-exclude .pytest_cache
+global-exclude .coverage
+global-exclude dist
+global-exclude build
+global-exclude *.egg-info
+global-exclude .DS_Store

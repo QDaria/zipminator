@@ -1,0 +1,77 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "zipminator-pqc"
+version = "0.1.0"
+description = "Quantum-safe cryptography with NIST Kyber768 and IBM QRNG"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "QDaria", email = "hello@qdaria.com"}]
+requires-python = ">=3.8"
+keywords = ["quantum", "cryptography", "kyber", "post-quantum", "qrng", "pqc", "nist"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Topic :: Security",
+    "Topic :: Security :: Cryptography",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "cryptography>=41.0.0",
+    "click>=8.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+]
+docs = [
+    "sphinx>=5.0.0",
+    "sphinx-rtd-theme>=1.0.0",
+    "myst-parser>=0.18.0",
+]
+
+[project.urls]
+Homepage = "https://qdaria.com/technology/products/zipminator"
+Documentation = "https://docs.qdaria.com/zipminator"
+Repository = "https://github.com/qdaria/zipminator"
+Issues = "https://github.com/qdaria/zipminator/issues"
+
+[project.scripts]
+zipminator = "zipminator.cli:main"
+
+[tool.maturin]
+python-source = "src/python"
+module-name = "zipminator._core"
+manylinux = "2014"
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=zipminator --cov-report=html --cov-report=term-missing"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false

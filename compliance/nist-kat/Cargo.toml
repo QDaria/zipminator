@@ -1,0 +1,22 @@
+[package]
+name = "nist-kat-kyber768"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Cryptographic dependencies
+aes = "0.8"
+ctr = "0.9"
+sha3 = "0.10"
+subtle = "2.5"
+
+# Kyber implementation (adjust path as needed)
+kyber768 = { path = "../../src/rust" }
+
+[[bin]]
+name = "nist_kat_kyber768"
+path = "src/rust/main.rs"
+
+[lib]
+name = "nist_kat"
+path = "src/rust/nist_kat.rs"

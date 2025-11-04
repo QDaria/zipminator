@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zipminator
+  namespace: zipminator-prod
+  labels:
+    app: zipminator
+    version: v1.0.0
+    component: qrng-service
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: zipminator
+  template:
+    metadata:
+      labels:
+        app: zipminator
+        version: v1.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: zipminator
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+
+      containers:
+      - name: zipminator
+        image: zipminator:latest
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+
+        env:
+        - name: ZIPMINATOR_ENV
+          value: "production"
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: zipminator-config
+              key: log_level
+        - name: QRNG_DEVICE
+          valueFrom:
+            configMapKeyRef:
+              name: zipminator-config
+              key: qrng_device
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: zipminator-secrets
+              key: api_key
+
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+
+        volumeMounts:
+        - name: config
+          mountPath: /etc/zipminator
+          readOnly: true
+        - name: usb-devices
+          mountPath: /dev/bus/usb
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+
+      volumes:
+      - name: config
+        configMap:
+          name: zipminator-config
+      - name: usb-devices
+        hostPath:
+          path: /dev/bus/usb
+          type: Directory
+
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: zipminator
+              topologyKey: kubernetes.io/hostname

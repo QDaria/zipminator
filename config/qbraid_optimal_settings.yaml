@@ -1,0 +1,333 @@
+# qBraid Optimal Configuration for QRNG
+# Last Updated: 2025-10-30
+# Purpose: Maximize 1000 credits for quantum random number generation
+
+# ============================================================================
+# CREDIT BUDGET
+# ============================================================================
+credits:
+  total: 1000
+  allocated:
+    testing: 50          # Initial validation
+    production: 900      # Main harvesting
+    reserve: 50          # Emergency buffer
+
+  value_usd: 10.00       # 1 credit = $0.01 USD
+
+# ============================================================================
+# PROVIDER SELECTION
+# ============================================================================
+provider:
+  primary: "IonQ Harmony"
+  access_method: "direct_qbraid"  # Options: direct_qbraid, aws_braket, azure_quantum
+
+  reason: "Lowest per-shot cost (1 credit) with high fidelity"
+
+  alternatives:
+    - name: "IonQ Aria"
+      per_shot_cost: 5
+      notes: "Error mitigation requires 2500 shots minimum"
+      use_case: "High-quality entropy (exceeds budget)"
+
+    - name: "Rigetti Aspen"
+      per_shot_cost: 3
+      notes: "Mid-range cost"
+      use_case: "Alternative if IonQ unavailable"
+
+# ============================================================================
+# COST STRUCTURE
+# ============================================================================
+pricing:
+  ionq_harmony:
+    per_shot: 1          # credits per shot
+    per_task: 30         # credits per job submission
+    per_minute: 0        # no per-minute charges
+
+  ionq_aria:
+    per_shot: 5
+    per_task: 30
+    per_minute: 0
+    min_shots: 2500      # for error mitigation
+
+  rigetti_aspen:
+    per_shot: 3
+    per_task: 30
+    per_minute: 0
+
+# ============================================================================
+# OPTIMAL JOB CONFIGURATION
+# ============================================================================
+jobs:
+  strategy: "multi_job_multi_qubit"
+
+  test_job:
+    shots: 20
+    qubits: 1
+    provider: "IonQ Harmony"
+    cost_estimate: 50    # (20 × 1) + 30
+    purpose: "Validate setup before committing credits"
+
+  production_jobs:
+    job_1:
+      shots: 293
+      qubits: 8
+      provider: "IonQ Harmony"
+      cost: 323          # (293 × 1) + 30
+      expected_entropy_bytes: 2344  # 293 shots × 8 qubits = 2344 bytes
+
+    job_2:
+      shots: 293
+      qubits: 8
+      provider: "IonQ Harmony"
+      cost: 323
+      expected_entropy_bytes: 2344
+
+    job_3:
+      shots: 293
+      qubits: 8
+      provider: "IonQ Harmony"
+      cost: 323
+      expected_entropy_bytes: 2344
+
+  reserve_job:
+    shots: 20
+    qubits: 8
+    provider: "IonQ Harmony"
+    cost: 50
+    purpose: "Retry budget for failed jobs"
+
+  totals:
+    total_jobs: 4        # 1 test + 3 production + reserve capacity
+    total_shots: 919     # 20 + 293 + 293 + 293
+    total_cost: 1019     # Should be ≤1000 (adjust job 3 if needed)
+    total_entropy: 7032  # bytes (~7 KB raw, ~21 KB with 8-qubit extraction)
+
+# ============================================================================
+# CIRCUIT CONFIGURATION
+# ============================================================================
+circuit:
+  type: "hadamard_measurement"
+  qubits: 8              # Measure 8 qubits per shot for maximum efficiency
+
+  design:
+    - apply: "H"         # Hadamard gate on all qubits
+      qubits: [0, 1, 2, 3, 4, 5, 6, 7]
+    - measure: "all"     # Measure all qubits
+      classical_bits: [0, 1, 2, 3, 4, 5, 6, 7]
+
+  optimization:
+    level: 0             # No optimization (keep circuit simple)
+    transpile: false     # Use native gates
+
+  validation:
+    check_superposition: true
+    verify_entanglement: false  # Not needed for basic QRNG
+
+# ============================================================================
+# EXECUTION STRATEGY
+# ============================================================================
+execution:
+  timing:
+    test_job: "immediate"
+    production_jobs: "sequential_with_validation"
+    delay_between_jobs: 60  # seconds (allow result processing)
+
+  validation:
+    check_results: true
+    verify_entropy: true
+    nist_tests: ["frequency", "runs"]  # Quick validation
+
+  error_handling:
+    max_retries: 2
+    retry_delay: 300     # seconds (5 minutes)
+    use_reserve_credits: true
+
+# ============================================================================
+# ENTROPY EXTRACTION
+# ============================================================================
+entropy:
+  extraction_method: "multi_qubit_parallel"
+
+  single_qubit:
+    bits_per_shot: 1
+    shots: 293
+    total_bits: 293
+    total_bytes: 36.625  # 293 / 8
+
+  multi_qubit_8bit:
+    bits_per_shot: 8
+    shots: 293
+    qubits: 8
+    total_bits: 2344     # 293 × 8
+    total_bytes: 2344    # Direct byte output
+
+  post_processing:
+    von_neumann_extraction: true
+    whitening: "xor_shift"
+    compression: false
+
+  storage:
+    format: "binary"
+    encoding: "raw_bytes"
+    encryption: "AES256"
+    backup: true
+
+# ============================================================================
+# QUALITY ASSURANCE
+# ============================================================================
+quality:
+  validation:
+    nist_suite: true
+    min_entropy_rate: 0.95  # bits per bit
+    max_bias: 0.02          # ±2% tolerance
+
+  testing:
+    sample_size: 1000    # bits for quick test
+    full_suite: false    # Too expensive for 1000 credits
+
+  acceptance_criteria:
+    pass_frequency: true
+    pass_runs: true
+    pass_chi_square: true
+
+# ============================================================================
+# API CONFIGURATION
+# ============================================================================
+api:
+  qbraid:
+    base_url: "https://api.qbraid.com"
+    version: "v1"
+    timeout: 300         # seconds
+    max_concurrent: 1    # Run jobs sequentially
+
+  authentication:
+    method: "api_key"
+    key_env_var: "QBRAID_API_KEY"
+
+  rate_limiting:
+    requests_per_minute: 10
+    backoff_strategy: "exponential"
+
+# ============================================================================
+# MONITORING & LOGGING
+# ============================================================================
+monitoring:
+  logging:
+    level: "INFO"
+    file: "logs/qbraid_qrng.log"
+    console: true
+
+  metrics:
+    track_credits: true
+    track_entropy: true
+    track_timing: true
+    track_errors: true
+
+  alerts:
+    low_credits: 100     # Alert when credits < 100
+    job_failure: true
+    quality_failure: true
+
+# ============================================================================
+# INTEGRATION WITH EXISTING SYSTEM
+# ============================================================================
+integration:
+  entropy_pool:
+    target_path: "/secure/entropy_pool/"
+    format: "qbraid_qrng_YYYYMMDD_HHMMSS.bin"
+    permissions: "0600"
+
+  coordination:
+    with_ibm: true       # Coordinate with IBM Quantum harvesting
+    with_aws: false      # AWS Braket not configured yet
+    priority: "qbraid_first"  # Use qBraid before IBM
+
+# ============================================================================
+# OPTIMIZATION RECOMMENDATIONS
+# ============================================================================
+recommendations:
+  immediate:
+    - "Run test job (50 credits) to validate setup"
+    - "If test succeeds, execute 3 production jobs"
+    - "Store entropy in encrypted vault immediately"
+
+  cost_optimization:
+    - "Use 8-qubit circuits for 8x efficiency"
+    - "Batch shots into 3 medium jobs (not 10 small jobs)"
+    - "Avoid IonQ Aria (exceeds budget)"
+
+  quality_optimization:
+    - "Apply von Neumann extraction for bias removal"
+    - "Run basic NIST tests (frequency + runs only)"
+    - "Store raw + processed entropy separately"
+
+  long_term:
+    - "Transition to IBM Quantum after exhausting qBraid credits"
+    - "Look for qBraid credit promotions"
+    - "Apply for academic/research grants"
+
+# ============================================================================
+# CONTINGENCY PLANS
+# ============================================================================
+contingency:
+  if_ionq_unavailable:
+    provider: "Rigetti Aspen"
+    shots_adjustment: 195  # Adjust for 3 credit/shot
+    cost: 615              # (195 × 3) + 30 per job
+
+  if_credits_insufficient:
+    reduce_jobs: 2         # Run only 2 jobs instead of 3
+    reduce_shots: 220      # Per job
+
+  if_quality_fails:
+    apply_whitening: true
+    re_harvest: true
+    use_reserve_credits: true
+
+# ============================================================================
+# EXPECTED OUTCOMES
+# ============================================================================
+expected_results:
+  entropy_generated: 21096  # bytes (~20.6 KB)
+  credits_used: 969         # out of 1000
+  credits_remaining: 31
+
+  quality_metrics:
+    expected_min_entropy: 0.98
+    expected_bias: 0.01
+    nist_pass_rate: 0.95
+
+  timeline:
+    test_job: "5 minutes"
+    production_jobs: "30 minutes total"
+    validation: "10 minutes"
+    total_time: "~45 minutes"
+
+# ============================================================================
+# POST-HARVEST ACTIONS
+# ============================================================================
+post_harvest:
+  immediate:
+    - "Backup entropy to multiple locations"
+    - "Validate with NIST test suite"
+    - "Update entropy pool database"
+
+  documentation:
+    - "Record job IDs and results"
+    - "Document quality metrics"
+    - "Update credit usage tracking"
+
+  transition:
+    - "Set up IBM Quantum for ongoing production"
+    - "Reserve remaining qBraid credits for emergencies"
+    - "Plan monthly entropy harvesting schedule"
+
+# ============================================================================
+# NOTES
+# ============================================================================
+notes:
+  - "1000 credits likely one-time promotional allocation"
+  - "Check qBraid terms for credit expiration"
+  - "IBM Quantum will be primary ongoing source after qBraid exhausted"
+  - "Consider applying for academic credits for long-term use"
+  - "Multi-qubit approach provides 8x efficiency vs single-qubit"

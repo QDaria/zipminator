@@ -1,0 +1,27 @@
+apiVersion: v2
+name: zipminator
+description: A Helm chart for Zipminator - Quantum Random Number Generator with Kyber768
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - qrng
+  - quantum
+  - cryptography
+  - kyber768
+  - post-quantum
+
+maintainers:
+  - name: Zipminator Team
+    email: team@zipminator.com
+
+home: https://github.com/zipminator/zipminator
+sources:
+  - https://github.com/zipminator/zipminator
+
+dependencies: []
+
+annotations:
+  category: Security
+  licenses: MIT

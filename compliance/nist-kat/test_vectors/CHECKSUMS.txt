@@ -1,0 +1,25 @@
+# SHA-256 Checksums for NIST Test Vectors
+# Generated: 2025-10-30
+# Purpose: File integrity verification for FIPS 203 certification
+
+# Official ML-KEM-768 Test Vectors (Primary Source)
+# Source: https://gist.github.com/itzmeanjan/c8f5bc9640d0f0bdd2437dfe364d7710
+# Format: NIST PQCkemKAT (.kat)
+# Vectors: 100
+dcbe58987a95fdbb4823755c4ae42098a94d9d6cdc78829d5424dbbbcb7ce440  ml_kem_768.kat
+
+# NIST ACVP Format Vectors (Secondary Source)
+# Source: https://github.com/usnistgov/ACVP-Server
+# Format: ACVP JSON
+# Purpose: Cross-validation
+80a2f859ecdebdba349a55fd3ccb1b8b33ee9c0eab08b171f0ed1a6e3bb45fb9  ml-kem-768-kat.json
+
+# Verification Commands:
+# macOS/Linux:
+#   shasum -a 256 -c CHECKSUMS.txt
+# Linux (coreutils):
+#   sha256sum -c CHECKSUMS.txt
+
+# Expected Output:
+#   ml_kem_768.kat: OK
+#   ml-kem-768-kat.json: OK

@@ -1,0 +1,9 @@
+# IBM Quantum Hardware Entropy Pool
+timestamp: 2025-10-31T08:56:19.214919
+bytes: 5120
+provider: IBM Quantum
+backend: AerSimulator (demo mode)
+job_id: sim_20251031_085619
+sha256: 7b02f21c02d0d62381f9d078aaaf3b251fccfb4da75affa37fb739d740ccc6f8
+sha512: 61668bac3716c8b07831f9bd141ffc274c7f6e08e4ad1f4eb23bca3a9635f70a4d0dd8cbcf04fc697f4982ddc0524a28e03edf8b2301c250f833bbf49feb8e6d
+source: Quantum simulator (demo mode)

@@ -1,0 +1,68 @@
+{
+  "name": "@qdaria/zipminator",
+  "version": "0.1.0",
+  "description": "Quantum-safe cryptography CLI with NIST Kyber768 and IBM QRNG (Rust binary wrapper)",
+  "author": "QDaria <hello@qdaria.com>",
+  "license": "MIT",
+  "homepage": "https://qdaria.com/technology/products/zipminator",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qdaria/zipminator"
+  },
+  "bugs": {
+    "url": "https://github.com/qdaria/zipminator/issues"
+  },
+  "keywords": [
+    "quantum",
+    "cryptography",
+    "kyber768",
+    "post-quantum",
+    "qrng",
+    "pqc",
+    "nist"
+  ],
+  "type": "module",
+  "main": "./lib/index.js",
+  "bin": {
+    "zipminator": "./bin/zipminator.js"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "scripts",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "scripts": {
+    "postinstall": "node scripts/install-binary.js",
+    "test": "node --test",
+    "prepublishOnly": "npm run build-binaries"
+  },
+  "dependencies": {
+    "@qdaria/zipminator-linux-x64": "0.1.0",
+    "@qdaria/zipminator-linux-arm64": "0.1.0",
+    "@qdaria/zipminator-darwin-x64": "0.1.0",
+    "@qdaria/zipminator-darwin-arm64": "0.1.0",
+    "@qdaria/zipminator-win32-x64": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

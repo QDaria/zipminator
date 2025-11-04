@@ -1,0 +1,347 @@
+# =============================================================================
+# Zipminator-PQC .gitignore
+# Post-Quantum Cryptography Platform with Quantum Entropy Generation
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Environment Variables & Secrets (CRITICAL - DO NOT COMMIT)
+# -----------------------------------------------------------------------------
+.env
+.env.*
+.env.local
+.env.*.local
+*.env
+
+# IBM Quantum credentials
+ibm_quantum_credentials.json
+qiskit-ibm.json
+.qiskit/
+IBM_QUANTUM_TOKEN*
+
+# qBraid credentials
+.qbraid/
+qbraid_credentials.json
+
+# AWS credentials
+.aws/
+aws_credentials.json
+
+# API keys and tokens
+*.key
+*.pem
+*.p12
+*.pfx
+*_token.txt
+*_token.json
+api_keys.json
+
+# Backup files with potential secrets
+*.bak
+*.backup
+*_backup.*
+
+# Token validation reports (may contain sensitive info)
+*_validation_report.json
+token_validation_*.json
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+demo/backend/venv/
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pyenv
+.python-version
+
+# -----------------------------------------------------------------------------
+# Rust
+# -----------------------------------------------------------------------------
+src/rust/target/
+src/rust/Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# -----------------------------------------------------------------------------
+# C++
+# -----------------------------------------------------------------------------
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+src/cpp/qrng/build/
+src/cpp/*.out
+src/cpp/kyber768_test
+src/cpp/qrng_test
+
+# -----------------------------------------------------------------------------
+# Node.js / Electron / Demo Application
+# -----------------------------------------------------------------------------
+node_modules/
+demo/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+package-lock.json
+
+# Electron build output
+demo/dist/
+demo/out/
+demo/build/
+demo/release/
+demo/*.dmg
+demo/*.pkg
+demo/*.exe
+demo/*.msi
+demo/*.AppImage
+demo/*.deb
+demo/*.rpm
+
+# -----------------------------------------------------------------------------
+# Operating System Files
+# -----------------------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.fuse_hidden*
+
+# -----------------------------------------------------------------------------
+# IDEs and Editors
+# -----------------------------------------------------------------------------
+# VSCode
+.vscode/
+*.code-workspace
+
+# JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*.swn
+.*.sw[a-p]
+
+# Emacs
+\#*\#
+.\#*
+
+# -----------------------------------------------------------------------------
+# Claude Flow / AI Coordination
+# -----------------------------------------------------------------------------
+.claude/settings.local.json
+.mcp.json
+claude-flow.config.json
+.swarm/
+.hive-mind/
+demo/.hive-mind/
+demo/.claude-flow/
+.claude-flow/
+memory/
+coordination/
+memory/claude-flow-data.json
+memory/sessions/*
+!memory/sessions/README.md
+memory/agents/*
+!memory/agents/README.md
+coordination/memory_bank/*
+coordination/subtasks/*
+coordination/orchestration/*
+*.db
+*.db-journal
+*.db-wal
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+claude-flow
+hive-mind-prompt-*.txt
+memory_store.json
+
+# -----------------------------------------------------------------------------
+# Quantum Entropy Pools (Generated Data)
+# -----------------------------------------------------------------------------
+# Keep structure, ignore generated entropy files
+production/entropy_pool/*.qep
+production/entropy_pool/*.bin
+quantum_entropy/*.qep
+quantum_entropy/*.bin
+entropy_data/
+*.entropy
+
+# -----------------------------------------------------------------------------
+# Build Artifacts & Installers
+# -----------------------------------------------------------------------------
+installers/
+*.dmg
+*.pkg
+*.msi
+*.exe
+*.AppImage
+*.deb
+*.rpm
+*.tar.gz
+*.zip
+build_output/
+
+# -----------------------------------------------------------------------------
+# Logs & Monitoring
+# -----------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+production/logs/*
+demo/logs/*
+
+# Monitoring data
+prometheus_data/
+grafana_data/
+
+# -----------------------------------------------------------------------------
+# Benchmarks & Test Results
+# -----------------------------------------------------------------------------
+benchmarks/results/
+benchmark_*.json
+perf_*.txt
+test_results/
+
+# -----------------------------------------------------------------------------
+# Temporary & Cache Files
+# -----------------------------------------------------------------------------
+tmp/
+temp/
+*.tmp
+.cache/
+cache/
+
+# -----------------------------------------------------------------------------
+# Documentation Build Artifacts
+# -----------------------------------------------------------------------------
+docs/_build/
+docs/.doctrees/
+site/
+
+# -----------------------------------------------------------------------------
+# Project-Specific Working Files (Keep in docs/ or archive/)
+# -----------------------------------------------------------------------------
+# These are working files that should be moved to proper directories
+*_COMPLETE.txt
+*_COMPLETE.md
+*_SUMMARY.txt
+*_SUMMARY.md
+*_CHECKLIST.md
+*_DELIVERY_*.txt
+*_MEETING_*.md
+
+# -----------------------------------------------------------------------------
+# Old/Archive Files
+# -----------------------------------------------------------------------------
+old-json-files/
+*.old
+archive/
+deprecated/
+
+# -----------------------------------------------------------------------------
+# Keep Important Files (Negation Patterns)
+# -----------------------------------------------------------------------------
+!.gitignore
+!.env.template
+!.env.example
+!README.md
+!LICENSE
+!CLAUDE.md
+!docs/README.md
+!production/entropy_pool/README.md
+!quantum_entropy/README.md

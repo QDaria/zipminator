@@ -1,0 +1,144 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: zipminator-alerts
+  namespace: zipminator-prod
+  labels:
+    app: zipminator
+    prometheus: kube-prometheus
+spec:
+  groups:
+  - name: zipminator.qrng
+    interval: 30s
+    rules:
+    # QRNG Health Alerts
+    - alert: QRNGDeviceDown
+      expr: qrng_device_status == 0
+      for: 1m
+      labels:
+        severity: critical
+        component: qrng
+      annotations:
+        summary: "QRNG device is down"
+        description: "QRNG device {{ $labels.device }} has been unavailable for more than 1 minute."
+
+    - alert: QRNGLowEntropyRate
+      expr: qrng_entropy_rate < 0.95
+      for: 5m
+      labels:
+        severity: warning
+        component: qrng
+      annotations:
+        summary: "QRNG entropy rate is low"
+        description: "QRNG device {{ $labels.device }} entropy rate is {{ $value }}, below threshold of 0.95."
+
+    - alert: QRNGBufferOverflow
+      expr: rate(qrng_buffer_overflow_total[5m]) > 0
+      labels:
+        severity: warning
+        component: qrng
+      annotations:
+        summary: "QRNG buffer overflow detected"
+        description: "QRNG buffer overflows detected at rate {{ $value }} per second."
+
+    # API Performance Alerts
+    - alert: HighAPILatency
+      expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 0.5
+      for: 5m
+      labels:
+        severity: warning
+        component: api
+      annotations:
+        summary: "High API latency detected"
+        description: "95th percentile API latency is {{ $value }}s, exceeding 0.5s threshold."
+
+    - alert: HighAPIErrorRate
+      expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+      for: 5m
+      labels:
+        severity: critical
+        component: api
+      annotations:
+        summary: "High API error rate"
+        description: "API error rate is {{ $value | humanizePercentage }}, exceeding 5% threshold."
+
+    - alert: APIRateLimitExceeded
+      expr: rate(http_requests_rate_limited_total[5m]) > 10
+      for: 5m
+      labels:
+        severity: warning
+        component: api
+      annotations:
+        summary: "API rate limit frequently exceeded"
+        description: "Rate limit exceeded {{ $value }} times per second."
+
+    # Kyber768 Alerts
+    - alert: Kyber768KeyRotationFailed
+      expr: kyber768_key_rotation_failures_total > 0
+      labels:
+        severity: critical
+        component: kyber768
+      annotations:
+        summary: "Kyber768 key rotation failed"
+        description: "Kyber768 key rotation has failed {{ $value }} times."
+
+    - alert: Kyber768KeyExpiringSoon
+      expr: (kyber768_key_age_seconds / kyber768_key_max_age_seconds) > 0.9
+      for: 10m
+      labels:
+        severity: warning
+        component: kyber768
+      annotations:
+        summary: "Kyber768 key expiring soon"
+        description: "Kyber768 key is at {{ $value | humanizePercentage }} of maximum age."
+
+    # Resource Alerts
+    - alert: HighMemoryUsage
+      expr: container_memory_usage_bytes{container="zipminator"} / container_spec_memory_limit_bytes{container="zipminator"} > 0.85
+      for: 5m
+      labels:
+        severity: warning
+        component: resources
+      annotations:
+        summary: "High memory usage"
+        description: "Container memory usage is {{ $value | humanizePercentage }} of limit."
+
+    - alert: HighCPUUsage
+      expr: rate(container_cpu_usage_seconds_total{container="zipminator"}[5m]) > 0.85
+      for: 5m
+      labels:
+        severity: warning
+        component: resources
+      annotations:
+        summary: "High CPU usage"
+        description: "Container CPU usage is {{ $value | humanizePercentage }}."
+
+    # Pod Health Alerts
+    - alert: PodCrashLooping
+      expr: rate(kube_pod_container_status_restarts_total{namespace="zipminator-prod"}[15m]) > 0
+      labels:
+        severity: critical
+        component: pod
+      annotations:
+        summary: "Pod is crash looping"
+        description: "Pod {{ $labels.pod }} is restarting frequently."
+
+    - alert: PodNotReady
+      expr: kube_pod_status_ready{namespace="zipminator-prod",condition="true"} == 0
+      for: 5m
+      labels:
+        severity: warning
+        component: pod
+      annotations:
+        summary: "Pod is not ready"
+        description: "Pod {{ $labels.pod }} has been not ready for more than 5 minutes."
+
+    - alert: LowPodCount
+      expr: count(kube_pod_status_ready{namespace="zipminator-prod",condition="true"}) < 2
+      for: 5m
+      labels:
+        severity: critical
+        component: availability
+      annotations:
+        summary: "Low pod count"
+        description: "Only {{ $value }} pods are ready, minimum is 2."

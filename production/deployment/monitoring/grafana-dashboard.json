@@ -1,0 +1,237 @@
+{
+  "dashboard": {
+    "title": "Zipminator - Quantum RNG & Kyber768",
+    "tags": ["zipminator", "qrng", "kyber768", "cryptography"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "QRNG Device Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "qrng_device_status",
+            "legendFormat": "Device {{ device }}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 1, "color": "green"}
+              ]
+            },
+            "mappings": [
+              {"type": "value", "value": 0, "text": "DOWN"},
+              {"type": "value", "value": 1, "text": "UP"}
+            ]
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "QRNG Entropy Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "qrng_entropy_rate",
+            "legendFormat": "Entropy Rate"
+          }
+        ],
+        "yaxes": [
+          {"format": "percentunit", "min": 0, "max": 1}
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {"type": "lt", "params": [0.95]},
+              "operator": {"type": "and"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"type": "avg"}
+            }
+          ]
+        }
+      },
+      {
+        "id": 3,
+        "title": "Random Bytes Generated",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(qrng_bytes_generated_total[5m])",
+            "legendFormat": "Bytes/sec"
+          }
+        ],
+        "yaxes": [
+          {"format": "Bps"}
+        ]
+      },
+      {
+        "id": 4,
+        "title": "API Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[5m])",
+            "legendFormat": "{{ method }} {{ path }} ({{ status }})"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps"}
+        ]
+      },
+      {
+        "id": 5,
+        "title": "API Latency (95th percentile)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "95th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "99th percentile"
+          }
+        ],
+        "yaxes": [
+          {"format": "s"}
+        ]
+      },
+      {
+        "id": 6,
+        "title": "API Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{status=~\"5..\"}[5m]) / rate(http_requests_total[5m])",
+            "legendFormat": "Error Rate"
+          }
+        ],
+        "yaxes": [
+          {"format": "percentunit"}
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Kyber768 Key Age",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "kyber768_key_age_seconds / kyber768_key_max_age_seconds",
+            "legendFormat": "Key Age"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 70, "color": "yellow"},
+                {"value": 90, "color": "red"}
+              ]
+            },
+            "unit": "percentunit",
+            "min": 0,
+            "max": 1
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Kyber768 Operations",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(kyber768_keygen_total[5m])",
+            "legendFormat": "KeyGen/sec"
+          },
+          {
+            "expr": "rate(kyber768_encapsulate_total[5m])",
+            "legendFormat": "Encap/sec"
+          },
+          {
+            "expr": "rate(kyber768_decapsulate_total[5m])",
+            "legendFormat": "Decap/sec"
+          }
+        ],
+        "yaxes": [
+          {"format": "ops"}
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "container_memory_usage_bytes{container=\"zipminator\"} / 1024 / 1024",
+            "legendFormat": "{{ pod }}"
+          }
+        ],
+        "yaxes": [
+          {"format": "MiB"}
+        ]
+      },
+      {
+        "id": 10,
+        "title": "CPU Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(container_cpu_usage_seconds_total{container=\"zipminator\"}[5m]) * 100",
+            "legendFormat": "{{ pod }}"
+          }
+        ],
+        "yaxes": [
+          {"format": "percent"}
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Pod Count",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "count(kube_pod_status_ready{namespace=\"zipminator-prod\",condition=\"true\"})",
+            "legendFormat": "Ready Pods"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 2, "color": "yellow"},
+                {"value": 3, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 12,
+        "title": "Container Restarts",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(kube_pod_container_status_restarts_total{namespace=\"zipminator-prod\"}[15m])",
+            "legendFormat": "{{ pod }}"
+          }
+        ],
+        "yaxes": [
+          {"format": "short"}
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}

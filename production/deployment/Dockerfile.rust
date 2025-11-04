@@ -1,0 +1,65 @@
+# Multi-stage build for Zipminator Rust implementation
+# Stage 1: Builder
+FROM rust:1.75 AS builder
+
+# Install additional dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libusb-1.0-0-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /build
+
+# Copy Cargo files first for better caching
+COPY src/rust/Cargo.toml src/rust/Cargo.lock ./
+
+# Cache dependencies
+RUN mkdir src && echo "fn main() {}" > src/main.rs && \
+    cargo build --release && \
+    rm -rf src
+
+# Copy actual source code
+COPY src/rust /build
+
+# Build release version
+RUN cargo build --release
+
+# Run tests during build
+RUN cargo test --release
+
+# Stage 2: Runtime
+FROM debian:bookworm-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libusb-1.0-0 \
+    ca-certificates \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -u 1000 zipminator
+
+# Copy binary from builder
+COPY --from=builder /build/target/release/zipminator /usr/bin/
+COPY --from=builder /build/target/release/libzipminator.so /usr/lib/
+
+# Copy configuration
+COPY production/config /etc/zipminator/
+
+# Set ownership
+RUN chown -R zipminator:zipminator /etc/zipminator
+
+# Switch to non-root user
+USER zipminator
+
+# Expose API port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Start server
+CMD ["/usr/bin/zipminator", "--config", "/etc/zipminator/config.yaml"]

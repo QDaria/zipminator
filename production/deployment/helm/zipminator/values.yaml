@@ -1,0 +1,164 @@
+# Default values for zipminator
+# This is a YAML-formatted file.
+
+# Image configuration
+image:
+  repository: zipminator
+  pullPolicy: IfNotPresent
+  tag: "latest"
+  # Choose implementation: cpp or rust
+  implementation: cpp
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Replica configuration
+replicaCount: 3
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+# Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+    - ALL
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+  annotations: {}
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+  hosts:
+    - host: api.zipminator.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: zipminator-tls
+      hosts:
+        - api.zipminator.com
+
+# Resource limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Node selection
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app: zipminator
+          topologyKey: kubernetes.io/hostname
+
+# Configuration
+config:
+  logLevel: "info"
+  qrngDevice: "/dev/qrng0"
+  maxBufferSize: 1048576
+  server:
+    workers: 4
+    maxConnections: 1000
+  kyber768:
+    enabled: true
+    keyRotationInterval: 3600
+  monitoring:
+    metricsEnabled: true
+  security:
+    corsEnabled: true
+    allowedOrigins:
+      - "https://app.zipminator.com"
+
+# Secrets (use external secret management in production)
+secrets:
+  apiKey: ""
+  # externally managed secrets
+  externalSecrets:
+    enabled: false
+    backend: ""  # aws-sm, vault, etc.
+
+# Monitoring
+monitoring:
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+  grafana:
+    enabled: true
+    dashboards:
+      enabled: true
+
+# Volume mounts
+volumes:
+  # USB device access for QRNG
+  usbDevices:
+    enabled: true
+    hostPath: /dev/bus/usb

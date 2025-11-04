@@ -1,0 +1,1075 @@
+/* ============================================================================
+   PROFESSIONAL INVESTOR DEMO - ENTERPRISE GRADE STYLING
+   ============================================================================ */
+
+/* ============================================================================
+   ROOT & RESET
+   ============================================================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============================================================================
+   COLOR PALETTE - CORPORATE & PROFESSIONAL
+   ============================================================================ */
+:root {
+  /* Primary Colors */
+  --color-primary-dark: #0d2847;      /* Deep blue - trust, security */
+  --color-primary-base: #1565a0;      /* Professional blue */
+  --color-primary-light: #1e88e5;     /* Brighter blue - focus */
+
+  /* Accent Colors */
+  --color-accent-dark: #00796b;       /* Teal - technology, quantum */
+  --color-accent-base: #00897b;       /* Professional teal */
+  --color-accent-light: #26c6da;      /* Cyan - energy, innovation */
+
+  /* Neutral Colors */
+  --color-bg-darkest: #0a0d15;        /* Almost black background */
+  --color-bg-dark: #141829;           /* Dark surface */
+  --color-bg-medium: #1a1f2e;         /* Medium surface */
+  --color-bg-light: #242d3d;          /* Light surface */
+
+  /* Text Colors */
+  --color-text-primary: #f5f5f5;      /* Primary text */
+  --color-text-secondary: #b0b8c1;    /* Secondary text */
+  --color-text-muted: #7a8691;        /* Muted text */
+
+  /* Status Colors */
+  --color-success: #0d8659;           /* Success green */
+  --color-warning: #c97f00;           /* Warning orange */
+  --color-error: #c41c3b;             /* Error red */
+  --color-info: #0066cc;              /* Info blue */
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* ============================================================================
+   TYPOGRAPHY
+   ============================================================================ */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background: linear-gradient(135deg, var(--color-bg-darkest) 0%, var(--color-bg-dark) 50%, var(--color-primary-dark) 100%);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  font-weight: 400;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+}
+
+h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+h5 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+small {
+  font-size: 0.875rem;
+}
+
+code, pre {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+/* ============================================================================
+   MAIN LAYOUT CONTAINERS
+   ============================================================================ */
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container {
+  max-width: 1420px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  flex: 1;
+  width: 100%;
+}
+
+/* ============================================================================
+   HEADER - PROFESSIONAL GRADIENT
+   ============================================================================ */
+
+.header {
+  text-align: center;
+  padding: 50px 40px;
+  background: linear-gradient(135deg, var(--color-primary-base) 0%, var(--color-primary-light) 50%, var(--color-accent-base) 100%);
+  border-radius: 8px;
+  margin-bottom: 40px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" stroke-width="0.5" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  opacity: 0.5;
+}
+
+.header h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -1px;
+}
+
+.header p {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.3px;
+}
+
+/* ============================================================================
+   NAVIGATION TABS
+   ============================================================================ */
+
+.demo-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 40px;
+  background: var(--color-bg-medium);
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(22, 101, 160, 0.2);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  flex: 1;
+  min-width: 140px;
+  padding: 12px 24px;
+  background: transparent;
+  border: 2px solid transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all var(--transition-base);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+}
+
+.tab-button:hover {
+  background: rgba(21, 101, 160, 0.15);
+  color: var(--color-text-primary);
+  border-color: var(--color-primary-light);
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-accent-light) 100%);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px rgba(21, 101, 160, 0.4);
+}
+
+/* ============================================================================
+   SECTIONS & CARDS
+   ============================================================================ */
+
+.demo-section {
+  background: rgba(36, 45, 61, 0.6);
+  border-radius: 8px;
+  padding: 36px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(21, 101, 160, 0.15);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.demo-section:hover {
+  border-color: rgba(21, 101, 160, 0.3);
+  background: rgba(36, 45, 61, 0.8);
+}
+
+.section-title {
+  font-size: 1.8rem;
+  margin-bottom: 24px;
+  color: var(--color-primary-light);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-accent-light), transparent);
+  border-radius: 2px;
+}
+
+/* ============================================================================
+   GRID & CARD SYSTEM
+   ============================================================================ */
+
+.quantum-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.quantum-card {
+  background: var(--color-bg-light);
+  border-radius: 8px;
+  padding: 28px;
+  border: 1px solid rgba(21, 101, 160, 0.2);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.quantum-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-accent-light), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.quantum-card:hover {
+  border-color: var(--color-primary-light);
+  background: var(--color-bg-medium);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.quantum-card:hover::before {
+  opacity: 1;
+}
+
+.quantum-card h3 {
+  color: var(--color-accent-light);
+  margin-bottom: 16px;
+  font-size: 1.25rem;
+  letter-spacing: -0.3px;
+}
+
+.quantum-card h4 {
+  color: var(--color-text-primary);
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+}
+
+.quantum-card p {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ============================================================================
+   METRICS & DATA DISPLAY
+   ============================================================================ */
+
+.metric-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px 0;
+  padding: 14px 16px;
+  background: var(--color-bg-dark);
+  border-radius: 6px;
+  border-left: 3px solid var(--color-accent-base);
+  transition: all var(--transition-fast);
+}
+
+.metric-display:hover {
+  background: rgba(0, 137, 123, 0.1);
+  border-left-color: var(--color-accent-light);
+}
+
+.metric-label {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  color: var(--color-accent-light);
+  font-weight: 700;
+  font-size: 1.25rem;
+  font-family: 'Monaco', monospace;
+  letter-spacing: -0.5px;
+}
+
+/* ============================================================================
+   STATUS INDICATORS - NO EMOJI
+   ============================================================================ */
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-indicator::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor;
+  animation: pulse-indicator 2s ease-in-out infinite;
+}
+
+.status-indicator.active {
+  color: var(--color-success);
+}
+
+.status-indicator.active::before {
+  background: var(--color-success);
+  box-shadow: 0 0 8px var(--color-success);
+}
+
+.status-indicator.inactive {
+  color: var(--color-error);
+}
+
+.status-indicator.inactive::before {
+  background: var(--color-error);
+  box-shadow: 0 0 6px var(--color-error);
+  animation: none;
+  opacity: 0.7;
+}
+
+.status-indicator.warning {
+  color: var(--color-warning);
+}
+
+.status-indicator.warning::before {
+  background: var(--color-warning);
+  box-shadow: 0 0 8px var(--color-warning);
+}
+
+.status-indicator.info {
+  color: var(--color-info);
+}
+
+.status-indicator.info::before {
+  background: var(--color-info);
+  box-shadow: 0 0 8px var(--color-info);
+  animation: none;
+}
+
+@keyframes pulse-indicator {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+/* ============================================================================
+   CODE & HASH DISPLAY
+   ============================================================================ */
+
+.hash-display {
+  background: var(--color-bg-dark);
+  padding: 18px 20px;
+  border-radius: 6px;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: var(--color-accent-light);
+  word-break: break-all;
+  margin: 18px 0;
+  border-left: 4px solid var(--color-accent-base);
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  overflow-x: auto;
+}
+
+.hash-display::-webkit-scrollbar {
+  height: 6px;
+}
+
+.hash-display::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.hash-display::-webkit-scrollbar-thumb {
+  background: rgba(38, 198, 218, 0.3);
+  border-radius: 3px;
+}
+
+.hash-display::-webkit-scrollbar-thumb:hover {
+  background: rgba(38, 198, 218, 0.5);
+}
+
+/* ============================================================================
+   BUTTONS & ACTIONS
+   ============================================================================ */
+
+.action-button {
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-accent-light) 100%);
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  margin: 8px 6px 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: left var(--transition-fast);
+  z-index: -1;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  letter-spacing: 1px;
+}
+
+.action-button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-md);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.action-button.secondary {
+  background: transparent;
+  border: 2px solid var(--color-primary-light);
+  color: var(--color-primary-light);
+  box-shadow: none;
+}
+
+.action-button.secondary:hover {
+  background: rgba(30, 136, 229, 0.15);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================================
+   FILE UPLOAD
+   ============================================================================ */
+
+.file-upload {
+  border: 2px dashed rgba(21, 101, 160, 0.4);
+  border-radius: 8px;
+  padding: 36px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  margin: 24px 0;
+  background: var(--color-bg-light);
+  position: relative;
+}
+
+.file-upload::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base));
+  opacity: 0;
+  border-radius: 8px;
+  transition: opacity var(--transition-base);
+  z-index: -1;
+}
+
+.file-upload:hover {
+  border-color: var(--color-primary-light);
+  background: rgba(30, 136, 229, 0.1);
+  box-shadow: var(--shadow-sm);
+}
+
+.file-upload.dragover {
+  background: rgba(30, 136, 229, 0.2);
+  border-color: var(--color-accent-light);
+  box-shadow: var(--shadow-md);
+}
+
+.file-upload p {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.file-upload p strong {
+  color: var(--color-accent-light);
+}
+
+/* ============================================================================
+   PROGRESS BAR
+   ============================================================================ */
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--color-bg-dark);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 18px 0;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent-base) 0%, var(--color-accent-light) 100%);
+  transition: width var(--transition-base);
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(38, 198, 218, 0.6);
+}
+
+/* ============================================================================
+   CHARTS
+   ============================================================================ */
+
+.chart-container {
+  position: relative;
+  height: 320px;
+  margin: 28px 0;
+  background: var(--color-bg-dark);
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid rgba(21, 101, 160, 0.15);
+}
+
+/* ============================================================================
+   BADGES & LABELS
+   ============================================================================ */
+
+.info-badge {
+  display: inline-block;
+  background: var(--color-bg-light);
+  color: var(--color-accent-light);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 6px;
+  border: 1px solid var(--color-accent-base);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all var(--transition-fast);
+}
+
+.info-badge:hover {
+  background: rgba(0, 137, 123, 0.15);
+  border-color: var(--color-accent-light);
+}
+
+/* ============================================================================
+   KYBER DEMO PANELS
+   ============================================================================ */
+
+.kyber-demo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.kyber-panel {
+  background: var(--color-bg-light);
+  border-radius: 8px;
+  padding: 28px;
+  border: 1px solid rgba(21, 101, 160, 0.2);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.kyber-panel:hover {
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.kyber-panel h4 {
+  color: var(--color-primary-light);
+  margin-bottom: 18px;
+  font-size: 1.1rem;
+  letter-spacing: -0.3px;
+}
+
+.kyber-panel p {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ============================================================================
+   LOADING SPINNER
+   ============================================================================ */
+
+.loading-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--color-accent-light);
+  border-right-color: var(--color-accent-light);
+  animation: spin 1s linear infinite;
+}
+
+.loading-spinner.small {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.loading-spinner.large {
+  width: 32px;
+  height: 32px;
+  border-width: 4px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.footer {
+  text-align: center;
+  padding: 28px 24px;
+  margin-top: 60px;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  letter-spacing: 0.3px;
+  border-top: 1px solid rgba(21, 101, 160, 0.1);
+}
+
+.footer p {
+  margin-bottom: 0.5rem;
+}
+
+.footer a {
+  color: var(--color-accent-light);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================================================
+   MESSAGES & ALERTS
+   ============================================================================ */
+
+.success-message {
+  background: rgba(13, 134, 89, 0.15);
+  border: 1px solid var(--color-success);
+  border-left: 4px solid var(--color-success);
+  color: var(--color-success);
+  padding: 18px 20px;
+  border-radius: 6px;
+  margin: 18px 0;
+  box-shadow: 0 2px 8px rgba(13, 134, 89, 0.2);
+  font-weight: 500;
+}
+
+.error-message {
+  background: rgba(196, 28, 59, 0.15);
+  border: 1px solid var(--color-error);
+  border-left: 4px solid var(--color-error);
+  color: var(--color-error);
+  padding: 18px 20px;
+  border-radius: 6px;
+  margin: 18px 0;
+  box-shadow: 0 2px 8px rgba(196, 28, 59, 0.2);
+  font-weight: 500;
+}
+
+.warning-message {
+  background: rgba(201, 127, 0, 0.15);
+  border: 1px solid var(--color-warning);
+  border-left: 4px solid var(--color-warning);
+  color: var(--color-warning);
+  padding: 18px 20px;
+  border-radius: 6px;
+  margin: 18px 0;
+  box-shadow: 0 2px 8px rgba(201, 127, 0, 0.2);
+  font-weight: 500;
+}
+
+.info-message {
+  background: rgba(0, 102, 204, 0.15);
+  border: 1px solid var(--color-info);
+  border-left: 4px solid var(--color-info);
+  color: var(--color-info);
+  padding: 18px 20px;
+  border-radius: 6px;
+  margin: 18px 0;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
+  font-weight: 500;
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+.p-1 { padding: 0.5rem; }
+.p-2 { padding: 1rem; }
+.p-3 { padding: 1.5rem; }
+.p-4 { padding: 2rem; }
+
+.gap-1 { gap: 0.5rem; }
+.gap-2 { gap: 1rem; }
+.gap-3 { gap: 1.5rem; }
+.gap-4 { gap: 2rem; }
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 1200px) {
+  .app-container {
+    padding: 32px 20px;
+  }
+
+  .header {
+    padding: 40px 30px;
+  }
+
+  .header h1 {
+    font-size: 2.2rem;
+  }
+
+  .demo-section {
+    padding: 28px;
+  }
+
+  .kyber-demo,
+  .quantum-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 24px 16px;
+  }
+
+  .header {
+    padding: 30px 20px;
+    margin-bottom: 24px;
+    border-radius: 6px;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+  }
+
+  .header p {
+    font-size: 1rem;
+  }
+
+  .demo-tabs {
+    gap: 8px;
+    padding: 6px;
+    margin-bottom: 24px;
+  }
+
+  .tab-button {
+    flex: 1;
+    padding: 10px 16px;
+    font-size: 0.8rem;
+    min-width: auto;
+  }
+
+  .demo-section {
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+  }
+
+  .quantum-grid,
+  .kyber-demo {
+    gap: 16px;
+  }
+
+  .quantum-card,
+  .kyber-panel {
+    padding: 20px;
+  }
+
+  .action-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    width: 100%;
+    margin: 8px 0;
+  }
+
+  .file-upload {
+    padding: 24px;
+  }
+
+  .metric-display {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .metric-value {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: 16px 12px;
+  }
+
+  .header {
+    padding: 24px 16px;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+  }
+
+  .demo-tabs {
+    flex-direction: column;
+  }
+
+  .tab-button {
+    width: 100%;
+  }
+
+  .demo-section {
+    padding: 16px;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .quantum-grid,
+  .kyber-demo {
+    gap: 12px;
+  }
+
+  .quantum-card,
+  .kyber-panel {
+    padding: 16px;
+  }
+
+  .metric-display {
+    padding: 12px;
+  }
+
+  .footer {
+    padding: 20px 16px;
+    margin-top: 40px;
+  }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .header,
+  .demo-section {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .action-button {
+    border: 1px solid #999;
+    background: white;
+    color: black;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus states for keyboard navigation */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: more) {
+  :root {
+    --color-text-secondary: #a0a8b1;
+    --color-text-muted: #888f97;
+  }
+
+  .quantum-card,
+  .kyber-panel {
+    border-width: 2px;
+  }
+}
+
+/* Dark mode support (already applied) */
+@media (prefers-color-scheme: dark) {
+  /* Styles are already optimized for dark mode */
+}

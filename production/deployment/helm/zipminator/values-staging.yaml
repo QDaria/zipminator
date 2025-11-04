@@ -1,0 +1,91 @@
+# Staging environment overrides
+# Mock QRNG configuration until hardware arrives
+environment: staging
+
+replicaCount: 2
+
+image:
+  tag: "staging"
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 400m
+    memory: 384Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+  hosts:
+    - host: staging-api.zipminator.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: zipminator-staging-tls
+      hosts:
+        - staging-api.zipminator.com
+
+config:
+  logLevel: "info"
+
+  # Mock QRNG Configuration (until hardware arrives)
+  qrngMode: "mock"
+  qrngDevice: "/dev/urandom"  # Use system random for mock
+
+  mockQrng:
+    enabled: true
+    seedMethod: "crypto"  # Use cryptographically secure PRNG
+    latencyMs: 5  # Simulate realistic QRNG latency
+    throughputBytesPerSec: 1048576  # 1MB/s simulated throughput
+
+  maxBufferSize: 524288  # 512KB (smaller than production)
+
+  server:
+    workers: 4
+    maxConnections: 500
+    readTimeout: 10
+    writeTimeout: 10
+
+  kyber768:
+    enabled: true
+    keyRotationInterval: 3600  # 1 hour
+
+  security:
+    corsEnabled: true
+    allowedOrigins:
+      - "https://staging-app.zipminator.com"
+      - "http://localhost:3000"  # For local development
+    rateLimitEnabled: true
+    rateLimitPerMinute: 100
+
+monitoring:
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+  grafana:
+    enabled: true
+    dashboards:
+      enabled: true
+
+# Volume configuration
+volumes:
+  usbDevices:
+    enabled: false  # Disabled in staging (no hardware)
