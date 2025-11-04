@@ -13,6 +13,42 @@
 
 **Zipminator-PQC** is a quantum-secure encryption platform that combines **real quantum hardware** for entropy generation with **NIST-approved post-quantum cryptography** (Kyber768). The platform provides enterprise-grade, GDPR-compliant data protection designed to withstand attacks from both classical and quantum computers.
 
+---
+
+## 📦 Editions
+
+### 🔓 Community Edition (This Repository - MIT License)
+
+**Open source and free to use:**
+- ✅ Core Kyber768 post-quantum cryptography
+- ✅ Basic quantum entropy harvesting (IBM simulator)
+- ✅ CLI tools and Python SDK
+- ✅ Demo application
+- ✅ Up to 1GB encrypted data
+- ✅ Community forum support
+
+**Perfect for:** Developers, researchers, proof-of-concepts, startups
+
+### 🔒 Enterprise Edition (Commercial License)
+
+**Advanced features for production deployments:**
+- ✅ **All Community features, plus:**
+- ✅ Multi-provider quantum entropy (IBM 127q, IonQ, Rigetti, AWS Braket)
+- ✅ HSM integration (YubiHSM, Thales, AWS CloudHSM)
+- ✅ SSO and RBAC (SAML, OAuth, Active Directory)
+- ✅ Multi-tenancy support
+- ✅ Cloud KMS integration (AWS KMS, Azure Key Vault, GCP KMS)
+- ✅ FIPS 140-3 validated modules
+- ✅ 24/7 enterprise support with SLA
+- ✅ Unlimited encrypted data
+- ✅ Professional services and training
+
+**Pricing:** Starting at $200K/year
+
+**Contact:** [enterprise@zipminator.io](mailto:enterprise@zipminator.io) | **[Request Trial →](https://github.com/MoHoushmand/zipminator-pqc/issues/new?template=enterprise-trial.md)**
+
+---
+
 ### Key Features
 
 - ✅ **Real Quantum Hardware Access** - IBM Quantum (127 qubits), IonQ, Rigetti, AWS Braket, OQC
