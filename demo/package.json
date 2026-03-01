@@ -9,16 +9,23 @@
     "build": "electron-builder",
     "install-deps": "npm install && cd backend && pip3 install -r requirements.txt"
   },
-  "keywords": ["quantum", "encryption", "kyber768", "qrng", "zipminator"],
+  "keywords": [
+    "quantum",
+    "encryption",
+    "kyber768",
+    "qrng",
+    "zipminator"
+  ],
   "author": "Qdaria",
   "license": "MIT",
   "dependencies": {
-    "electron": "^28.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "ai-labs-claude-skills": "^2.0.1",
+    "axios": "^1.6.2",
     "chart.js": "^4.4.0",
+    "electron": "^39.2.1",
+    "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
-    "axios": "^1.6.2"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",

@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "title": "Zipminator - Quantum Cybersecurity Suite",
+    "model": "veo-3.1-generate-preview",
+    "totalScenes": 9,
+    "estimatedCost": "$54.00",
+    "generatedAt": "2025-11-20T21:08:29.036Z"
+  },
+  "scenes": [
+    {
+      "sceneId": 1,
+      "duration": "8s",
+      "prompt": "Cinematic corporate video: QDaria logo materializes from glowing teal quantum particles in deep space. Particles form beautiful entanglement patterns, swirling elegantly and converging into the sleek QDaria wordmark. Background is deep blue space with flowing quantum circuit diagrams. Ultra-modern, professional, 4K quality, volumetric lighting, smooth particle animation, corporate aesthetic.",
+      "voiceover": "Introducing Zipminator from QDaria - The world's most sophisticated cybersecurity suite.",
+      "status": "error",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/veo-3.1-generate-preview:generateContent: [404 Not Found] models/veo-3.1-generate-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    },
+    {
+      "sceneId": 2,
+      "duration": "8s",
+      "prompt": "Split-screen cinematic showcase: LEFT side shows Rigetti quantum computer with intricate gold wiring and chandelier-like structure. RIGHT side shows IBM quantum computer in sleek white cylindrical housing. Teal data streams flow between them. Quantum circuit diagrams in background. Dramatic lighting with teal rim lights. Slow camera pan. Photorealistic 4K rendering.",
+      "voiceover": "The only platform combining multi-provider quantum entropy from Rigetti Computing and IBM Quantum.",
+      "status": "error",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/veo-3.1-generate-preview:generateContent: [404 Not Found] models/veo-3.1-generate-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    },
+    {
+      "sceneId": 3,
+      "duration": "8s",
+      "prompt": "Abstract tech visualization: Chaotic amber data particles flow from left through layered hexagonal grids of glowing teal light. As data passes through encryption layers, particles transform from disorganized amber to perfectly synchronized teal streams. Zipminator logo glows at center. Matrix-inspired but elegant, 4K, high-contrast digital aesthetic.",
+      "voiceover": "Homomorphic encryption lets you compute on encrypted data without ever exposing it.",
+      "status": "error",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/veo-3.1-generate-preview:generateContent: [404 Not Found] models/veo-3.1-generate-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    },
+    {
+      "sceneId": 4,
+      "duration": "8s",
+      "prompt": "Military facility interior: Holographic amber data crystal floats in center. PASS 1: Deep blue energy wave sweeps across neutralizing glow. PASS 2: Teal grid overlays with precision. PASS 3: Explosive particle burst completely annihilates crystal. DoD 5220.22-M badge appears with checkmark. Dark, authoritative, cinematic lighting, 4K quality.",
+      "voiceover": "DoD 5220.22-M certified deletion. Three-pass forensic-proof data destruction.",
+      "status": "error",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/veo-3.1-generate-preview:generateContent: [404 Not Found] models/veo-3.1-generate-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    },
+    {
+      "sceneId": 5,
+      "duration": "8s",
+      "prompt": "Futuristic security display: Glowing teal hexagonal shield materializes, deflecting incoming amber threat particles. Shield has quantum lattice structure. FIPS 203 ML-KEM certification badge appears prominently with 'Post-Quantum Ready' text. Kyber lattice visualization in deep blue background. Clean, authoritative, 4K professional quality.",
+      "voiceover": "FIPS 203 ML-KEM ready. Built on Kyber standards for post-quantum cryptography.",
+      "status": "error",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/veo-3.1-generate-preview:generateContent: [404 Not Found] models/veo-3.1-generate-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    },
+    {
+      "sceneId": 6,
+      "duration": "8s",
+      "prompt": "Clean document interface: Professional document with visible text. Teal scanner light sweeps across highlighting sensitive data (Norwegian FNR, credit cards, SSN) in amber. Highlighted text instantly redacts with black bars. GDPR compliance badge appears with checkmark. Modern UI, crisp 4K rendering, smooth animations.",
+      "voiceover": "GDPR-compliant PII auto-redaction. Sensitive data automatically detected and protected.",
+      "status": "error",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/veo-3.1-generate-preview:generateContent: [404 Not Found] models/veo-3.1-generate-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    },
+    {
+      "sceneId": 7,
+      "duration": "8s",
+      "prompt": "Prestigious corporate showcase: DNB bank logo and Norsk Tipping logo displayed with golden trust seals and certification marks. Deep blue corporate skyline background. Professional lighting. Logos fade in confidently with subtle glow effects. Premium broadcast quality, 4K, corporate presentation style.",
+      "voiceover": "Trusted by DNB for financial security and Norsk Tipping for quantum-fair gaming.",
+      "status": "error",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/veo-3.1-generate-preview:generateContent: [404 Not Found] models/veo-3.1-generate-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    },
+    {
+      "sceneId": 8,
+      "duration": "8s",
+      "prompt": "Modern code editor (VS Code dark theme): Python code types out naturally with cursor movement: 'from zipminator import Zipndel' then 'zipper = Zipndel(file_name=\"sensitive.csv\")' then 'zipper.zip_it()'. Syntax highlighting in teal and amber colors. Green success checkmark appears. Clean developer interface, 4K, crisp text rendering.",
+      "voiceover": "Developer-friendly API. Quantum security in three lines of code.",
+      "status": "error",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/veo-3.1-generate-preview:generateContent: [404 Not Found] models/veo-3.1-generate-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    },
+    {
+      "sceneId": 9,
+      "duration": "8s",
+      "prompt": "Premium brand finale: Zipminator and QDaria logos side-by-side centered on beautiful teal-to-deep-blue gradient background with subtle quantum particles. Text fades in: 'ZIPMINATOR', 'Quantum-Powered. Homomorphically Encrypted. DoD-Secure.', 'zipminator.qdaria.com'. Elegant, powerful, 4K, perfect brand representation with soft logo glow.",
+      "voiceover": "Zipminator. Quantum-powered. Homomorphically encrypted. DoD-secure.",
+      "status": "error",
+      "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/veo-3.1-generate-preview:generateContent: [404 Not Found] models/veo-3.1-generate-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    }
+  ],
+  "instructions": {
+    "manual": "If API access is limited, use Google AI Studio",
+    "url": "https://aistudio.google.com",
+    "steps": [
+      "1. Visit Google AI Studio and sign in",
+      "2. Select 'Veo 3' or 'Veo 3.1' model",
+      "3. Copy each scene prompt from this file",
+      "4. Generate each 8-second video clip",
+      "5. Download all clips",
+      "6. Use video editing software to combine clips",
+      "7. Add voiceovers from the 'voiceover' field"
+    ]
+  }
+}

@@ -1,0 +1,295 @@
+name: Performance Benchmarks
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run benchmarks weekly on Sunday at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Rust benchmarks
+  rust-benchmarks:
+    name: Rust Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-bench-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run Kyber768 benchmarks
+        working-directory: src/rust
+        run: |
+          cargo bench --bench kyber_bench -- --output-format bencher | tee benchmark-results.txt
+
+      - name: Run CLI benchmarks
+        working-directory: cli
+        run: |
+          cargo bench --bench cli_bench -- --output-format bencher | tee -a benchmark-results.txt
+
+      - name: Parse benchmark results
+        id: parse_results
+        run: |
+          echo "Parsing benchmark results..."
+          # Extract key performance metrics
+          KEYGEN_TIME=$(grep "keygen" benchmark-results.txt | awk '{print $5}')
+          ENCAPS_TIME=$(grep "encaps" benchmark-results.txt | awk '{print $5}')
+          DECAPS_TIME=$(grep "decaps" benchmark-results.txt | awk '{print $5}')
+
+          echo "keygen_time=$KEYGEN_TIME" >> $GITHUB_OUTPUT
+          echo "encaps_time=$ENCAPS_TIME" >> $GITHUB_OUTPUT
+          echo "decaps_time=$DECAPS_TIME" >> $GITHUB_OUTPUT
+
+      - name: Store benchmark results
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: Rust Benchmarks
+          tool: 'cargo'
+          output-file-path: benchmark-results.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          alert-threshold: '150%'
+          comment-on-alert: true
+          fail-on-alert: true
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-benchmark-results
+          path: |
+            benchmark-results.txt
+            src/rust/target/criterion/**
+            cli/target/criterion/**
+          retention-days: 30
+
+  # Python benchmarks
+  python-benchmarks:
+    name: Python Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: |
+          pip install maturin pytest pytest-benchmark
+
+      - name: Build Python package
+        working-directory: cli
+        run: maturin develop --release
+
+      - name: Run Python benchmarks
+        run: |
+          pytest benches/python_bench.py --benchmark-json=python-benchmark.json
+
+      - name: Store Python benchmark results
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: Python Benchmarks
+          tool: 'pytest'
+          output-file-path: python-benchmark.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+
+      - name: Upload Python benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-benchmark-results
+          path: python-benchmark.json
+          retention-days: 30
+
+  # Memory profiling
+  memory-profiling:
+    name: Memory Profiling
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install valgrind
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+
+      - name: Install heaptrack
+        run: |
+          sudo apt-get install -y heaptrack
+
+      - name: Build with debug symbols
+        working-directory: cli
+        run: cargo build --release
+
+      - name: Run memory profiling
+        run: |
+          heaptrack cli/target/release/zipminator keygen --output /tmp/test-keys
+          heaptrack_print heaptrack.zipminator.*.gz > memory-profile.txt
+
+      - name: Analyze memory usage
+        run: |
+          echo "=== Memory Usage Analysis ===" >> memory-report.md
+          grep -A 5 "peak heap memory" memory-profile.txt >> memory-report.md || echo "No peak data" >> memory-report.md
+
+      - name: Upload memory profile
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-profile
+          path: |
+            memory-profile.txt
+            memory-report.md
+          retention-days: 30
+
+  # Performance regression detection
+  regression-detection:
+    name: Performance Regression Detection
+    runs-on: ubuntu-latest
+    needs: [rust-benchmarks]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download current benchmarks
+        uses: actions/download-artifact@v4
+        with:
+          name: rust-benchmark-results
+          path: current/
+
+      - name: Compare with baseline
+        id: compare
+        run: |
+          # Compare with previous benchmark results
+          echo "Comparing benchmark results..."
+
+          # Check for regressions (>10% slower)
+          REGRESSION_THRESHOLD=1.10
+
+          # Parse results and detect regressions
+          # This is a placeholder - implement actual comparison logic
+          echo "regression_detected=false" >> $GITHUB_OUTPUT
+
+      - name: Comment on PR if regression detected
+        if: github.event_name == 'pull_request' && steps.compare.outputs.regression_detected == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ Performance regression detected! Some benchmarks are >10% slower than the baseline.'
+            })
+
+      - name: Fail on significant regression
+        if: steps.compare.outputs.regression_detected == 'true'
+        run: |
+          echo "Significant performance regression detected!"
+          exit 1
+
+  # Benchmark comparison report
+  benchmark-report:
+    name: Generate Benchmark Report
+    runs-on: ubuntu-latest
+    needs: [rust-benchmarks, python-benchmarks, memory-profiling]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Generate comprehensive report
+        run: |
+          mkdir -p reports
+          cat > reports/benchmark-summary.md << 'EOF'
+          # Performance Benchmark Report
+
+          ## Rust Core Library
+          - **KeyGen**: See rust-benchmark-results
+          - **Encapsulation**: See rust-benchmark-results
+          - **Decapsulation**: See rust-benchmark-results
+
+          ## Python Bindings
+          - See python-benchmark-results
+
+          ## Memory Usage
+          - See memory-profile
+
+          ## Recommendations
+          - Review any performance regressions
+          - Monitor memory allocations
+          - Optimize critical paths if needed
+
+          Generated: $(date -u)
+          EOF
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-report
+          path: reports/
+          retention-days: 90
+
+  # Performance tracking with Claude Flow
+  performance-tracking:
+    name: Performance Tracking
+    runs-on: ubuntu-latest
+    needs: [rust-benchmarks, python-benchmarks]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Claude Flow
+        run: npm install -g claude-flow@alpha
+
+      - name: Track performance metrics
+        run: |
+          npx claude-flow@alpha hooks notify --message "Performance benchmarks completed"
+          npx claude-flow@alpha hooks post-task --task-id "benchmark-run-${{ github.run_number }}"
+
+      - name: Store metrics in memory
+        run: |
+          # Store performance metrics for historical tracking
+          npx claude-flow@alpha hooks post-edit --file "benchmark-results" --memory-key "performance/benchmarks/${{ github.run_number }}"

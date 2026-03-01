@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: zipminator-postgres
+    environment:
+      POSTGRES_USER: zipminator
+      POSTGRES_PASSWORD: dev_password
+      POSTGRES_DB: zipminator_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zipminator"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: zipminator-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: zipminator-api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://zipminator:dev_password@postgres:5432/zipminator_dev
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: dev-secret-key-change-in-production
+      CLI_PATH: /app/cli/zipminator
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ../cli/target/release/zipminator:/app/cli/zipminator:ro
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:

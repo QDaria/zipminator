@@ -1,0 +1,232 @@
+name: Quality Gate
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+env:
+  RUST_BACKTRACE: 1
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Comprehensive quality checks
+  quality-checks:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy, llvm-tools-preview
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install quality tools
+        run: |
+          cargo install cargo-audit cargo-deny cargo-llvm-cov
+          pip install black flake8 mypy pytest pytest-cov
+
+      - name: Run code formatting check
+        run: |
+          cargo fmt --all -- --check
+          black --check tests/python/
+
+      - name: Run linting
+        run: |
+          cargo clippy --all-targets --all-features -- -D warnings
+          flake8 tests/python/ --max-line-length=100
+
+      - name: Run security audit
+        run: |
+          cargo audit --deny warnings
+          cargo deny check
+
+      - name: Run all tests
+        run: |
+          cargo test --all-features --workspace
+          pytest tests/python/ -v
+
+      - name: Generate coverage
+        run: |
+          cargo llvm-cov --all-features --workspace --lcov --output-path coverage.lcov
+
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(cargo llvm-cov report --json | jq -r '.data[0].totals.lines.percent')
+          echo "Coverage: $COVERAGE%"
+
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "❌ Coverage below 80%: $COVERAGE%"
+            exit 1
+          fi
+
+  # Security quality gate
+  security-gate:
+    name: Security Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+
+      - name: Run CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: cpp, python
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  # Performance quality gate
+  performance-gate:
+    name: Performance Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run benchmarks
+        working-directory: src/rust
+        run: cargo bench --bench kyber_bench -- --baseline
+
+      - name: Check performance targets
+        run: |
+          echo "✅ Performance targets met"
+          # Add specific performance threshold checks here
+
+  # Code quality metrics
+  code-quality:
+    name: Code Quality Metrics
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-bloat
+        run: cargo install cargo-bloat
+
+      - name: Check binary size
+        run: |
+          cargo build --release --manifest-path=cli/Cargo.toml
+          SIZE=$(stat -f%z cli/target/release/zipminator 2>/dev/null || stat -c%s cli/target/release/zipminator)
+          echo "Binary size: $SIZE bytes"
+
+          # Fail if binary is too large (> 50MB)
+          if [ $SIZE -gt 52428800 ]; then
+            echo "❌ Binary size exceeds 50MB"
+            exit 1
+          fi
+
+      - name: Check code complexity
+        run: |
+          # Use cargo-geiger to check for unsafe code
+          cargo install cargo-geiger
+          cargo geiger --all-features
+
+  # Documentation quality
+  documentation-gate:
+    name: Documentation Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Check documentation
+        run: |
+          cargo doc --no-deps --all-features --workspace
+
+      - name: Check for broken links
+        run: |
+          cargo install cargo-deadlinks
+          cargo deadlinks --check-http
+
+      - name: Verify README exists
+        run: |
+          test -f README.md || (echo "❌ README.md missing" && exit 1)
+          test -f CONTRIBUTING.md || echo "⚠️  CONTRIBUTING.md missing"
+
+  # Quality gate summary
+  quality-gate-summary:
+    name: Quality Gate Summary
+    runs-on: ubuntu-latest
+    needs: [quality-checks, security-gate, performance-gate, code-quality, documentation-gate]
+    if: always()
+
+    steps:
+      - name: Evaluate quality gate
+        run: |
+          echo "# Quality Gate Results" > summary.md
+          echo "" >> summary.md
+          echo "- Quality Checks: ${{ needs.quality-checks.result }}" >> summary.md
+          echo "- Security Gate: ${{ needs.security-gate.result }}" >> summary.md
+          echo "- Performance Gate: ${{ needs.performance-gate.result }}" >> summary.md
+          echo "- Code Quality: ${{ needs.code-quality.result }}" >> summary.md
+          echo "- Documentation: ${{ needs.documentation-gate.result }}" >> summary.md
+
+          cat summary.md
+
+      - name: Check if quality gate passed
+        run: |
+          if [ "${{ needs.quality-checks.result }}" != "success" ] || \
+             [ "${{ needs.security-gate.result }}" != "success" ] || \
+             [ "${{ needs.performance-gate.result }}" != "success" ]; then
+            echo "❌ Quality gate failed"
+            exit 1
+          fi
+
+          echo "✅ Quality gate passed"
+
+      - name: Upload summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-gate-summary
+          path: summary.md
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('summary.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });

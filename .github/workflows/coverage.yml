@@ -1,0 +1,221 @@
+name: Code Coverage
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # Rust code coverage with llvm-cov
+  rust-coverage:
+    name: Rust Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - name: Install cargo-llvm-cov
+        run: cargo install cargo-llvm-cov
+
+      - name: Generate coverage - Core library
+        working-directory: src/rust
+        run: |
+          cargo llvm-cov --all-features --workspace --lcov --output-path ../../coverage-rust-core.lcov
+          cargo llvm-cov report --html --output-dir ../../coverage-html-rust-core
+
+      - name: Generate coverage - CLI
+        working-directory: cli
+        run: |
+          cargo llvm-cov --all-features --lcov --output-path ../coverage-rust-cli.lcov
+          cargo llvm-cov report --html --output-dir ../coverage-html-rust-cli
+
+      - name: Generate coverage - Compliance
+        working-directory: compliance/nist-kat
+        run: |
+          cargo llvm-cov --all-features --lcov --output-path ../../coverage-rust-compliance.lcov
+          cargo llvm-cov report --html --output-dir ../../coverage-html-rust-compliance
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage-rust-core.lcov,./coverage-rust-cli.lcov,./coverage-rust-compliance.lcov
+          flags: rust
+          name: rust-coverage
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload HTML coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-coverage-html
+          path: |
+            coverage-html-rust-core/
+            coverage-html-rust-cli/
+            coverage-html-rust-compliance/
+
+      - name: Check coverage thresholds
+        run: |
+          CORE_COV=$(cargo llvm-cov report --json --manifest-path=src/rust/Cargo.toml | jq -r '.data[0].totals.lines.percent')
+          CLI_COV=$(cargo llvm-cov report --json --manifest-path=cli/Cargo.toml | jq -r '.data[0].totals.lines.percent')
+
+          echo "Core coverage: $CORE_COV%"
+          echo "CLI coverage: $CLI_COV%"
+
+          # Require 80% minimum coverage
+          if (( $(echo "$CORE_COV < 80" | bc -l) )); then
+            echo "❌ Core coverage below 80%: $CORE_COV%"
+            exit 1
+          fi
+
+          if (( $(echo "$CLI_COV < 75" | bc -l) )); then
+            echo "❌ CLI coverage below 75%: $CLI_COV%"
+            exit 1
+          fi
+
+          echo "✅ Coverage thresholds met"
+
+  # Python coverage with pytest-cov
+  python-coverage:
+    name: Python Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: |
+          pip install maturin pytest pytest-cov pytest-benchmark coverage[toml]
+
+      - name: Build Python package
+        working-directory: cli
+        run: maturin develop
+
+      - name: Run tests with coverage
+        run: |
+          pytest tests/python/ \
+            --cov=zipminator_pqc \
+            --cov-report=xml:coverage-python.xml \
+            --cov-report=html:coverage-html-python \
+            --cov-report=term-missing \
+            --cov-fail-under=85
+
+      - name: Upload Python coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage-python.xml
+          flags: python
+          name: python-coverage
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload HTML coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-coverage-html
+          path: coverage-html-python/
+
+  # C++ coverage with gcov/lcov
+  cpp-coverage:
+    name: C++ Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+
+      - name: Install coverage tools
+        run: sudo apt-get update && sudo apt-get install -y lcov gcov
+
+      - name: Build with coverage
+        working-directory: src/cpp
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON
+          cmake --build . --config Debug
+
+      - name: Run tests
+        working-directory: src/cpp/build
+        run: ctest --output-on-failure
+
+      - name: Generate coverage report
+        working-directory: src/cpp/build
+        run: |
+          lcov --capture --directory . --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' --output-file coverage.info
+          lcov --list coverage.info
+
+      - name: Upload C++ coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./src/cpp/build/coverage.info
+          flags: cpp
+          name: cpp-coverage
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  # Combined coverage report
+  coverage-report:
+    name: Combined Coverage Report
+    runs-on: ubuntu-latest
+    needs: [rust-coverage, python-coverage, cpp-coverage]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all coverage reports
+        uses: actions/download-artifact@v4
+
+      - name: Generate summary
+        run: |
+          echo "# Coverage Summary" > coverage-summary.md
+          echo "" >> coverage-summary.md
+          echo "Coverage reports generated for:" >> coverage-summary.md
+          echo "- Rust core library" >> coverage-summary.md
+          echo "- Rust CLI" >> coverage-summary.md
+          echo "- Python bindings" >> coverage-summary.md
+          echo "- C++ implementation" >> coverage-summary.md
+          echo "" >> coverage-summary.md
+          echo "View detailed reports in artifacts." >> coverage-summary.md
+
+      - name: Upload summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary
+          path: coverage-summary.md
+
+  # Quality gate check
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [rust-coverage, python-coverage, cpp-coverage]
+
+    steps:
+      - name: Check overall quality
+        run: |
+          echo "✅ All coverage thresholds met"
+          echo "✅ Quality gate passed"

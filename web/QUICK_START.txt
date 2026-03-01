@@ -1,0 +1,124 @@
+# ZIPMINATOR-PQC LANDING PAGE - QUICK START GUIDE
+
+## Installation & Setup (5 minutes)
+
+1. Navigate to directory:
+   cd /Users/mos/dev/zipminator/landing-page
+
+2. Install dependencies:
+   npm install
+   # or: bun install
+   # or: pnpm install
+
+3. Start development server:
+   npm run dev
+   # Server starts at: http://localhost:3000
+
+4. Open browser:
+   http://localhost:3000
+
+## Project Structure
+
+landing-page/
+├── app/                    # Next.js pages
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Home page
+│   └── globals.css        # Global styles
+├── components/            # React components (10 files)
+├── lib/                   # Utilities & constants
+├── public/               # Static assets
+└── [config files]        # package.json, tsconfig.json, etc.
+
+## Key Files
+
+📄 README.md              - Complete documentation
+📄 DEPLOYMENT.md          - Deployment guide (Vercel/Netlify/Docker)
+📄 ARCHITECTURE.md        - System architecture & tech decisions
+📄 DESIGN_SPEC.md         - Design system & specifications
+
+## What's Included
+
+✅ 10 Complete Components:
+   - Navigation (QDaria-branded)
+   - Hero (with Three.js quantum background)
+   - ProviderShowcase (IBM, IonQ, Rigetti, AWS, OQC)
+   - TrustSignals (clients & certifications)
+   - KeyFeatures (3-column grid)
+   - HowItWorks (3-step process)
+   - StatsBar (performance metrics)
+   - UseCases (industry applications)
+   - CTA (final call-to-action)
+   - Footer (comprehensive links)
+
+✅ Styling:
+   - Tailwind CSS v4 (quantum theme)
+   - Dark mode by default
+   - Fully responsive
+   - Framer Motion animations
+   - Three.js quantum background
+
+✅ Development:
+   - TypeScript configured
+   - ESLint setup
+   - Next.js 14 + React 18
+   - Optimized for performance
+
+## Quick Commands
+
+npm run dev        # Start dev server
+npm run build      # Build for production
+npm start          # Start production server
+npm run lint       # Run linting
+npm run type-check # TypeScript check
+
+## Deployment (Fast Track)
+
+### Vercel (Recommended - 2 minutes):
+1. Install: npm i -g vercel
+2. Run: vercel
+3. Follow prompts
+4. Done! Your site is live
+
+### Netlify:
+1. Install: npm i -g netlify-cli
+2. Run: netlify deploy --prod
+3. Follow prompts
+
+See DEPLOYMENT.md for detailed instructions.
+
+## Customization
+
+1. Colors: Edit tailwind.config.ts
+2. Content: Edit component files in components/
+3. Config: Edit lib/constants.ts
+4. Branding: Update Navigation.tsx and Footer.tsx
+
+## Next Steps
+
+1. ✅ Review README.md for full documentation
+2. ✅ Check DESIGN_SPEC.md for design system
+3. ✅ Read ARCHITECTURE.md for tech details
+4. ✅ Follow DEPLOYMENT.md to go live
+5. 🎨 Customize content and branding
+6. 🚀 Deploy to production
+
+## Support
+
+- Documentation: README.md (this repo)
+- GitHub: https://github.com/qdaria/zipminator-pqc
+- QDaria: https://qdaria.com/contact
+- Email: contact@qdaria.com
+
+## Design Inspiration
+
+Based on qBraid.com design philosophy:
+- Clean, modern quantum aesthetic
+- Provider showcase layout
+- Trust signals prominence
+- Card-based information architecture
+
+---
+
+Total setup time: ~5 minutes
+Ready to deploy: Yes
+Production ready: Yes

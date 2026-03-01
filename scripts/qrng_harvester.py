@@ -1,112 +1,111 @@
 import os
+import hashlib
 import math
 from dotenv import load_dotenv
-from pathlib import Path  # <-- IMPORT PATHLIB
+from pathlib import Path
 from qiskit import QuantumCircuit
-from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
+# Use qBraid provider to access IBM backends for free
+from qbraid.providers.qiskit import QbraidProvider
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 
 # --- Configuration ---
-# TARGET_BYTES = 15  # <-- START WITH 1 SHOT (15 bytes) FOR TESTING
-# TARGET_BYTES = 3000  # <-- Max for demo (~9 mins)
-TARGET_BYTES = 15 * 50  # <-- 750 Bytes for full test
+# Harvesting continuously to build a massive entropy pool
+TARGET_BYTES = 1024 * 50  # 50 KB per harvest cycle
 BYTES_PER_SHOT = 15
 NUM_QUBITS = BYTES_PER_SHOT * 8
 
-# --- Path Fixes ---
-# Find the project root (which is 2 levels up from this file)
+# Backend preference order (156-qubit Eagle r3 processors)
+BACKEND_PRIORITY = ["ibm_q_marrakesh", "ibm_q_fez"]
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ENV_PATH = PROJECT_ROOT / ".env"
-# RENAME THE OUTPUT FILE TO PRESERVE YOUR TEST FILE
-OUTPUT_DIR = PROJECT_ROOT / "quantum_entropy" # <-- This is your correct path
-OUTPUT_FILE = OUTPUT_DIR / "entropy_demo_750B.bin"
-#OUTPUT_FILE = OUTPUT_DIR / "entropy_pool.bin"
-# --------------------
+OUTPUT_DIR = PROJECT_ROOT / "quantum_entropy"
+OUTPUT_FILE = OUTPUT_DIR / "quantum_entropy_pool.bin"
 
-def create_q_rng_circuit(num_bits):
-    circuit = QuantumCircuit(num_bits, num_bits, name="qrng")
-    circuit.h(range(num_bits))
-    circuit.measure(range(num_bits), range(num_bits))
-    return circuit
 
-def load_credentials():
-    """Loads IBM Cloud credentials securely from .env file."""
-    load_dotenv(dotenv_path=ENV_PATH)  # <-- Specify .env path
-    token = os.getenv("IBM_CLOUD_TOKEN")
-    instance = os.getenv("IBM_CLOUD_INSTANCE")
-    
-    if not token or not instance:
-        print("="*50)
-        print(f"ERROR: Could not find .env file at {ENV_PATH}")
-        print("Please create a .env file in the project root.")
-        print("="*50)
-        return None, None
-    return token, instance
+def _connect_backend(provider):
+    """Try each backend in priority order, return the first that connects."""
+    for backend_name in BACKEND_PRIORITY:
+        try:
+            print(f"📡 Trying qBraid backend: {backend_name}...")
+            backend = provider.get_backend(backend_name)
+            print(f"✅ Connected to {backend_name}")
+            return backend, backend_name
+        except Exception as e:
+            print(f"⚠️  {backend_name} unavailable: {e}")
+    raise RuntimeError(
+        f"All backends failed: {', '.join(BACKEND_PRIORITY)}. "
+        "Check qBraid account status and backend availability."
+    )
+
 
 def main():
-    """Main function to generate and save quantum entropy."""
-    
-    print("Starting Zipminator Quantum Entropy Harvester...")
-    token, instance = load_credentials()
-    if not token:
+    load_dotenv(ENV_PATH)
+    qbraid_api_key = os.getenv("QBRAID_API_KEY")
+
+    if not qbraid_api_key:
+        print("❌ ERROR: QBRAID_API_KEY environment variable not found in .env!")
         return
 
     try:
-        # --- 1. Authentication ---
-        print("Connecting to IBM Quantum...")
-        service = QiskitRuntimeService(channel="ibm_cloud", instance=instance, token=token)
-        
-        backend = service.least_busy(min_num_qubits=NUM_QUBITS, simulator=False, operational=True)
-        print(f"Secured backend: {backend.name} ({backend.num_qubits} qubits)")
+        print("🚀 Initializing qBraid Provider...")
+        provider = QbraidProvider(qbraid_api_key=qbraid_api_key)
 
-        # --- 2. Circuit Preparation ---
-        print(f"Requesting {TARGET_BYTES} bytes of quantum entropy.")
-        print(f"Using {NUM_QUBITS} qubits ({BYTES_PER_SHOT} bytes per shot).")
-        
+        # Connect to best available backend (Marrakesh first, then Fez)
+        backend, backend_name = _connect_backend(provider)
+
+        print(f"🏗️ Building {NUM_QUBITS}-qubit Quantum Hadamard Circuit...")
+        qc = QuantumCircuit(NUM_QUBITS, NUM_QUBITS)
+        for i in range(NUM_QUBITS):
+            qc.h(i)
+        qc.measure(range(NUM_QUBITS), range(NUM_QUBITS))
+
+        print("⚙️ Transpiling for hardware...")
+        pm = generate_preset_pass_manager(optimization_level=1, backend=backend)
+        isa_circuit = pm.run(qc)
+
         shots_needed = math.ceil(TARGET_BYTES / BYTES_PER_SHOT)
-        print(f"Calculated shots needed: {shots_needed}")
+        print(f"📤 Submitting job to qBraid ({backend_name}) for {shots_needed} shots...")
 
-        qc = create_q_rng_circuit(NUM_QUBITS)
-        
-        print("Transpiling circuit for backend...")
-        pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
-        isa_qc = pm.run(qc)
+        job = backend.run(isa_circuit, shots=shots_needed)
+        print(f"⏳ Job ID: {job.job_id()}. Waiting for execution...")
 
-        # --- 3. Run on Quantum Hardware ---
-        print("Initializing SamplerV2 in 'job' mode...")
-        sampler = Sampler(mode=backend) 
-        
-        print(f"Sending job to {backend.name}...")
-        job = sampler.run([isa_qc], shots=shots_needed)
-        print(f"Job ID: {job.job_id()}. Waiting for results...")
-        
-        result_hw = job.result() 
-        print("Job finished. Processing results...")
+        result = job.result()
+        counts = result.get_counts()
 
-        # --- 4. Process and Save Data ---
-        counts = result_hw[0].data.c.get_counts()
         all_bit_strings = list(counts.keys())
-        
         byte_data = b''
         for bit_string in all_bit_strings:
             byte_data += int(bit_string, 2).to_bytes(BYTES_PER_SHOT, 'big')
 
         final_entropy = byte_data[:TARGET_BYTES]
-        
-        # Create the data directory if it doesn't exist
+
+        # SHA-256 integrity hash for this harvest cycle
+        harvest_hash = hashlib.sha256(final_entropy).hexdigest()
+
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-        with open(OUTPUT_FILE, 'wb') as f:
+        # Record pool size before append
+        pool_before = OUTPUT_FILE.stat().st_size if OUTPUT_FILE.exists() else 0
+
+        # APPEND TO THE POOL (ever-increasing, no maximum limit)
+        with open(OUTPUT_FILE, 'ab') as f:
             f.write(final_entropy)
-        
-        print("\n" + "="*50)
-        print("✅ SUCCESS!")
-        print(f"Successfully harvested {len(final_entropy)} bytes of quantum entropy.")
-        print(f"Data saved to: {OUTPUT_FILE}")
-        print("="*50)
+
+        pool_after = OUTPUT_FILE.stat().st_size
+
+        print("\n" + "=" * 60)
+        print("✅ HARVEST COMPLETE")
+        print(f"  Backend        : {backend_name}")
+        print(f"  Harvested      : {len(final_entropy):,} bytes")
+        print(f"  SHA-256        : {harvest_hash}")
+        print(f"  Pool Before    : {pool_before:,} bytes")
+        print(f"  Pool After     : {pool_after:,} bytes")
+        print(f"  Pool Location  : {OUTPUT_FILE}")
+        print("=" * 60)
 
     except Exception as e:
-        print(f"\nAn error occurred: {e}")
+        print(f"\n❌ Harvest failed: {e}")
 
 if __name__ == "__main__":
     main()

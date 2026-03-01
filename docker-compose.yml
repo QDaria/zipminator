@@ -1,0 +1,86 @@
+version: "3.9"
+
+services:
+  # --------------------------------------------------------------------------
+  # PostgreSQL database for the API
+  # --------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-zipminator}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zipminator_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-zipminator}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zipminator}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --------------------------------------------------------------------------
+  # Redis cache
+  # --------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # --------------------------------------------------------------------------
+  # FastAPI backend
+  # --------------------------------------------------------------------------
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-zipminator}:${POSTGRES_PASSWORD:-zipminator_dev}@postgres:5432/${POSTGRES_DB:-zipminator}"
+      REDIS_URL: "redis://redis:6379"
+      IBM_CLOUD_TOKEN: ${IBM_CLOUD_TOKEN:-}
+      IBM_CLOUD_INSTANCE: ${IBM_CLOUD_INSTANCE:-open-instance}
+      QBRAID_API_KEY: ${QBRAID_API_KEY:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ./api/src:/app/src
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # --------------------------------------------------------------------------
+  # Next.js dashboard / web frontend
+  # --------------------------------------------------------------------------
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      target: dev
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://api:8000"
+    volumes:
+      - ./web/app:/app/app
+      - ./web/components:/app/components
+      - ./web/lib:/app/lib
+    depends_on:
+      - api
+    command: npm run dev
+
+volumes:
+  pgdata:

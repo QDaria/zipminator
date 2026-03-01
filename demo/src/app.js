@@ -1,6 +1,15 @@
 const { useState, useEffect, useRef } = React;
 
-const API_BASE = 'http://localhost:5001/api';
+// Resolved at startup: prefers /api (Docker nginx proxy) when available,
+// falls back to http://localhost:5001/api (local dev / Electron).
+// Resolve API base: try nginx proxy first, fall back to direct Flask.
+let API_BASE = 'http://localhost:5001/api';
+(async () => {
+  try {
+    const r = await fetch('/api/health', { method: 'GET', signal: AbortSignal.timeout(1500) });
+    if (r.ok) API_BASE = '/api';
+  } catch (_) { /* keep direct URL */ }
+})();
 
 // Main App Component
 function App() {
@@ -53,15 +62,20 @@ function App() {
       React.createElement('button', {
         className: `tab-button ${activeTab === 'kyber' ? 'active' : ''}`,
         onClick: () => setActiveTab('kyber')
-      }, 'Post-Quantum Kyber768')
+      }, 'Post-Quantum Kyber768'),
+      React.createElement('button', {
+        className: `tab-button ${activeTab === 'jupyter' ? 'active' : ''}`,
+        onClick: () => setActiveTab('jupyter')
+      }, '📓 Jupyter Notebooks')
     ),
 
     activeTab === 'quantum' && React.createElement(QuantumEntropyDemo, null),
     activeTab === 'zipminator' && React.createElement(ZipminatorDemo, null),
     activeTab === 'kyber' && React.createElement(KyberDemo, null),
+    activeTab === 'jupyter' && React.createElement(JupyterDemo, null),
 
     React.createElement('div', { className: 'footer' },
-      'Powered by Real Quantum Hardware (IBM 127-qubit) • Zipminator by QDaria © 2025'
+      'Powered by Real Quantum Hardware (IBM 127-qubit) • Zipminator by QDaria © 2026'
     )
   );
 }
@@ -194,6 +208,8 @@ function ZipminatorDemo() {
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState(null);
   const [dragOver, setDragOver] = useState(false);
+  const [selfDestructEnabled, setSelfDestructEnabled] = useState(true);
+  const [destructHours, setDestructHours] = useState(24);
 
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
@@ -215,6 +231,8 @@ function ZipminatorDemo() {
     setProcessing(true);
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('self_destruct_enabled', selfDestructEnabled);
+    formData.append('destruct_hours', destructHours);
 
     try {
       const response = await axios.post(`${API_BASE}/zipminator/encrypt`, formData, {
@@ -222,7 +240,7 @@ function ZipminatorDemo() {
       });
       setResult({
         type: 'success',
-        message: 'File encrypted successfully with quantum-seeded AES-256',
+        message: `File encrypted successfully with quantum-seeded AES-256${selfDestructEnabled ? ` (Self-destruct: ${destructHours}h)` : ''}`,
         data: response.data
       });
     } catch (error) {
@@ -310,6 +328,35 @@ function ZipminatorDemo() {
       )
     ),
 
+    React.createElement('div', { className: 'self-destruct-options', style: { marginBottom: '20px' } },
+      React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', padding: '15px', background: '#2a2a2a', borderRadius: '8px' } },
+        React.createElement('input', {
+          type: 'checkbox',
+          id: 'enableSelfDestruct',
+          checked: selfDestructEnabled,
+          onChange: (e) => setSelfDestructEnabled(e.target.checked),
+          style: { width: '18px', height: '18px', cursor: 'pointer' }
+        }),
+        React.createElement('label', {
+          htmlFor: 'enableSelfDestruct',
+          style: { cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }
+        },
+          '💣 Enable Self-Destruct Timer'
+        ),
+        selfDestructEnabled && React.createElement('select', {
+          id: 'destructTime',
+          value: destructHours,
+          onChange: (e) => setDestructHours(parseInt(e.target.value)),
+          style: { marginLeft: '12px', padding: '8px', background: '#1a1a1a', color: '#fff', border: '1px solid #444', borderRadius: '4px', cursor: 'pointer' }
+        },
+          React.createElement('option', { value: 1 }, '1 hour'),
+          React.createElement('option', { value: 24 }, '24 hours'),
+          React.createElement('option', { value: 168 }, '7 days'),
+          React.createElement('option', { value: 672 }, '28 days')
+        )
+      )
+    ),
+
     React.createElement('div', {
       className: `file-upload ${dragOver ? 'dragover' : ''}`,
       onDrop: handleDrop,
@@ -368,6 +415,120 @@ function ZipminatorDemo() {
         React.createElement('p', null, `Encryption ID: ${result.data.file_id}`),
         React.createElement('p', null, `Generated: ${new Date().toLocaleString()}`)
       )
+    )
+  );
+}
+
+// Jupyter Demo Component
+function JupyterDemo() {
+  const [launching, setLaunching] = useState(false);
+  const [launchResult, setLaunchResult] = useState(null);
+
+  const launchJupyter = async () => {
+    setLaunching(true);
+    setLaunchResult(null);
+
+    try {
+      const response = await axios.post(`${API_BASE}/jupyter/launch`);
+      if (response.data.success) {
+        setLaunchResult({
+          type: 'success',
+          message: 'JupyterLab launched successfully! Opening in browser...',
+          url: response.data.url || 'http://localhost:8888'
+        });
+      }
+    } catch (error) {
+      setLaunchResult({
+        type: 'error',
+        message: 'Failed to launch JupyterLab: ' + error.message
+      });
+    } finally {
+      setLaunching(false);
+    }
+  };
+
+  return React.createElement('div', { className: 'demo-section' },
+    React.createElement('h2', { className: 'section-title' }, '🪐 JupyterLab Environment'),
+
+    React.createElement('div', { className: 'quantum-grid' },
+      React.createElement('div', { className: 'quantum-card' },
+        React.createElement('h3', null, 'Included Notebooks'),
+        React.createElement('div', { className: 'feature-list' },
+          React.createElement('div', { className: 'feature-item' },
+            React.createElement('span', { className: 'feature-icon' }, '📊'),
+            React.createElement('span', null, 'DEMO_COMBINED.ipynb - 15-min banking demo')
+          ),
+          React.createElement('div', { className: 'feature-item' },
+            React.createElement('span', { className: 'feature-icon' }, '🚀'),
+            React.createElement('span', null, '01_basic_usage.ipynb - Quick start guide')
+          ),
+          React.createElement('div', { className: 'feature-item' },
+            React.createElement('span', { className: 'feature-icon' }, '🔒'),
+            React.createElement('span', null, '02_masking_anonymization.ipynb - Privacy features')
+          ),
+          React.createElement('div', { className: 'feature-item' },
+            React.createElement('span', { className: 'feature-icon' }, '🇳🇴'),
+            React.createElement('span', null, '03_norwegian_pii.ipynb - PII detection')
+          ),
+          React.createElement('div', { className: 'feature-item' },
+            React.createElement('span', { className: 'feature-icon' }, '✅'),
+            React.createElement('span', null, '04_compliance_audit.ipynb - GDPR compliance')
+          )
+        )
+      ),
+
+      React.createElement('div', { className: 'quantum-card' },
+        React.createElement('h3', null, 'Environment Details'),
+        React.createElement('div', { className: 'metric-display' },
+          React.createElement('span', { className: 'metric-label' }, 'Environment'),
+          React.createElement('span', { className: 'metric-value' }, 'zip-pqc')
+        ),
+        React.createElement('div', { className: 'metric-display' },
+          React.createElement('span', { className: 'metric-label' }, 'Python Packages'),
+          React.createElement('span', { className: 'metric-value' }, 'Qiskit, Pandas, Cryptography')
+        ),
+        React.createElement('div', { className: 'metric-display' },
+          React.createElement('span', { className: 'metric-label' }, 'Port'),
+          React.createElement('span', { className: 'metric-value' }, '8888')
+        ),
+        React.createElement('div', { className: 'metric-display' },
+          React.createElement('span', { className: 'metric-label' }, 'Status'),
+          React.createElement('span', { className: 'metric-value status-cell' },
+            React.createElement('span', { className: 'status-indicator active' }),
+            React.createElement('span', null, 'Ready')
+          )
+        )
+      )
+    ),
+
+    React.createElement('div', { className: 'jupyter-launch-section', style: { marginTop: '30px', textAlign: 'center' } },
+      React.createElement('p', { style: { fontSize: '16px', marginBottom: '20px', color: '#666' } },
+        'Launch interactive Jupyter notebooks with all dependencies pre-configured for quantum encryption demonstrations'
+      ),
+
+      React.createElement('button', {
+        className: 'action-button primary',
+        onClick: launchJupyter,
+        disabled: launching,
+        style: { fontSize: '18px', padding: '15px 40px' }
+      }, launching ? 'Launching JupyterLab...' : '🚀 Launch JupyterLab'),
+
+      launchResult && React.createElement('div', {
+        className: launchResult.type === 'success' ? 'success-message' : 'error-message',
+        style: { marginTop: '20px' }
+      },
+        React.createElement('p', null, launchResult.message),
+        launchResult.url && React.createElement('p', { className: 'result-details' },
+          `URL: ${launchResult.url}`
+        )
+      )
+    ),
+
+    React.createElement('div', { className: 'info-badges' },
+      React.createElement('div', { className: 'info-badge' }, 'Pre-configured Environment'),
+      React.createElement('div', { className: 'info-badge' }, 'Interactive Demos'),
+      React.createElement('div', { className: 'info-badge' }, 'Quantum + Classical'),
+      React.createElement('div', { className: 'info-badge' }, 'Production Examples')
     )
   );
 }
@@ -547,7 +708,7 @@ function KyberDemo() {
     React.createElement('div', { className: 'info-badges' },
       React.createElement('div', { className: 'info-badge' }, 'Quantum-Resistant'),
       React.createElement('div', { className: 'info-badge' }, 'High Performance'),
-      React.createElement('div', { className: 'info-badge' }, 'NIST Finalist'),
+      React.createElement('div', { className: 'info-badge' }, 'NIST FIPS 203'),
       React.createElement('div', { className: 'info-badge' }, 'Production Ready')
     )
   );

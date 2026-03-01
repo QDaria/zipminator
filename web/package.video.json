@@ -1,0 +1,20 @@
+{
+  "name": "zipminator-video-generation",
+  "version": "1.0.0",
+  "description": "Zipminator promotional video generation using Gemini AI",
+  "type": "module",
+  "scripts": {
+    "generate-video": "node scripts/generate-zipminator-video.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  },
+  "keywords": [
+    "zipminator",
+    "quantum-security",
+    "video-generation",
+    "gemini-ai"
+  ],
+  "author": "QDaria Inc.",
+  "license": "Proprietary"
+}

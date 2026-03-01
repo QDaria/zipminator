@@ -1,0 +1,146 @@
+version: 2
+updates:
+  # Rust dependencies (core library)
+  - package-ecosystem: "cargo"
+    directory: "/src/rust"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "MoHoushmand"
+    labels:
+      - "dependencies"
+      - "rust"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      cryptography:
+        patterns:
+          - "sha3"
+          - "subtle"
+          - "rand*"
+          - "getrandom"
+      development:
+        patterns:
+          - "criterion"
+          - "proptest"
+
+  # Rust dependencies (CLI)
+  - package-ecosystem: "cargo"
+    directory: "/cli"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "MoHoushmand"
+    labels:
+      - "dependencies"
+      - "rust"
+      - "cli"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # Rust dependencies (NIST KAT)
+  - package-ecosystem: "cargo"
+    directory: "/compliance/nist-kat"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "MoHoushmand"
+    labels:
+      - "dependencies"
+      - "rust"
+      - "compliance"
+
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/cli"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "MoHoushmand"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      quantum:
+        patterns:
+          - "qiskit*"
+          - "qbraid*"
+      crypto:
+        patterns:
+          - "cryptography"
+          - "pycryptodome"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "MoHoushmand"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+
+  # Docker
+  - package-ecosystem: "docker"
+    directory: "/docker"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "MoHoushmand"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore(docker)"
+      include: "scope"
+
+  # NPM (if demo exists)
+  - package-ecosystem: "npm"
+    directory: "/demo"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "MoHoushmand"
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "demo"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    ignore:
+      # Ignore major version updates for stable dependencies
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "electron"
+        update-types: ["version-update:semver-major"]

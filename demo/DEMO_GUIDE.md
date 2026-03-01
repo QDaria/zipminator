@@ -103,7 +103,7 @@
 ### Demo Steps:
 1. **Explain the Quantum Threat**
    - Brief: "Current encryption (RSA, ECC) will be broken by quantum computers"
-   - Kyber768 is quantum-resistant, NIST finalist
+   - Kyber768 is quantum-resistant, NIST FIPS 203 standard (finalized August 13, 2024)
 
 2. **Generate Keypair**
    - Click "Generate Kyber768 Keys"

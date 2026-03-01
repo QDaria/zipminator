@@ -1,0 +1,25 @@
+[workspace]
+members = [
+    "crates/zipminator-core",
+    "crates/zipminator-fuzz",
+    "crates/zipminator-nist",
+    "crates/zipminator-bench",
+]
+resolver = "2"
+
+[workspace.package]
+version = "1.0.0"
+edition = "2021"
+authors = ["Qdaria Inc. <team@qdaria.com>"]
+license = "MIT"
+repository = "https://github.com/MoHoushmand/zipminator-pqc"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = false
+debug = false
+
+[profile.bench]
+inherits = "release"

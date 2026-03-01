@@ -30,3 +30,11 @@ npm-debug.log*
 
 # Electron
 out/
+
+# Docker
+.docker/
+
+# Claude / Hive-Mind
+.claude-flow/
+.hive-mind/
+CLAUDE.md

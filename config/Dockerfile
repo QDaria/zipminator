@@ -28,7 +28,7 @@ RUN cargo build --release \
 FROM alpine:latest
 
 LABEL maintainer="QDaria <hello@qdaria.com>"
-LABEL version="0.1.0"
+LABEL version="1.0.0"
 
 # Install runtime dependencies
 RUN apk add --no-cache \
@@ -63,7 +63,7 @@ CMD ["--help"]
 # Build metadata
 ARG BUILD_DATE
 ARG VCS_REF
-ARG VERSION=0.1.0
+ARG VERSION=1.0.0
 
 LABEL org.opencontainers.image.created=$BUILD_DATE
 LABEL org.opencontainers.image.revision=$VCS_REF

@@ -1,0 +1,17 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+RUN pip install --no-cache-dir flask flask-cors
+
+# Copy backend code
+COPY backend/ ./backend/
+COPY sample_data/ ./sample_data/
+
+# Create entropy directory (will be auto-populated on first run)
+RUN mkdir -p /app/quantum_entropy
+
+EXPOSE 5001
+
+CMD ["python3", "backend/server.py"]

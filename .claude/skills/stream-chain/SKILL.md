@@ -1,4 +1,4 @@
----
+333---
 name: stream-chain
 description: Stream-JSON chaining for multi-agent pipelines, data transformation, and sequential workflows
 version: 1.0.0
@@ -13,7 +13,7 @@ Execute sophisticated multi-step workflows where each agent's output flows into 
 ## Overview
 
 Stream-Chain provides two powerful modes for orchestrating multi-agent workflows:
-
+3sss
 1. **Custom Chains** (`run`): Execute custom prompt sequences with full control
 2. **Predefined Pipelines** (`pipeline`): Use battle-tested workflows for common tasks
 

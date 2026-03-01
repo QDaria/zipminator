@@ -1,6 +1,6 @@
 {
   "name": "@qdaria/zipminator",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Quantum-safe cryptography CLI with NIST Kyber768 and IBM QRNG (Rust binary wrapper)",
   "author": "QDaria <hello@qdaria.com>",
   "license": "MIT",
@@ -51,11 +51,11 @@
     "prepublishOnly": "npm run build-binaries"
   },
   "dependencies": {
-    "@qdaria/zipminator-linux-x64": "0.1.0",
-    "@qdaria/zipminator-linux-arm64": "0.1.0",
-    "@qdaria/zipminator-darwin-x64": "0.1.0",
-    "@qdaria/zipminator-darwin-arm64": "0.1.0",
-    "@qdaria/zipminator-win32-x64": "0.1.0"
+    "@qdaria/zipminator-linux-x64": "1.0.0",
+    "@qdaria/zipminator-linux-arm64": "1.0.0",
+    "@qdaria/zipminator-darwin-x64": "1.0.0",
+    "@qdaria/zipminator-darwin-arm64": "1.0.0",
+    "@qdaria/zipminator-win32-x64": "1.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
