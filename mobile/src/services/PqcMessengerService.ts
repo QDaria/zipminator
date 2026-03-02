@@ -1,77 +1,271 @@
-import ZipminatorCrypto from '../modules/zipminator-crypto';
+import { EventEmitter } from 'events';
+import ZipminatorCrypto from '../../modules/zipminator-crypto';
 import { signalingService, SignalingMessage } from './SignalingService';
+import type {
+    ConnectionState,
+    RatchetState,
+    EncryptedMessage,
+    CryptoError,
+} from '../types/crypto';
 
-export class PqcMessengerService {
-    private localKeyPair: { publicKey: string, secretKey: string } | null = null;
-    private remotePublicKey: string | null = null;
-    private sharedSecret: string | null = null;
+// Re-export types consumed by the component layer
+export type { ConnectionState, RatchetState, EncryptedMessage, CryptoError };
+
+// ─── Handshake step constants ────────────────────────────────────────────────
+
+const STEP_IDLE = 0;      // No handshake in progress
+const STEP_SENT_PK = 1;   // Alice: sent our KEM public key, waiting for CT + peer PK
+const STEP_COMPLETE = 3;  // Both sides: ratchet initialised, session secure
+
+// ─── PqcMessengerService ─────────────────────────────────────────────────────
+
+export class PqcMessengerService extends EventEmitter {
+    private localKeyPair: { publicKey: string; secretKey: string } | null = null;
     private targetId: string | null = null;
+    private isInitiator: boolean = false;
+    private handshakeStep: number = STEP_IDLE;
 
-    constructor() { }
+    private ratchetState: RatchetState = {
+        epoch: 0,
+        messagesSent: 0,
+        messagesReceived: 0,
+        isSecure: false,
+    };
 
-    async initialize(targetId: string) {
-        this.targetId = targetId;
-        // Generate our persistent static keypair for this session
-        this.localKeyPair = await ZipminatorCrypto.generateKEMKeyPair('Kyber768');
+    private connectionState: ConnectionState = 'disconnected';
 
-        // Listen for signaling messages
-        signalingService.on('message', this.handleSignalingMessage.bind(this));
+    // Bound handler reference so we can remove it on destroy
+    private _boundHandler: ((msg: SignalingMessage) => void) | null = null;
+
+    constructor() {
+        super();
     }
 
-    async startHandshake() {
+    // ── Lifecycle ─────────────────────────────────────────────────────────────
+
+    async initialize(targetId: string): Promise<void> {
+        this.targetId = targetId;
+
+        // Generate our static KEM keypair for this session
+        this.localKeyPair = await ZipminatorCrypto.generateKEMKeyPair('Kyber768');
+
+        // Register signaling listener
+        this._boundHandler = this.handleSignalingMessage.bind(this);
+        signalingService.on('message', this._boundHandler);
+
+        this._setConnectionState('connecting');
+    }
+
+    async startHandshake(): Promise<void> {
         if (!this.localKeyPair || !this.targetId) return;
 
-        // Send our public key to the target
+        this.isInitiator = true;
+        this.handshakeStep = STEP_SENT_PK;
+        this._setConnectionState('handshaking');
+
+        // Step 1: Alice sends her KEM public key
         signalingService.send({
             target: this.targetId,
             type: 'pqc_handshake',
-            payload: { publicKey: this.localKeyPair.publicKey }
+            payload: { publicKey: this.localKeyPair.publicKey },
         });
     }
 
-    private async handleSignalingMessage(msg: SignalingMessage) {
-        if (msg.type === 'pqc_handshake' && msg.payload.publicKey) {
-            console.log('PQC: Received remote public key');
-            this.remotePublicKey = msg.payload.publicKey;
+    destroy(): void {
+        if (this._boundHandler) {
+            signalingService.removeListener('message', this._boundHandler);
+            this._boundHandler = null;
+        }
 
-            // If we are the "responder", we encapsulate a secret
-            if (this.localKeyPair) {
-                const { ciphertext, sharedSecret } = await ZipminatorCrypto.encapsulateSecret(
-                    this.remotePublicKey!,
-                    'Kyber768'
-                );
-                this.sharedSecret = sharedSecret;
+        // Null out key material
+        this.localKeyPair = null;
+        this.targetId = null;
+        this.handshakeStep = STEP_IDLE;
+        this.ratchetState = {
+            epoch: 0,
+            messagesSent: 0,
+            messagesReceived: 0,
+            isSecure: false,
+        };
+        this._setConnectionState('disconnected');
+        this.removeAllListeners();
+    }
 
-                // Send the ciphertext back to the initiator
-                signalingService.send({
-                    target: msg.sender,
-                    type: 'pqc_handshake',
-                    payload: { ciphertext }
-                });
-            }
-        } else if (msg.type === 'pqc_handshake' && msg.payload.ciphertext) {
-            console.log('PQC: Received ciphertext, decapsulating...');
-            if (this.localKeyPair) {
-                this.sharedSecret = await ZipminatorCrypto.decapsulateSecret(
-                    msg.payload.ciphertext,
-                    this.localKeyPair.secretKey,
-                    'Kyber768'
-                );
-                console.log('PQC: Shared secret established!');
-            }
+    // ── Signaling message handler (3-step state machine) ─────────────────────
+
+    private async handleSignalingMessage(msg: SignalingMessage): Promise<void> {
+        if (msg.type === 'pqc_handshake') {
+            await this._handleHandshakeMessage(msg);
+            return;
+        }
+
+        if (msg.type === 'chat_message' && msg.payload) {
+            await this._handleChatMessage(msg);
         }
     }
 
-    async encryptMessage(text: string): Promise<string> {
-        if (!this.sharedSecret) return text; // Fallback or throw error
-        // In a real implementation, we'd use the sharedSecret to derive AES keys
-        return `[PQC_ENCRYPTED:${text}]`;
+    private async _handleHandshakeMessage(msg: SignalingMessage): Promise<void> {
+        const payload = msg.payload ?? {};
+
+        // ── Bob path: received Alice's public key ─────────────────────────────
+        if (payload.publicKey && !this.isInitiator) {
+            this._setConnectionState('handshaking');
+
+            try {
+                // Encapsulate a shared secret against Alice's KEM public key
+                const { ciphertext } = await ZipminatorCrypto.encapsulateSecret(
+                    payload.publicKey,
+                    'Kyber768'
+                );
+
+                // Initialise Bob's side of the ratchet; get Bob's ratchet PK
+                const { publicKey: bobRatchetPk } = await ZipminatorCrypto.initRatchetAsBob();
+
+                // Send ciphertext + Bob's ratchet PK back to Alice
+                signalingService.send({
+                    target: msg.sender,
+                    type: 'pqc_handshake',
+                    payload: {
+                        ciphertext,
+                        ephemeralPk: bobRatchetPk,
+                    },
+                });
+            } catch (err) {
+                console.error('PQC: Bob handshake failed', err);
+                this._emitError('HANDSHAKE_FAILED', String(err));
+                this._setConnectionState('error');
+            }
+            return;
+        }
+
+        // ── Alice path: received Bob's ciphertext + ratchet PK ────────────────
+        if (payload.ciphertext && payload.ephemeralPk && this.isInitiator) {
+            try {
+                if (!this.localKeyPair) throw new Error('No local keypair');
+
+                // Decapsulate to recover the shared secret
+                await ZipminatorCrypto.decapsulateSecret(
+                    payload.ciphertext,
+                    this.localKeyPair.secretKey,
+                    'Kyber768'
+                );
+
+                // Initialise Alice's ratchet using Bob's ratchet PK
+                await ZipminatorCrypto.initRatchetAsAlice(payload.ephemeralPk);
+
+                this.handshakeStep = STEP_COMPLETE;
+                this.ratchetState = {
+                    ...this.ratchetState,
+                    epoch: 1,
+                    isSecure: true,
+                };
+
+                this._setConnectionState('secure', this.ratchetState);
+            } catch (err) {
+                console.error('PQC: Alice decapsulation failed', err);
+                this._emitError('HANDSHAKE_FAILED', String(err));
+                this._setConnectionState('error');
+            }
+            return;
+        }
+
+        // ── Bob path: Alice's ratchet ready signal (no extra payload needed) ──
+        // After Bob initialised his ratchet PK, the session is also secure on his side.
+        if (payload.ephemeralPk === undefined && payload.ciphertext === undefined && !this.isInitiator) {
+            // Bob completes once Alice's first real message arrives via chat_message.
+            // Mark secure here conservatively after the exchange round-trips.
+            this.handshakeStep = STEP_COMPLETE;
+            this.ratchetState = { ...this.ratchetState, epoch: 1, isSecure: true };
+            this._setConnectionState('secure', this.ratchetState);
+        }
     }
 
-    async decryptMessage(encryptedText: string): Promise<string> {
-        if (!this.sharedSecret) return encryptedText;
-        return encryptedText.replace('[PQC_ENCRYPTED:', '').replace(']', '');
+    private async _handleChatMessage(msg: SignalingMessage): Promise<void> {
+        // Mark Bob as secure once the first chat message arrives (ratchet is ready)
+        if (!this.ratchetState.isSecure) {
+            this.handshakeStep = STEP_COMPLETE;
+            this.ratchetState = { ...this.ratchetState, epoch: 1, isSecure: true };
+            this._setConnectionState('secure', this.ratchetState);
+        }
+
+        const encryptedMsg: EncryptedMessage = msg.payload;
+
+        try {
+            const plaintext = await this.decryptMessage(encryptedMsg);
+            this.emit('incoming_message', plaintext, msg.sender);
+        } catch (err) {
+            console.error('PQC: Decryption failed', err);
+            this._emitError('DECRYPTION_FAILED', String(err));
+            this.emit('incoming_message', '[decryption failed]', msg.sender);
+        }
+    }
+
+    // ── Encrypt / Decrypt ─────────────────────────────────────────────────────
+
+    /**
+     * Encrypt a plaintext string using the ratchet.
+     * Returns an EncryptedMessage ({ header, ciphertext }) — both base64.
+     * Falls back to returning the plaintext unchanged when no session is
+     * established, so callers can detect the unprotected state.
+     */
+    async encryptMessage(text: string): Promise<EncryptedMessage> {
+        if (!this.ratchetState.isSecure) {
+            // Return a sentinel that callers can detect as unencrypted
+            return { header: '', ciphertext: text };
+        }
+
+        const result = await ZipminatorCrypto.ratchetEncrypt(text);
+
+        this.ratchetState = {
+            ...this.ratchetState,
+            messagesSent: this.ratchetState.messagesSent + 1,
+        };
+
+        return result as EncryptedMessage;
+    }
+
+    /**
+     * Decrypt an EncryptedMessage returned by encryptMessage.
+     */
+    async decryptMessage(msg: EncryptedMessage): Promise<string> {
+        if (!this.ratchetState.isSecure) {
+            return msg.ciphertext; // Return raw (sentinel / plaintext fallback)
+        }
+
+        const plaintext = await ZipminatorCrypto.ratchetDecrypt(
+            msg.header,
+            msg.ciphertext
+        );
+
+        this.ratchetState = {
+            ...this.ratchetState,
+            messagesReceived: this.ratchetState.messagesReceived + 1,
+        };
+
+        return plaintext as string;
+    }
+
+    // ── State accessors ───────────────────────────────────────────────────────
+
+    getRatchetState(): RatchetState {
+        return { ...this.ratchetState };
+    }
+
+    getConnectionState(): ConnectionState {
+        return this.connectionState;
+    }
+
+    // ── Internal helpers ──────────────────────────────────────────────────────
+
+    private _setConnectionState(state: ConnectionState, ratchet?: RatchetState): void {
+        this.connectionState = state;
+        this.emit('state_change', state, ratchet ?? this.ratchetState);
+    }
+
+    private _emitError(code: CryptoError, detail: string): void {
+        this.emit('error', code, detail);
     }
 }
 
+// Singleton export — preserves backward compatibility with existing imports
 export const pqcMessenger = new PqcMessengerService();

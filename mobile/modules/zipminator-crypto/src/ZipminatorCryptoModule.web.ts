@@ -1,19 +1,46 @@
 import { registerWebModule, NativeModule } from 'expo';
 
-import { ChangeEventPayload } from './ZipminatorCrypto.types';
+import type { ZipminatorCryptoModuleEvents } from './ZipminatorCrypto.types';
 
-type ZipminatorCryptoModuleEvents = {
-  onChange: (params: ChangeEventPayload) => void;
+/**
+ * ZipminatorCryptoModule — Web stub.
+ *
+ * Quantum-safe cryptography requires native hardware capabilities that are
+ * not available in a browser context. All methods throw an explicit error so
+ * callers can gate on platform before invoking.
+ */
+class ZipminatorCryptoModule extends NativeModule<ZipminatorCryptoModuleEvents> {
+  async generateKEMKeyPair(_algorithm: string): Promise<never> {
+    throw new Error('ZipminatorCrypto: generateKEMKeyPair is not supported on web.');
+  }
+
+  async encapsulateSecret(_publicKey: string, _algorithm: string): Promise<never> {
+    throw new Error('ZipminatorCrypto: encapsulateSecret is not supported on web.');
+  }
+
+  async decapsulateSecret(
+    _ciphertext: string,
+    _secretKey: string,
+    _algorithm: string
+  ): Promise<never> {
+    throw new Error('ZipminatorCrypto: decapsulateSecret is not supported on web.');
+  }
+
+  async initRatchetAsBob(): Promise<never> {
+    throw new Error('ZipminatorCrypto: initRatchetAsBob is not supported on web.');
+  }
+
+  async initRatchetAsAlice(_remotePublicKey: string): Promise<never> {
+    throw new Error('ZipminatorCrypto: initRatchetAsAlice is not supported on web.');
+  }
+
+  async ratchetEncrypt(_message: string): Promise<never> {
+    throw new Error('ZipminatorCrypto: ratchetEncrypt is not supported on web.');
+  }
+
+  async ratchetDecrypt(_header: string, _ciphertext: string): Promise<never> {
+    throw new Error('ZipminatorCrypto: ratchetDecrypt is not supported on web.');
+  }
 }
 
-class ZipminatorCryptoModule extends NativeModule<ZipminatorCryptoModuleEvents> {
-  PI = Math.PI;
-  async setValueAsync(value: string): Promise<void> {
-    this.emit('onChange', { value });
-  }
-  hello() {
-    return 'Hello world! 👋';
-  }
-};
-
-export default registerWebModule(ZipminatorCryptoModule, 'ZipminatorCryptoModule');
+export default registerWebModule(ZipminatorCryptoModule, 'ZipminatorCrypto');

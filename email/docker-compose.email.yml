@@ -1,0 +1,35 @@
+services:
+  redis-kms:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: >
+      redis-server
+      --save ""
+      --appendonly no
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    ports:
+      - "127.0.0.1:6380:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  kms:
+    build:
+      context: ./kms
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8100:8100"
+    environment:
+      REDIS_URL: "redis://redis-kms:6379"
+      KMS_MASTER_KEY: ${KMS_MASTER_KEY:-dev-master-key-change-in-production}
+    depends_on:
+      redis-kms:
+        condition: service_healthy

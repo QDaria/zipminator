@@ -1,0 +1,2 @@
+# DKIM Signing Table -- maps sender domains to key entries
+*@zipminator.zip    s1._domainkey.zipminator.zip

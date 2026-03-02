@@ -1,0 +1,91 @@
+# Zipminator PQC Mail Server -- Postfix Configuration
+# X25519MLKEM768 hybrid post-quantum key exchange for TLS 1.3
+# ============================================================================
+
+# General
+myhostname = mail.zipminator.zip
+mydomain = zipminator.zip
+myorigin = $mydomain
+mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+mynetworks = 127.0.0.0/8 [::1]/128 172.16.0.0/12
+inet_interfaces = all
+inet_protocols = all
+
+# Mailbox
+home_mailbox = Maildir/
+virtual_mailbox_domains = zipminator.zip
+virtual_mailbox_base = /var/mail
+virtual_mailbox_maps = hash:/etc/postfix/vmailbox
+virtual_uid_maps = static:5000
+virtual_gid_maps = static:5000
+
+# Message size (25MB)
+message_size_limit = 26214400
+
+# ============================================================================
+# TLS -- Post-Quantum Hybrid Key Exchange (X25519MLKEM768)
+# ============================================================================
+
+# Inbound (server) TLS
+smtpd_tls_security_level = may
+smtpd_tls_cert_file = /etc/ssl/certs/mail.zipminator.zip.crt
+smtpd_tls_key_file = /etc/ssl/private/mail.zipminator.zip.key
+smtpd_tls_protocols = >=TLSv1.2
+smtpd_tls_mandatory_protocols = >=TLSv1.2
+smtpd_tls_loglevel = 1
+
+# Outbound (client) TLS
+smtp_tls_security_level = may
+smtp_tls_loglevel = 1
+smtp_tls_note_starttls_offer = yes
+
+# PQC Key Exchange Groups -- THE KEY CONFIG
+# X25519MLKEM768 = hybrid X25519 + ML-KEM-768 (NIST Level 3)
+# Fallback chain: X25519MLKEM768 -> X25519 -> P-256 -> P-384
+tls_eecdh_auto_curves = X25519MLKEM768, X25519, prime256v1, secp384r1
+
+# TLS session cache
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+smtpd_tls_session_cache_timeout = 3600s
+
+# ============================================================================
+# DKIM -- Dual-Sign (RSA-2048 + ML-DSA-65)
+# ============================================================================
+
+# OpenDKIM milter for RSA-2048 classical DKIM
+milter_protocol = 6
+milter_default_action = accept
+smtpd_milters = inet:localhost:8891
+non_smtpd_milters = inet:localhost:8891
+
+# ML-DSA-65 PQ DKIM is handled by a second milter (custom, port 8892)
+# Added after the classical milter in the chain
+# smtpd_milters = inet:localhost:8891, inet:localhost:8892
+
+# ============================================================================
+# Security
+# ============================================================================
+
+# SASL authentication
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_security_options = noanonymous
+smtpd_sasl_local_domain = $myhostname
+
+# Restrictions
+smtpd_helo_required = yes
+smtpd_helo_restrictions = permit_mynetworks, reject_invalid_helo_hostname
+smtpd_sender_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unknown_sender_domain
+smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
+
+# Prevent open relay
+smtpd_relay_restrictions = permit_mynetworks, permit_sasl_authenticated, defer_unauth_destination
+
+# Rate limiting
+smtpd_client_message_rate_limit = 100
+smtpd_client_recipient_rate_limit = 500
+
+# Compatibility
+compatibility_level = 3.6

@@ -11,11 +11,14 @@
 #![cfg_attr(target_arch = "x86_64", feature(stdarch_x86_avx512))]
 
 pub mod constants;
+pub mod email_crypto;
 pub mod entropy_source;
 pub mod errors;
 pub mod ffi;
 pub mod kyber768;
 pub mod ntt;
+pub mod openpgp_keys;
+pub mod pii;
 pub mod poly;
 pub mod qrng;
 pub mod quantum_entropy_pool;

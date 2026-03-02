@@ -1,6 +1,9 @@
-# Zipminator × Claude-Flow V3: Parallel Hive-Mind Orchestration Guide
+# Zipminator × Claude Code v2.1.63: Advanced Multi-Agent Orchestration Guide
 
-> **Purpose:** Everything needed to continue developing the Zipminator PQC platform using Claude-Flow V3's parallel hive-mind orchestration in Claude Code.
+> **Purpose:** Master reference for developing the Zipminator PQC Super-App using Claude Code v2.1.63's native agent teams, parallel subagents, hive-mind skills, RALPH iteration loops, pair programming, and continuous learning patterns.
+>
+> **Claude Code Version:** v2.1.63 (verified)
+> **Last Updated:** 2026-03-02
 
 ---
 
@@ -9,18 +12,26 @@
 1. [Current Project State](#1-current-project-state)
 2. [What Remains To Be Done](#2-what-remains-to-be-done)
 3. [Architecture & File Map](#3-architecture--file-map)
-4. [Skills & Agents](#4-skills--agents)
-5. [Claude-Flow V3 Setup](#5-claude-flow-v3-setup)
-6. [Master Prompt (Copy-Paste Ready)](#6-master-prompt)
-7. [Quantum Entropy Pool](#7-quantum-entropy-pool)
-8. [Project Cleanup Strategy](#8-project-cleanup-strategy)
-9. [Verification Checklist](#9-verification-checklist)
+4. [Claude Code v2.1.63 Superpowers](#4-claude-code-v2163-superpowers)
+5. [Three Orchestration Tiers](#5-three-orchestration-tiers)
+6. [Skills & Agents Reference](#6-skills--agents-reference)
+7. [Terminal Prompt Recipes](#7-terminal-prompt-recipes)
+8. [RALPH Iteration Loop](#8-ralph-iteration-loop)
+9. [Agent Team Workflows](#9-agent-team-workflows)
+10. [Pair Programming Mode](#10-pair-programming-mode)
+11. [Continuous Learning & Reasoning](#11-continuous-learning--reasoning)
+12. [Quantum Skills Integration](#12-quantum-skills-integration)
+13. [Claude-Flow MCP Setup](#13-claude-flow-mcp-setup)
+14. [Quantum Entropy Pool](#14-quantum-entropy-pool)
+15. [Project Cleanup Strategy](#15-project-cleanup-strategy)
+16. [Verification Checklist](#16-verification-checklist)
+17. [Companion Files Reference](#17-companion-files-reference)
 
 ---
 
 ## 1. Current Project State
 
-### Completed
+### Completed (Phases 1, 4, 5, 6)
 
 | Component | Status | Key Deliverables |
 |-----------|--------|-----------------|
@@ -32,36 +43,107 @@
 | **QRNG Harvester** | Done | `scripts/qrng_harvester.py` appends to growing entropy pool |
 | **Gov Demo** | Done | `demo/gov-demo/` with install script and tutorial |
 | **CI/CD Workflows** | Done | `.github/workflows/` with CI, security, release, benchmarks |
+| **10-Level Anonymizer** | Done | L1-L10 processing, QRNG Levels 7-10, AdvancedAnonymizer module |
+| **OpenClaw AI** | Done | Chat UI, PQC tunnel mode, prompt injection defense |
+| **MCP Server** | Done | Kyber/Dilithium tools, QRNG harvesting, PII scanning |
+| **Agentic Skills** | Done | `/anonymize-vault`, `/pqc-shield`, `/quantum-status` commands |
 
-### In-Progress
+### In-Progress (Phases 2, 3)
 
-| Component | Status | Remaining Work |
-|-----------|--------|---------------|
+| Component | % | Remaining Work |
+|-----------|---|---------------|
 | **Secure Messenger** | 70% | Double Ratchet Rust impl, C++ JSI bridge, native PQC calls |
 | **VoIP & Q-VPN** | 30% | WebRTC native, PQ-SRTP, PQ-WireGuard NetworkExtension/VpnService |
+
+### Not Started (Phases 7, 8)
+
+| Component | Description |
+|-----------|-------------|
+| **Quantum-Secure Email** | `@zipminator.zip` domain, PQC SMTP/IMAP, self-destruct, PII scan |
+| **ZipBrowser** | PQC AI browser, OpenClaw sidebar, built-in Q-VPN, zero telemetry |
+
+### Phase Dependency Graph
+
+```
+Phase 1 (Foundation) ✅
+    │
+Phase 2 (Messenger) 🟡 70%
+    │  ratchet.rs, FFI bridge, native crypto
+    │
+    ├──→ Phase 3 (VoIP/VPN) 🟡 30%
+    │       PQ-SRTP, PQ-WireGuard
+    │       │
+    │       ├──→ Phase 8 (ZipBrowser) 📋
+    │       │       Needs: Q-VPN, OpenClaw, PQC TLS
+    │       │       START RESEARCH NOW (Recipe G)
+    │       │       BUILD after Phase 3 completes (Recipe H)
+    │       │
+    │       └──→ Phase 7 (Email) 📋
+    │               Independent -- can run parallel to Phase 8
+    │               Needs: PQC TLS, PII scanner (both done)
+    │
+Phase 4 (Anonymizer) ✅ ──→ Phase 8 (OpenClaw AI sidebar)
+Phase 5 (MCP Server) ✅
+Phase 6 (Agentic Skills) ✅
+```
+
+**Key insight:** Phase 8 research can start immediately (Recipe G). Phase 8 build requires Phase 3's Q-VPN. Phase 7 is independent and can run parallel to anything.
+
+### Entropy Pool Model
+
+The quantum entropy pool is **append-only and ever-growing**:
+- Harvested via **qBraid** (not direct IBM) -> IBM Marrakesh / Fez 156q backends
+- `scripts/qrng_harvester.py` appends ~50KB per cycle
+- Pool at `quantum_entropy/quantum_entropy_pool.bin` is gitignored
+- Consumers read sequentially and wrap around on exhaustion (reload from file)
+- **Entropy is reusable** -- quantum random bytes are statistically independent
+- No bytes are "consumed" or "destroyed" -- the file only grows
+- Bootstrap: 4096-byte `secrets.token_bytes()` seed if no pool exists
 
 ---
 
 ## 2. What Remains To Be Done
 
-### Phase 2: Quantum Secure Messenger
+### Phase 2: Quantum Secure Messenger (Critical Path)
 
-| Task | Priority | Agent Type |
-|------|----------|-----------|
-| Complete PQC Double Ratchet in `crates/zipminator-core/src/ratchet.rs` | Critical | `coder` |
-| Build C++ JSI bridge for React Native | Critical | `coder` |
-| Replace mock crypto in `PqcMessengerService.ts` with native calls | High | `coder` |
-| Add PQC-encrypted file attachments in `SecureMessenger.tsx` | Medium | `coder` |
+| Task | Priority | Agent Type | Isolation |
+|------|----------|-----------|-----------|
+| Complete PQC Double Ratchet in `crates/zipminator-core/src/ratchet.rs` | Critical | `coder` | worktree |
+| Build C++ JSI bridge for React Native | Critical | `coder` | worktree |
+| Replace mock crypto in `PqcMessengerService.ts` with native calls | High | `coder` | worktree |
+| Add PQC-encrypted file attachments in `SecureMessenger.tsx` | Medium | `coder` | -- |
 
 ### Phase 3: VoIP, Video & Q-VPN
 
+| Task | Priority | Agent Type | Isolation |
+|------|----------|-----------|-----------|
+| Integrate `react-native-webrtc` in `VoipService.ts` | Critical | `coder` | worktree |
+| Implement PQ-SRTP: seed SRTP keys from Kyber shared secret | Critical | `coder` | worktree |
+| Build iOS `NetworkExtension` for PQ-WireGuard | Critical | `coder` | worktree |
+| Build Android `VpnService` for PQ-WireGuard | Critical | `coder` | worktree |
+| Connect `NetworkShield.tsx` to real tunnel telemetry | High | `coder` | -- |
+
+### Phase 7: Quantum-Secure Email (Planned)
+
 | Task | Priority | Agent Type |
 |------|----------|-----------|
-| Integrate `react-native-webrtc` in `VoipService.ts` | Critical | `coder` |
-| Implement PQ-SRTP: seed SRTP keys from Kyber shared secret | Critical | `coder` |
-| Build iOS `NetworkExtension` for PQ-WireGuard | Critical | `coder` |
-| Build Android `VpnService` for PQ-WireGuard | Critical | `coder` |
-| Connect `NetworkShield.tsx` to real tunnel telemetry | High | `coder` |
+| Register `zipminator.zip` domain, configure DNS (MX, SPF, DKIM, DMARC) | Critical | manual |
+| Deploy PQC-secured SMTP/IMAP (Postfix/Dovecot + ML-KEM-768 TLS) | Critical | `coder` |
+| Build webmail UI with quantum-purple design | High | `coder` |
+| Integrate PII scanner into compose flow | High | `coder` |
+| Self-destructing emails (timer + read-receipt) | Medium | `coder` |
+| Mobile `ZipMail.tsx` in Expo app | Medium | `coder` |
+
+### Phase 8: ZipBrowser (Planned)
+
+| Task | Priority | Agent Type |
+|------|----------|-----------|
+| Fork Chromium or build Tauri desktop shell | Critical | `researcher` + `coder` |
+| Integrate PQC TLS (ML-KEM-768 for all HTTPS) | Critical | `coder` |
+| Embed Q-VPN (PQ-WireGuard) as always-on tunnel | Critical | `coder` |
+| OpenClaw AI sidebar | High | `coder` |
+| QRNG-seeded sessions + fingerprint-resistant cookies | High | `coder` |
+| PQC password manager extension | Medium | `coder` |
 
 ---
 
@@ -97,85 +179,790 @@ zipminator/
 ├── quantum_entropy/              # Entropy pool directory
 │   └── quantum_entropy_pool.bin  # Growing pool (gitignored)
 ├── tests/                        # Python, Rust, integration tests
-├── guides/                       # This directory
+├── docs/guides/                  # This directory (9 files)
 └── .claude/
     ├── skills/                   # 80+ skill definitions
-    └── agents/                   # 85 agent definitions
+    ├── agents/                   # 85 agent definitions
+    └── settings.json             # Claude Code local settings
 ```
 
 ---
 
-## 4. Skills & Agents
+## 4. Claude Code v2.1.63 Superpowers
 
-### Skills (confirmed in `.claude/skills/`)
+These are native Claude Code features (no MCP required). Use them directly from the terminal.
 
-| Skill | Purpose |
-|-------|---------|
-| `hive-mind-advanced` | Queen-led multi-agent coordination with consensus |
-| `pair-programming` | Navigator/Driver TDD mode |
-| `sparc-methodology` | SPARC TDD workflow (Red-Green-Refactor) |
-| `verification-quality` | Truth scoring, 0.995 threshold, automatic rollback |
-| `quantum-hive-queen` | Supreme coordinator for multi-domain orchestration |
-| `quantum-chief-of-staff` | Strategic operations coordination |
-| `quantum-execution-manager` | Task orchestration and resource allocation |
-| `quantum-cryptanalysis-expert` | PQC algorithm auditing |
-| `quantum-memory-archivist` | Persistent memory and context management |
-| `performance-analysis` | Performance profiling and optimization |
-| `swarm-advanced` | Advanced swarm orchestration patterns |
-| `stream-chain` | Pipeline orchestration |
-| `agentic-jujutsu` | Quantum-resistant self-learning patterns |
-| `hooks-automation` | Automated coordination and formatting |
-| `quantum-circuit-architect` | Hardware-native circuit design |
-| `quantum-assurance-validator` | Physics fact-checking |
+### 4.1 Agent Teams (Experimental, v2.1.47+)
 
-### Agents (confirmed in `.claude/agents/`)
+Multiple Claude Code instances working together with shared task lists and direct inter-agent messaging. One session acts as team lead, others are teammates.
 
-| Agent Path | Role |
-|-----------|------|
-| `hive-mind/queen-coordinator.md` | Hive Queen orchestrator |
-| `hive-mind/collective-intelligence-coordinator.md` | Distributed cognition |
-| `hive-mind/scout-explorer.md` | Reconnaissance specialist |
-| `hive-mind/worker-specialist.md` | Task execution |
-| `hive-mind/swarm-memory-manager.md` | Distributed memory |
-| `core/coder.md` | Implementation |
-| `core/tester.md` | TDD and testing |
-| `core/reviewer.md` | Code review |
-| `core/researcher.md` | Research and analysis |
-| `core/planner.md` | Strategic planning |
-| `optimization/performance-monitor.md` | Performance monitoring |
-| `optimization/benchmark-suite.md` | Benchmarking |
-| `optimization/load-balancer.md` | Load distribution |
-| `optimization/topology-optimizer.md` | Topology optimization |
-| `consensus/byzantine-coordinator.md` | Byzantine fault tolerance |
-| `consensus/raft-manager.md` | Raft consensus |
-| `swarm/hierarchical-coordinator.md` | Hierarchical topology |
-| `swarm/mesh-coordinator.md` | Mesh topology |
-| `swarm/adaptive-coordinator.md` | Dynamic topology switching |
-| `specialized/spec-mobile-react-native.md` | React Native specialist |
-| `github/pr-manager.md` | PR lifecycle management |
-| `github/code-review-swarm.md` | Multi-agent code review |
-| `testing/tdd-london-swarm.md` | London-school TDD |
-| `testing/production-validator.md` | Production readiness |
+**Enable once (add to settings.json or shell):**
+```bash
+# In ~/.claude/settings.json:
+# { "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" } }
+
+# Or per-session:
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+```
+
+**Key capabilities:**
+- Shared task list with dependency tracking
+- Teammates communicate directly (not just report to lead)
+- `Shift+Down` to cycle through teammates in-process mode
+- Split-pane mode via tmux or iTerm2 for visual monitoring
+- Plan approval gates: teammates must get lead approval before implementing
+- `TeammateIdle` and `TaskCompleted` hooks for quality enforcement
+
+**When to use agent teams vs subagents:**
+
+| | Subagents | Agent Teams |
+|---|---|---|
+| Context | Own window, results return to caller | Own window, fully independent |
+| Communication | Report back to main only | Message each other directly |
+| Best for | Focused tasks, research, verification | Complex work needing collaboration |
+| Token cost | Lower (summarized results) | Higher (separate instances) |
+
+### 4.2 Parallel Subagents with Worktree Isolation (v2.1.49+)
+
+Each subagent gets its own git worktree -- safe parallel file editing without conflicts.
+
+```
+# Claude Code spawns agents with isolation: "worktree"
+# Each gets a branch in .claude/worktrees/<name>
+# Changes auto-merge or return as branch for review
+```
+
+### 4.3 Auto-Memory (v2.1.59+)
+
+Claude automatically persists useful context to `~/.claude/projects/<path>/memory/MEMORY.md`. Survives session restarts. Use `/memory` to manage.
+
+### 4.4 Hooks System (v2.1.50+)
+
+```
+SessionStart, SessionEnd      # Session lifecycle
+PreToolUse, PostToolUse        # Tool execution gates
+ConfigChange                   # Settings file changes
+WorktreeCreate, WorktreeRemove # Worktree lifecycle
+TeammateIdle                   # Agent team quality gate
+TaskCompleted                  # Task completion gate
+```
+
+HTTP hooks supported: POST JSON to URL, receive JSON response.
+
+### 4.5 1M Context Window (v2.1.49+)
+
+Opus 4.6 on Max plan supports 1M token context. Disable with `CLAUDE_CODE_DISABLE_1M_CONTEXT`.
+
+### 4.6 Skills & Slash Commands
+
+80+ project skills available. Key ones for Zipminator:
+- `/pair-programming` -- Navigator/Driver TDD mode
+- `/hive-mind-advanced` -- Queen-led multi-agent coordination
+- `/sparc-methodology` -- SPARC TDD (Red-Green-Refactor)
+- `/verification-quality` -- Truth scoring with automatic rollback
+- `/simplify` -- Code review for reuse, quality, efficiency
+
+### 4.7 Key Changelog Highlights (v2.1.4 → v2.1.63)
+
+| Version Range | Feature |
+|--------------|---------|
+| v2.1.47+ | Agent teams stable, memory optimized |
+| v2.1.49+ | Subagent worktree isolation, 1M context, ConfigChange hooks |
+| v2.1.50+ | WorktreeCreate/Remove hooks, memory leak fixes |
+| v2.1.51+ | HTTP hooks, `last_assistant_message` in Stop hooks |
+| v2.1.59+ | Auto-memory system, `/copy` interactive picker |
+| v2.1.63 | `/simplify` + `/batch` commands, HTTP hooks, plugin skills |
+
+---
+
+## 5. Three Orchestration Tiers
+
+Choose based on task complexity. You can combine tiers.
+
+### Tier 1: Single Session + Subagents (Simplest)
+
+For focused work on 1-2 files. Claude spawns background subagents for research/verification while you work.
+
+```
+Terminal: claude
+Prompt: "Complete ratchet.rs with PQC Double Ratchet. Use /pair-programming mode.
+         Spawn a researcher subagent to check Signal's X3DH spec while we implement."
+```
+
+### Tier 2: Agent Teams (Parallel Development)
+
+For multi-file, multi-domain work. 3-5 teammates with shared task list.
+
+```
+Terminal: export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 && claude
+Prompt: "Create an agent team for Zipminator Phase 2. Spawn 4 teammates:
+         - Rust crypto: ratchet.rs + ffi.rs (worktree isolation)
+         - JSI bridge: C++ bridge + Swift/Kotlin modules (worktree isolation)
+         - Mobile integration: PqcMessengerService.ts + SecureMessenger.tsx
+         - TDD: write tests BEFORE each implementation lands
+         Require plan approval for the Rust crypto teammate."
+```
+
+### Tier 3: Hive-Mind + Claude-Flow MCP (Maximum Orchestration)
+
+For full-project campaigns across all phases. Queen coordinator + Claude-Flow swarm.
+
+```
+Terminal: claude
+Prompt: "Initialize hive-mind orchestration for Zipminator Phases 2-3.
+         Use /hive-mind-advanced skill.
+         Read docs/guides/task.md for remaining work.
+         Read docs/guides/architecture.md for system design constraints.
+         RALPH loop: iterate until cargo test + pytest both pass."
+```
+
+---
+
+## 6. Skills & Agents Reference
+
+### Skills for Zipminator Development
+
+| Skill | When to Use | Invoke |
+|-------|-------------|--------|
+| `hive-mind-advanced` | Multi-agent queen-led orchestration with consensus | `/hive-mind-advanced` |
+| `pair-programming` | Navigator/Driver TDD, one writes tests the other implements | `/pair-programming` |
+| `sparc-methodology` | SPARC TDD workflow (Specification → Architecture → Refinement) | `/sparc-methodology` |
+| `verification-quality` | Truth scoring, 0.995 threshold, automatic rollback | `/verification-quality` |
+| `quantum-hive-queen` | Supreme coordinator for multi-domain orchestration | `/quantum-hive-queen` |
+| `quantum-chief-of-staff` | Strategic operations coordination, delegation | `/quantum-chief-of-staff` |
+| `quantum-execution-manager` | Task orchestration, resource allocation, progress tracking | `/quantum-execution-manager` |
+| `quantum-cryptanalysis-expert` | PQC algorithm auditing, side-channel review | Activated by lead |
+| `quantum-memory-archivist` | Persistent memory and cross-session context | `/quantum-memory-archivist` |
+| `performance-analysis` | Profiling, benchmarking, optimization | `/performance-analysis` |
+| `agentic-jujutsu` | Self-learning patterns, adaptive strategies | `/agentic-jujutsu` |
+| `quantum-circuit-architect` | Hardware-native circuit design for entropy | Activated by lead |
+| `quantum-assurance-validator` | Physics fact-checking for entropy claims | Activated by lead |
+| `hooks-automation` | Automated coordination, formatting, CI triggers | `/hooks-automation` |
+| `swarm-advanced` | Advanced swarm topology patterns | `/swarm-advanced` |
+| `test-specialist` | Comprehensive test suite generation | `/test-specialist` |
+
+### Agent Definitions (`.claude/agents/`)
+
+| Category | Agents | Use Case |
+|----------|--------|----------|
+| **hive-mind/** | queen-coordinator, collective-intelligence, scout-explorer, worker-specialist, swarm-memory-manager | Large campaigns |
+| **core/** | coder, tester, reviewer, researcher, planner | Every task |
+| **optimization/** | performance-monitor, benchmark-suite, load-balancer, topology-optimizer | Performance work |
+| **consensus/** | byzantine-coordinator, raft-manager | Multi-agent agreement |
+| **swarm/** | hierarchical, mesh, adaptive coordinators | Topology selection |
+| **specialized/** | spec-mobile-react-native | React Native tasks |
+| **github/** | pr-manager, code-review-swarm | PR workflows |
+| **testing/** | tdd-london-swarm, production-validator | Quality gates |
 
 Total: **85 agent definitions** across 15 categories.
 
 ---
 
-## 5. Claude-Flow V3 Setup
+## 7. Terminal Prompt Recipes
+
+### Quick Reference: How to Start Claude Code
+
+```bash
+# Standard session
+cd ~/dev/qdaria/zipminator && claude
+
+# With agent teams enabled
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+cd ~/dev/qdaria/zipminator && claude
+
+# Resume previous session
+claude --resume
+
+# With worktree isolation from start
+claude --worktree
+
+# Specific model (default is Opus 4.6)
+claude  # uses opus by default on Max plan
+
+# Split-pane agent teams (requires tmux)
+claude --teammate-mode tmux
+```
+
+### Recipe A: Phase 2 Messenger Sprint (Agent Team)
+
+```
+Create an agent team to complete Zipminator Phase 2 (Quantum Secure Messenger).
+
+Read these context files first:
+- docs/guides/task.md (checklist of remaining work)
+- docs/guides/architecture.md (Rust core design, NTT, entropy)
+- crates/zipminator-core/src/ratchet.rs (current Double Ratchet state)
+- crates/zipminator-core/src/ffi.rs (current FFI state)
+
+Spawn 4 teammates:
+1. "rust-crypto" (Sonnet): Complete ratchet.rs and ffi.rs, run cargo test
+2. "native-bridge" (Sonnet): C++ JSI bridge, Swift/Kotlin modules
+3. "mobile-integration" (Sonnet): PqcMessengerService.ts + SecureMessenger.tsx
+4. "quality-gate" (Sonnet): Write tests BEFORE each piece lands, run full suite
+
+Use worktree isolation for rust-crypto and native-bridge.
+Require plan approval for rust-crypto before implementation.
+
+RALPH loop: iterate until cargo test --workspace && pytest tests/ both pass.
+Constraint: ML-KEM-768 for KEM, AES-256-GCM for symmetric, never log private keys.
+```
+
+### Recipe B: Phase 3 VoIP + Q-VPN Sprint (Agent Team)
+
+```
+Create an agent team to complete Zipminator Phase 3 (VoIP & Q-VPN).
+
+Context files:
+- docs/guides/task.md
+- docs/guides/FEATURES.md (feature specs for VoIP, Q-VPN)
+
+Spawn 4 teammates:
+1. "webrtc" (Sonnet): react-native-webrtc integration, VoipService.ts
+2. "pq-srtp" (Sonnet): PQ-SRTP implementation, Kyber shared secret -> SRTP keys
+3. "vpn-ios" (Sonnet): iOS NetworkExtension with PQ-WireGuard
+4. "vpn-android" (Sonnet): Android VpnService with PQ-WireGuard
+
+All use worktree isolation. TDD required.
+```
+
+### Recipe C: Single-File Deep Work (Pair Programming)
+
+```
+Use /pair-programming mode to complete ratchet.rs.
+
+I'll be the Navigator (design decisions), you be the Driver (implementation).
+
+Context: Read docs/guides/architecture.md for Kyber-768 internals.
+The Double Ratchet must use ML-KEM-768 for ratchet key rotation
+and AES-256-GCM for message encryption.
+
+Write failing tests first (Red), implement to pass (Green), refactor (Refactor).
+Iterate until cargo test passes with all ratchet tests.
+```
+
+### Recipe D: Research-Then-Build (Subagent Pattern)
+
+```
+Phase 7 (Quantum-Secure Email) needs research before coding.
+
+Spawn 3 researcher subagents in parallel:
+1. Research PQC TLS for SMTP/IMAP (Postfix + ML-KEM-768 patches)
+2. Research self-destructing email protocols (timer + read-receipt patterns)
+3. Research PII scanning in email compose flow (real-time regex + NER)
+
+After research completes, create an implementation plan in docs/guides/.
+Do NOT write code yet -- research only.
+```
+
+### Recipe E: Hive-Mind Full Campaign
+
+```
+You are the Hive Queen Coordinator for Zipminator.
+Use /hive-mind-advanced to orchestrate Phases 2 and 3 completion.
+
+Read all context:
+- docs/guides/task.md (remaining work checklist)
+- docs/guides/FEATURES.md (feature specifications)
+- docs/guides/architecture.md (system design)
+- CLAUDE.md (project conventions)
+
+Spawn domain agents:
+- DOMAIN A (PQC Security): ratchet.rs, ffi.rs, Rust tests
+- DOMAIN B (Native Bridge): C++ JSI, Swift, Kotlin modules
+- DOMAIN C (WebRTC & VoIP): react-native-webrtc, PQ-SRTP
+- DOMAIN D (Q-VPN): iOS NetworkExtension, Android VpnService
+
+Run RALPH loop per domain:
+  Research -> Architecture -> Logic -> Polish -> Harden
+
+Quality gates via /verification-quality:
+  cargo test --workspace must pass
+  pytest tests/ must pass
+  No private keys in logs
+
+Use /quantum-memory-archivist for cross-session context persistence.
+```
+
+### Recipe F: Code Review Swarm
+
+```
+Run a parallel code review on the Phase 2 messenger implementation.
+
+Create an agent team with 3 reviewers:
+1. "security-reviewer": Focus on crypto correctness, constant-time ops, key handling
+2. "performance-reviewer": Check for unnecessary allocations, NTT bottlenecks
+3. "test-reviewer": Verify test coverage, edge cases, fuzz targets
+
+Review files: crates/zipminator-core/src/ratchet.rs, ffi.rs, and mobile/ services.
+Each reviewer reports findings. Lead synthesizes into actionable issues.
+```
+
+### Recipe G: Phase 8 Research Sprint (Start NOW -- Before Phase 3 Completes)
+
+Phase 8 (ZipBrowser) is the most ambitious phase. The first question -- Chromium fork vs Tauri -- determines the entire architecture. Start research now while Phases 2-3 are in progress.
+
+```
+Phase 8 (ZipBrowser) needs deep research before any code.
+
+Spawn 4 researcher subagents in parallel:
+
+1. "chromium-feasibility": Research Chromium fork approach
+   - How do Brave, Arc, Vivaldi fork Chromium?
+   - What's required to integrate custom TLS (ML-KEM-768)?
+   - Build time, binary size, update cadence, licensing
+   - Effort: months? years?
+
+2. "tauri-feasibility": Research Tauri desktop browser approach
+   - Can Tauri's WebView act as a full browser?
+   - How to intercept ALL HTTPS and inject PQC TLS?
+   - Does system WebView support TLS extension points?
+   - Integration with Rust core (already Rust -- natural fit)
+
+3. "pqc-tls-state-of-art": Research PQC TLS implementations
+   - OQS-OpenSSL / OQS-BoringSSL current status
+   - ML-KEM-768 in TLS 1.3 -- which CAs support it?
+   - Cloudflare/Google PQC TLS experiments
+   - Can we proxy all traffic through a local PQC tunnel instead?
+
+4. "ai-browser-landscape": Research competing AI browsers
+   - OpenAI Atlas, Browser Company Dia, Perplexity Comet
+   - What AI features do users actually want?
+   - How do they handle privacy? (none use PQC -- our differentiator)
+   - Extension API vs sidebar vs agent mode
+
+After all research completes, synthesize into a decision document:
+- Chromium vs Tauri recommendation with trade-offs
+- PQC TLS integration strategy
+- AI sidebar architecture
+- Write findings to docs/guides/phase8-zipbrowser-research.md
+Do NOT write code yet.
+```
+
+### Recipe H: Phase 8 Full Build (After Phase 3 Completes)
+
+This is the hierarchical team-of-teams pattern: a Hive Queen coordinates domain team leads, each lead manages their own agent team.
+
+```
+You are the Hive Queen for Zipminator Phase 8 (ZipBrowser).
+Use /hive-mind-advanced for supreme coordination.
+
+PREREQUISITE CHECK:
+- Phase 3 Q-VPN (PQ-WireGuard) must be complete (needed for embedded VPN)
+- Phase 4 OpenClaw AI must be complete (needed for AI sidebar) -- ✅ already done
+- Read docs/guides/phase8-zipbrowser-research.md for the Chromium vs Tauri decision
+
+DEPENDENCY GRAPH:
+  Phase 2 crypto core ──→ Phase 8 PQC TLS
+  Phase 3 Q-VPN ────────→ Phase 8 embedded VPN
+  Phase 4 OpenClaw ─────→ Phase 8 AI sidebar
+
+HIERARCHICAL ORCHESTRATION:
+Create an agent team with 5 domain leads. Each lead should further
+delegate to subagents for their domain's subtasks.
+
+DOMAIN LEAD 1: "browser-shell" (Opus)
+  Owns: Browser engine setup (Chromium fork OR Tauri, per research decision)
+  Subagents:
+  - Build system + CI for browser compilation
+  - Window management, tab system, navigation chrome
+  - Extension/plugin API scaffold
+  RALPH loop until: browser launches, loads pages, has tab management
+
+DOMAIN LEAD 2: "pqc-tls" (Opus)
+  Owns: All HTTPS connections use ML-KEM-768 key exchange
+  Subagents:
+  - OQS-BoringSSL integration OR local PQC proxy approach
+  - Certificate handling, TLS 1.3 negotiation with PQC
+  - Fallback to classical TLS for non-PQC servers
+  RALPH loop until: browser connects to any website with PQC when available
+
+DOMAIN LEAD 3: "embedded-vpn" (Sonnet)
+  Owns: Q-VPN (PQ-WireGuard) always-on inside browser
+  Subagents:
+  - Reuse Phase 3's PQ-WireGuard implementation
+  - Tunnel all browser traffic through VPN
+  - Kill switch: no traffic if VPN drops
+  RALPH loop until: all browser traffic routes through PQ-WireGuard
+
+DOMAIN LEAD 4: "ai-sidebar" (Sonnet)
+  Owns: OpenClaw AI integration in browser
+  Subagents:
+  - Sidebar UI (page summarization, agentic tasks, writing assist)
+  - Local LLM mode (no data leaves device)
+  - PQC tunnel mode for cloud LLM queries
+  RALPH loop until: AI can summarize current page and answer questions
+
+DOMAIN LEAD 5: "privacy-engine" (Sonnet)
+  Owns: Zero telemetry, QRNG sessions, fingerprint resistance
+  Subagents:
+  - QRNG-seeded session tokens from quantum_entropy_pool.bin
+  - Fingerprint-resistant cookie rotation
+  - PQC password manager + form autofill
+  - Audit: verify zero telemetry (no data exits without PQC tunnel)
+  RALPH loop until: no outbound connections without PQC encryption
+
+CROSS-DOMAIN INTERFACES (Queen enforces):
+  browser-shell <-> pqc-tls: TLS hook point where PQC intercepts connections
+  browser-shell <-> embedded-vpn: Network layer routing
+  browser-shell <-> ai-sidebar: Extension/sidebar API
+  privacy-engine <-> all: Entropy pool access, session management
+
+QUALITY GATES:
+  - Browser launches and renders pages
+  - PQC TLS negotiation succeeds (test against pq.cloudflareresearch.com)
+  - All traffic routes through PQ-WireGuard tunnel
+  - AI sidebar summarizes a page
+  - Zero telemetry audit passes
+  - No private keys or entropy bytes in logs
+
+ENTROPY NOTE:
+  The quantum entropy pool at quantum_entropy/quantum_entropy_pool.bin is
+  append-only and ever-growing. Harvested via qBraid -> IBM Marrakesh/Fez.
+  Entropy is reusable (quantum randomness has no memory). The pool is NOT
+  consumed -- readers wrap around and reload. The privacy-engine domain
+  reads from this pool for session tokens and cookie rotation seeds.
+```
+
+### Recipe I: Phase 7+8 Parallel Campaign (Maximum Orchestration)
+
+Phase 7 (Email) and Phase 8 (Browser) are independent. Run them simultaneously with two separate agent teams under one Hive Queen.
+
+```
+You are the Hive Queen for Zipminator Phases 7 and 8 simultaneously.
+Use /hive-mind-advanced for supreme coordination.
+
+These phases are INDEPENDENT -- they share no code dependencies.
+Run them as two parallel agent teams.
+
+TEAM ALPHA: Phase 7 (Quantum-Secure Email)
+  Lead: "email-lead" (Sonnet)
+  Teammates:
+  - "mail-server": Postfix/Dovecot + ML-KEM-768 TLS config
+  - "webmail-ui": React/Next.js webmail with quantum-purple design
+  - "mail-security": PII scanner in compose, self-destruct, L1-L10 attachments
+  - "mobile-mail": ZipMail.tsx in Expo app
+
+TEAM BETA: Phase 8 (ZipBrowser)
+  Lead: "browser-lead" (Opus)
+  Teammates: [Use Recipe H structure above]
+
+SHARED RESOURCES (both teams use):
+  - quantum_entropy/quantum_entropy_pool.bin (read-only, ever-growing)
+  - crates/zipminator-core/ (Kyber768, existing crypto)
+  - src/zipminator/crypto/ (Python PQC wrapper)
+
+Queen's job:
+  - Ensure no file conflicts between teams
+  - Run RALPH loop per team independently
+  - Cross-pollinate: if email team discovers a PQC TLS pattern, share with browser team
+  - Final integration verification after both teams complete
+```
+
+---
+
+## 8. RALPH Iteration Loop
+
+RALPH (Research, Architecture, Logic, Polish, Harden) is the iterative refinement protocol. Each domain cycles through these phases until quality gates pass.
+
+```
+┌─────────────────────────────────────────────┐
+│                RALPH LOOP                    │
+│                                             │
+│  ┌──────────┐    ┌──────────────┐           │
+│  │ Research  │───→│ Architecture │           │
+│  │ (explore  │    │ (design the  │           │
+│  │  problem) │    │  solution)   │           │
+│  └──────────┘    └──────┬───────┘           │
+│                         │                    │
+│  ┌──────────┐    ┌──────▼───────┐           │
+│  │ Harden   │←───│   Logic      │           │
+│  │ (security │    │ (implement   │           │
+│  │  + fuzz)  │    │  + test)     │           │
+│  └────┬─────┘    └──────────────┘           │
+│       │                                      │
+│  ┌────▼─────┐                               │
+│  │  Polish   │──→ QUALITY GATE              │
+│  │ (refactor │    ├─ cargo test passes?     │
+│  │  + docs)  │    ├─ pytest passes?         │
+│  └──────────┘    ├─ no private key leaks?   │
+│       │           └─ constant-time verified? │
+│       │                                      │
+│       ├── PASS ──→ DONE (move to next task) │
+│       └── FAIL ──→ Back to Research ↺       │
+│                                             │
+│  Max iterations: 12 (then escalate)         │
+└─────────────────────────────────────────────┘
+```
+
+### RALPH Phase Details
+
+| Phase | What Happens | Skills Used |
+|-------|-------------|-------------|
+| **R**esearch | Read specs, existing code, and docs. Spawn researcher subagents. | `/quantum-cryptanalysis-expert`, subagent:researcher |
+| **A**rchitecture | Design the solution, choose data structures, define interfaces. Write plan. | `/sparc-methodology` (Architecture phase) |
+| **L**ogic | Write failing tests (Red), implement (Green), iterate. | `/pair-programming`, `/test-specialist` |
+| **P**olish | Refactor, remove dead code, improve naming, add minimal docs. | `/simplify` |
+| **H**arden | Security audit, fuzz testing, constant-time verification, CI run. | `/verification-quality`, `/quantum-assurance-validator` |
+
+### Using RALPH in Prompts
+
+Add to any prompt:
+```
+Run a RALPH loop on this task:
+- R: Read the relevant source files and specs
+- A: Design the approach (get my approval if non-trivial)
+- L: TDD -- write tests first, then implement
+- P: Simplify the code (/simplify)
+- H: Security review + cargo test + pytest
+- Iterate up to 12 times until quality gates pass.
+```
+
+---
+
+## 9. Agent Team Workflows
+
+### Enabling Agent Teams
+
+```json
+// ~/.claude/settings.json or project .claude/settings.json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "teammateMode": "in-process"  // or "tmux" for split panes
+}
+```
+
+### Team Topology for Zipminator
+
+```
+                    ┌──────────────┐
+                    │  You (Human) │
+                    └──────┬───────┘
+                           │ prompt
+                    ┌──────▼───────┐
+                    │  Team Lead   │ reads CLAUDE.md, docs/guides/
+                    │  (Opus 4.6)  │ creates task list, assigns work
+                    └──┬──┬──┬──┬──┘
+                       │  │  │  │
+          ┌────────────┘  │  │  └────────────┐
+          │               │  │               │
+  ┌───────▼──────┐ ┌─────▼──▼────┐ ┌────────▼──────┐
+  │ Rust Crypto  │ │ Native Bridge│ │ Mobile Integ  │
+  │ (Sonnet)     │ │ (Sonnet)     │ │ (Sonnet)      │
+  │ worktree     │ │ worktree     │ │ worktree      │
+  │ ratchet.rs   │ │ C++ JSI      │ │ TS services   │
+  │ ffi.rs       │ │ Swift/Kotlin │ │ React Native  │
+  └──────────────┘ └──────────────┘ └───────────────┘
+          │               │               │
+          └───────────────┼───────────────┘
+                          │
+                  ┌───────▼──────┐
+                  │ Quality Gate │
+                  │ (Sonnet)     │
+                  │ TDD + review │
+                  └──────────────┘
+```
+
+### Controlling the Team
+
+| Action | How |
+|--------|-----|
+| Cycle between teammates | `Shift+Down` |
+| View teammate's session | `Enter` on teammate |
+| Interrupt teammate | `Escape` |
+| Toggle task list | `Ctrl+T` |
+| Message teammate directly | Type message after selecting |
+| Shut down teammate | Tell lead: "Ask the X teammate to shut down" |
+| Clean up team | Tell lead: "Clean up the team" |
+
+### Quality Gates via Hooks
+
+Configure in `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "TaskCompleted": [
+      {
+        "command": "cd /Users/mos/dev/qdaria/zipminator && cargo test --workspace 2>&1 | tail -5",
+        "timeout": 120000
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "command": "echo 'Review your changes: git diff --stat'",
+        "timeout": 5000
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 10. Pair Programming Mode
+
+The `/pair-programming` skill activates a Navigator/Driver TDD mode. You make design decisions (Navigator), Claude implements and tests (Driver).
+
+### Starting a Pair Session
+
+```
+Use /pair-programming mode.
+
+File: crates/zipminator-core/src/ratchet.rs
+Goal: Complete PQC Double Ratchet with ML-KEM-768 key rotation
+
+I'll navigate (design decisions, trade-offs).
+You drive (write tests, implement, refactor).
+
+Cycle: Red (failing test) -> Green (make it pass) -> Refactor -> repeat
+```
+
+### Pair Programming with Agent Teams
+
+You can combine pair programming with agent teams. The lead pairs with you on the critical path while teammates handle independent work:
+
+```
+Create an agent team. I'll pair-program with the lead on ratchet.rs
+using /pair-programming.
+
+Meanwhile, spawn 2 teammates:
+1. "bridge-builder": Build the C++ JSI bridge (independent, worktree)
+2. "test-writer": Write integration tests for the messenger flow (independent)
+
+I'll focus on navigating the Double Ratchet design with the lead.
+```
+
+---
+
+## 11. Continuous Learning & Reasoning
+
+### Auto-Memory for Cross-Session Context
+
+Claude Code v2.1.59+ automatically persists useful patterns to memory. For Zipminator:
+
+```
+# Check current memory
+/memory
+
+# Memory lives at:
+# ~/.claude/projects/-Users-mos-dev-qdaria-zipminator/memory/MEMORY.md
+
+# Claude auto-saves:
+# - Rust binding API signatures (keypair, encapsulate, decapsulate)
+# - Build commands (maturin develop, cargo test)
+# - Common issues (ESLint version, --legacy-peer-deps)
+# - Architecture decisions (entropy pool design, PQC wrapper pattern)
+```
+
+### Reinforcement Pattern: Learn from Failures
+
+When a RALPH iteration fails, Claude should:
+
+1. **Log the failure** to memory (what went wrong, which test, which file)
+2. **Adjust strategy** (change approach, not just retry)
+3. **Persist the lesson** so future sessions avoid the same mistake
+
+Prompt pattern:
+```
+When a test fails or a build breaks, before retrying:
+1. Diagnose the root cause (don't just re-run)
+2. Save the lesson to auto-memory if it's a pattern
+3. Adjust your approach, then retry with the fix
+Maximum 12 retry cycles before escalating to me.
+```
+
+### Reasoning Depth Control
+
+Claude Code supports effort levels. For crypto-critical work, use maximum reasoning:
+
+```
+# In prompts for crypto work:
+"Use maximum reasoning depth for this task. This is security-critical code
+where correctness matters more than speed."
+
+# For boilerplate/config:
+"This is straightforward setup work. Move quickly."
+```
+
+### Quantum Skills for Specialized Reasoning
+
+| Skill | Reasoning Domain | When |
+|-------|-----------------|------|
+| `/quantum-cryptanalysis-expert` | PQC algorithm correctness, side-channel analysis | Reviewing crypto code |
+| `/quantum-assurance-validator` | Physics fact-checking for entropy claims | Verifying QRNG claims |
+| `/quantum-circuit-architect` | Hadamard circuit design for entropy harvesting | Modifying harvester |
+| `/agentic-jujutsu` | Adaptive self-learning, strategy adjustment | When stuck in RALPH loop |
+
+---
+
+## 12. Quantum Skills Integration
+
+### Quantum Skill Activation Patterns
+
+These skills provide specialized system prompts. Activate them through the lead agent or directly:
+
+#### Entropy Pool Work
+```
+Activate /quantum-circuit-architect and /quantum-assurance-validator.
+Review and optimize the QRNG harvester at scripts/qrng_harvester.py.
+Verify the Hadamard circuit design produces genuinely random bitstrings.
+Check the entropy pool integrity hash mechanism.
+```
+
+#### Crypto Implementation Review
+```
+Activate /quantum-cryptanalysis-expert.
+Audit crates/zipminator-core/src/kyber768.rs for:
+- Constant-time violations (timing side-channels)
+- NTT correctness (twiddle factors, butterfly operations)
+- Implicit rejection in decapsulation
+- CBD sampling correctness
+```
+
+#### Cross-Session Memory Archival
+```
+Use /quantum-memory-archivist to persist:
+- All architectural decisions made this session
+- Build commands that worked
+- Patterns that solved recurring issues
+- Current phase completion status
+```
+
+### Hive-Mind Advanced Mode
+
+The `/hive-mind-advanced` skill activates a queen-led coordination pattern where a supreme coordinator delegates to specialized workers:
+
+```
+Use /hive-mind-advanced for a full Phase 2+3 campaign.
+
+The Queen should:
+1. Read docs/guides/task.md for remaining work
+2. Decompose into 4 domains (PQC, Bridge, WebRTC, VPN)
+3. Assign domain agents with clear boundaries
+4. Run consensus checks between domains (interfaces must agree)
+5. Apply RALPH loop per domain
+6. Final verification: cargo test + pytest + demo launch
+```
+
+---
+
+## 13. Claude-Flow MCP Setup
+
+Claude-Flow provides additional MCP-based orchestration. This is **optional** -- Claude Code's native agent teams and subagents handle most workflows. Use Claude-Flow when you need swarm-level coordination across 10+ agents.
 
 ### Installation
 
 ```bash
-# Install claude-flow (the actual package name)
+# Install claude-flow (the actual package name -- NOT "ruflo")
 npx claude-flow@alpha --version
 
 # Add as MCP server to Claude Code
 claude mcp add claude-flow -- npx claude-flow@alpha mcp start
 ```
 
-> **Note:** The package is `claude-flow`, not "ruflo". There is no `ruflo` npm package.
-
-### Verified Claude-Flow V3 Commands
+### Verified Commands
 
 ```bash
 # Project initialization
@@ -216,69 +1003,19 @@ claude-flow doctor
 | Memory | `memory_usage`, `neural_status`, `neural_train` |
 | GitHub | `github_swarm`, `repo_analyze`, `pr_enhance`, `issue_triage` |
 
----
+### When to Use Claude-Flow vs Native Agent Teams
 
-## 6. Master Prompt
-
-Copy-paste into Claude Code to begin orchestrated development:
-
-```
-You are the Hive Queen Coordinator for the Zipminator PQC platform.
-Complete Phase 2 (Quantum Secure Messenger) and Phase 3 (VoIP & Q-VPN).
-
-## PROJECT ROOT
-/Users/mos/dev/qdaria/zipminator
-
-## CONTEXT FILES
-- CLAUDE.md (project conventions)
-- guides/ruflo-v3-orchestration/README.md (this guide)
-- crates/zipminator-core/Cargo.toml (Rust dependencies)
-
-## STEP 1: Initialize
-claude-flow hive-mind init
-claude-flow hive-mind spawn -n 8 --claude -o "Complete Zipminator Phase 2 & 3"
-
-## STEP 2: Parallel Execution
-
-DOMAIN A -- PQC SECURITY (skill: /quantum-cryptanalysis-expert)
-1. Complete ratchet.rs: Double Ratchet with Kyber-768 key rotation
-2. Complete ffi.rs: Expose encrypt/decrypt/ratchet_step over C FFI
-3. Write Rust unit tests
-4. Cross-compile via scripts/build_rust_mobile.sh
-
-DOMAIN B -- NATIVE BRIDGE (skill: /pair-programming)
-1. Build C++ JSI bridge wrapping Rust staticlib
-2. Update ZipminatorCryptoModule.swift for iOS
-3. Create ZipminatorCryptoModule.kt for Android
-4. Replace mocks in PqcMessengerService.ts with native calls
-
-DOMAIN C -- WEBRTC & VOIP (skill: /sparc-methodology)
-1. Install react-native-webrtc in Expo project
-2. Implement real WebRTC in VoipService.ts
-3. Implement PQ-SRTP from Kyber shared secret
-4. Test end-to-end audio/video through signaling server
-
-DOMAIN D -- Q-VPN (skill: /sparc-methodology)
-1. iOS NetworkExtension with PQ-WireGuard
-2. Android VpnService with PQ-WireGuard
-3. Connect NetworkShield.tsx to real tunnel status
-4. Display real metrics (IP, RX/TX, latency)
-
-## STEP 3: Verification (skill: /verification-quality)
-1. cargo test --workspace
-2. pytest tests/
-3. npx expo start (verify mobile UI)
-
-## CONSTRAINTS
-- TDD: Write tests BEFORE implementation
-- Crypto: ML-KEM-768 (Kyber) for KEM, AES-256-GCM for symmetric
-- Performance: Sub-100ms crypto handshakes
-- Security: Never log private keys
-```
+| Scenario | Use |
+|----------|-----|
+| 3-5 parallel teammates | Native agent teams |
+| Single focused task | Subagents |
+| 10+ agents, complex topology | Claude-Flow swarm |
+| Neural training, pattern learning | Claude-Flow neural |
+| Cross-repo orchestration | Claude-Flow GitHub tools |
 
 ---
 
-## 7. Quantum Entropy Pool
+## 14. Quantum Entropy Pool
 
 ### How It Works
 
@@ -318,11 +1055,11 @@ If no pool file exists, the demo backend auto-creates a 4096-byte seed using `se
 
 ---
 
-## 8. Project Cleanup Strategy
+## 15. Project Cleanup Strategy
 
 ### Archive Directory
 
-Legacy files (old docs, compliance, benchmarks) are preserved in `_archive/` at the project root. This directory is gitignored, so archived content stays local but doesn't bloat the repo.
+Legacy files are preserved in `_archive/` (gitignored):
 
 ```bash
 # Already configured in .gitignore:
@@ -342,7 +1079,7 @@ deprecated/
 | `.claude/skills/`, `.claude/agents/` | Commit | AI orchestration config |
 | `Cargo.toml`, `Cargo.lock`, `pyproject.toml` | Commit | Build configuration |
 | `scripts/` | Commit | Build and harvesting scripts |
-| `guides/` | Commit | Developer guides |
+| `docs/guides/` | Commit | Developer guides |
 
 ### What Gets Gitignored
 
@@ -356,8 +1093,6 @@ deprecated/
 
 ### Reducing Git Status Noise
 
-The repository had 283 files staged for deletion (moved to `_archive/`) and 143 untracked files. To clean up:
-
 ```bash
 # Stage all the deletions (files already moved to _archive/)
 git add -u
@@ -365,7 +1100,7 @@ git add -u
 # Add new source directories
 git add crates/ src/zipminator/ api/ web/ tests/ scripts/ \
        .github/ .claude/ Cargo.toml Cargo.lock pyproject.toml \
-       guides/ demo/ config/ docs/guides/
+       docs/guides/ demo/ config/
 
 # Commit the restructure
 git commit -m "chore: archive legacy docs/compliance/benchmarks, restructure repo"
@@ -373,7 +1108,7 @@ git commit -m "chore: archive legacy docs/compliance/benchmarks, restructure rep
 
 ---
 
-## 9. Verification Checklist
+## 16. Verification Checklist
 
 After any orchestrated session, verify:
 
@@ -382,8 +1117,39 @@ After any orchestrated session, verify:
 - [ ] Demo starts: `bash demo/run.sh`
 - [ ] `GET http://localhost:5001/api/quantum/status` shows pool size > 0
 - [ ] `POST http://localhost:5001/api/quantum/generate` returns entropy
-- [ ] Kyber round-trip works: keygen → encrypt → decrypt
-- [ ] `python scripts/qrng_harvester.py` shows Marrakesh→Fez fallback logic
-- [ ] No references to "ruflo" in guide (`grep -r "ruflo" guides/`)
-- [ ] No phantom V3 skill references (`v3-security-overhaul`, etc.)
+- [ ] Kyber round-trip works: keygen -> encrypt -> decrypt
+- [ ] `python scripts/qrng_harvester.py` shows Marrakesh->Fez fallback logic
+- [ ] No references to "ruflo" in codebase
+- [ ] No private keys in any log output
 - [ ] `.gitignore` covers `_archive/`, `target/`, `*.so`, `demo-*.png`
+
+---
+
+## 17. Companion Files Reference
+
+All files in `docs/guides/` and their purpose:
+
+| File | Purpose | Feed To |
+|------|---------|---------|
+| **claude-flow-orchestration.md** | This file. Master prompt hub and orchestration reference. | You (human operator) |
+| **task.md** | Phase-by-phase checklist with checkbox status | Agent team leads, RALPH loops |
+| **FEATURES.md** | Complete feature specs for all 8 pillars | Coder agents, researchers |
+| **implementation_plan.md** | Vision document with competitive analysis and roadmap | Lead agents, planners |
+| **architecture.md** | Rust core internals, NTT, entropy pool, PyO3, security model | Coder agents working on crypto |
+| **api-reference.md** | FastAPI endpoint contracts, auth, request/response schemas | Backend coder agents |
+| **getting-started.md** | Build commands, SDK usage, CLI quickstart, troubleshooting | New session bootstrapping |
+| **deployment.md** | Docker, Kubernetes, Helm charts, env vars, production hardening | DevOps agents |
+| **investor-overview.md** | Business case, market, moat, roadmap (not used by agents) | Humans only |
+
+### How to Feed Context Files to Agents
+
+In your prompt, reference them explicitly:
+
+```
+Read these files for context:
+- docs/guides/task.md (what's done and remaining)
+- docs/guides/architecture.md (system design constraints)
+- docs/guides/FEATURES.md (feature specifications)
+```
+
+Claude Code reads them into context automatically. For agent teams, include the paths in each teammate's spawn prompt so they load the right context independently.

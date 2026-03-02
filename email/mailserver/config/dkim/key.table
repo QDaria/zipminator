@@ -1,0 +1,2 @@
+# DKIM Key Table -- maps key entries to selector/domain/keyfile
+s1._domainkey.zipminator.zip    zipminator.zip:s1:/etc/opendkim/keys/zipminator.zip/s1.private

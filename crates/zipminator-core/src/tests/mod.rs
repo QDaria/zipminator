@@ -1,4 +1,6 @@
-//! Integration tests for Kyber-768 implementation
+//! Integration tests for Kyber-768 implementation and PQ Double Ratchet.
+
+mod ratchet_tests;
 
 use crate::*;
 

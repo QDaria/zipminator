@@ -365,3 +365,4 @@ deprecated/
 !docs/README.md
 !production/entropy_pool/README.md
 !quantum_entropy/README.md
+.claude/worktrees/
