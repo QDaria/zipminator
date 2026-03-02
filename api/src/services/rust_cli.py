@@ -24,15 +24,11 @@ class RustCLIWrapper:
         Returns:
             Tuple of (public_key_base64, secret_key_base64)
         """
-        start_time = time.time()
-
-        # Build command
         cmd = [str(self.cli_path), "keygen"]
         if use_quantum:
             cmd.append("--quantum")
 
         try:
-            # Execute CLI
             result = subprocess.run(
                 cmd,
                 capture_output=True,
@@ -41,8 +37,6 @@ class RustCLIWrapper:
                 timeout=30,
             )
 
-            # Parse output (CLI writes to stdout)
-            # Expected format: "Public key: <base64>\nSecret key: <base64>"
             output = result.stdout.strip()
             lines = output.split('\n')
 
@@ -58,7 +52,6 @@ class RustCLIWrapper:
             if not public_key or not secret_key:
                 raise ValueError("Failed to parse keypair from CLI output")
 
-            duration_ms = int((time.time() - start_time) * 1000)
             return public_key, secret_key
 
         except subprocess.CalledProcessError as e:
@@ -77,25 +70,21 @@ class RustCLIWrapper:
         Returns:
             Tuple of (ciphertext_base64, shared_secret_base64)
         """
-        start_time = time.time()
-
         try:
-            # The CLI expects public key and plaintext as arguments
-            # We'll use stdin for plaintext to handle binary data safely
             plaintext_b64 = base64.b64encode(plaintext).decode('utf-8')
 
-            cmd = [str(self.cli_path), "encrypt", "--public-key", public_key]
+            # Pass public key via stdin to avoid process listing exposure
+            cmd = [str(self.cli_path), "encrypt"]
 
             result = subprocess.run(
                 cmd,
-                input=plaintext_b64,
+                input=f"{public_key}\n{plaintext_b64}",
                 capture_output=True,
                 text=True,
                 check=True,
                 timeout=30,
             )
 
-            # Parse output
             output = result.stdout.strip()
             lines = output.split('\n')
 
@@ -129,21 +118,19 @@ class RustCLIWrapper:
         Returns:
             Tuple of (plaintext_bytes, shared_secret_base64)
         """
-        start_time = time.time()
-
         try:
-            cmd = [str(self.cli_path), "decrypt", "--secret-key", secret_key]
+            # Pass secret key via stdin to avoid process listing exposure
+            cmd = [str(self.cli_path), "decrypt"]
 
             result = subprocess.run(
                 cmd,
-                input=ciphertext,
+                input=f"{secret_key}\n{ciphertext}",
                 capture_output=True,
                 text=True,
                 check=True,
                 timeout=30,
             )
 
-            # Parse output
             output = result.stdout.strip()
             lines = output.split('\n')
 
@@ -159,7 +146,6 @@ class RustCLIWrapper:
             if not plaintext_b64 or not shared_secret:
                 raise ValueError("Failed to parse decryption output from CLI")
 
-            # Decode plaintext from base64
             plaintext = base64.b64decode(plaintext_b64)
 
             return plaintext, shared_secret
@@ -170,5 +156,12 @@ class RustCLIWrapper:
             raise RuntimeError("CLI decryption timed out after 30 seconds")
 
 
-# Singleton instance
-cli_wrapper = RustCLIWrapper()
+# Lazy singleton -- only initialize when first accessed
+_cli_wrapper: Optional[RustCLIWrapper] = None
+
+
+def get_cli_wrapper() -> RustCLIWrapper:
+    global _cli_wrapper
+    if _cli_wrapper is None:
+        _cli_wrapper = RustCLIWrapper()
+    return _cli_wrapper

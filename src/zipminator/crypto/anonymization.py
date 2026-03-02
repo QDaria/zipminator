@@ -178,14 +178,6 @@ class AnonymizationEngine:
 
         return df_copy
 
-    def _randomized_response(self, value: str, p: float = 0.75) -> str:
-        """Apply randomized response for differential privacy on categorical data."""
-        if self.qrand.random() < p:
-            return value
-        else:
-            chars = string.ascii_uppercase + string.digits
-            return ''.join([self.qrand.choice(chars) for _ in range(len(str(value)))])
-
     def _simple_homomorphic_encrypt(self, value: Any) -> str:
         """Legacy/Fallback encryption for non-numeric data."""
         try:

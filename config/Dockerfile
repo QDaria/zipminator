@@ -21,7 +21,7 @@ COPY . .
 
 # Build the CLI binary
 RUN cargo build --release \
-    --manifest-path /build/src/rust/Cargo.toml \
+    --manifest-path /build/Cargo.toml \
     --target x86_64-unknown-linux-musl
 
 # Stage 2: Runtime
@@ -44,7 +44,7 @@ RUN addgroup -g 1000 zipminator && \
 WORKDIR /app
 
 # Copy binary from builder
-COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/kyber768 /usr/local/bin/zipminator
+COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/zipminator /usr/local/bin/zipminator
 
 # Create volume for input/output
 RUN mkdir -p /app/data && \

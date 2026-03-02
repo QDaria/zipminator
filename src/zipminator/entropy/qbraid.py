@@ -105,8 +105,8 @@ class QBraidAdapter:
             device = self.get_best_device()
             if not device:
                  # Fallback to simulation if no device
-                import random
-                return bytes([random.randint(0, 255) for _ in range(num_bytes)])
+                import secrets
+                return secrets.token_bytes(num_bytes)
             
             # If we have a device, we would run the circuit. 
             # Omitted for brevity in this refactor, assuming the original file had it.

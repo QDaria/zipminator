@@ -25,51 +25,37 @@ class RateLimiter:
         now = datetime.utcnow()
         window_start = now - timedelta(seconds=window_seconds)
 
-        # Use sorted set to track requests
         redis_key = f"rate_limit:{key}"
 
-        # Remove old entries
         self.redis_client.zremrangebyscore(redis_key, 0, window_start.timestamp())
-
-        # Count requests in current window
         current_count = self.redis_client.zcard(redis_key)
 
         if current_count >= limit:
             return False
 
-        # Add current request
         self.redis_client.zadd(redis_key, {str(now.timestamp()): now.timestamp()})
-
-        # Set expiration
         self.redis_client.expire(redis_key, window_seconds)
 
         return True
 
     def get_remaining_requests(self, key: str, limit: int, window_seconds: int = 3600) -> int:
-        """
-        Get number of remaining requests in current window
-
-        Args:
-            key: Unique identifier
-            limit: Maximum requests allowed
-            window_seconds: Time window in seconds
-
-        Returns:
-            Number of remaining requests
-        """
+        """Get number of remaining requests in current window"""
         now = datetime.utcnow()
         window_start = now - timedelta(seconds=window_seconds)
 
         redis_key = f"rate_limit:{key}"
-
-        # Remove old entries
         self.redis_client.zremrangebyscore(redis_key, 0, window_start.timestamp())
-
-        # Count requests
         current_count = self.redis_client.zcard(redis_key)
 
         return max(0, limit - current_count)
 
 
-# Singleton instance
-rate_limiter = RateLimiter()
+# Lazy singleton -- only initialize when first accessed (avoids crash if Redis is down)
+_rate_limiter: Optional[RateLimiter] = None
+
+
+def get_rate_limiter() -> RateLimiter:
+    global _rate_limiter
+    if _rate_limiter is None:
+        _rate_limiter = RateLimiter()
+    return _rate_limiter

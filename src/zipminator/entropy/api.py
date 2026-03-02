@@ -1,4 +1,4 @@
-import random
+import secrets
 import requests
 from .base import QuantumProvider
 
@@ -14,10 +14,8 @@ class APIProxyProvider(QuantumProvider):
             # In a real scenario, we would call the actual API
             # response = requests.get(f"{self.api_url}?bits={num_bits}")
             # return response.json()['binary']
-            
-            # For the MVP/Demo without a live server, we fallback to local simulation
-            # but label it as "Cloud API" to demonstrate the architecture
-            return "".join(str(random.randint(0, 1)) for _ in range(num_bits))
+
+            # Fallback to CSPRNG simulation for demo/MVP
+            return bin(int.from_bytes(secrets.token_bytes((num_bits + 7) // 8), 'big'))[2:].zfill(num_bits)[:num_bits]
         except Exception:
-            # Fallback to pseudo-random if network fails
-            return "".join(str(random.randint(0, 1)) for _ in range(num_bits))
+            return bin(int.from_bytes(secrets.token_bytes((num_bits + 7) // 8), 'big'))[2:].zfill(num_bits)[:num_bits]

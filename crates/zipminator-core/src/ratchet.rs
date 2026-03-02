@@ -1,7 +1,8 @@
-use aes_gcm::aead::{Aead, KeyInit};
+use aes_gcm::aead::{Aead, KeyInit, Payload};
 use aes_gcm::{Aes256Gcm, Key, Nonce};
+use getrandom::getrandom;
 use pqcrypto_kyber::kyber768;
-use pqcrypto_traits::kem::{Ciphertext, PublicKey, SecretKey, SharedSecret};
+use pqcrypto_traits::kem::{Ciphertext, PublicKey, SharedSecret};
 use std::convert::TryInto;
 
 pub struct PqcRatchet {
@@ -59,17 +60,36 @@ impl PqcRatchet {
         Ok(ss_bytes)
     }
 
-    pub fn encrypt(&self, data: &[u8], key: &[u8; 32], _ad: &[u8]) -> Vec<u8> {
+    /// Encrypt data with AES-256-GCM using a random 12-byte nonce.
+    /// The nonce is prepended to the ciphertext (first 12 bytes of output).
+    /// Associated data is authenticated but not included in the output.
+    pub fn encrypt(&self, data: &[u8], key: &[u8; 32], ad: &[u8]) -> Result<Vec<u8>, &'static str> {
         let cipher = Aes256Gcm::new(Key::<Aes256Gcm>::from_slice(key));
-        let nonce = Nonce::from_slice(b"pqc-zipminator"); // Use meaningful nonces in prod
-        cipher.encrypt(nonce, data).expect("encryption failure")
+
+        let mut nonce_bytes = [0u8; 12];
+        getrandom(&mut nonce_bytes).map_err(|_| "Failed to generate random nonce")?;
+        let nonce = Nonce::from_slice(&nonce_bytes);
+
+        let payload = Payload { msg: data, aad: ad };
+        let ciphertext = cipher.encrypt(nonce, payload).map_err(|_| "AES-GCM encryption failed")?;
+
+        // Prepend nonce to ciphertext so decrypt can recover it
+        let mut output = Vec::with_capacity(12 + ciphertext.len());
+        output.extend_from_slice(&nonce_bytes);
+        output.extend_from_slice(&ciphertext);
+        Ok(output)
     }
 
-    pub fn decrypt(&self, encrypted_data: &[u8], key: &[u8; 32], _ad: &[u8]) -> Vec<u8> {
+    /// Decrypt data encrypted by `encrypt`. Expects the first 12 bytes to be the nonce.
+    pub fn decrypt(&self, encrypted_data: &[u8], key: &[u8; 32], ad: &[u8]) -> Result<Vec<u8>, &'static str> {
+        if encrypted_data.len() < 12 {
+            return Err("Ciphertext too short to contain nonce");
+        }
+        let (nonce_bytes, ciphertext) = encrypted_data.split_at(12);
         let cipher = Aes256Gcm::new(Key::<Aes256Gcm>::from_slice(key));
-        let nonce = Nonce::from_slice(b"pqc-zipminator");
-        cipher
-            .decrypt(nonce, encrypted_data)
-            .expect("decryption failure")
+        let nonce = Nonce::from_slice(nonce_bytes);
+
+        let payload = Payload { msg: ciphertext, aad: ad };
+        cipher.decrypt(nonce, payload).map_err(|_| "AES-GCM decryption failed")
     }
 }
