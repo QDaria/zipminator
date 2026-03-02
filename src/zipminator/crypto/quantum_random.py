@@ -33,7 +33,7 @@ __version__ = "0.3.0"
 T = TypeVar("T")
 
 # Configuration
-ENTROPY_POOL_PATH = Path(__file__).parent.parent.parent / \
+ENTROPY_POOL_PATH = Path(__file__).parent.parent.parent.parent / \
     "quantum_entropy" / "quantum_entropy_pool.bin"
 MIN_POOL_THRESHOLD = 500  # bytes - trigger refill warning
 BYTES_PER_RANDOM = 8  # 64-bit floats

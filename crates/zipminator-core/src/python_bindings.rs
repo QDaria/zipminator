@@ -60,17 +60,17 @@ impl PySecretKey {
 
     /// Get secret key as bytes
     fn to_bytes(&self, py: Python) -> PyObject {
-        PyBytes::new(py, &self.inner.data).into()
+        PyBytes::new(py, self.inner.as_bytes()).into()
     }
 
     /// Get size of secret key
     #[getter]
     fn size(&self) -> usize {
-        self.inner.data.len()
+        self.inner.len()
     }
 
     fn __repr__(&self) -> String {
-        format!("SecretKey({} bytes)", self.inner.data.len())
+        format!("SecretKey({} bytes)", self.inner.len())
     }
 }
 

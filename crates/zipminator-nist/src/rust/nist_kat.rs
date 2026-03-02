@@ -12,7 +12,7 @@ pub use deterministic_rng::DeterministicRNG;
 
 // Import Kyber768 implementation
 // Adjust path based on your project structure
-use zipminator_core::{Kyber768, PublicKey, SecretKey, Ciphertext, SharedSecret};
+use zipminator_core::Kyber768;
 
 /// NIST KAT test vector structure
 #[derive(Debug, Clone)]
@@ -106,7 +106,7 @@ pub fn run_kat_test(test: &KATVector) -> Result<(), String> {
     println!("  ✓ Public key matches");
 
     // Verify secret key
-    if !compare_bytes("Secret Key", &sk.data, &test.expected_sk) {
+    if !compare_bytes("Secret Key", sk.as_bytes(), &test.expected_sk) {
         return Err("Secret key mismatch".to_string());
     }
     println!("  ✓ Secret key matches");
@@ -245,7 +245,7 @@ pub fn generate_sample_vectors() -> Vec<KATVector> {
         test_name: "Sample_Test_1".to_string(),
         seed,
         expected_pk: pk.data,
-        expected_sk: sk.data,
+        expected_sk: sk.as_bytes().to_vec(),
         expected_ct: ct.data,
         expected_ss: ss.data.to_vec(),
     });

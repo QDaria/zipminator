@@ -1,6 +1,8 @@
 // Quantum Entropy Pool - Rust Implementation
 // Memory-safe, zero-copy quantum random byte storage with encryption
 
+use base64::Engine;
+
 use aes_gcm::{
     aead::{Aead, KeyInit},
     Aes256Gcm, Nonce,
@@ -10,6 +12,8 @@ use hmac::{Hmac, Mac};
 use sha2::Sha256;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Seek, SeekFrom, Write};
+#[cfg(unix)]
+use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -297,7 +301,7 @@ impl QuantumEntropyPool {
         let mut hmac_data = header.to_bytes_for_hmac();
         hmac_data.extend_from_slice(encrypted_data);
 
-        let mut mac = HmacSha256::new_from_slice(&keys.hmac_key)
+        let mut mac = <HmacSha256 as Mac>::new_from_slice(&keys.hmac_key)
             .map_err(|_| EntropyPoolError::KeyDerivationFailed)?;
         mac.update(&hmac_data);
         let hmac_result = mac.finalize();
@@ -349,7 +353,7 @@ impl QuantumEntropyPool {
         let mut hmac_data = header.to_bytes_for_hmac();
         hmac_data.extend_from_slice(&encrypted_data);
 
-        let mut mac = HmacSha256::new_from_slice(&keys.hmac_key)
+        let mut mac = <HmacSha256 as Mac>::new_from_slice(&keys.hmac_key)
             .map_err(|_| EntropyPoolError::KeyDerivationFailed)?;
         mac.update(&hmac_data);
         mac.verify_slice(&header.hmac_tag)
@@ -391,12 +395,23 @@ impl QuantumEntropyPool {
         let end_idx = start_idx + num_bytes;
         let result = self.decrypted_entropy[start_idx..end_idx].to_vec();
 
-        // Securely wipe consumed entropy (3-pass)
-        for pass in 0..3 {
-            let fill_value = if pass == 0 { 0x00 } else { 0xFF };
-            for byte in &mut self.decrypted_entropy[start_idx..end_idx] {
-                *byte = fill_value;
+        // Securely wipe consumed entropy (DoD 5220.22-M 3-pass)
+        // Pass 0: all zeros (volatile writes to prevent optimizer elision)
+        for byte in &mut self.decrypted_entropy[start_idx..end_idx] {
+            unsafe { std::ptr::write_volatile(byte, 0x00u8); }
+        }
+        // Pass 1: all ones
+        for byte in &mut self.decrypted_entropy[start_idx..end_idx] {
+            unsafe { std::ptr::write_volatile(byte, 0xFFu8); }
+        }
+        // Pass 2: random bytes via getrandom
+        {
+            let mut rand_buf = vec![0u8; num_bytes];
+            let _ = getrandom::getrandom(&mut rand_buf);
+            for (dst, src) in self.decrypted_entropy[start_idx..end_idx].iter_mut().zip(rand_buf.iter()) {
+                unsafe { std::ptr::write_volatile(dst, *src); }
             }
+            rand_buf.zeroize();
         }
 
         self.header.consumed_bytes += num_bytes as u32;
@@ -453,7 +468,7 @@ impl QuantumEntropyPool {
     fn load_master_key() -> Result<Vec<u8>, EntropyPoolError> {
         // Try environment variable first
         if let Ok(env_key) = std::env::var("QUANTUM_ENTROPY_KEY") {
-            if let Ok(key) = base64::decode(&env_key) {
+            if let Ok(key) = base64::engine::general_purpose::STANDARD.decode(&env_key) {
                 if key.len() == AES_256_KEY_SIZE {
                     return Ok(key);
                 }
@@ -483,12 +498,11 @@ impl QuantumEntropyPool {
         header: &QEPHeader,
         encrypted_data: &[u8],
     ) -> io::Result<()> {
-        let mut file = OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(true)
-            .mode(0o600)
-            .open(path)?;
+        let mut opts = OpenOptions::new();
+        opts.create(true).write(true).truncate(true);
+        #[cfg(unix)]
+        opts.mode(0o600);
+        let mut file = opts.open(path)?;
 
         file.write_all(&header.to_bytes())?;
         file.write_all(encrypted_data)?;

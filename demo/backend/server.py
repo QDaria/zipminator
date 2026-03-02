@@ -5,6 +5,7 @@ Provides REST API for quantum entropy, Zipminator encryption, and Kyber768 opera
 """
 
 import os
+import re
 import sys
 import time
 import json
@@ -18,6 +19,10 @@ import tempfile
 
 # Add parent directory to path to import from src
 sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add project src/ so we can import the zipminator package
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'src'))
+
+from zipminator.crypto.quantum_random import QuantumEntropyPool
 
 app = Flask(__name__)
 CORS(app)
@@ -41,8 +46,13 @@ def _ensure_entropy_file():
     first-run or offline usage we generate a cryptographically-secure seed so
     the application starts reliably.
     """
-    if ENTROPY_FILE.exists() and ENTROPY_FILE.stat().st_size > 0:
-        return
+    try:
+        with open(ENTROPY_FILE, 'rb') as f:
+            # File exists; check it has content
+            if f.read(1):
+                return
+    except FileNotFoundError:
+        pass
     ENTROPY_DIR.mkdir(parents=True, exist_ok=True)
     ENTROPY_FILE.write_bytes(secrets.token_bytes(BOOTSTRAP_SEED_SIZE))
     print(f"[BOOTSTRAP] Generated {BOOTSTRAP_SEED_SIZE}-byte entropy seed at {ENTROPY_FILE}")
@@ -50,60 +60,32 @@ def _ensure_entropy_file():
 
 def _get_pool_size():
     """Read actual entropy pool file size from disk."""
-    if ENTROPY_FILE.exists():
+    try:
         return ENTROPY_FILE.stat().st_size
-    return 0
+    except FileNotFoundError:
+        return 0
 
 
 _ensure_entropy_file()
 
-# Entropy pool state (sizes are read dynamically from file)
-_initial_pool_size = _get_pool_size()
-entropy_pool = {
-    'pool_size': _initial_pool_size,
-    'bytes_consumed': 0,
-    'bytes_remaining': _initial_pool_size,
-    'entropy_file': str(ENTROPY_FILE),
+# ---------------------------------------------------------------------------
+# Consolidated entropy pool -- delegates to QuantumEntropyPool from
+# src/zipminator/crypto/quantum_random.py instead of reimplementing the
+# read-offset-refill logic inline.  The class handles thread-safe reads,
+# position tracking, automatic refill on exhaustion, and pseudo-random
+# fallback when the pool file is missing or empty.
+# ---------------------------------------------------------------------------
+_qep = QuantumEntropyPool(pool_path=ENTROPY_FILE)
+
+# Demo-specific metadata not tracked by QuantumEntropyPool
+_DEMO_ENTROPY_META = {
     'backend': 'IBM Quantum (156-qubit Marrakesh/Fez)',
     'qubits': 156,
-    'status': 'online',
-    'last_generation': None,
-    'latest_entropy': None,
-    'total_generated': 0,
-    'entropy_type': 'Quantum Entropy Pool'
+    'entropy_type': 'Quantum Entropy Pool',
 }
-
-def read_entropy_from_file(num_bytes):
-    """
-    Read real quantum entropy from the stored entropy file.
-    Returns entropy bytes and updates consumption tracking.
-    """
-    if not ENTROPY_FILE.exists():
-        raise FileNotFoundError(f"Entropy file not found: {ENTROPY_FILE}")
-
-    # Read the entire entropy pool
-    with open(ENTROPY_FILE, 'rb') as f:
-        entropy_data = f.read()
-
-    # Check if we have enough bytes remaining
-    start_offset = entropy_pool['bytes_consumed']
-    end_offset = start_offset + num_bytes
-
-    if end_offset > len(entropy_data):
-        # Pool depleted, reset to beginning (in production, would refill from quantum source)
-        print(f"WARNING: Entropy pool depleted. Resetting to beginning of pool.")
-        entropy_pool['bytes_consumed'] = 0
-        start_offset = 0
-        end_offset = num_bytes
-
-    # Extract the requested bytes
-    entropy_bytes = entropy_data[start_offset:end_offset]
-
-    # Update consumption tracking
-    entropy_pool['bytes_consumed'] = end_offset
-    entropy_pool['bytes_remaining'] = len(entropy_data) - end_offset
-
-    return entropy_bytes
+_demo_last_generation = None
+_demo_latest_entropy = None
+_demo_total_generated = 0
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -118,23 +100,26 @@ def health_check():
 @app.route('/api/quantum/status', methods=['GET'])
 def quantum_status():
     """Get quantum entropy pool status"""
+    global _demo_last_generation, _demo_latest_entropy, _demo_total_generated
+
     file_exists = ENTROPY_FILE.exists()
     file_size = ENTROPY_FILE.stat().st_size if file_exists else 0
+    stats = _qep.get_stats()
 
     return jsonify({
-        'pool_size': entropy_pool['pool_size'],
-        'bytes_consumed': entropy_pool['bytes_consumed'],
-        'bytes_remaining': entropy_pool['bytes_remaining'],
-        'entropy_file': entropy_pool['entropy_file'],
+        'pool_size': stats['pool_size'],
+        'bytes_consumed': stats['total_consumed'],
+        'bytes_remaining': stats['remaining'],
+        'entropy_file': stats['pool_path'],
         'file_exists': file_exists,
         'file_size': file_size,
-        'backend': entropy_pool['backend'],
-        'qubits': entropy_pool['qubits'],
+        'backend': _DEMO_ENTROPY_META['backend'],
+        'qubits': _DEMO_ENTROPY_META['qubits'],
         'status': 'online' if file_exists else 'offline',
-        'entropy_type': entropy_pool['entropy_type'],
-        'last_generation': entropy_pool['last_generation'],
-        'latest_entropy': entropy_pool['latest_entropy'],
-        'total_generated': entropy_pool['total_generated'],
+        'entropy_type': _DEMO_ENTROPY_META['entropy_type'],
+        'last_generation': _demo_last_generation,
+        'latest_entropy': _demo_latest_entropy,
+        'total_generated': _demo_total_generated,
         'entropy_rate': 7.998,
         'chi_square': 'PASS',
         'runs_test': 'PASS',
@@ -144,6 +129,8 @@ def quantum_status():
 @app.route('/api/quantum/generate', methods=['POST'])
 def generate_entropy():
     """Generate quantum entropy from real quantum source file"""
+    global _demo_last_generation, _demo_latest_entropy, _demo_total_generated
+
     try:
         data = request.json or {}
         num_bytes = data.get('num_bytes', 256)
@@ -152,34 +139,35 @@ def generate_entropy():
         if num_bytes <= 0 or num_bytes > 1024:
             return jsonify({'error': 'num_bytes must be between 1 and 1024'}), 400
 
-        # Read real quantum entropy from file
-        entropy_bytes = read_entropy_from_file(num_bytes)
+        # Read quantum entropy via the consolidated pool
+        entropy_bytes = _qep.get_bytes(num_bytes)
         entropy_hash = hashlib.sha256(entropy_bytes).hexdigest()
 
-        # Update pool status
-        entropy_pool['latest_entropy'] = entropy_hash
-        entropy_pool['last_generation'] = datetime.now().isoformat()
-        entropy_pool['total_generated'] += num_bytes
+        # Update demo-specific tracking
+        _demo_latest_entropy = entropy_hash
+        _demo_last_generation = datetime.now().isoformat()
+        _demo_total_generated += num_bytes
 
-        # Calculate pool status
-        current_pool_size = _get_pool_size()
-        entropy_pool['pool_size'] = current_pool_size
-        pool_percentage = (entropy_pool['bytes_remaining'] / current_pool_size * 100) if current_pool_size > 0 else 0
+        # Get current pool stats
+        stats = _qep.get_stats()
+        pool_size = stats['pool_size']
+        remaining = stats['remaining']
+        pool_percentage = (remaining / pool_size * 100) if pool_size > 0 else 0
 
         response = {
             'success': True,
             'num_bytes': num_bytes,
             'entropy_hash': entropy_hash,
             'entropy_hex': entropy_bytes.hex(),
-            'backend': entropy_pool['backend'],
-            'entropy_type': entropy_pool['entropy_type'],
+            'backend': _DEMO_ENTROPY_META['backend'],
+            'entropy_type': _DEMO_ENTROPY_META['entropy_type'],
             'timestamp': datetime.now().isoformat(),
-            'pool_size': entropy_pool['pool_size'],
-            'bytes_consumed': entropy_pool['bytes_consumed'],
-            'bytes_remaining': entropy_pool['bytes_remaining'],
+            'pool_size': pool_size,
+            'bytes_consumed': stats['total_consumed'],
+            'bytes_remaining': remaining,
             'pool_percentage': round(pool_percentage, 2),
             'latest_entropy': entropy_hash,
-            'source_file': str(ENTROPY_FILE)
+            'source_file': stats['pool_path']
         }
 
         # Add warning if pool is getting low
@@ -203,22 +191,20 @@ def generate_entropy():
 
 @app.route('/api/quantum/refill', methods=['POST'])
 def refill_entropy_pool():
-    """Reset entropy pool consumption counter (simulates refilling)"""
+    """Reload entropy pool from disk (simulates refilling)"""
     try:
         if not ENTROPY_FILE.exists():
             return jsonify({'error': 'Entropy file not found'}), 503
 
-        # Reset consumption tracking and re-read pool size from disk
-        current_pool_size = _get_pool_size()
-        entropy_pool['pool_size'] = current_pool_size
-        entropy_pool['bytes_consumed'] = 0
-        entropy_pool['bytes_remaining'] = current_pool_size
+        # Reload the pool from disk via the consolidated class
+        _qep._refill_pool()
+        stats = _qep.get_stats()
 
         return jsonify({
             'success': True,
             'message': 'Entropy pool refilled',
-            'pool_size': entropy_pool['pool_size'],
-            'bytes_remaining': entropy_pool['bytes_remaining'],
+            'pool_size': stats['pool_size'],
+            'bytes_remaining': stats['remaining'],
             'timestamp': datetime.now().isoformat()
         })
 
@@ -240,9 +226,6 @@ def zipminator_encrypt():
         form_data = request.form
         self_destruct_enabled = form_data.get('self_destruct_enabled', 'false').lower() == 'true'
         destruct_hours = int(form_data.get('destruct_hours', 24))
-
-        # Simulate encryption process
-        time.sleep(1.5)
 
         # Generate encryption metadata
         file_id = hashlib.sha256(secrets.token_bytes(32)).hexdigest()[:16]
@@ -274,7 +257,8 @@ def zipminator_encrypt():
             'encryption_key': encryption_key,
             'size': os.path.getsize(encrypted_path),
             'timestamp': datetime.now().isoformat(),
-            'gdpr_compliant': True,
+            # Demo only: file is saved as-is, no real encryption is applied
+            'simulated': True,
             'self_destruct': f'{destruct_hours} hours' if self_destruct_enabled else 'disabled',
             'self_destruct_enabled': self_destruct_enabled,
             'audit_trail': True
@@ -287,7 +271,16 @@ def zipminator_encrypt():
 def zipminator_download(file_id):
     """Download encrypted file"""
     try:
-        encrypted_path = DEMO_DATA_FOLDER / f'encrypted_{file_id}.zip'
+        # Validate file_id is strict hex to prevent path traversal
+        if not re.fullmatch(r'[a-f0-9]+', file_id):
+            return jsonify({'error': 'Invalid file_id'}), 400
+
+        encrypted_path = (DEMO_DATA_FOLDER / f'encrypted_{file_id}.zip').resolve()
+
+        # Ensure resolved path is still under DEMO_DATA_FOLDER
+        if not str(encrypted_path).startswith(str(DEMO_DATA_FOLDER.resolve())):
+            return jsonify({'error': 'Invalid file_id'}), 400
+
         if not encrypted_path.exists():
             return jsonify({'error': 'File not found'}), 404
 
@@ -301,29 +294,47 @@ def zipminator_download(file_id):
         return jsonify({'error': str(e)}), 500
 
 # ---------------------------------------------------------------------------
-# Kyber768 KEM -- try real Rust bindings, fall back to demo simulation
+# Kyber768 KEM -- delegate to the shared PQC class which handles
+# Rust-native vs pure-Python vs simulation fallback internally.
 # ---------------------------------------------------------------------------
-_USE_RUST = False
-_PK_CLS = None   # PublicKey type
-_SK_CLS = None   # SecretKey type
-_CT_CLS = None   # Ciphertext type
+_USE_PQC = False
 try:
-    sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'src'))
-    from zipminator._core import keypair as _rs_keypair, encapsulate as _rs_encap, decapsulate as _rs_decap
-    # Cache type references for from_bytes reconstruction
-    _pk_tmp, _sk_tmp = _rs_keypair()
-    _ct_tmp, _ = _rs_encap(_pk_tmp)
-    _PK_CLS = type(_pk_tmp)
-    _SK_CLS = type(_sk_tmp)
-    _CT_CLS = type(_ct_tmp)
-    del _pk_tmp, _sk_tmp, _ct_tmp
-    _USE_RUST = True
-    print("[KYBER] Using Rust Kyber768 bindings (native speed)")
-except ImportError:
-    print("[KYBER] Rust bindings unavailable -- using demo simulation")
+    from zipminator.crypto.pqc import PQC
+    _pqc = PQC(level=768)
+    _USE_PQC = True
+    _USE_RUST = _pqc.use_rust
+    print(f"[KYBER] PQC backend loaded (rust={_USE_RUST})")
+except (ImportError, Exception) as exc:
+    _pqc = None
+    _USE_RUST = False
+    print(f"[KYBER] PQC unavailable ({exc}) -- using demo simulation")
 
-# In-memory store so encrypt -> decrypt round-trips work
+# In-memory store so encrypt -> decrypt round-trips work.
+# Bounded: max 100 entries, entries expire after 5 minutes.
 _kyber_store: dict = {}
+_KYBER_STORE_MAX = 100
+_KYBER_STORE_TTL = 300  # seconds
+
+
+def _kyber_store_put(key: str, value: dict) -> None:
+    """Insert into bounded store. Evicts oldest half when limit exceeded."""
+    _kyber_store[key] = {**value, '_ts': time.monotonic()}
+    if len(_kyber_store) > _KYBER_STORE_MAX:
+        # Sort by timestamp, delete oldest 50
+        by_age = sorted(_kyber_store, key=lambda k: _kyber_store[k].get('_ts', 0))
+        for k in by_age[:len(by_age) // 2]:
+            del _kyber_store[k]
+
+
+def _kyber_store_get(key: str) -> dict | None:
+    """Retrieve from store, returning None for missing or expired entries."""
+    entry = _kyber_store.get(key)
+    if entry is None:
+        return None
+    if time.monotonic() - entry.get('_ts', 0) > _KYBER_STORE_TTL:
+        del _kyber_store[key]
+        return None
+    return entry
 
 
 @app.route('/api/kyber/generate', methods=['POST'])
@@ -331,17 +342,17 @@ def kyber_generate():
     """Generate Kyber768 keypair"""
     try:
         t0 = time.perf_counter()
-        if _USE_RUST:
-            pk_obj, sk_obj = _rs_keypair()
-            public_key = pk_obj.to_bytes().hex()
-            private_key = sk_obj.to_bytes().hex()
+        if _USE_PQC:
+            pk_bytes, sk_bytes = _pqc.generate_keypair()
+            public_key = pk_bytes.hex()
+            private_key = sk_bytes.hex()
         else:
             public_key = secrets.token_hex(1184)   # Kyber768 pk size
             private_key = secrets.token_hex(2400)   # Kyber768 sk size
         elapsed = (time.perf_counter() - t0) * 1000
 
         pair_id = hashlib.sha256((public_key[:64] + private_key[:64]).encode()).hexdigest()[:12]
-        _kyber_store[pair_id] = {'pk': public_key, 'sk': private_key}
+        _kyber_store_put(pair_id, {'pk': public_key, 'sk': private_key})
 
         return jsonify({
             'success': True,
@@ -370,10 +381,9 @@ def kyber_encrypt():
             return jsonify({'error': 'Public key required'}), 400
 
         t0 = time.perf_counter()
-        if _USE_RUST:
-            pk_real = _PK_CLS.from_bytes(bytes.fromhex(public_key))
-            ct_obj, ss_bytes = _rs_encap(pk_real)
-            ciphertext = ct_obj.to_bytes().hex()
+        if _USE_PQC:
+            ct_bytes, ss_bytes = _pqc.encapsulate(bytes.fromhex(public_key))
+            ciphertext = ct_bytes.hex()
             shared_secret = ss_bytes.hex()
         else:
             ciphertext = secrets.token_hex(544)
@@ -387,11 +397,11 @@ def kyber_encrypt():
 
         # Store for round-trip
         enc_id = hashlib.sha256(ciphertext[:64].encode()).hexdigest()[:12]
-        _kyber_store[enc_id] = {
+        _kyber_store_put(enc_id, {
             'ciphertext': ciphertext,
             'shared_secret': shared_secret,
             'original_message': message,
-        }
+        })
 
         return jsonify({
             'success': True,
@@ -422,13 +432,11 @@ def kyber_decrypt():
         t0 = time.perf_counter()
         # Attempt round-trip lookup
         enc_id = hashlib.sha256(ciphertext[:64].encode()).hexdigest()[:12]
-        stored = _kyber_store.get(enc_id, {})
+        stored = _kyber_store_get(enc_id) or {}
         original = stored.get('original_message', 'Hello from Post-Quantum World!')
 
-        if _USE_RUST:
-            sk_real = _SK_CLS.from_bytes(bytes.fromhex(private_key))
-            ct_real = _CT_CLS.from_bytes(bytes.fromhex(ciphertext))
-            _rs_decap(ct_real, sk_real)
+        if _USE_PQC:
+            _pqc.decapsulate(bytes.fromhex(private_key), bytes.fromhex(ciphertext))
         elapsed = (time.perf_counter() - t0) * 1000
 
         return jsonify({
@@ -448,15 +456,15 @@ def kyber_benchmark():
     import time as _time
     ROUNDS = 20
 
-    if _USE_RUST:
+    if _USE_PQC:
         kg_times, en_times, de_times = [], [], []
         for _ in range(ROUNDS):
             t0 = _time.perf_counter()
-            pk, sk = _rs_keypair()
+            pk_bytes, sk_bytes = _pqc.generate_keypair()
             t1 = _time.perf_counter()
-            ct, ss1 = _rs_encap(pk)
+            ct_bytes, ss = _pqc.encapsulate(pk_bytes)
             t2 = _time.perf_counter()
-            ss2 = _rs_decap(ct, sk)
+            _pqc.decapsulate(sk_bytes, ct_bytes)
             t3 = _time.perf_counter()
             kg_times.append((t1 - t0) * 1000)
             en_times.append((t2 - t1) * 1000)
@@ -488,8 +496,13 @@ def kyber_benchmark():
 
 @app.route('/api/jupyter/launch', methods=['POST'])
 def launch_jupyter():
-    """Launch JupyterLab environment"""
+    """Launch JupyterLab environment (localhost only)"""
     try:
+        # Only allow from localhost -- launching processes is dangerous from remote
+        remote = request.remote_addr
+        if remote not in ('127.0.0.1', '::1'):
+            return jsonify({'error': 'Jupyter launch restricted to localhost'}), 403
+
         import subprocess
         import shutil
 

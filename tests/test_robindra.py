@@ -15,26 +15,35 @@ import pytest
 # Add src to path for testing
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "zipminator"))
 
-# Import robindra directly (standalone module)
-import robindra
+# Import quantum_random module (formerly named robindra)
+from crypto import quantum_random as robindra
+
+
+@pytest.fixture
+def tmp_entropy_pool(tmp_path):
+    """Create a temporary entropy pool file with 4096 bytes of test entropy."""
+    pool_file = tmp_path / "test_entropy_pool.bin"
+    # Use os.urandom for deterministic-size test data (4096 bytes)
+    pool_file.write_bytes(os.urandom(4096))
+    return pool_file
 
 
 class TestQuantumEntropyPool:
     """Test quantum entropy pool management."""
 
-    def test_pool_initialization(self):
+    def test_pool_initialization(self, tmp_entropy_pool):
         """Test entropy pool loads correctly."""
-        pool = robindra.QuantumEntropyPool()
+        pool = robindra.QuantumEntropyPool(pool_path=tmp_entropy_pool)
         stats = pool.get_stats()
 
-        assert stats["pool_size"] > 0
+        assert stats["pool_size"] == 4096
         assert stats["position"] == 0
         assert stats["total_consumed"] == 0
         assert stats["refill_count"] == 0
 
-    def test_get_bytes(self):
+    def test_get_bytes(self, tmp_entropy_pool):
         """Test getting random bytes from pool."""
-        pool = robindra.QuantumEntropyPool()
+        pool = robindra.QuantumEntropyPool(pool_path=tmp_entropy_pool)
 
         # Get 16 bytes
         data = pool.get_bytes(16)
@@ -46,9 +55,9 @@ class TestQuantumEntropyPool:
         assert stats["position"] == 16
         assert stats["total_consumed"] == 16
 
-    def test_pool_refill(self):
+    def test_pool_refill(self, tmp_entropy_pool):
         """Test pool refills when exhausted."""
-        pool = robindra.QuantumEntropyPool()
+        pool = robindra.QuantumEntropyPool(pool_path=tmp_entropy_pool)
         pool_size = len(pool._pool)
 
         # Exhaust the pool
@@ -57,11 +66,11 @@ class TestQuantumEntropyPool:
         stats = pool.get_stats()
         assert stats["refill_count"] >= 1
 
-    def test_thread_safety(self):
+    def test_thread_safety(self, tmp_entropy_pool):
         """Test thread-safe access to entropy pool."""
         import threading
 
-        pool = robindra.QuantumEntropyPool()
+        pool = robindra.QuantumEntropyPool(pool_path=tmp_entropy_pool)
         results = []
 
         def worker():

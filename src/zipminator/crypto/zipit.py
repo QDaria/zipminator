@@ -75,6 +75,24 @@ class Zipndel:
 
     def __init__(self, file_name='df', file_format='csv', self_destruct_enabled=False, self_destruct_time=(672, 0, 0), password=None, encryption_algorithm='AES', mask_columns=None, anonymize_columns=None, compliance_check=False, audit_trail=False, auto_pii_scan=True, anonymization_level=1,
                  public_key_file=None):
+        """
+        Initialize the Zipndel object.
+
+        Args:
+            file_name (str): The name of the file to be written, default is 'df'.
+            file_format (str): The file format of the file to be written, default is 'csv'.
+            self_destruct_enabled (bool): Whether to enable auto-activating self-destruct timer, default is False.
+            self_destruct_time (tuple): A tuple of (hours, minutes, seconds) until self-destruct, default is (672, 0, 0).
+            password (str): The password to use for the zip file, default is None.
+            encryption_algorithm (str): The encryption algorithm to use for the zip file, default is 'AES'.
+            mask_columns (list): The list of columns to mask, default is None.
+            anonymize_columns (list): The list of columns to anonymize, default is None.
+            compliance_check (bool): Whether to perform a compliance check on the data, default is False.
+            audit_trail (bool): Whether to keep an audit trail, default is False.
+            auto_pii_scan (bool): Whether to automatically scan for PII before encryption, default is True.
+            anonymization_level (int): Current anonymization level (1-10), default is 1.
+            public_key_file (str): Path to public key file for PQC encryption, default is None.
+        """
         self.file_name = file_name
         self.file_format = file_format
         self.self_destruct_enabled = self_destruct_enabled
@@ -106,28 +124,9 @@ class Zipndel:
             self._anonymization_engine = AnonymizationEngine()
         else:
             self._anonymization_engine = None
-        self.last_pii_scan_results = None
 
         print(
             f"🔒 Secure Zip initialized with Quantum Entropy Support (Tier: {qrand.license_tier})")
-
-        """
-        Initialize the Zipndel object.
-
-        Args:
-            file_name (str): The name of the file to be written, default is 'df'.
-            file_format (str): The file format of the file to be written, default is 'csv'.
-            self_destruct_enabled (bool): Whether to enable auto-activating self-destruct timer, default is False.
-            self_destruct_time (tuple): A tuple of (hours, minutes, seconds) until self-destruct, default is (672, 0, 0).
-            password (str): The password to use for the zip file, default is None.
-            encryption_algorithm (str): The encryption algorithm to use for the zip file, default is 'AES'.
-            mask_columns (list): The list of columns to mask, default is None.
-            anonymize_columns (list): The list of columns to anonymize, default is None.
-            compliance_check (bool): Whether to perform a compliance check on the data, default is False.
-            audit_trail (bool): Whether to keep an audit trail, default is False.
-            auto_pii_scan (bool): Whether to automatically scan for PII before encryption, default is True.
-            anonymization_level (int): Current anonymization level (1-10), default is 1.
-        """
 
     def zipit(self, df: pd.DataFrame) -> None:
         """

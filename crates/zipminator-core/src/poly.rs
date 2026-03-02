@@ -128,17 +128,15 @@ impl Poly {
     }
 
     /// Decompress polynomial
-    pub fn decompress(data: &[u8], d: usize) -> Self {
+    ///
+    /// Returns an error if `data` is too short for the given compression parameter `d`.
+    pub fn decompress(data: &[u8], d: usize) -> Result<Self, &'static str> {
         let mut poly = Self::new();
         let mut idx = 0;
         let expected_bytes = KYBER_N * d / 8;
 
-        // Validate input length to prevent panics
         if data.len() < expected_bytes {
-            panic!(
-                "Insufficient data for decompression: got {} bytes, need {} (d={})",
-                data.len(), expected_bytes, d
-            );
+            return Err("Insufficient data for polynomial decompression");
         }
 
         for i in 0..KYBER_N {
@@ -147,17 +145,14 @@ impl Poly {
             for j in 0..d {
                 let byte_idx = idx / 8;
                 let bit_idx = idx % 8;
-                // Bounds check before access
-                if byte_idx < data.len() {
-                    t |= ((data[byte_idx] >> bit_idx) as u32 & 1) << j;
-                }
+                t |= ((data[byte_idx] >> bit_idx) as u32 & 1) << j;
                 idx += 1;
             }
 
             poly.coeffs[i] = ((t * KYBER_Q as u32 + (1u32 << (d - 1))) >> d) as i16;
         }
 
-        poly
+        Ok(poly)
     }
 
     /// Serialize polynomial to bytes
@@ -254,14 +249,19 @@ impl PolyVec {
     }
 
     /// Deserialize from bytes
-    pub fn from_bytes(data: &[u8]) -> Self {
+    ///
+    /// Returns an error if `data` is shorter than `KYBER_K * KYBER_POLYBYTES`.
+    pub fn from_bytes(data: &[u8]) -> Result<Self, &'static str> {
+        if data.len() < KYBER_K * KYBER_POLYBYTES {
+            return Err("Insufficient data for PolyVec deserialization");
+        }
         let mut vec = Self::new();
         for i in 0..KYBER_K {
             let start = i * KYBER_POLYBYTES;
             let end = start + KYBER_POLYBYTES;
             vec.polys[i] = Poly::from_bytes(&data[start..end]);
         }
-        vec
+        Ok(vec)
     }
 }
 

@@ -4,11 +4,10 @@ on:
   push:
     branches: [main, develop]
     paths:
+      - 'crates/**'
       - 'src/**'
-      - 'cli/**'
       - 'docs/**'
       - 'README.md'
-      - 'CONTRIBUTING.md'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -38,8 +37,7 @@ jobs:
           key: ${{ runner.os }}-cargo-docs-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Build documentation
-        run: |
-          cargo doc --all --no-deps --document-private-items
+        run: cargo doc --workspace --no-deps --document-private-items
 
       - name: Create index redirect
         run: |
@@ -47,7 +45,7 @@ jobs:
           <!DOCTYPE html>
           <html>
           <head>
-            <meta http-equiv="refresh" content="0; url=zipminator_pqc/index.html">
+            <meta http-equiv="refresh" content="0; url=zipminator_core/index.html">
           </head>
           <body>
             Redirecting to documentation...
@@ -116,7 +114,6 @@ jobs:
           pip install maturin sphinx sphinx-rtd-theme
 
       - name: Build Python package
-        working-directory: cli
         run: maturin develop
 
       - name: Generate API documentation
@@ -134,7 +131,7 @@ jobs:
           Zipminator-PQC Python API
           =========================
 
-          .. automodule:: zipminator_pqc
+          .. automodule:: zipminator
              :members:
              :undoc-members:
              :show-inheritance:
@@ -234,7 +231,7 @@ jobs:
               <div class="docs-grid">
                 <a href="rust/" class="doc-card">
                   <h2>Rust API Documentation</h2>
-                  <p>Complete Rust API reference for the core library and CLI</p>
+                  <p>Complete Rust API reference for the core library</p>
                 </a>
 
                 <a href="python/" class="doc-card">
@@ -242,7 +239,7 @@ jobs:
                   <p>Python bindings and API reference</p>
                 </a>
 
-                <a href="https://github.com/zipminator/zipminator" class="doc-card">
+                <a href="https://github.com/MoHoushmand/zipminator-pqc" class="doc-card">
                   <h2>GitHub Repository</h2>
                   <p>Source code, issues, and contributions</p>
                 </a>
@@ -286,7 +283,8 @@ jobs:
           # Check for undocumented public APIs
           echo "Checking documentation completeness..."
 
-  # Documentation notification
+  # NOTE: Claude Flow notification pattern is duplicated across 8+ workflows.
+  # TODO: Extract into a reusable composite action at .github/actions/claude-flow-notify/action.yml
   docs-notification:
     name: Documentation Notification
     runs-on: ubuntu-latest

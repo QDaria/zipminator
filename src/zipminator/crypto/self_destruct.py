@@ -68,24 +68,17 @@ class SelfDestruct:
             # Get file size
             file_size = file_path.stat().st_size
 
-            # DoD 5220.22-M (3 passes)
-            # Pass 1: All zeros
-            with open(file_path, 'wb') as f:
-                f.write(b'\x00' * file_size)
-                f.flush()
-                os.fsync(f.fileno())
-
-            # Pass 2: All ones
-            with open(file_path, 'wb') as f:
-                f.write(b'\xFF' * file_size)
-                f.flush()
-                os.fsync(f.fileno())
-
-            # Pass 3: Random data
-            with open(file_path, 'wb') as f:
-                f.write(os.urandom(file_size))
-                f.flush()
-                os.fsync(f.fileno())
+            # DoD 5220.22-M style overwrite with configurable pass count
+            patterns = [b'\x00', b'\xFF', None]  # None = random data
+            for pass_num in range(overwrite_passes):
+                pattern = patterns[pass_num % len(patterns)]
+                with open(file_path, 'wb') as f:
+                    if pattern is None:
+                        f.write(os.urandom(file_size))
+                    else:
+                        f.write(pattern * file_size)
+                    f.flush()
+                    os.fsync(f.fileno())
 
             # Delete the file
             file_path.unlink()

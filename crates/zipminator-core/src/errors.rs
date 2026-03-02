@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2025 Zipminator Project
 
+#[cfg(feature = "config")]
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use thiserror::Error;
 
 /// Error codes matching C++ implementation for ABI compatibility
 #[repr(u32)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "config", derive(Serialize, Deserialize))]
 pub enum ErrorCode {
     // Success (0x0000)
     Success = 0x0000,
@@ -62,7 +64,8 @@ impl fmt::Display for ErrorCode {
 }
 
 /// Error severity levels
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[cfg_attr(feature = "config", derive(Serialize, Deserialize))]
 pub enum ErrorSeverity {
     Info = 0,
     Warning = 1,
@@ -84,14 +87,16 @@ impl fmt::Display for ErrorSeverity {
 }
 
 /// Error context with location information
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "config", derive(Serialize, Deserialize))]
 pub struct ErrorContext {
     pub file: String,
     pub line: u32,
     pub column: u32,
     pub operation: Option<String>,
     pub details: Option<String>,
-    pub timestamp: chrono::DateTime<chrono::Utc>,
+    #[cfg_attr(feature = "config", serde(skip))]
+    pub timestamp: std::time::SystemTime,
 }
 
 impl ErrorContext {
@@ -102,7 +107,7 @@ impl ErrorContext {
             column,
             operation: None,
             details: None,
-            timestamp: chrono::Utc::now(),
+            timestamp: std::time::SystemTime::now(),
         }
     }
 
@@ -118,13 +123,14 @@ impl ErrorContext {
 }
 
 /// Main error type for Zipminator operations
-#[derive(Error, Debug, Clone, Serialize, Deserialize)]
+#[derive(Error, Debug, Clone)]
+#[cfg_attr(feature = "config", derive(Serialize, Deserialize))]
 pub struct ZipminatorError {
     pub code: ErrorCode,
     pub severity: ErrorSeverity,
     pub message: String,
     pub context: ErrorContext,
-    #[serde(skip)]
+    #[cfg_attr(feature = "config", serde(skip))]
     pub source: Option<Box<ZipminatorError>>,
 }
 
@@ -182,13 +188,13 @@ impl ZipminatorError {
         self
     }
 
+    #[cfg(feature = "config")]
     pub fn to_json(&self) -> serde_json::Value {
         serde_json::json!({
             "error_code": format!("{:?}", self.code),
             "error_code_value": self.code as u32,
             "severity": format!("{}", self.severity),
             "message": self.message,
-            "timestamp": self.context.timestamp.to_rfc3339(),
             "location": {
                 "file": self.context.file,
                 "line": self.context.line,
@@ -249,6 +255,7 @@ impl From<std::io::Error> for ZipminatorError {
 }
 
 /// Convert serde JSON errors to Zipminator errors
+#[cfg(feature = "config")]
 impl From<serde_json::Error> for ZipminatorError {
     fn from(err: serde_json::Error) -> Self {
         ZipminatorError::new(
@@ -256,6 +263,147 @@ impl From<serde_json::Error> for ZipminatorError {
             format!("JSON parse error: {}", err),
             ErrorSeverity::Error,
             ErrorContext::new("", 0, 0),
+        )
+    }
+}
+
+/// Convert QRNG errors to Zipminator errors.
+///
+/// Mapping:
+/// - `InitializationFailed` -> `QrngInitializationFailed`
+/// - `DeviceNotFound`       -> `QrngDeviceNotFound`
+/// - `ReadError`            -> `QrngDeviceDisconnected`
+/// - `UsbError`             -> `QrngDeviceDisconnected`
+/// - `InsufficientEntropy`  -> `QrngInsufficientEntropy`
+/// - `HealthCheckFailed`    -> `QrngHealthCheckFailed`
+/// - `InvalidBufferSize`    -> `InternalError`
+/// - `Timeout`              -> `Timeout`
+/// - `StatisticalTestFailed`-> `QrngEntropyTestFailed`
+impl From<crate::qrng::QrngError> for ZipminatorError {
+    fn from(err: crate::qrng::QrngError) -> Self {
+        let (code, severity) = match &err {
+            crate::qrng::QrngError::InitializationFailed(_) => {
+                (ErrorCode::QrngInitializationFailed, ErrorSeverity::Critical)
+            }
+            crate::qrng::QrngError::DeviceNotFound => {
+                (ErrorCode::QrngDeviceNotFound, ErrorSeverity::Critical)
+            }
+            crate::qrng::QrngError::ReadError(_) => {
+                (ErrorCode::QrngDeviceDisconnected, ErrorSeverity::Error)
+            }
+            crate::qrng::QrngError::UsbError(_) => {
+                (ErrorCode::QrngDeviceDisconnected, ErrorSeverity::Error)
+            }
+            crate::qrng::QrngError::InsufficientEntropy => {
+                (ErrorCode::QrngInsufficientEntropy, ErrorSeverity::Warning)
+            }
+            crate::qrng::QrngError::HealthCheckFailed(_) => {
+                (ErrorCode::QrngHealthCheckFailed, ErrorSeverity::Error)
+            }
+            crate::qrng::QrngError::InvalidBufferSize { .. } => {
+                (ErrorCode::InternalError, ErrorSeverity::Error)
+            }
+            crate::qrng::QrngError::Timeout(_) => {
+                (ErrorCode::Timeout, ErrorSeverity::Error)
+            }
+            crate::qrng::QrngError::StatisticalTestFailed(_) => {
+                (ErrorCode::QrngEntropyTestFailed, ErrorSeverity::Critical)
+            }
+        };
+
+        ZipminatorError::new(
+            code,
+            format!("QRNG error: {}", err),
+            severity,
+            ErrorContext::new("", 0, 0).with_operation("qrng"),
+        )
+    }
+}
+
+/// Convert entropy source errors to Zipminator errors.
+///
+/// The `entropy_source::Error` enum wraps `QrngError` via `#[from]`, so the
+/// `QrngError` variant delegates to the `From<QrngError>` impl above.
+impl From<crate::entropy_source::Error> for ZipminatorError {
+    fn from(err: crate::entropy_source::Error) -> Self {
+        match err {
+            crate::entropy_source::Error::NotAvailable(msg) => ZipminatorError::new(
+                ErrorCode::QrngDeviceNotFound,
+                format!("Entropy source not available: {}", msg),
+                ErrorSeverity::Critical,
+                ErrorContext::new("", 0, 0).with_operation("entropy_source"),
+            ),
+            crate::entropy_source::Error::InsufficientEntropy => ZipminatorError::new(
+                ErrorCode::QrngInsufficientEntropy,
+                "Insufficient entropy from all sources".to_string(),
+                ErrorSeverity::Critical,
+                ErrorContext::new("", 0, 0).with_operation("entropy_source"),
+            ),
+            crate::entropy_source::Error::QrngError(qrng_err) => {
+                // Delegate to the From<QrngError> implementation
+                let mut z_err = ZipminatorError::from(qrng_err);
+                z_err.context.operation = Some("entropy_source".to_string());
+                z_err
+            }
+            crate::entropy_source::Error::IoError(io_err) => ZipminatorError::new(
+                ErrorCode::IoError,
+                format!("Entropy source IO error: {}", io_err),
+                ErrorSeverity::Error,
+                ErrorContext::new("", 0, 0).with_operation("entropy_source"),
+            ),
+        }
+    }
+}
+
+/// Convert entropy pool errors to Zipminator errors.
+///
+/// Mapping:
+/// - `IoError`                 -> `IoError`
+/// - `InvalidMagic`            -> `InvariantViolation`
+/// - `UnsupportedVersion`      -> `InvalidConfiguration`
+/// - `HmacVerificationFailed`  -> `SignatureVerificationFailed`
+/// - `DecryptionFailed`        -> `DecapsulationFailed`
+/// - `InsufficientEntropy`     -> `QrngInsufficientEntropy`
+/// - `KeyDerivationFailed`     -> `KeyGenerationFailed`
+/// - `KeyNotFound`             -> `MissingConfiguration`
+/// - `ValidationFailed`        -> `QrngEntropyTestFailed`
+impl From<crate::quantum_entropy_pool::EntropyPoolError> for ZipminatorError {
+    fn from(err: crate::quantum_entropy_pool::EntropyPoolError) -> Self {
+        use crate::quantum_entropy_pool::EntropyPoolError;
+
+        let (code, severity) = match &err {
+            EntropyPoolError::IoError(_) => (ErrorCode::IoError, ErrorSeverity::Error),
+            EntropyPoolError::InvalidMagic => {
+                (ErrorCode::InvariantViolation, ErrorSeverity::Critical)
+            }
+            EntropyPoolError::UnsupportedVersion => {
+                (ErrorCode::InvalidConfiguration, ErrorSeverity::Error)
+            }
+            EntropyPoolError::HmacVerificationFailed => {
+                (ErrorCode::SignatureVerificationFailed, ErrorSeverity::Fatal)
+            }
+            EntropyPoolError::DecryptionFailed => {
+                (ErrorCode::DecapsulationFailed, ErrorSeverity::Fatal)
+            }
+            EntropyPoolError::InsufficientEntropy => {
+                (ErrorCode::QrngInsufficientEntropy, ErrorSeverity::Warning)
+            }
+            EntropyPoolError::KeyDerivationFailed => {
+                (ErrorCode::KeyGenerationFailed, ErrorSeverity::Critical)
+            }
+            EntropyPoolError::KeyNotFound => {
+                (ErrorCode::MissingConfiguration, ErrorSeverity::Critical)
+            }
+            EntropyPoolError::ValidationFailed => {
+                (ErrorCode::QrngEntropyTestFailed, ErrorSeverity::Critical)
+            }
+        };
+
+        ZipminatorError::new(
+            code,
+            format!("Entropy pool error: {}", err),
+            severity,
+            ErrorContext::new("", 0, 0).with_operation("entropy_pool"),
         )
     }
 }
@@ -276,6 +424,7 @@ mod tests {
         assert!(err.message.contains("QRNG"));
     }
 
+    #[cfg(feature = "config")]
     #[test]
     fn test_error_serialization() {
         let err = zipminator_error!(

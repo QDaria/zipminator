@@ -50,13 +50,17 @@ jobs:
       - name: Run workspace tests
         run: cargo test --workspace --verbose
 
+      # NOTE: Only upload test result XMLs, not the entire target/ directory
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: rust-test-results-${{ matrix.os }}
-          path: target/
+          path: |
+            target/nextest/**/*.xml
+            target/test-results/
           retention-days: 5
+          if-no-files-found: ignore
 
   # ---------------------------------------------------------------------------
   # Python: pytest

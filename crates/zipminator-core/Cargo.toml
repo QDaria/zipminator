@@ -20,6 +20,7 @@ pqcrypto-kyber = "0.8"
 pqcrypto-traits = "0.3"
 aes-gcm = "0.10"
 libc = "0.2"
+zeroize = { version = "1", features = ["derive"] }
 
 # QRNG Integration
 libusb = { version = "0.3", optional = true }
@@ -27,6 +28,13 @@ thiserror = "1.0"
 log = "0.4"
 env_logger = "0.11"
 crossbeam = "0.8"
+
+# Entropy pool crypto
+hkdf = "0.12"
+hmac = "0.12"
+sha2 = "0.10"
+base64 = "0.21"
+rand = "0.8"
 
 # Optional features
 tokio = { version = "1.40", features = ["full"], optional = true }

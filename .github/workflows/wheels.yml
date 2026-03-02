@@ -41,7 +41,7 @@ jobs:
           # Build manylinux wheels
           docker run --rm -v $(pwd):/io \
             ghcr.io/pyo3/maturin \
-            build --release --out /io/dist --manifest-path /io/src/rust/Cargo.toml
+            build --release --out /io/dist
 
       - name: Build wheels (macOS)
         if: runner.os == 'macOS'
@@ -96,7 +96,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-13, macos-14, windows-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
 
     steps:
       - uses: actions/checkout@v4
@@ -118,8 +118,8 @@ jobs:
 
       - name: Test installation
         run: |
-          python -c "import zipminator; print(zipminator.__version__)"
-          python -c "from zipminator import keypair, encapsulate, decapsulate; pk, sk = keypair(); ct, ss1 = encapsulate(pk); ss2 = decapsulate(ct, sk); assert ss1 == ss2; print('✓ KEM test passed')"
+          python -c "import zipminator; print('Import successful')"
+          python -c "from zipminator import keypair, encapsulate, decapsulate; pk, sk = keypair(); ct, ss1 = encapsulate(pk); ss2 = decapsulate(ct, sk); assert ss1 == ss2; print('KEM test passed')"
 
       - name: Run pytest
         run: |

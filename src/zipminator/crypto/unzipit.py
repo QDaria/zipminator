@@ -1,17 +1,8 @@
 # zipminator/unzipit.py
 import pandas as pd
 import pyzipper
-import time
-import threading
 import getpass
 import os
-import hashlib
-import random
-import string
-import re
-
-
-# zipminator/unzipit.py
 
 class Unzipndel:
 

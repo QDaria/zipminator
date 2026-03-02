@@ -1,6 +1,6 @@
 """Data masking module for Zipminator NAV."""
 
-import random
+import secrets
 import string
 from typing import List, Optional, Dict, Any
 import pandas as pd
@@ -77,9 +77,8 @@ class DataMask:
         str_value = str(value)
         length = len(str_value) if preserve_length else 10
 
-        return ''.join(
-            random.choices(string.ascii_uppercase + string.digits, k=length)
-        )
+        chars = string.ascii_uppercase + string.digits
+        return ''.join(secrets.choice(chars) for _ in range(length))
 
     @staticmethod
     def _hash_mask(value: Any) -> str:

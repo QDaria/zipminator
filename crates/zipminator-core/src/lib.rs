@@ -12,11 +12,13 @@
 
 pub mod constants;
 pub mod entropy_source;
+pub mod errors;
 pub mod ffi;
 pub mod kyber768;
 pub mod ntt;
 pub mod poly;
 pub mod qrng;
+pub mod quantum_entropy_pool;
 pub mod ratchet;
 pub mod utils;
 

@@ -49,7 +49,7 @@ fn test_ciphertext_tampering() {
 fn test_key_sizes() {
     let (pk, sk) = Kyber768::keypair();
     assert_eq!(pk.data.len(), KYBER768_PUBLICKEYBYTES);
-    assert_eq!(sk.data.len(), KYBER768_SECRETKEYBYTES);
+    assert_eq!(sk.len(), KYBER768_SECRETKEYBYTES);
 }
 
 #[test]
