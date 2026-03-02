@@ -20,6 +20,7 @@ pub mod poly;
 pub mod qrng;
 pub mod quantum_entropy_pool;
 pub mod ratchet;
+pub mod srtp;
 pub mod utils;
 
 // Python bindings module - this is the entry point for Python

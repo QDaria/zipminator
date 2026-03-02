@@ -38,6 +38,6 @@ yarn-error.*
 
 app-example
 
-# generated native folders
+# generated native folders (use `git add -f` for custom native code in ios/ZipVPN/ and android/*/com/zipminator/)
 /ios
 /android

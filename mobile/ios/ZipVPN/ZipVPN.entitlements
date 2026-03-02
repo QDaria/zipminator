@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Required: NetworkExtension packet-tunnel capability.
+         Must match the provisioning profile and App ID configuration
+         in the Apple Developer portal. -->
+    <key>com.apple.developer.networking.networkextension</key>
+    <array>
+        <string>packet-tunnel-provider</string>
+    </array>
+
+    <!-- Required for VPN extensions to establish outbound network connections -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+
+    <!-- Required for VPN extensions to accept inbound connections (UDP listen) -->
+    <key>com.apple.security.network.server</key>
+    <true/>
+
+    <!-- App Groups: shared keychain/UserDefaults access between main app and extension.
+         Replace <TEAM_ID> with your actual 10-character Apple Team ID. -->
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>group.io.zipminator.vpn</string>
+    </array>
+
+    <!-- Keychain sharing: allows the extension to read VPN credentials
+         stored by the main application. -->
+    <key>keychain-access-groups</key>
+    <array>
+        <string>$(AppIdentifierPrefix)io.zipminator.vpn</string>
+    </array>
+</dict>
+</plist>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  AndroidManifest.snippet.xml — Merge this into your app's AndroidManifest.xml
+
+  Required permissions and service declaration for Zipminator PQ-WireGuard VPN.
+  Paste these declarations inside the <manifest> and <application> elements as shown.
+-->
+
+<!-- =========================================================================
+     PERMISSIONS — add inside <manifest> (outside <application>)
+     ========================================================================= -->
+
+<!-- Required: VPN tunneling capability -->
+<uses-permission android:name="android.permission.BIND_VPN_SERVICE"
+    tools:ignore="ProtectedPermissions" />
+
+<!-- Required: Run ZipVpnService as a foreground service -->
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+<!-- Required on Android 14+ for data-sync foreground services -->
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+    android:minSdkVersion="34" />
+
+<!-- Required: Keep CPU alive during re-keying operations -->
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+
+<!-- Required: Monitor network state changes for seamless Wi-Fi/cellular handoff -->
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
+<!-- Required: Receive broadcast when device boots (optional — for auto-reconnect) -->
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+<!-- =========================================================================
+     SERVICE DECLARATION — add inside <application>
+     ========================================================================= -->
+
+<!--
+  ZipVpnService: the primary foreground service that manages the VPN tunnel.
+
+  android:permission ensures only system components (or apps with BIND_VPN_SERVICE)
+  can bind to this service. Combined with the intent-filter it is discoverable by
+  Android's VPN subsystem.
+-->
+<service
+    android:name="com.zipminator.vpn.ZipVpnService"
+    android:exported="true"
+    android:permission="android.permission.BIND_VPN_SERVICE"
+    android:foregroundServiceType="specialUse">
+
+    <intent-filter>
+        <action android:name="android.net.VpnService" />
+    </intent-filter>
+
+    <!-- Required on Android 14+ when using foregroundServiceType="specialUse" -->
+    <property
+        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+        android:value="vpn"
+        tools:targetApi="34" />
+</service>
+
+<!--
+  Optional: BroadcastReceiver to auto-reconnect after device reboot.
+  Uncomment if auto-reconnect functionality is desired.
+-->
+<!--
+<receiver
+    android:name="com.zipminator.vpn.BootReceiver"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+    </intent-filter>
+</receiver>
+-->

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Extension bundle identifier must be <main-app-bundle-id>.ZipVPN -->
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+
+    <key>CFBundleName</key>
+    <string>ZipVPN</string>
+
+    <key>CFBundleDisplayName</key>
+    <string>Zipminator VPN</string>
+
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+
+    <key>CFBundlePackageType</key>
+    <string>XPC!</string>
+
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+
+    <!-- NetworkExtension packet-tunnel configuration -->
+    <key>NSExtension</key>
+    <dict>
+        <key>NSExtensionPointIdentifier</key>
+        <string>com.apple.networkextension.packet-tunnel</string>
+
+        <key>NSExtensionPrincipalClass</key>
+        <string>$(PRODUCT_MODULE_NAME).PacketTunnelProvider</string>
+    </dict>
+
+    <!-- Privacy descriptions (required for App Store submission) -->
+    <key>NSNetworkUsageDescription</key>
+    <string>ZipVPN tunnels all network traffic through the post-quantum encrypted VPN to protect your data.</string>
+
+    <!-- Minimum OS version -->
+    <key>MinimumOSVersion</key>
+    <string>16.0</string>
+
+    <!-- Background mode for VPN extension -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>network-authentication</string>
+    </array>
+</dict>
+</plist>
