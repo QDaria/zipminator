@@ -273,9 +273,13 @@ function ZipminatorDemo() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);
-      alert('Download failed: ' + error.message);
+      setResult({
+        type: 'error',
+        message: 'Download failed: ' + (error.response?.data?.error || error.message)
+      });
     }
   };
 
@@ -334,7 +338,7 @@ function ZipminatorDemo() {
     ),
 
     React.createElement('div', { className: 'self-destruct-options', style: { marginBottom: '20px' } },
-      React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', padding: '15px', background: '#2a2a2a', borderRadius: '8px' } },
+      React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', padding: '15px', background: 'rgba(15, 18, 33, 0.6)', borderRadius: '8px', border: '1px solid rgba(102, 126, 234, 0.1)' } },
         React.createElement('input', {
           type: 'checkbox',
           id: 'enableSelfDestruct',
@@ -352,7 +356,7 @@ function ZipminatorDemo() {
           id: 'destructTime',
           value: destructHours,
           onChange: (e) => setDestructHours(parseInt(e.target.value)),
-          style: { marginLeft: '12px', padding: '8px', background: '#1a1a1a', color: '#fff', border: '1px solid #444', borderRadius: '4px', cursor: 'pointer' }
+          style: { marginLeft: '12px', padding: '8px 12px', background: 'rgba(3, 7, 18, 0.6)', color: '#f1f5f9', border: '1px solid rgba(102, 126, 234, 0.2)', borderRadius: '6px', cursor: 'pointer' }
         },
           React.createElement('option', { value: 1 }, '1 hour'),
           React.createElement('option', { value: 24 }, '24 hours'),
@@ -511,7 +515,7 @@ function JupyterDemo() {
     ),
 
     React.createElement('div', { className: 'jupyter-launch-section', style: { marginTop: '30px', textAlign: 'center' } },
-      React.createElement('p', { style: { fontSize: '16px', marginBottom: '20px', color: '#666' } },
+      React.createElement('p', { style: { fontSize: '1rem', marginBottom: '20px', color: '#94a3b8' } },
         'Launch interactive Jupyter notebooks with all dependencies pre-configured for quantum encryption demonstrations'
       ),
 
@@ -550,15 +554,19 @@ function KyberDemo() {
   const [encryptedData, setEncryptedData] = useState(null);
   const [decryptedMessage, setDecryptedMessage] = useState('');
   const [benchmarks, setBenchmarks] = useState(null);
+  const [kyberError, setKyberError] = useState(null);
 
   const generateKeypair = async () => {
     setGenerating(true);
+    setKyberError(null);
     try {
       const response = await axios.post(`${API_BASE}/kyber/generate`);
       setKeypair(response.data);
+      setEncryptedData(null);
+      setDecryptedMessage('');
     } catch (error) {
       console.error('Failed to generate keypair:', error);
-      alert('Failed to generate keypair: ' + error.message);
+      setKyberError('Failed to generate keypair: ' + (error.response?.data?.error || error.message));
     } finally {
       setGenerating(false);
     }
@@ -566,6 +574,7 @@ function KyberDemo() {
 
   const encryptMessage = async () => {
     if (!keypair) return;
+    setKyberError(null);
 
     try {
       const response = await axios.post(`${API_BASE}/kyber/encrypt`, {
@@ -576,12 +585,13 @@ function KyberDemo() {
       setDecryptedMessage('');
     } catch (error) {
       console.error('Encryption failed:', error);
-      alert('Encryption failed: ' + error.message);
+      setKyberError('Encryption failed: ' + (error.response?.data?.error || error.message));
     }
   };
 
   const decryptMessage = async () => {
     if (!keypair || !encryptedData) return;
+    setKyberError(null);
 
     try {
       const response = await axios.post(`${API_BASE}/kyber/decrypt`, {
@@ -592,7 +602,7 @@ function KyberDemo() {
       setDecryptedMessage(response.data.message);
     } catch (error) {
       console.error('Decryption failed:', error);
-      alert('Decryption failed: ' + error.message);
+      setKyberError('Decryption failed: ' + (error.response?.data?.error || error.message));
     }
   };
 
@@ -654,6 +664,10 @@ function KyberDemo() {
           )
         )
       )
+    ),
+
+    kyberError && React.createElement('div', { className: 'error-message' },
+      React.createElement('p', null, kyberError)
     ),
 
     React.createElement('div', { className: 'kyber-demo' },

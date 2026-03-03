@@ -1284,8 +1284,9 @@ code, pre {
 /* Focus states for keyboard navigation */
 button:focus-visible,
 a:focus-visible,
-input:focus-visible {
-  outline: 2px solid var(--color-accent-light);
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-primary-light);
   outline-offset: 2px;
 }
 
