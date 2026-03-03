@@ -5,10 +5,11 @@ export function generateStaticParams() {
   return EMAIL_IDS.map((id) => ({ id }))
 }
 
-export default function EmailPage({
+export default async function EmailPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  return <EmailViewer id={params.id} />
+  const { id } = await params
+  return <EmailViewer id={id} />
 }
