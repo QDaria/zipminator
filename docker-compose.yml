@@ -82,5 +82,46 @@ services:
       - api
     command: npm run dev
 
+  # --------------------------------------------------------------------------
+  # PQC Key Directory (WKD-compatible ML-KEM-768 + X25519 + Ed25519 keys)
+  # --------------------------------------------------------------------------
+  keydir:
+    build:
+      context: ./email/keydir
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${KEYDIR_PORT:-8080}:8000"
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-zipminator}:${POSTGRES_PASSWORD:-zipminator_dev}@postgres:5432/${POSTGRES_DB:-zipminator}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # --------------------------------------------------------------------------
+  # PQC-secured SMTP/IMAP mail transport
+  # --------------------------------------------------------------------------
+  mail-transport:
+    build:
+      context: ./email/transport
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${SMTP_PORT:-2525}:2525"
+      - "${IMAP_PORT:-1143}:1143"
+      - "8025:8025"
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-zipminator}:${POSTGRES_PASSWORD:-zipminator_dev}@postgres:5432/${POSTGRES_DB:-zipminator}"
+      KEYDIR_URL: "http://keydir:8000"
+      SMTP_HOST: "0.0.0.0"
+      SMTP_PORT: "2525"
+      IMAP_HOST: "0.0.0.0"
+      IMAP_PORT: "1143"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keydir:
+        condition: service_started
+
 volumes:
   pgdata:

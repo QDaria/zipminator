@@ -19,6 +19,7 @@
 use hkdf::Hkdf;
 use libc::c_int;
 use sha2::Sha256;
+use std::panic::{catch_unwind, AssertUnwindSafe};
 
 // HKDF info strings — fixed labels per NIST SP 800-56C
 const SRTP_KEY_INFO: &[u8] = b"zipminator-srtp-master-key";
@@ -124,19 +125,24 @@ pub unsafe extern "C" fn zipminator_derive_srtp_keys(
     out_key: *mut u8,         // 16 bytes
     out_salt: *mut u8,        // 14 bytes
 ) -> c_int {
-    if shared_secret.is_null() || out_key.is_null() || out_salt.is_null() {
-        return -1;
+    match catch_unwind(AssertUnwindSafe(|| {
+        if shared_secret.is_null() || out_key.is_null() || out_salt.is_null() {
+            return -1;
+        }
+
+        // SAFETY: caller guarantees 32 readable bytes at `shared_secret`
+        let ss_slice: &[u8; 32] = &*(shared_secret as *const [u8; 32]);
+        let material = derive_srtp_keys(ss_slice);
+
+        // SAFETY: caller guarantees writable buffers of correct sizes
+        std::ptr::copy_nonoverlapping(material.master_key.as_ptr(), out_key, 16);
+        std::ptr::copy_nonoverlapping(material.master_salt.as_ptr(), out_salt, 14);
+
+        0
+    })) {
+        Ok(result) => result,
+        Err(_) => -2,
     }
-
-    // SAFETY: caller guarantees 32 readable bytes at `shared_secret`
-    let ss_slice: &[u8; 32] = &*(shared_secret as *const [u8; 32]);
-    let material = derive_srtp_keys(ss_slice);
-
-    // SAFETY: caller guarantees writable buffers of correct sizes
-    std::ptr::copy_nonoverlapping(material.master_key.as_ptr(), out_key, 16);
-    std::ptr::copy_nonoverlapping(material.master_salt.as_ptr(), out_salt, 14);
-
-    0
 }
 
 // ── Tests ──────────────────────────────────────────────────────────────────

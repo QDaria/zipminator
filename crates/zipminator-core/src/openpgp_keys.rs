@@ -7,7 +7,7 @@
 //! Composite encryption combines two KEM shared secrets via HKDF to produce
 //! a single session key, providing security even if one primitive is broken.
 
-use crate::email_crypto::{EmailCrypto, EmailCryptoError, EmailEnvelope};
+use crate::email_crypto::EmailCryptoError;
 
 use hkdf::Hkdf;
 use sha2::Sha256;

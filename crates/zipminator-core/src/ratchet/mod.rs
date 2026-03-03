@@ -144,6 +144,36 @@ impl PqcRatchet {
     }
 }
 
+/// Zeroize secret material on drop for `PqcRatchet`.
+///
+/// `kyber768::SecretKey` / `kyber768::PublicKey` are opaque pqcrypto types
+/// without a `Zeroize` impl, so we overwrite their memory via raw pointer.
+impl Drop for PqcRatchet {
+    fn drop(&mut self) {
+        // Zeroize the root key (plain byte array).
+        self.root_key.zeroize();
+
+        // Zeroize local_static_secret via raw pointer (opaque type, no Zeroize impl).
+        let sk_ptr = &mut self.local_static_secret as *mut kyber768::SecretKey as *mut u8;
+        let sk_size = std::mem::size_of::<kyber768::SecretKey>();
+        // SAFETY: we own self exclusively (mutable borrow in Drop) and write
+        //         exactly size_of bytes, which is within the allocation.
+        unsafe { std::ptr::write_bytes(sk_ptr, 0u8, sk_size); }
+
+        // Zeroize remote_static_public (not secret, but reduces attack surface).
+        if let Some(ref mut rpk) = self.remote_static_public {
+            let pk_ptr = rpk as *mut kyber768::PublicKey as *mut u8;
+            let pk_size = std::mem::size_of::<kyber768::PublicKey>();
+            unsafe { std::ptr::write_bytes(pk_ptr, 0u8, pk_size); }
+        }
+
+        // Also zeroize local_static_public for completeness.
+        let lpk_ptr = &mut self.local_static_public as *mut kyber768::PublicKey as *mut u8;
+        let lpk_size = std::mem::size_of::<kyber768::PublicKey>();
+        unsafe { std::ptr::write_bytes(lpk_ptr, 0u8, lpk_size); }
+    }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // PqRatchetSession — Full PQ Double Ratchet
 // ─────────────────────────────────────────────────────────────────────────────
@@ -258,12 +288,13 @@ impl PqRatchetSession {
         // pqcrypto-kyber returns (SharedSecret, Ciphertext)
         let (ss, ct) = kyber768::encapsulate(&their_pk);
 
-        let ss_bytes: [u8; 32] = ss
+        let mut ss_bytes: [u8; 32] = ss
             .as_bytes()
             .try_into()
             .map_err(|_| RatchetError::CryptoError("shared secret size mismatch"))?;
 
         let (new_rk, new_ck) = root_kdf(&state.root_key.0, &ss_bytes);
+        ss_bytes.zeroize();
         state.root_key.0 = new_rk;
 
         // Generate a fresh sending ratchet keypair.
@@ -290,12 +321,13 @@ impl PqRatchetSession {
         let sk = Self::our_sk(state)?;
         let ss = kyber768::decapsulate(&ct, &sk);
 
-        let ss_bytes: [u8; 32] = ss
+        let mut ss_bytes: [u8; 32] = ss
             .as_bytes()
             .try_into()
             .map_err(|_| RatchetError::CryptoError("shared secret size mismatch"))?;
 
         let (new_rk, new_ck) = root_kdf(&state.root_key.0, &ss_bytes);
+        ss_bytes.zeroize();
         state.root_key.0 = new_rk;
 
         // Update the remote ratchet key.
@@ -361,7 +393,7 @@ impl PqRatchetSession {
 
         // Encapsulate to Alice's key: pqcrypto-kyber returns (SharedSecret, Ciphertext).
         let (ss, ct) = kyber768::encapsulate(&alice_pk);
-        let ss_bytes: [u8; 32] = ss
+        let mut ss_bytes: [u8; 32] = ss
             .as_bytes()
             .try_into()
             .map_err(|_| RatchetError::CryptoError("shared secret size"))?;
@@ -369,6 +401,7 @@ impl PqRatchetSession {
         // Derive initial root key from the shared secret (no prior root key).
         let zero_rk = [0u8; 32];
         let (rk, send_ck) = root_kdf(&zero_rk, &ss_bytes);
+        ss_bytes.zeroize();
         state.root_key.0 = rk;
         state.send_chain_key.0 = send_ck;
 
@@ -405,7 +438,7 @@ impl PqRatchetSession {
             .map_err(|_| RatchetError::InvalidCiphertext("invalid kem_ct"))?;
         let sk = Self::our_sk(&self.state)?;
         let ss = kyber768::decapsulate(&ct, &sk);
-        let ss_bytes: [u8; 32] = ss
+        let mut ss_bytes: [u8; 32] = ss
             .as_bytes()
             .try_into()
             .map_err(|_| RatchetError::CryptoError("shared secret size"))?;
@@ -413,6 +446,7 @@ impl PqRatchetSession {
         // Derive initial root key.
         let zero_rk = [0u8; 32];
         let (rk, recv_ck) = root_kdf(&zero_rk, &ss_bytes);
+        ss_bytes.zeroize();
         self.state.root_key.0 = rk;
         self.state.recv_chain_key.0 = recv_ck;
 
@@ -484,12 +518,13 @@ impl PqRatchetSession {
 
         // Derive AES key + nonce from the message key.
         let mut mk = msg_key;
-        let (aes_key, nonce) = message_keys(&mk, msg_number);
+        let (mut aes_key, nonce) = message_keys(&mk, msg_number);
         mk.zeroize();
 
         let header_bytes = header.to_bytes();
         // Use header bytes as associated data for authentication.
         let ciphertext = Self::aes_encrypt(&aes_key, &nonce, plaintext, &header_bytes)?;
+        aes_key.zeroize();
 
         Ok((header_bytes, ciphertext))
     }
@@ -510,9 +545,11 @@ impl PqRatchetSession {
         // Check skipped-key cache first (handles out-of-order delivery).
         let skip_key = SkipKey::new(&header.ephemeral_pk, header.message_number);
         if let Some(mut mk) = self.state.take_skipped_key(&skip_key) {
-            let (aes_key, nonce) = message_keys(&mk, header.message_number);
+            let (mut aes_key, nonce) = message_keys(&mk, header.message_number);
             mk.zeroize();
-            return Self::aes_decrypt(&aes_key, &nonce, ciphertext, header_bytes);
+            let result = Self::aes_decrypt(&aes_key, &nonce, ciphertext, header_bytes);
+            aes_key.zeroize();
+            return result;
         }
 
         let state = &mut self.state;
@@ -538,10 +575,12 @@ impl PqRatchetSession {
         state.recv_chain_key.0 = next_ck;
         state.recv_message_number = header.message_number + 1;
 
-        let (aes_key, nonce) = message_keys(&mk, header.message_number);
+        let (mut aes_key, nonce) = message_keys(&mk, header.message_number);
         mk.zeroize();
 
-        Self::aes_decrypt(&aes_key, &nonce, ciphertext, header_bytes)
+        let result = Self::aes_decrypt(&aes_key, &nonce, ciphertext, header_bytes);
+        aes_key.zeroize();
+        result
     }
 
     /// Return our current ratchet public key bytes.

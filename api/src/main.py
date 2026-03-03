@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.config import settings
-from src.routes import health, auth, keys, crypto
+from src.routes import health, auth, keys, crypto, anonymize
 from src.middleware.logging import LoggingMiddleware
 import logging
 
@@ -38,6 +38,7 @@ app.include_router(health.router, tags=["health"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(keys.router, prefix="/v1/keys", tags=["keys"])
 app.include_router(crypto.router, prefix="/v1", tags=["crypto"])
+app.include_router(anonymize.router, prefix="/v1", tags=["anonymize"])
 
 
 @app.on_event("startup")

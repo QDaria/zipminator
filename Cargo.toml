@@ -5,6 +5,9 @@ members = [
     "crates/zipminator-nist",
     "crates/zipminator-bench",
 ]
+exclude = [
+    "browser/src-tauri",
+]
 resolver = "2"
 
 [workspace.package]

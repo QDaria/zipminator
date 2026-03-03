@@ -20,10 +20,11 @@
 //! | -2          | Crypto / handshake error          |
 //! | -3          | Buffer too small                  |
 
-use crate::ratchet::{PqRatchetSession, PqcRatchet};
 use crate::ratchet::header::{CT_BYTES, PK_BYTES};
+use crate::ratchet::{PqRatchetSession, PqcRatchet};
 use libc::c_int;
 use pqcrypto_traits::kem::PublicKey;
+use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::ptr;
 use std::slice;
 
@@ -42,7 +43,12 @@ const ERR_BUFFER: c_int = -3;
 /// Caller must free it with [`zipminator_ratchet_free`].
 #[no_mangle]
 pub extern "C" fn zipminator_ratchet_new() -> *mut PqcRatchet {
-    Box::into_raw(Box::new(PqcRatchet::new()))
+    match catch_unwind(AssertUnwindSafe(|| {
+        Box::into_raw(Box::new(PqcRatchet::new()))
+    })) {
+        Ok(result) => result,
+        Err(_) => ptr::null_mut(),
+    }
 }
 
 /// Free a `PqcRatchet` previously allocated by [`zipminator_ratchet_new`].
@@ -51,10 +57,12 @@ pub extern "C" fn zipminator_ratchet_new() -> *mut PqcRatchet {
 /// `ptr` must be a valid pointer returned by `zipminator_ratchet_new`, or null.
 #[no_mangle]
 pub unsafe extern "C" fn zipminator_ratchet_free(ptr: *mut PqcRatchet) {
-    if ptr.is_null() {
-        return;
-    }
-    drop(Box::from_raw(ptr));
+    let _ = catch_unwind(AssertUnwindSafe(|| {
+        if ptr.is_null() {
+            return;
+        }
+        drop(Box::from_raw(ptr));
+    }));
 }
 
 /// Copy the public key of a `PqcRatchet` into a caller-supplied buffer.
@@ -69,13 +77,18 @@ pub unsafe extern "C" fn zipminator_ratchet_get_public_key(
     ptr: *mut PqcRatchet,
     out_ptr: *mut u8,
 ) -> c_int {
-    if ptr.is_null() || out_ptr.is_null() {
-        return ERR_NULL;
+    match catch_unwind(AssertUnwindSafe(|| {
+        if ptr.is_null() || out_ptr.is_null() {
+            return ERR_NULL;
+        }
+        let ratchet = &*ptr;
+        let pk_bytes = ratchet.local_static_public.as_bytes();
+        ptr::copy_nonoverlapping(pk_bytes.as_ptr(), out_ptr, pk_bytes.len());
+        pk_bytes.len() as c_int
+    })) {
+        Ok(result) => result,
+        Err(_) => ERR_CRYPTO,
     }
-    let ratchet = &*ptr;
-    let pk_bytes = ratchet.local_static_public.as_bytes();
-    ptr::copy_nonoverlapping(pk_bytes.as_ptr(), out_ptr, pk_bytes.len());
-    pk_bytes.len() as c_int
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -97,18 +110,23 @@ pub unsafe extern "C" fn zipminator_ratchet_session_new_alice(
     out_pk: *mut u8,
     pk_cap: usize,
 ) -> *mut PqRatchetSession {
-    if out_pk.is_null() {
-        return ptr::null_mut();
+    match catch_unwind(AssertUnwindSafe(|| {
+        if out_pk.is_null() {
+            return ptr::null_mut();
+        }
+        if pk_cap < PK_BYTES {
+            return ptr::null_mut();
+        }
+
+        let (session, pk_bytes) = PqRatchetSession::init_alice();
+
+        ptr::copy_nonoverlapping(pk_bytes.as_ptr(), out_pk, pk_bytes.len());
+
+        Box::into_raw(Box::new(session))
+    })) {
+        Ok(result) => result,
+        Err(_) => ptr::null_mut(),
     }
-    if pk_cap < PK_BYTES {
-        return ptr::null_mut();
-    }
-
-    let (session, pk_bytes) = PqRatchetSession::init_alice();
-
-    ptr::copy_nonoverlapping(pk_bytes.as_ptr(), out_pk, pk_bytes.len());
-
-    Box::into_raw(Box::new(session))
 }
 
 /// Initialise the Bob side of a ratchet session given Alice's ephemeral public key.
@@ -132,23 +150,28 @@ pub unsafe extern "C" fn zipminator_ratchet_session_new_bob(
     out_bob_pk: *mut u8,
     bob_pk_cap: usize,
 ) -> *mut PqRatchetSession {
-    if alice_pk.is_null() || out_ct.is_null() || out_bob_pk.is_null() {
-        return ptr::null_mut();
-    }
-    if pk_len != PK_BYTES || ct_cap < CT_BYTES || bob_pk_cap < PK_BYTES {
-        return ptr::null_mut();
-    }
-
-    let alice_pk_slice = slice::from_raw_parts(alice_pk, pk_len);
-
-    let result = PqRatchetSession::init_bob(alice_pk_slice);
-    match result {
-        Err(_) => ptr::null_mut(),
-        Ok((session, kem_ct, bob_pk)) => {
-            ptr::copy_nonoverlapping(kem_ct.as_ptr(), out_ct, kem_ct.len());
-            ptr::copy_nonoverlapping(bob_pk.as_ptr(), out_bob_pk, bob_pk.len());
-            Box::into_raw(Box::new(session))
+    match catch_unwind(AssertUnwindSafe(|| {
+        if alice_pk.is_null() || out_ct.is_null() || out_bob_pk.is_null() {
+            return ptr::null_mut();
         }
+        if pk_len != PK_BYTES || ct_cap < CT_BYTES || bob_pk_cap < PK_BYTES {
+            return ptr::null_mut();
+        }
+
+        let alice_pk_slice = slice::from_raw_parts(alice_pk, pk_len);
+
+        let result = PqRatchetSession::init_bob(alice_pk_slice);
+        match result {
+            Err(_) => ptr::null_mut(),
+            Ok((session, kem_ct, bob_pk)) => {
+                ptr::copy_nonoverlapping(kem_ct.as_ptr(), out_ct, kem_ct.len());
+                ptr::copy_nonoverlapping(bob_pk.as_ptr(), out_bob_pk, bob_pk.len());
+                Box::into_raw(Box::new(session))
+            }
+        }
+    })) {
+        Ok(result) => result,
+        Err(_) => ptr::null_mut(),
     }
 }
 
@@ -170,19 +193,24 @@ pub unsafe extern "C" fn zipminator_ratchet_session_alice_finish(
     bob_pk: *const u8,
     pk_len: usize,
 ) -> c_int {
-    if ptr.is_null() || ct.is_null() || bob_pk.is_null() {
-        return ERR_NULL;
-    }
-    if ct_len != CT_BYTES || pk_len != PK_BYTES {
-        return ERR_NULL;
-    }
+    match catch_unwind(AssertUnwindSafe(|| {
+        if ptr.is_null() || ct.is_null() || bob_pk.is_null() {
+            return ERR_NULL;
+        }
+        if ct_len != CT_BYTES || pk_len != PK_BYTES {
+            return ERR_NULL;
+        }
 
-    let session = &mut *ptr;
-    let ct_slice = slice::from_raw_parts(ct, ct_len);
-    let pk_slice = slice::from_raw_parts(bob_pk, pk_len);
+        let session = &mut *ptr;
+        let ct_slice = slice::from_raw_parts(ct, ct_len);
+        let pk_slice = slice::from_raw_parts(bob_pk, pk_len);
 
-    match session.alice_finish_handshake(ct_slice, pk_slice) {
-        Ok(()) => 0,
+        match session.alice_finish_handshake(ct_slice, pk_slice) {
+            Ok(()) => 0,
+            Err(_) => ERR_CRYPTO,
+        }
+    })) {
+        Ok(result) => result,
         Err(_) => ERR_CRYPTO,
     }
 }
@@ -210,37 +238,46 @@ pub unsafe extern "C" fn zipminator_ratchet_session_encrypt(
     ct_cap: usize,
     out_ct_written: *mut usize,
 ) -> c_int {
-    if ptr.is_null()
-        || plaintext.is_null()
-        || out_header.is_null()
-        || out_header_written.is_null()
-        || out_ct.is_null()
-        || out_ct_written.is_null()
-    {
-        return ERR_NULL;
-    }
-
-    let session = &mut *ptr;
-    let pt_slice = if pt_len == 0 {
-        &[]
-    } else {
-        slice::from_raw_parts(plaintext, pt_len)
-    };
-
-    match session.encrypt(pt_slice) {
-        Err(_) => ERR_CRYPTO,
-        Ok((header_bytes, ct_bytes)) => {
-            if header_bytes.len() > header_cap || ct_bytes.len() > ct_cap {
-                return ERR_BUFFER;
-            }
-            ptr::copy_nonoverlapping(header_bytes.as_ptr(), out_header, header_bytes.len());
-            *out_header_written = header_bytes.len();
-
-            ptr::copy_nonoverlapping(ct_bytes.as_ptr(), out_ct, ct_bytes.len());
-            *out_ct_written = ct_bytes.len();
-
-            0
+    match catch_unwind(AssertUnwindSafe(|| {
+        if ptr.is_null()
+            || plaintext.is_null()
+            || out_header.is_null()
+            || out_header_written.is_null()
+            || out_ct.is_null()
+            || out_ct_written.is_null()
+        {
+            return ERR_NULL;
         }
+
+        let session = &mut *ptr;
+        let pt_slice = if pt_len == 0 {
+            &[]
+        } else {
+            slice::from_raw_parts(plaintext, pt_len)
+        };
+
+        match session.encrypt(pt_slice) {
+            Err(_) => ERR_CRYPTO,
+            Ok((header_bytes, ct_bytes)) => {
+                if header_bytes.len() > header_cap || ct_bytes.len() > ct_cap {
+                    return ERR_BUFFER;
+                }
+                ptr::copy_nonoverlapping(
+                    header_bytes.as_ptr(),
+                    out_header,
+                    header_bytes.len(),
+                );
+                *out_header_written = header_bytes.len();
+
+                ptr::copy_nonoverlapping(ct_bytes.as_ptr(), out_ct, ct_bytes.len());
+                *out_ct_written = ct_bytes.len();
+
+                0
+            }
+        }
+    })) {
+        Ok(result) => result,
+        Err(_) => ERR_CRYPTO,
     }
 }
 
@@ -261,32 +298,37 @@ pub unsafe extern "C" fn zipminator_ratchet_session_decrypt(
     out_buf: *mut u8,
     out_cap: usize,
 ) -> c_int {
-    if ptr.is_null()
-        || header.is_null()
-        || ct.is_null()
-        || out_buf.is_null()
-    {
-        return ERR_NULL;
-    }
-    if header_len == 0 || ct_len == 0 {
-        return ERR_NULL;
-    }
-
-    let session = &mut *ptr;
-    let header_slice = slice::from_raw_parts(header, header_len);
-    let ct_slice = slice::from_raw_parts(ct, ct_len);
-
-    match session.decrypt(header_slice, ct_slice) {
-        Err(_) => ERR_CRYPTO,
-        Ok(plaintext) => {
-            if plaintext.len() > out_cap {
-                return ERR_BUFFER;
-            }
-            if !plaintext.is_empty() {
-                ptr::copy_nonoverlapping(plaintext.as_ptr(), out_buf, plaintext.len());
-            }
-            plaintext.len() as c_int
+    match catch_unwind(AssertUnwindSafe(|| {
+        if ptr.is_null() || header.is_null() || ct.is_null() || out_buf.is_null() {
+            return ERR_NULL;
         }
+        if header_len == 0 || ct_len == 0 {
+            return ERR_NULL;
+        }
+
+        let session = &mut *ptr;
+        let header_slice = slice::from_raw_parts(header, header_len);
+        let ct_slice = slice::from_raw_parts(ct, ct_len);
+
+        match session.decrypt(header_slice, ct_slice) {
+            Err(_) => ERR_CRYPTO,
+            Ok(plaintext) => {
+                if plaintext.len() > out_cap {
+                    return ERR_BUFFER;
+                }
+                if !plaintext.is_empty() {
+                    ptr::copy_nonoverlapping(
+                        plaintext.as_ptr(),
+                        out_buf,
+                        plaintext.len(),
+                    );
+                }
+                plaintext.len() as c_int
+            }
+        }
+    })) {
+        Ok(result) => result,
+        Err(_) => ERR_CRYPTO,
     }
 }
 
@@ -297,10 +339,12 @@ pub unsafe extern "C" fn zipminator_ratchet_session_decrypt(
 /// functions, or null.  Calling this twice is undefined behaviour.
 #[no_mangle]
 pub unsafe extern "C" fn zipminator_ratchet_session_free(ptr: *mut PqRatchetSession) {
-    if ptr.is_null() {
-        return;
-    }
-    drop(Box::from_raw(ptr));
+    let _ = catch_unwind(AssertUnwindSafe(|| {
+        if ptr.is_null() {
+            return;
+        }
+        drop(Box::from_raw(ptr));
+    }));
 }
 
 /// Copy the session's current ratchet public key into a caller buffer.
@@ -318,17 +362,22 @@ pub unsafe extern "C" fn zipminator_ratchet_session_get_public_key(
     out: *mut u8,
     len: usize,
 ) -> c_int {
-    if ptr.is_null() || out.is_null() {
-        return ERR_NULL;
-    }
-    if len < PK_BYTES {
-        return ERR_NULL;
-    }
+    match catch_unwind(AssertUnwindSafe(|| {
+        if ptr.is_null() || out.is_null() {
+            return ERR_NULL;
+        }
+        if len < PK_BYTES {
+            return ERR_NULL;
+        }
 
-    let session = &*ptr;
-    let pk = session.public_key_bytes();
-    ptr::copy_nonoverlapping(pk.as_ptr(), out, pk.len());
-    pk.len() as c_int
+        let session = &*ptr;
+        let pk = session.public_key_bytes();
+        ptr::copy_nonoverlapping(pk.as_ptr(), out, pk.len());
+        pk.len() as c_int
+    })) {
+        Ok(result) => result,
+        Err(_) => ERR_CRYPTO,
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -364,39 +413,48 @@ pub unsafe extern "C" fn zipminator_pii_scan(
     results_buf: *mut u8,
     results_cap: usize,
 ) -> c_int {
-    if text_ptr.is_null() || results_buf.is_null() {
-        return ERR_NULL;
-    }
-
-    // Reconstruct the text slice
-    let text_slice = slice::from_raw_parts(text_ptr, text_len);
-    let text = match std::str::from_utf8(text_slice) {
-        Ok(s) => s,
-        Err(_) => return ERR_NULL,
-    };
-
-    // Parse country codes (comma-separated) or empty for all
-    let countries: Vec<&str> = if countries_ptr.is_null() || countries_len == 0 {
-        Vec::new()
-    } else {
-        let countries_slice = slice::from_raw_parts(countries_ptr, countries_len);
-        match std::str::from_utf8(countries_slice) {
-            Ok(s) => s.split(',').map(|c| c.trim()).filter(|c| !c.is_empty()).collect(),
-            Err(_) => return ERR_NULL,
+    match catch_unwind(AssertUnwindSafe(|| {
+        if text_ptr.is_null() || results_buf.is_null() {
+            return ERR_NULL;
         }
-    };
 
-    // Run the PII scan
-    let matches = crate::pii::scan_text(text, &countries);
-    let json = crate::pii::matches_to_json(&matches);
-    let json_bytes = json.as_bytes();
+        // Reconstruct the text slice
+        let text_slice = slice::from_raw_parts(text_ptr, text_len);
+        let text = match std::str::from_utf8(text_slice) {
+            Ok(s) => s,
+            Err(_) => return ERR_NULL,
+        };
 
-    if json_bytes.len() > results_cap {
-        return ERR_BUFFER;
+        // Parse country codes (comma-separated) or empty for all
+        let countries: Vec<&str> = if countries_ptr.is_null() || countries_len == 0 {
+            Vec::new()
+        } else {
+            let countries_slice = slice::from_raw_parts(countries_ptr, countries_len);
+            match std::str::from_utf8(countries_slice) {
+                Ok(s) => s
+                    .split(',')
+                    .map(|c| c.trim())
+                    .filter(|c| !c.is_empty())
+                    .collect(),
+                Err(_) => return ERR_NULL,
+            }
+        };
+
+        // Run the PII scan
+        let matches = crate::pii::scan_text(text, &countries);
+        let json = crate::pii::matches_to_json(&matches);
+        let json_bytes = json.as_bytes();
+
+        if json_bytes.len() > results_cap {
+            return ERR_BUFFER;
+        }
+
+        ptr::copy_nonoverlapping(json_bytes.as_ptr(), results_buf, json_bytes.len());
+        json_bytes.len() as c_int
+    })) {
+        Ok(result) => result,
+        Err(_) => ERR_CRYPTO,
     }
-
-    ptr::copy_nonoverlapping(json_bytes.as_ptr(), results_buf, json_bytes.len());
-    json_bytes.len() as c_int
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -436,39 +494,44 @@ pub unsafe extern "C" fn zipminator_email_encrypt(
     out_ptr: *mut u8,
     out_cap: usize,
 ) -> c_int {
-    if pk_ptr.is_null() || out_ptr.is_null() {
-        return ERR_NULL;
-    }
-    // plaintext and aad may be empty but not null
-    if plaintext_len > 0 && plaintext_ptr.is_null() {
-        return ERR_NULL;
-    }
-    if aad_len > 0 && aad_ptr.is_null() {
-        return ERR_NULL;
-    }
-
-    let pk_slice = slice::from_raw_parts(pk_ptr, pk_len);
-    let plaintext_slice = if plaintext_len > 0 {
-        slice::from_raw_parts(plaintext_ptr, plaintext_len)
-    } else {
-        &[]
-    };
-    let aad_slice = if aad_len > 0 {
-        slice::from_raw_parts(aad_ptr, aad_len)
-    } else {
-        &[]
-    };
-
-    match crate::email_crypto::EmailCrypto::encrypt(pk_slice, plaintext_slice, aad_slice) {
-        Err(_) => ERR_CRYPTO,
-        Ok(envelope) => {
-            let serialized = envelope.to_bytes();
-            if serialized.len() > out_cap {
-                return ERR_BUFFER;
-            }
-            ptr::copy_nonoverlapping(serialized.as_ptr(), out_ptr, serialized.len());
-            serialized.len() as c_int
+    match catch_unwind(AssertUnwindSafe(|| {
+        if pk_ptr.is_null() || out_ptr.is_null() {
+            return ERR_NULL;
         }
+        // plaintext and aad may be empty but not null
+        if plaintext_len > 0 && plaintext_ptr.is_null() {
+            return ERR_NULL;
+        }
+        if aad_len > 0 && aad_ptr.is_null() {
+            return ERR_NULL;
+        }
+
+        let pk_slice = slice::from_raw_parts(pk_ptr, pk_len);
+        let plaintext_slice = if plaintext_len > 0 {
+            slice::from_raw_parts(plaintext_ptr, plaintext_len)
+        } else {
+            &[]
+        };
+        let aad_slice = if aad_len > 0 {
+            slice::from_raw_parts(aad_ptr, aad_len)
+        } else {
+            &[]
+        };
+
+        match crate::email_crypto::EmailCrypto::encrypt(pk_slice, plaintext_slice, aad_slice) {
+            Err(_) => ERR_CRYPTO,
+            Ok(envelope) => {
+                let serialized = envelope.to_bytes();
+                if serialized.len() > out_cap {
+                    return ERR_BUFFER;
+                }
+                ptr::copy_nonoverlapping(serialized.as_ptr(), out_ptr, serialized.len());
+                serialized.len() as c_int
+            }
+        }
+    })) {
+        Ok(result) => result,
+        Err(_) => ERR_CRYPTO,
     }
 }
 
@@ -505,37 +568,42 @@ pub unsafe extern "C" fn zipminator_email_decrypt(
     out_ptr: *mut u8,
     out_cap: usize,
 ) -> c_int {
-    if sk_ptr.is_null() || envelope_ptr.is_null() || out_ptr.is_null() {
-        return ERR_NULL;
-    }
-    if aad_len > 0 && aad_ptr.is_null() {
-        return ERR_NULL;
-    }
-
-    let sk_slice = slice::from_raw_parts(sk_ptr, sk_len);
-    let envelope_slice = slice::from_raw_parts(envelope_ptr, envelope_len);
-    let aad_slice = if aad_len > 0 {
-        slice::from_raw_parts(aad_ptr, aad_len)
-    } else {
-        &[]
-    };
-
-    let envelope = match crate::email_crypto::EmailEnvelope::from_bytes(envelope_slice) {
-        Err(_) => return ERR_CRYPTO,
-        Ok(e) => e,
-    };
-
-    match crate::email_crypto::EmailCrypto::decrypt(sk_slice, &envelope, aad_slice) {
-        Err(_) => ERR_CRYPTO,
-        Ok(plaintext) => {
-            if plaintext.len() > out_cap {
-                return ERR_BUFFER;
-            }
-            if !plaintext.is_empty() {
-                ptr::copy_nonoverlapping(plaintext.as_ptr(), out_ptr, plaintext.len());
-            }
-            plaintext.len() as c_int
+    match catch_unwind(AssertUnwindSafe(|| {
+        if sk_ptr.is_null() || envelope_ptr.is_null() || out_ptr.is_null() {
+            return ERR_NULL;
         }
+        if aad_len > 0 && aad_ptr.is_null() {
+            return ERR_NULL;
+        }
+
+        let sk_slice = slice::from_raw_parts(sk_ptr, sk_len);
+        let envelope_slice = slice::from_raw_parts(envelope_ptr, envelope_len);
+        let aad_slice = if aad_len > 0 {
+            slice::from_raw_parts(aad_ptr, aad_len)
+        } else {
+            &[]
+        };
+
+        let envelope = match crate::email_crypto::EmailEnvelope::from_bytes(envelope_slice) {
+            Err(_) => return ERR_CRYPTO,
+            Ok(e) => e,
+        };
+
+        match crate::email_crypto::EmailCrypto::decrypt(sk_slice, &envelope, aad_slice) {
+            Err(_) => ERR_CRYPTO,
+            Ok(plaintext) => {
+                if plaintext.len() > out_cap {
+                    return ERR_BUFFER;
+                }
+                if !plaintext.is_empty() {
+                    ptr::copy_nonoverlapping(plaintext.as_ptr(), out_ptr, plaintext.len());
+                }
+                plaintext.len() as c_int
+            }
+        }
+    })) {
+        Ok(result) => result,
+        Err(_) => ERR_CRYPTO,
     }
 }
 
@@ -567,28 +635,33 @@ pub unsafe extern "C" fn zipminator_composite_keygen(
     sk_out: *mut u8,
     sk_cap: usize,
 ) -> c_int {
-    if pk_out.is_null() || sk_out.is_null() {
-        return ERR_NULL;
+    match catch_unwind(AssertUnwindSafe(|| {
+        if pk_out.is_null() || sk_out.is_null() {
+            return ERR_NULL;
+        }
+
+        const COMPOSITE_PK_SIZE: usize = 1184 + 32; // mlkem_pk + x25519_pk
+        const COMPOSITE_SK_SIZE: usize = 2400 + 32; // mlkem_sk + x25519_sk
+
+        if pk_cap < COMPOSITE_PK_SIZE || sk_cap < COMPOSITE_SK_SIZE {
+            return ERR_NULL;
+        }
+
+        let kp = crate::openpgp_keys::CompositeEncryptionKeypair::generate();
+        let pub_key = kp.export_public();
+        let pk_bytes = pub_key.to_bytes();
+
+        ptr::copy_nonoverlapping(pk_bytes.as_ptr(), pk_out, pk_bytes.len());
+
+        // Write SK: mlkem_sk || x25519_sk
+        ptr::copy_nonoverlapping(kp.mlkem_sk().as_ptr(), sk_out, 2400);
+        ptr::copy_nonoverlapping(kp.x25519_sk().as_ptr(), sk_out.add(2400), 32);
+
+        0
+    })) {
+        Ok(result) => result,
+        Err(_) => ERR_CRYPTO,
     }
-
-    const COMPOSITE_PK_SIZE: usize = 1184 + 32; // mlkem_pk + x25519_pk
-    const COMPOSITE_SK_SIZE: usize = 2400 + 32; // mlkem_sk + x25519_sk
-
-    if pk_cap < COMPOSITE_PK_SIZE || sk_cap < COMPOSITE_SK_SIZE {
-        return ERR_NULL;
-    }
-
-    let kp = crate::openpgp_keys::CompositeEncryptionKeypair::generate();
-    let pub_key = kp.export_public();
-    let pk_bytes = pub_key.to_bytes();
-
-    ptr::copy_nonoverlapping(pk_bytes.as_ptr(), pk_out, pk_bytes.len());
-
-    // Write SK: mlkem_sk || x25519_sk
-    ptr::copy_nonoverlapping(kp.mlkem_sk().as_ptr(), sk_out, 2400);
-    ptr::copy_nonoverlapping(kp.x25519_sk().as_ptr(), sk_out.add(2400), 32);
-
-    0
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -744,8 +817,11 @@ mod tests {
             assert!(bytes_written > 0, "PII scan should produce results");
             let json_str = std::str::from_utf8(&results[..bytes_written as usize]).unwrap();
             assert!(json_str.starts_with('['), "Result should be a JSON array");
-            assert!(json_str.contains("phone") || json_str.contains("contact"),
-                    "Should detect phone or contact info in: {}", json_str);
+            assert!(
+                json_str.contains("phone") || json_str.contains("contact"),
+                "Should detect phone or contact info in: {}",
+                json_str
+            );
         }
     }
 
@@ -817,7 +893,11 @@ mod tests {
             assert!(bytes_written > 2, "Should find email across all countries");
             let json_str = std::str::from_utf8(&results[..bytes_written as usize]).unwrap();
             // Email pattern exists in US, UK, and UAE
-            assert!(json_str.contains("contact"), "Should detect email: {}", json_str);
+            assert!(
+                json_str.contains("contact"),
+                "Should detect email: {}",
+                json_str
+            );
         }
     }
 
@@ -825,18 +905,11 @@ mod tests {
     fn test_ffi_get_public_key() {
         unsafe {
             let mut pk_buf = vec![0u8; PK_BYTES];
-            let ptr = zipminator_ratchet_session_new_alice(
-                pk_buf.as_mut_ptr(),
-                pk_buf.len(),
-            );
+            let ptr = zipminator_ratchet_session_new_alice(pk_buf.as_mut_ptr(), pk_buf.len());
             assert!(!ptr.is_null());
 
             let mut out = vec![0u8; PK_BYTES];
-            let rc = zipminator_ratchet_session_get_public_key(
-                ptr,
-                out.as_mut_ptr(),
-                out.len(),
-            );
+            let rc = zipminator_ratchet_session_get_public_key(ptr, out.as_mut_ptr(), out.len());
             assert_eq!(rc, PK_BYTES as c_int);
             // Key from init and from getter must match.
             assert_eq!(pk_buf, out);
@@ -980,9 +1053,15 @@ mod tests {
             assert_eq!(rc, 0, "composite keygen failed");
 
             // Verify pk is non-zero
-            assert!(pk_buf.iter().any(|&b| b != 0), "public key must not be all-zero");
+            assert!(
+                pk_buf.iter().any(|&b| b != 0),
+                "public key must not be all-zero"
+            );
             // Verify sk is non-zero
-            assert!(sk_buf.iter().any(|&b| b != 0), "secret key must not be all-zero");
+            assert!(
+                sk_buf.iter().any(|&b| b != 0),
+                "secret key must not be all-zero"
+            );
         }
     }
 
@@ -990,21 +1069,11 @@ mod tests {
     fn test_ffi_composite_keygen_null_pointers() {
         unsafe {
             let mut pk = vec![0u8; 1216];
-            let rc = zipminator_composite_keygen(
-                pk.as_mut_ptr(),
-                pk.len(),
-                ptr::null_mut(),
-                0,
-            );
+            let rc = zipminator_composite_keygen(pk.as_mut_ptr(), pk.len(), ptr::null_mut(), 0);
             assert_eq!(rc, ERR_NULL);
 
             let mut sk = vec![0u8; 2432];
-            let rc = zipminator_composite_keygen(
-                ptr::null_mut(),
-                0,
-                sk.as_mut_ptr(),
-                sk.len(),
-            );
+            let rc = zipminator_composite_keygen(ptr::null_mut(), 0, sk.as_mut_ptr(), sk.len());
             assert_eq!(rc, ERR_NULL);
         }
     }

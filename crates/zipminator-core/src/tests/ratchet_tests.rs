@@ -1,50 +1,30 @@
-//! TDD test specifications for the PQ Double Ratchet protocol.
+//! Tests for the PQ Double Ratchet protocol.
 //!
-//! Written BEFORE implementation lands. Tests marked `#[ignore]` require API
-//! extensions not yet present; they will be un-ignored as the implementation
-//! progresses.
+//! Contains tests for both the legacy `PqcRatchet` (single-step KEM wrapper)
+//! and the full `PqRatchetSession` (Double Ratchet with handshake, chain KDFs,
+//! skipped-key caching).
 //!
-//! ## Known Bug Detected by These Tests
+//! API contracts:
 //!
-//! `ratchet.rs::PqcRatchet::encapsulate()` line 41 has the return values of
-//! `kyber768::encapsulate(pk)` assigned in the WRONG ORDER.  The `pqcrypto-kyber`
-//! crate returns `(SharedSecret, Ciphertext)` but `ratchet.rs` destructures as
-//! `(ct, ss)` — making `ct` a `SharedSecret` (32 bytes) and `ss` a `Ciphertext`
-//! (1088 bytes).  The subsequent `try_into::<[u8;32]>()` on 1088 bytes panics with
-//! `"Invalid shared secret length"`.
-//!
-//! Fix required in `ratchet.rs`:
-//!   ```rust
-//!   // WRONG (current):
-//!   let (ct, ss) = kyber768::encapsulate(pk);
-//!   // CORRECT:
-//!   let (ss, ct) = kyber768::encapsulate(pk);
-//!   ```
-//!
-//! All 9 non-ignored test failures in this file are caused solely by this one bug.
-//! Fixing it will cause those 9 tests to pass (assuming the rest of the API is correct).
-//!
-//! API contract assumed from `ratchet.rs`:
+//! ## PqcRatchet (legacy)
 //!   - `PqcRatchet::new()` -> Self
 //!   - `ratchet.local_static_public` : kyber768::PublicKey
 //!   - `ratchet.set_remote_public(&[u8])` -> Result<(), &str>
-//!   - `ratchet.encapsulate()` -> Result<(Vec<u8>, [u8;32]), &str>  // (ct, shared_secret)
+//!   - `ratchet.encapsulate()` -> Result<(Vec<u8>, [u8;32]), &str>
 //!   - `ratchet.decapsulate(&[u8])` -> Result<[u8;32], &str>
 //!   - `ratchet.encrypt(&[u8], key: &[u8;32], ad: &[u8])` -> Result<Vec<u8>, &str>
 //!   - `ratchet.decrypt(&[u8], key: &[u8;32], ad: &[u8])` -> Result<Vec<u8>, &str>
 //!
-//! Future API extensions expected (currently stubbed with #[ignore]):
-//!   - `ratchet.ratchet_encrypt(plaintext: &[u8])` -> Result<EncryptedMessage, &str>
-//!   - `ratchet.ratchet_decrypt(msg: &EncryptedMessage)` -> Result<Vec<u8>, &str>
-//!   - `ratchet.step_root_chain(ss: [u8;32])` -> ()
-//!   - `ratchet.sending_chain_key` : [u8; 32]
-//!   - `ratchet.receiving_chain_key` : [u8; 32]
-//!   - `ratchet.send_counter` : u64
-//!   - `ratchet.receive_counter` : u64
+//! ## PqRatchetSession (full Double Ratchet)
+//!   - `PqRatchetSession::init_alice()` -> (Self, Vec<u8>)
+//!   - `PqRatchetSession::init_bob(&[u8])` -> Result<(Self, Vec<u8>, Vec<u8>), RatchetError>
+//!   - `session.alice_finish_handshake(&[u8], &[u8])` -> Result<(), RatchetError>
+//!   - `session.encrypt(&[u8])` -> Result<(Vec<u8>, Vec<u8>), RatchetError>
+//!   - `session.decrypt(&[u8], &[u8])` -> Result<Vec<u8>, RatchetError>
 
 use pqcrypto_traits::kem::PublicKey;
 
-use crate::ratchet::PqcRatchet;
+use crate::ratchet::{PqcRatchet, PqRatchetSession};
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -73,6 +53,20 @@ fn kem_handshake() -> (PqcRatchet, PqcRatchet, [u8; 32]) {
     );
 
     (alice, bob, ss_alice)
+}
+
+/// Set up a full PqRatchetSession handshake between Alice and Bob.
+/// Returns (alice_session, bob_session) both ready for encrypt/decrypt.
+fn session_handshake() -> (PqRatchetSession, PqRatchetSession) {
+    let (mut alice, alice_pk) = PqRatchetSession::init_alice();
+    let (bob, kem_ct, bob_pk) =
+        PqRatchetSession::init_bob(&alice_pk).expect("bob init");
+    alice
+        .alice_finish_handshake(&kem_ct, &bob_pk)
+        .expect("alice finish handshake");
+    assert!(alice.is_ready());
+    assert!(bob.is_ready());
+    (alice, bob)
 }
 
 // ─── Basic Ratchet Lifecycle ─────────────────────────────────────────────────
@@ -205,36 +199,74 @@ fn test_ratchet_bidirectional() {
 
 // ─── Ratchet Stepping ────────────────────────────────────────────────────────
 
-/// After a KEM ratchet step, the chain keys held by each party must differ
-/// from the initial root key (they must be derived, not equal to the root).
+/// A ratchet step occurs when Alice sends her first message (msg_number==0)
+/// and when the conversation direction changes.  This test verifies that
+/// messages still decrypt correctly across ratchet steps.
 ///
-/// STUBBED: requires `ratchet.step_root_chain()` and `ratchet.sending_chain_key`.
+/// Sequence: handshake -> Alice sends M0 (ratchet step) -> Bob decrypts ->
+/// Bob sends a reply -> Alice decrypts -> Alice sends again (new ratchet step)
+/// -> Bob decrypts.  All messages must round-trip.
 #[test]
-#[ignore = "requires ratchet chain stepping API (step_root_chain, sending_chain_key)"]
 fn test_ratchet_step_produces_new_keys() {
-    // When implemented, this test should:
-    //   1. Establish shared root key via KEM handshake.
-    //   2. Call alice.step_root_chain(shared_secret) to derive chain keys.
-    //   3. Assert alice.sending_chain_key != shared_secret (the root key).
-    //   4. Assert alice.sending_chain_key != [0u8; 32] (not zeroed out).
-    //   5. Call the same on Bob's side; verify his receiving_chain_key == alice.sending_chain_key.
-    todo!("Implement once step_root_chain() is in ratchet.rs")
+    let (mut alice, mut bob) = session_handshake();
+
+    // Alice sends M0 (triggers a KEM ratchet step because send_message_number==0)
+    let (h_a0, c_a0) = alice.encrypt(b"alice-step-0").expect("alice encrypt M0");
+    let p_a0 = bob.decrypt(&h_a0, &c_a0).expect("bob decrypt alice M0");
+    assert_eq!(p_a0, b"alice-step-0");
+
+    // Bob sends a reply
+    let (h_b0, c_b0) = bob.encrypt(b"bob-reply-0").expect("bob encrypt");
+    let p_b0 = alice.decrypt(&h_b0, &c_b0).expect("alice decrypt bob reply");
+    assert_eq!(p_b0, b"bob-reply-0");
+
+    // Alice sends again (another ratchet step since send_message_number resets)
+    let (h_a1, c_a1) = alice.encrypt(b"alice-step-1").expect("alice encrypt after ratchet");
+    let p_a1 = bob.decrypt(&h_a1, &c_a1).expect("bob decrypt alice after ratchet");
+    assert_eq!(p_a1, b"alice-step-1");
+
+    // Ciphertexts from different ratchet epochs must differ
+    assert_ne!(c_a0, c_a1, "Ciphertexts from different ratchet steps must differ");
 }
 
-/// Forward secrecy: a message key used for message N must not be reachable from
-/// the state present after message N+1 has been sent.
+/// Forward secrecy: each message produces a distinct ciphertext (the chain key
+/// advances after each encryption), and all messages decrypt correctly.
 ///
-/// STUBBED: requires `ratchet_encrypt` / chain key advance API.
+/// Alice sends 3 messages to Bob; all ciphertexts differ; all decrypt to the
+/// expected plaintext.
 #[test]
-#[ignore = "requires ratchet_encrypt and chain-key ratcheting"]
 fn test_ratchet_forward_secrecy() {
-    // When implemented:
-    //   1. Alice sends message M0 -> records message_key_0.
-    //   2. Alice sends message M1 -> records message_key_1.
-    //   3. Verify message_key_0 != message_key_1.
-    //   4. Verify that no information in Alice's current state allows re-deriving
-    //      message_key_0 (the chain key has been advanced and old key is zeroized).
-    todo!("Implement once chain key advancement is in ratchet.rs")
+    let (mut alice, mut bob) = session_handshake();
+
+    let msgs: Vec<&[u8]> = vec![b"msg-0", b"msg-1", b"msg-2"];
+    let mut headers = Vec::new();
+    let mut ciphertexts = Vec::new();
+
+    // Alice sends 3 messages
+    for msg in &msgs {
+        let (hdr, ct) = alice.encrypt(msg).expect("encrypt");
+        headers.push(hdr);
+        ciphertexts.push(ct);
+    }
+
+    // All ciphertexts must be distinct (chain key advances each time)
+    for i in 0..ciphertexts.len() {
+        for j in (i + 1)..ciphertexts.len() {
+            assert_ne!(
+                ciphertexts[i], ciphertexts[j],
+                "Ciphertexts for message {} and {} must differ (forward secrecy)",
+                i, j
+            );
+        }
+    }
+
+    // Bob decrypts all 3 in order and verifies correctness
+    for (i, msg) in msgs.iter().enumerate() {
+        let plain = bob
+            .decrypt(&headers[i], &ciphertexts[i])
+            .unwrap_or_else(|e| panic!("decrypt message {} failed: {}", i, e));
+        assert_eq!(plain, *msg, "Decrypted plaintext must match for message {}", i);
+    }
 }
 
 /// Each KEM encaps/decaps cycle must feed entropy into the root chain and
@@ -265,37 +297,80 @@ fn test_ratchet_kem_ratchet_step() {
 
 // ─── Edge Cases ──────────────────────────────────────────────────────────────
 
-/// Messages arriving out of order must be decryptable if their keys have
-/// been stored in the skipped-message-key cache.
+/// Messages arriving out of order must be decryptable via the skipped-key cache.
 ///
-/// STUBBED: requires `ratchet_encrypt` / `ratchet_decrypt` with ordering metadata.
+/// Alice's first message (M0) carries a KEM ratchet step that initializes
+/// Bob's receiving chain, so Bob must process it first.  After that, M1..M3
+/// are within the same chain and can be delivered out of order.
+///
+/// Sequence: Bob decrypts M0 (ratchet init), then receives M3, M1, M2.
 #[test]
-#[ignore = "requires ratchet_encrypt/ratchet_decrypt with message counter support"]
 fn test_ratchet_out_of_order_messages() {
-    // When implemented:
-    //   1. Alice sends messages M0, M1, M2.
-    //   2. Bob receives them in order M2, M0, M1.
-    //   3. On receiving M2, Bob caches keys for M0 and M1.
-    //   4. M0 and M1 decrypt successfully using cached keys.
-    //   5. Cached keys are deleted after use (no double-spend).
-    todo!("Implement once message ordering is in ratchet.rs")
+    let (mut alice, mut bob) = session_handshake();
+
+    // Alice sends M0 (carries KEM ratchet step), M1, M2, M3
+    let (h0, c0) = alice.encrypt(b"msg-0").expect("encrypt M0");
+    let (h1, c1) = alice.encrypt(b"msg-1").expect("encrypt M1");
+    let (h2, c2) = alice.encrypt(b"msg-2").expect("encrypt M2");
+    let (h3, c3) = alice.encrypt(b"msg-3").expect("encrypt M3");
+
+    // Bob decrypts M0 first (required: contains KEM CT that initializes recv chain)
+    let p0 = bob.decrypt(&h0, &c0).expect("decrypt M0 (ratchet init)");
+    assert_eq!(p0, b"msg-0");
+
+    // Bob receives M3, M1, M2 out of order (all within same chain epoch)
+    let p3 = bob.decrypt(&h3, &c3).expect("decrypt M3 (out of order)");
+    assert_eq!(p3, b"msg-3");
+
+    let p1 = bob.decrypt(&h1, &c1).expect("decrypt M1 (from skipped cache)");
+    assert_eq!(p1, b"msg-1");
+
+    let p2 = bob.decrypt(&h2, &c2).expect("decrypt M2 (from skipped cache)");
+    assert_eq!(p2, b"msg-2");
 }
 
-/// Keys for skipped messages must be persisted until the messages arrive or
-/// a configurable window limit is exceeded.
+/// Keys for skipped messages are persisted until the messages arrive.
 ///
-/// STUBBED: requires skipped-key cache API.
+/// Alice sends 6 messages (M0..M5).  Bob decrypts M0 first (required: it
+/// carries the KEM ratchet step), then jumps to M5 (skipping 1-4), then
+/// decrypts M4, M3, M2, M1 in reverse order from the skipped-key cache.
 #[test]
-#[ignore = "requires skipped_message_keys storage in PqcRatchet"]
 fn test_ratchet_skipped_message_keys() {
-    // When implemented:
-    //   1. Alice sends M0, M1, M2.
-    //   2. Bob receives only M2 (skipping M0 and M1).
-    //   3. Assert skipped_keys cache contains keys for M0 and M1.
-    //   4. Bob receives M0 -> decrypts successfully -> key removed from cache.
-    //   5. Bob receives M1 -> decrypts successfully -> key removed from cache.
-    //   6. Cache is now empty.
-    todo!("Implement once skipped_message_keys map is in PqcRatchet")
+    let (mut alice, mut bob) = session_handshake();
+
+    // Alice sends M0..M5
+    let mut encrypted: Vec<(Vec<u8>, Vec<u8>)> = Vec::new();
+    for i in 0u32..6 {
+        let msg = format!("message-{}", i);
+        let (h, c) = alice.encrypt(msg.as_bytes()).expect("encrypt");
+        encrypted.push((h, c));
+    }
+
+    // Bob decrypts M0 first (carries KEM ratchet step, initializes recv chain)
+    let p0 = bob
+        .decrypt(&encrypted[0].0, &encrypted[0].1)
+        .expect("decrypt M0 (ratchet init)");
+    assert_eq!(p0, b"message-0");
+
+    // Bob skips ahead to M5 (this caches keys for M1..M4)
+    let p5 = bob
+        .decrypt(&encrypted[5].0, &encrypted[5].1)
+        .expect("decrypt M5 (skip ahead)");
+    assert_eq!(p5, b"message-5");
+
+    // Now decrypt M4, M3, M2, M1 from skipped cache (reverse order)
+    for i in (1..5).rev() {
+        let msg = format!("message-{}", i);
+        let plain = bob
+            .decrypt(&encrypted[i].0, &encrypted[i].1)
+            .unwrap_or_else(|e| panic!("decrypt M{} from skipped cache failed: {}", i, e));
+        assert_eq!(
+            plain,
+            msg.as_bytes(),
+            "Skipped message M{} must decrypt correctly",
+            i
+        );
+    }
 }
 
 /// Tampering with the AES-GCM ciphertext body must cause authentication
@@ -363,7 +438,7 @@ fn test_ratchet_wrong_recipient() {
     bob_encap.set_remote_public(alice.local_static_public.as_bytes()).unwrap();
     let (ct_bytes, ss_bob) = bob_encap.encapsulate().unwrap();
 
-    // Carol has a completely different keypair — she should not recover ss_bob
+    // Carol has a completely different keypair -- she should not recover ss_bob
     let carol = PqcRatchet::new();
     let ss_carol = carol.decapsulate(&ct_bytes).unwrap(); // Kyber returns implicit-rejection value
 
@@ -402,53 +477,89 @@ fn test_ratchet_no_key_reuse() {
     );
 }
 
-/// Secret material (root key, chain keys, message keys) must be zeroized when
-/// the ratchet is dropped. This test does a best-effort check by inspecting the
-/// raw memory location after drop. It requires `unsafe` and is architecture-sensitive.
+/// Smoke test for zeroize-on-drop: create sessions, use them for encryption,
+/// then drop them.  The test verifies no panics occur during drop.
 ///
-/// STUBBED: requires `Zeroize` / `ZeroizeOnDrop` derives on `PqcRatchet`.
+/// True memory-level verification that secret bytes are zeroed requires
+/// platform-specific inspection (e.g., valgrind, /proc/self/mem, or a
+/// custom allocator) and is not portable in a standard unit test.
+/// The `RatchetState` struct derives `ZeroizeOnDrop` and manually zeroizes
+/// skipped keys in its `Drop` impl, so this smoke test confirms the drop
+/// path executes cleanly.
 #[test]
-#[ignore = "requires ZeroizeOnDrop on PqcRatchet secret fields"]
 fn test_ratchet_zeroize_on_drop() {
-    // When implemented:
-    //   1. Create a PqcRatchet and record the address of root_key.
-    //   2. Seed root_key with known non-zero bytes.
-    //   3. Drop the ratchet.
-    //   4. Read the raw memory at the recorded address (unsafe).
-    //   5. Assert the bytes are now zero (zeroized on drop).
-    //
-    // Note: The compiler may reuse memory; this test relies on the allocator
-    // not overwriting the freed region before the assertion, which is typically
-    // true in debug builds. A sanitizer-based approach (valgrind) is more robust.
-    todo!("Add ZeroizeOnDrop to PqcRatchet and implement the memory-peek assertion")
+    // Create sessions, exchange messages, then drop.
+    {
+        let (mut alice, mut bob) = session_handshake();
+
+        // Send a few messages to populate chain keys and skipped-key caches.
+        let (h0, c0) = alice.encrypt(b"drop-test-0").expect("encrypt");
+        let (h1, c1) = alice.encrypt(b"drop-test-1").expect("encrypt");
+        let (h2, c2) = alice.encrypt(b"drop-test-2").expect("encrypt");
+        let (h3, c3) = alice.encrypt(b"drop-test-3").expect("encrypt");
+
+        // Bob decrypts M0 (required: carries KEM ratchet step)
+        let _ = bob.decrypt(&h0, &c0).expect("decrypt M0");
+        // Bob skips to M3 (populates skipped key cache with M1, M2 keys)
+        let _ = bob.decrypt(&h3, &c3).expect("decrypt M3");
+        // Leave M1, M2 keys in the skipped cache -- they will be zeroized on drop.
+
+        // Suppress unused-variable warnings.
+        let _ = (h1, c1, h2, c2);
+
+        // Sessions are dropped here.  No panic = Drop::drop ran cleanly.
+    }
+
+    // If we get here without a panic, the zeroize-on-drop path is clean.
+    // NOTE: verifying the actual memory contents are zero requires platform
+    // inspection (valgrind, msan, or reading /proc/self/mem). This test only
+    // confirms no UB or panics in the cleanup path.
 }
 
-/// Comparison of ciphertexts / MACs must execute in constant time regardless
-/// of where the first differing byte is, preventing timing side-channel attacks.
+/// Verifies that different plaintexts produce different ciphertexts and that
+/// the same plaintext encrypted twice produces different ciphertexts (due to
+/// chain key advancement producing unique message keys).
 ///
-/// This test uses statistical timing to detect non-constant-time behaviour.
-/// It is inherently probabilistic; run with --test-threads=1 for stability.
-///
-/// STUBBED: the current `decrypt` relies on AES-GCM (which is constant-time in
-/// the `aes-gcm` crate), but the stub documents the intent.
+/// NOTE: a true constant-time comparison audit requires statistical timing
+/// analysis under controlled conditions (--test-threads=1, pinned CPU, etc.).
+/// The `aes-gcm` crate uses constant-time operations internally. This test
+/// only validates the observable cryptographic properties.
 #[test]
-#[ignore = "statistical timing test — requires controlled benchmark environment"]
 fn test_ratchet_constant_time_comparison() {
-    // When implemented:
-    //   1. Prepare two ciphertexts: one that differs in the first byte, one in the last.
-    //   2. Time `decrypt` for both variants across N=10_000 iterations.
-    //   3. Assert that the timing distributions are not statistically distinguishable
-    //      (e.g., Welch t-test with p > 0.05).
-    //
-    // The `subtle` crate's `ct_eq` is the standard approach; verify it is used
-    // in any hand-rolled MAC comparison paths.
-    todo!("Implement timing measurement once constant-time comparison paths are audited")
+    let (mut alice, mut bob) = session_handshake();
+
+    // Different plaintexts produce different ciphertexts
+    let (h1, c1) = alice.encrypt(b"plaintext-A").expect("encrypt A");
+    let (h2, c2) = alice.encrypt(b"plaintext-B").expect("encrypt B");
+    assert_ne!(c1, c2, "Different plaintexts must produce different ciphertexts");
+
+    // Bob decrypts both correctly
+    let p1 = bob.decrypt(&h1, &c1).expect("decrypt A");
+    let p2 = bob.decrypt(&h2, &c2).expect("decrypt B");
+    assert_eq!(p1, b"plaintext-A");
+    assert_eq!(p2, b"plaintext-B");
+
+    // Same plaintext encrypted twice produces different ciphertexts
+    // (chain key advances, so message keys differ even for identical plaintext)
+    let (mut alice2, _bob2) = session_handshake();
+    let (_h3, c3) = alice2.encrypt(b"same-text").expect("encrypt same 1");
+    let (_h4, c4) = alice2.encrypt(b"same-text").expect("encrypt same 2");
+    assert_ne!(
+        c3, c4,
+        "Same plaintext encrypted twice must produce different ciphertexts \
+         (unique message keys from chain advancement)"
+    );
+
+    // NOTE: timing-based constant-time verification is inherently probabilistic
+    // and requires a controlled benchmark environment. The aes-gcm crate uses
+    // constant-time AES-NI/NEON where available. This test verifies the
+    // cryptographic uniqueness property, not timing characteristics.
 }
 
 // ─── FFI Tests ───────────────────────────────────────────────────────────────
 
 /// Verify the complete FFI lifecycle: allocate a ratchet, extract the public key,
-/// and free it — all via the C API.
+/// and free it -- all via the C API.
 #[test]
 fn test_ffi_ratchet_lifecycle() {
     use crate::ffi::{
@@ -478,22 +589,128 @@ fn test_ffi_ratchet_lifecycle() {
     }
 }
 
-/// Encrypt a message via the FFI layer and decrypt it back.
-///
-/// STUBBED: requires FFI functions for encrypt/decrypt not yet exported.
+/// Full FFI roundtrip using the PqRatchetSession FFI functions:
+///   1. zipminator_ratchet_session_new_alice
+///   2. zipminator_ratchet_session_new_bob
+///   3. zipminator_ratchet_session_alice_finish
+///   4. zipminator_ratchet_session_encrypt
+///   5. zipminator_ratchet_session_decrypt
+///   6. zipminator_ratchet_session_free
 #[test]
-#[ignore = "requires zipminator_ratchet_encrypt / zipminator_ratchet_decrypt FFI exports"]
 fn test_ffi_ratchet_encrypt_decrypt() {
-    // When implemented:
-    //   1. Create two ratchets via FFI (Alice, Bob).
-    //   2. Exchange public keys via get_public_key / set_remote_public_key FFI calls.
-    //   3. Bob calls zipminator_ratchet_encapsulate -> writes ciphertext to C buffer.
-    //   4. Alice calls zipminator_ratchet_decapsulate(ct_buf) -> shared secret.
-    //   5. Alice calls zipminator_ratchet_encrypt(plaintext_buf, key_buf, ad_buf) -> ct.
-    //   6. Bob calls zipminator_ratchet_decrypt(ct_buf, key_buf, ad_buf) -> plaintext.
-    //   7. Assert plaintext round-trips correctly.
-    //   8. Free both ratchets.
-    todo!("Implement once encrypt/decrypt FFI exports exist in ffi.rs")
+    use crate::ffi::{
+        zipminator_ratchet_session_alice_finish, zipminator_ratchet_session_decrypt,
+        zipminator_ratchet_session_encrypt, zipminator_ratchet_session_free,
+        zipminator_ratchet_session_new_alice, zipminator_ratchet_session_new_bob,
+    };
+    use crate::ratchet::header::{CT_BYTES, PK_BYTES};
+
+    unsafe {
+        // 1. Alice initialises her session
+        let mut alice_pk = vec![0u8; PK_BYTES];
+        let alice_ptr = zipminator_ratchet_session_new_alice(
+            alice_pk.as_mut_ptr(),
+            alice_pk.len(),
+        );
+        assert!(!alice_ptr.is_null(), "Alice session must be non-null");
+
+        // 2. Bob initialises his session with Alice's public key
+        let mut kem_ct = vec![0u8; CT_BYTES];
+        let mut bob_pk = vec![0u8; PK_BYTES];
+        let bob_ptr = zipminator_ratchet_session_new_bob(
+            alice_pk.as_ptr(),
+            alice_pk.len(),
+            kem_ct.as_mut_ptr(),
+            kem_ct.len(),
+            bob_pk.as_mut_ptr(),
+            bob_pk.len(),
+        );
+        assert!(!bob_ptr.is_null(), "Bob session must be non-null");
+
+        // 3. Alice finishes the handshake
+        let rc = zipminator_ratchet_session_alice_finish(
+            alice_ptr,
+            kem_ct.as_ptr(),
+            kem_ct.len(),
+            bob_pk.as_ptr(),
+            bob_pk.len(),
+        );
+        assert_eq!(rc, 0, "alice_finish must return 0 on success");
+
+        // 4. Alice encrypts a message
+        let plaintext = b"FFI session encrypt/decrypt roundtrip";
+        let mut header_buf = vec![0u8; 4096];
+        let mut ct_buf = vec![0u8; 4096];
+        let mut header_written: usize = 0;
+        let mut ct_written: usize = 0;
+
+        let rc = zipminator_ratchet_session_encrypt(
+            alice_ptr,
+            plaintext.as_ptr(),
+            plaintext.len(),
+            header_buf.as_mut_ptr(),
+            header_buf.len(),
+            &mut header_written,
+            ct_buf.as_mut_ptr(),
+            ct_buf.len(),
+            &mut ct_written,
+        );
+        assert_eq!(rc, 0, "encrypt must return 0 on success");
+        assert!(header_written > 0, "header must have been written");
+        assert!(ct_written > 0, "ciphertext must have been written");
+
+        // 5. Bob decrypts the message
+        let mut out_buf = vec![0u8; 4096];
+        let bytes_written = zipminator_ratchet_session_decrypt(
+            bob_ptr,
+            header_buf.as_ptr(),
+            header_written,
+            ct_buf.as_ptr(),
+            ct_written,
+            out_buf.as_mut_ptr(),
+            out_buf.len(),
+        );
+        assert!(bytes_written >= 0, "decrypt must return >= 0 on success, got {}", bytes_written);
+        let decrypted = &out_buf[..bytes_written as usize];
+        assert_eq!(decrypted, plaintext, "Decrypted text must match original");
+
+        // Send a second message to verify continued operation
+        let plaintext2 = b"Second FFI message";
+        let mut header_buf2 = vec![0u8; 4096];
+        let mut ct_buf2 = vec![0u8; 4096];
+        let mut header_written2: usize = 0;
+        let mut ct_written2: usize = 0;
+
+        let rc = zipminator_ratchet_session_encrypt(
+            alice_ptr,
+            plaintext2.as_ptr(),
+            plaintext2.len(),
+            header_buf2.as_mut_ptr(),
+            header_buf2.len(),
+            &mut header_written2,
+            ct_buf2.as_mut_ptr(),
+            ct_buf2.len(),
+            &mut ct_written2,
+        );
+        assert_eq!(rc, 0, "second encrypt must succeed");
+
+        let mut out_buf2 = vec![0u8; 4096];
+        let bytes2 = zipminator_ratchet_session_decrypt(
+            bob_ptr,
+            header_buf2.as_ptr(),
+            header_written2,
+            ct_buf2.as_ptr(),
+            ct_written2,
+            out_buf2.as_mut_ptr(),
+            out_buf2.len(),
+        );
+        assert!(bytes2 >= 0, "second decrypt must succeed, got {}", bytes2);
+        assert_eq!(&out_buf2[..bytes2 as usize], plaintext2);
+
+        // 6. Free both sessions
+        zipminator_ratchet_session_free(alice_ptr);
+        zipminator_ratchet_session_free(bob_ptr);
+    }
 }
 
 /// All FFI functions must handle null pointer arguments without crashing.

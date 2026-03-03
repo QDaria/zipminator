@@ -1,0 +1,33 @@
+[package]
+name = "zipminator-core-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+pqcrypto-traits = "0.3"
+
+[dependencies.zipminator-core]
+path = ".."
+
+# Prevent this fuzz crate from being part of the workspace
+[workspace]
+
+[[bin]]
+name = "fuzz_header_from_bytes"
+path = "fuzz_targets/fuzz_header_from_bytes.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_session_decrypt"
+path = "fuzz_targets/fuzz_session_decrypt.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_legacy_decrypt"
+path = "fuzz_targets/fuzz_legacy_decrypt.rs"
+doc = false

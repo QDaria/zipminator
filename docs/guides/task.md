@@ -19,10 +19,10 @@
 ## Phase 3: VoIP, Video & Q-VPN
 
 - [x] Build UI Layout for VoIP Call Screens and Q-VPN toggles.
-- [/] Implement WebRTC signaling for PQC VoIP calls.
-- [ ] Integrate React Native WebRTC natively for camera and microphone access.
-- [ ] Secure media streams with PQ-SRTP negotiation.
-- [ ] Build native iOS `NetworkExtension` and Android `VpnService` for PQ-WireGuard.
+- [x] Implement WebRTC signaling for PQC VoIP calls.
+- [x] Integrate React Native WebRTC natively for camera and microphone access.
+- [x] Secure media streams with PQ-SRTP negotiation.
+- [x] Build native iOS `NetworkExtension` and Android `VpnService` for PQ-WireGuard.
 
 ## Phase 4: Big Data, AI, & Anonymization
 
@@ -50,21 +50,21 @@
 ## Phase 7: Quantum-Secure Email (`@zipminator.zip`)
 
 - [ ] Register `zipminator.zip` domain and configure DNS (MX, SPF, DKIM, DMARC).
-- [ ] Deploy PQC-secured SMTP/IMAP mail server (ML-KEM-768 TLS).
-- [ ] Build webmail UI with quantum-purple design language.
-- [ ] Integrate PII scanner into compose flow (auto-warn on sensitive data).
-- [ ] Implement self-destructing emails (timer + read-receipt).
-- [ ] Add 10-level anonymization for outgoing attachments.
-- [ ] Build mobile `ZipMail.tsx` component in Expo app.
-- [ ] QRNG-seeded session tokens and per-message encryption keys.
+- [x] Deploy PQC-secured SMTP/IMAP mail server (ML-KEM-768 TLS).
+- [x] Build webmail UI with quantum-purple design language.
+- [x] Integrate PII scanner into compose flow (auto-warn on sensitive data).
+- [x] Implement self-destructing emails (timer + read-receipt).
+- [x] Add 10-level anonymization for outgoing attachments.
+- [x] Build mobile `ZipMail.tsx` component in Expo app.
+- [x] QRNG-seeded session tokens and per-message encryption keys.
 
 ## Phase 8: ZipBrowser — PQC AI Browser
 
-- [ ] Fork Chromium or build Tauri desktop browser shell.
-- [ ] Integrate PQC TLS (ML-KEM-768 for all HTTPS connections).
-- [ ] Embed Q-VPN (PQ-WireGuard) as always-on browser tunnel.
-- [ ] Integrate OpenClaw AI sidebar (summarize, agentic tasks, writing).
-- [ ] QRNG-seeded session tokens and fingerprint-resistant cookie rotation.
-- [ ] Zero telemetry architecture (no data exits without PQC tunnel).
-- [ ] PQC password manager extension and form autofill.
-- [ ] Mobile browser component via WebView with PQC proxy.
+- [x] Fork Chromium or build Tauri desktop browser shell.
+- [x] Integrate PQC TLS (ML-KEM-768 for all HTTPS connections).
+- [x] Embed Q-VPN (PQ-WireGuard) as always-on browser tunnel.
+- [x] Integrate OpenClaw AI sidebar (summarize, agentic tasks, writing).
+- [x] QRNG-seeded session tokens and fingerprint-resistant cookie rotation.
+- [x] Zero telemetry architecture (no data exits without PQC tunnel).
+- [x] PQC password manager extension and form autofill.
+- [x] Mobile browser component via WebView with PQC proxy.
