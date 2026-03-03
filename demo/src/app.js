@@ -1,4 +1,4 @@
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect } = React;
 
 // Resolved at startup: prefers /api (Docker nginx proxy) when available,
 // falls back to http://localhost:5001/api (local dev / Electron).
@@ -44,9 +44,13 @@ function App() {
       ),
       React.createElement('div', { style: { marginTop: '15px', display: 'flex', alignItems: 'center', gap: '8px' } },
         React.createElement('span', {
-          className: `status-indicator ${backendStatus === 'connected' ? 'active' : 'inactive'}`
+          className: `status-indicator ${backendStatus === 'connected' ? 'active' : backendStatus === 'connecting' ? 'warning' : 'inactive'}`
         }),
-        React.createElement('span', null, backendStatus === 'connected' ? 'Quantum Backend Active' : 'Connecting to Quantum Backend...')
+        React.createElement('span', null,
+          backendStatus === 'connected' ? 'Quantum Backend Active' :
+          backendStatus === 'connecting' ? 'Checking...' :
+          'Quantum Backend Offline'
+        )
       )
     ),
 
@@ -85,7 +89,6 @@ function QuantumEntropyDemo() {
   const [entropyData, setEntropyData] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
-  const chartRef = useRef(null);
 
   useEffect(() => {
     fetchEntropyStatus();
@@ -99,7 +102,6 @@ function QuantumEntropyDemo() {
     try {
       const response = await axios.get(`${API_BASE}/quantum/status`);
       setEntropyData(response.data);
-      updateChart(response.data);
     } catch (error) {
       console.error('Failed to fetch entropy status:', error);
     }
@@ -112,17 +114,12 @@ function QuantumEntropyDemo() {
         num_bytes: 256
       });
       setEntropyData(response.data);
-      updateChart(response.data);
     } catch (error) {
       console.error('Failed to generate entropy:', error);
-      alert('Failed to generate entropy: ' + error.message);
+      setEntropyData(prev => ({ ...prev, error: 'Failed to generate entropy: ' + (error.response?.data?.error || error.message) }));
     } finally {
       setGenerating(false);
     }
-  };
-
-  const updateChart = (data) => {
-    // Chart update logic would go here
   };
 
   return React.createElement('div', { className: 'demo-section' },
@@ -175,6 +172,10 @@ function QuantumEntropyDemo() {
       )
     ),
 
+    entropyData && entropyData.error && React.createElement('div', { className: 'error-message' },
+      React.createElement('p', null, entropyData.error)
+    ),
+
     entropyData && entropyData.latest_entropy && React.createElement('div', { style: { marginTop: '20px' } },
       React.createElement('h3', null, 'Latest Generated Entropy (SHA-256)'),
       React.createElement('div', { className: 'hash-display' }, entropyData.latest_entropy)
@@ -185,7 +186,11 @@ function QuantumEntropyDemo() {
         className: 'action-button primary',
         onClick: generateEntropy,
         disabled: generating
-      }, generating ? 'Generating from Quantum Hardware...' : 'Generate Quantum Entropy (256 bytes)'),
+      }, generating ?
+        React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '8px' } },
+          React.createElement('span', { className: 'loading-spinner small' }),
+          'Generating from Quantum Hardware...'
+        ) : 'Generate Quantum Entropy (256 bytes)'),
 
       React.createElement('button', {
         className: `action-button ${autoRefresh ? 'success' : 'secondary'}`,
@@ -399,7 +404,11 @@ function ZipminatorDemo() {
         className: 'action-button primary',
         onClick: encryptFile,
         disabled: processing
-      }, processing ? 'Encrypting with Quantum Entropy...' : 'Encrypt File with AES-256'),
+      }, processing ?
+        React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '8px' } },
+          React.createElement('span', { className: 'loading-spinner small' }),
+          'Encrypting with Quantum Entropy...'
+        ) : 'Encrypt File with AES-256'),
 
       result && result.data && React.createElement('button', {
         className: 'action-button success',
@@ -654,7 +663,11 @@ function KyberDemo() {
           className: 'action-button primary full-width',
           onClick: generateKeypair,
           disabled: generating
-        }, generating ? 'Generating Kyber768 Keys...' : 'Generate Kyber768 Keypair'),
+        }, generating ?
+        React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '8px' } },
+          React.createElement('span', { className: 'loading-spinner small' }),
+          'Generating Kyber768 Keys...'
+        ) : 'Generate Kyber768 Keypair'),
 
         keypair && React.createElement('div', { className: 'success-message', style: { marginTop: '15px' } },
           React.createElement('p', null, 'Keypair generated successfully'),

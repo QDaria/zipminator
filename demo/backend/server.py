@@ -22,7 +22,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 # Add project src/ so we can import the zipminator package
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'src'))
 
-from zipminator.crypto.quantum_random import QuantumEntropyPool
+_USE_QEP = False
+try:
+    from zipminator.crypto.quantum_random import QuantumEntropyPool
+    _USE_QEP = True
+except (ImportError, Exception) as exc:
+    QuantumEntropyPool = None
+    print(f"[ENTROPY] QuantumEntropyPool unavailable ({exc}) -- using fallback")
 
 app = Flask(__name__)
 CORS(app)
@@ -74,8 +80,45 @@ _ensure_entropy_file()
 # read-offset-refill logic inline.  The class handles thread-safe reads,
 # position tracking, automatic refill on exhaustion, and pseudo-random
 # fallback when the pool file is missing or empty.
+#
+# When the zipminator package is not installed, a minimal shim provides
+# os.urandom-based entropy so the demo server still functions.
 # ---------------------------------------------------------------------------
-_qep = QuantumEntropyPool(pool_path=ENTROPY_FILE)
+if _USE_QEP:
+    _qep = QuantumEntropyPool(pool_path=ENTROPY_FILE)
+else:
+    # Minimal fallback shim when QuantumEntropyPool is unavailable
+    class _FallbackEntropyPool:
+        """Minimal entropy pool using os.urandom as fallback."""
+        def __init__(self):
+            self._total_consumed = 0
+
+        def get_bytes(self, n: int) -> bytes:
+            self._total_consumed += n
+            # Try reading from the pool file first, else use os.urandom
+            try:
+                with open(ENTROPY_FILE, 'rb') as f:
+                    data = f.read(n)
+                    if len(data) >= n:
+                        return data[:n]
+            except Exception:
+                pass
+            return secrets.token_bytes(n)
+
+        def get_stats(self) -> dict:
+            pool_size = _get_pool_size()
+            return {
+                'pool_size': pool_size,
+                'total_consumed': self._total_consumed,
+                'remaining': max(0, pool_size - self._total_consumed),
+                'pool_path': str(ENTROPY_FILE),
+            }
+
+        def _refill_pool(self):
+            pass  # No-op for fallback
+
+    _qep = _FallbackEntropyPool()
+    print("[ENTROPY] Using fallback entropy pool (os.urandom)")
 
 # Demo-specific metadata not tracked by QuantumEntropyPool
 _DEMO_ENTROPY_META = {
@@ -386,7 +429,7 @@ def kyber_encrypt():
             ciphertext = ct_bytes.hex()
             shared_secret = ss_bytes.hex()
         else:
-            ciphertext = secrets.token_hex(544)
+            ciphertext = secrets.token_hex(1088)   # 1088 bytes -> 2176 hex chars (matches real Kyber768 ct)
             shared_secret = secrets.token_hex(32)
 
         # AES-encrypt the user message with the shared secret
