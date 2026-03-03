@@ -1,3 +1,4 @@
+// LEGACY: This file is not used when expo-router is active (see app/_layout.tsx)
 import React from 'react';
 import { View, Text, TouchableOpacity, SafeAreaView, StatusBar, ScrollView } from 'react-native';
 import { ExpertiseProvider, useExpertise } from './src/context/ExpertiseContext';
@@ -15,7 +16,7 @@ function MainScreen() {
                 {/* Header Section */}
                 {mode === 'novice' ? (
                     <View className="items-center w-full mb-10 pt-10">
-                        <View className="w-48 h-48 rounded-full bg-quantum-500/20 items-center justify-center border-4 border-quantum-400 mb-8 shadow-lg shadow-quantum-400">
+                        <View className="w-48 h-48 rounded-full bg-quantum-500/20 items-center justify-center border-4 border-quantum-400 mb-8 shadow-lg">
                             <Text className="text-white font-bold text-lg">Gathering Power...</Text>
                         </View>
                         <Text className="text-white text-3xl font-bold mb-4 text-center">
@@ -35,7 +36,7 @@ function MainScreen() {
                             <Text className="text-green-400 font-mono text-sm">ONLINE</Text>
                         </View>
 
-                        <View className="border border-white/20 bg-black/50 p-6 rounded-lg mb-6 shadow shadow-quantum-500/20">
+                        <View className="border border-white/20 bg-black/50 p-6 rounded-lg mb-6 shadow-lg">
                             <Text className="text-gray-400 font-mono text-xs mb-2">TARGET PROVIDER:</Text>
                             <Text className="text-white font-mono text-lg mb-1">qBraid Cloud - IBM Quantum</Text>
                             <Text className="text-quantum-300 font-mono text-sm">Active Node: Marrakesh (156q)</Text>
@@ -44,7 +45,7 @@ function MainScreen() {
                         <View className="border border-white/20 bg-black/50 p-6 rounded-lg mb-8">
                             <Text className="text-gray-400 font-mono text-xs mb-2">ENTROPY POOL STATUS:</Text>
                             <View className="flex-row justify-between mb-2">
-                                <Text className="text-white font-mono text-sm animate-pulse">Harvesting q-bits...</Text>
+                                <Text className="text-white font-mono text-sm">Harvesting q-bits...</Text>
                                 <Text className="text-white font-mono text-sm">1024B / 1024B</Text>
                             </View>
                             <View className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
@@ -69,7 +70,7 @@ function MainScreen() {
 
             {/* Global Expertise Toggle Button Footer */}
             <View className="absolute bottom-10 w-full items-center px-6">
-                <View className="bg-white/10 backdrop-blur-md rounded-full p-1 flex-row border border-white/20">
+                <View className="bg-white/10 rounded-full p-1 flex-row border border-white/20">
                     <TouchableOpacity
                         onPress={() => mode !== 'novice' && toggleMode()}
                         className={`px-6 py-2 rounded-full ${mode === 'novice' ? 'bg-white' : 'bg-transparent'}`}

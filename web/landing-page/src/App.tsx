@@ -27,7 +27,7 @@ export default function App() {
                 </h1>
 
                 <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-                    Powered by real 127-qubit IBM hardware, Zipminator injects true quantum entropy into the world's fastest ML-KEM architecture.
+                    Powered by real 156-qubit IBM hardware, Zipminator injects true quantum entropy into the world's fastest ML-KEM architecture.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

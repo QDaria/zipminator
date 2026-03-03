@@ -72,7 +72,7 @@ const Footer = () => {
   ]
 
   return (
-    <footer className="relative bg-gray-950 border-t border-gray-800 overflow-hidden">
+    <footer className="relative bg-gray-950 border-t border-white/[0.08] overflow-hidden">
       {/* Subtle quantum grid pattern background */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
@@ -94,7 +94,7 @@ const Footer = () => {
             <div>
               <Link href="/" className="inline-block mb-2">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-quantum-gradient rounded-lg flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center shadow-lg" style={{ backgroundImage: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
                     <span className="text-white font-bold text-2xl">Z</span>
                   </div>
                   <div>
@@ -110,7 +110,7 @@ const Footer = () => {
               >
                 <span>by</span>
                 <span className="font-semibold">QDaria</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </Link>
@@ -132,7 +132,7 @@ const Footer = () => {
                   className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center hover:bg-gray-800 transition-all duration-200 group"
                   aria-label={social.label}
                 >
-                  <social.icon className="w-5 h-5 text-gray-400 group-hover:text-quantum-400 transition-colors" />
+                  <social.icon className="w-5 h-5 text-gray-400 group-hover:text-quantum-400 transition-colors duration-200" />
                 </a>
               ))}
             </div>
@@ -195,7 +195,7 @@ const Footer = () => {
               className="inline-flex items-center space-x-2 text-sm text-quantum-400 hover:text-quantum-300 transition-colors mt-4 group"
             >
               <span>Explore all products</span>
-              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
@@ -221,7 +221,7 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="relative border-t border-gray-800">
+      <div className="relative border-t border-white/[0.06]">
         <div className="container-custom py-6">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
             {/* Copyright */}
@@ -251,7 +251,7 @@ const Footer = () => {
           </div>
 
           {/* Compliance Badges */}
-          <div className="mt-6 pt-6 border-t border-gray-800">
+          <div className="mt-6 pt-6 border-t border-white/[0.06]">
             <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-500">
               <div className="flex items-center space-x-2 group cursor-default">
                 <div className="w-4 h-4 bg-blue-600 rounded group-hover:scale-110 transition-transform" />

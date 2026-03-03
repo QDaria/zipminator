@@ -1,10 +1,23 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Shield, Clock, Star, Github, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 
 const CTA = () => {
+  const [particles, setParticles] = useState<Array<{ left: number; top: number; duration: number }>>([])
+
+  useEffect(() => {
+    setParticles(
+      Array.from({ length: 12 }, () => ({
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        duration: 3 + Math.random() * 2,
+      }))
+    )
+  }, [])
+
   // Particle animation variants
   const particleVariants = {
     animate: {
@@ -34,19 +47,19 @@ const CTA = () => {
 
       {/* Floating Quantum Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(12)].map((_, i) => (
+        {particles.map((p, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-quantum-400/30 rounded-full"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${p.left}%`,
+              top: `${p.top}%`,
             }}
             variants={particleVariants}
             animate="animate"
             transition={{
               delay: i * 0.2,
-              duration: 3 + Math.random() * 2
+              duration: p.duration
             }}
           />
         ))}
@@ -111,6 +124,7 @@ const CTA = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-12"
           >
+            {/* TODO: Inconsistent CTA - manually recreates gradient style instead of using btn-primary class from globals.css */}
             <Link
               href="#signup"
               className="group relative inline-flex items-center space-x-2 bg-gradient-to-r from-quantum-500 to-purple-600 text-white font-semibold text-lg px-10 py-5 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-quantum-500/50 w-full sm:w-auto"

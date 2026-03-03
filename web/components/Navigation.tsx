@@ -52,7 +52,9 @@ const Navigation = () => {
   ]
 
   const navLinks = [
-    { name: 'Features', href: '#features' },
+    { name: 'Features', href: '/features' },
+    { name: 'Demo', href: '/demo' },
+    { name: 'Impact', href: '/impact' },
     { name: 'Documentation', href: 'https://docs.zipminator.zip' },
     { name: 'Pricing', href: '#pricing' },
     { name: 'GitHub', href: 'https://github.com/qdaria/zipminator-pqc' },
@@ -60,9 +62,9 @@ const Navigation = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-        ? 'bg-gray-950/95 backdrop-blur-xl border-b border-gray-800/80 shadow-xl'
-        : 'bg-gray-950/90 backdrop-blur-md border-b border-gray-800'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
+        ? 'bg-gray-950/80 backdrop-blur-xl border-b border-white/[0.08] shadow-2xl shadow-black/40'
+        : 'bg-transparent backdrop-blur-sm border-b border-transparent'
         }`}
       role="navigation"
       aria-label="Main navigation"

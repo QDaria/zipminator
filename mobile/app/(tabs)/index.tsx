@@ -9,6 +9,39 @@ import OpenClawChat from '../../src/components/OpenClawChat';
 import AnonymizationPanel from '../../src/components/AnonymizationPanel';
 import JupyterLabConnect from '../../src/components/JupyterLabConnect';
 
+// Error boundary for components that depend on the native crypto bridge.
+// Catches crashes when the native module is unavailable (e.g. Expo Go, web).
+class NativeBridgeGuard extends React.Component<
+  { children: React.ReactNode; label?: string },
+  { hasError: boolean; error: string }
+> {
+  constructor(props: { children: React.ReactNode; label?: string }) {
+    super(props);
+    this.state = { hasError: false, error: '' };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error: error.message };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View className="w-full bg-red-900/20 rounded-2xl p-6 mb-8 border border-red-500/30 items-center">
+          <Text className="text-red-400 font-bold mb-2">
+            {this.props.label ?? 'Component'} Unavailable
+          </Text>
+          <Text className="text-gray-400 text-sm text-center">
+            The native crypto module is not available in this environment.
+            Build a native dev client to use this feature.
+          </Text>
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function HomeScreen() {
   const { mode, toggleMode } = useExpertise();
 
@@ -21,7 +54,7 @@ export default function HomeScreen() {
         {/* Header Section */}
         {mode === 'novice' ? (
           <View className="items-center w-full mb-10 pt-10">
-            <View className="w-48 h-48 rounded-full bg-quantum-500/20 items-center justify-center border-4 border-quantum-400 mb-8 shadow-lg shadow-quantum-400">
+            <View className="w-48 h-48 rounded-full bg-quantum-500/20 items-center justify-center border-4 border-quantum-400 mb-8 shadow-lg">
               <Text className="text-white font-bold text-lg">Gathering Power...</Text>
             </View>
             <Text className="text-white text-3xl font-bold mb-4 text-center">
@@ -41,7 +74,7 @@ export default function HomeScreen() {
               <Text className="text-green-400 font-mono text-sm">ONLINE</Text>
             </View>
 
-            <View className="border border-white/20 bg-black/50 p-6 rounded-lg mb-6 shadow shadow-quantum-500/20">
+            <View className="border border-white/20 bg-black/50 p-6 rounded-lg mb-6 shadow-lg">
               <Text className="text-gray-400 font-mono text-xs mb-2">TARGET PROVIDER:</Text>
               <Text className="text-white font-mono text-lg mb-1">qBraid Cloud - IBM Quantum</Text>
               <Text className="text-quantum-300 font-mono text-sm">Active Node: Marrakesh (156q)</Text>
@@ -50,7 +83,7 @@ export default function HomeScreen() {
             <View className="border border-white/20 bg-black/50 p-6 rounded-lg mb-8">
               <Text className="text-gray-400 font-mono text-xs mb-2">ENTROPY POOL STATUS:</Text>
               <View className="flex-row justify-between mb-2">
-                <Text className="text-white font-mono text-sm animate-pulse">Harvesting q-bits...</Text>
+                <Text className="text-white font-mono text-sm">Harvesting q-bits...</Text>
                 <Text className="text-white font-mono text-sm">1024B / 1024B</Text>
               </View>
               <View className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
@@ -69,19 +102,33 @@ export default function HomeScreen() {
         )}
 
         {/* Feature Components rendering below the header */}
-        <KeyGenerator />
-        <FileVault />
-        <SecureMessenger />
-        <NetworkShield />
-        <JupyterLabConnect />
-        <AnonymizationPanel />
-        <OpenClawChat />
+        <NativeBridgeGuard label="Key Generator">
+          <KeyGenerator />
+        </NativeBridgeGuard>
+        <NativeBridgeGuard label="File Vault">
+          <FileVault />
+        </NativeBridgeGuard>
+        <NativeBridgeGuard label="Secure Messenger">
+          <SecureMessenger />
+        </NativeBridgeGuard>
+        <NativeBridgeGuard label="Network Shield">
+          <NetworkShield />
+        </NativeBridgeGuard>
+        <NativeBridgeGuard label="JupyterLab Connect">
+          <JupyterLabConnect />
+        </NativeBridgeGuard>
+        <NativeBridgeGuard label="Anonymization">
+          <AnonymizationPanel />
+        </NativeBridgeGuard>
+        <NativeBridgeGuard label="OpenClaw Chat">
+          <OpenClawChat />
+        </NativeBridgeGuard>
 
       </ScrollView>
 
       {/* Global Expertise Toggle Button Footer */}
       <View className="absolute bottom-10 w-full items-center px-6">
-        <View className="bg-white/10 backdrop-blur-md rounded-full p-1 flex-row border border-white/20">
+        <View className="bg-white/10 rounded-full p-1 flex-row border border-white/20">
           <TouchableOpacity
             onPress={() => mode !== 'novice' && toggleMode()}
             className={`px-6 py-2 rounded-full ${mode === 'novice' ? 'bg-white' : 'bg-transparent'}`}

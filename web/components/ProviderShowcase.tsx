@@ -7,7 +7,7 @@ const ProviderShowcase = () => {
   const providers = [
     {
       name: 'IBM Quantum',
-      description: '127-qubit hardware partner',
+      description: '156-qubit hardware partner',
       icon: Cpu,
       color: 'from-blue-500 to-cyan-500',
       verified: true
@@ -175,7 +175,7 @@ const ProviderShowcase = () => {
           className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto"
         >
           <div className="card-quantum text-center">
-            <div className="text-3xl font-bold text-quantum-400 mb-2">127</div>
+            <div className="text-3xl font-bold text-quantum-400 mb-2">156</div>
             <div className="text-gray-400">Qubit Quantum Hardware</div>
           </div>
 

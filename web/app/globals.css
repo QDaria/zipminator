@@ -7,6 +7,10 @@
   --font-outfit: 'Outfit', system-ui, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   * {
     @apply border-gray-800;
@@ -22,7 +26,17 @@
   h4,
   h5,
   h6 {
-    @apply font-display tracking-tight;
+    @apply font-display tracking-tight text-balance;
+  }
+
+  /* Accessible focus-visible ring for all interactive elements */
+  :focus-visible {
+    @apply outline-none ring-2 ring-quantum-500 ring-offset-2 ring-offset-gray-950;
+  }
+
+  /* Remove default outline; focus-visible handles keyboard users */
+  :focus:not(:focus-visible) {
+    outline: none;
   }
 }
 
@@ -62,6 +76,16 @@
 
   .glass-panel {
     @apply bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+
+  .section-padding {
+    @apply py-24 md:py-32;
+  }
+
+  .quantum-bg {
+    @apply bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950;
+    background-size: 100% 200%;
+    animation: quantum-bg-shift 12s ease-in-out infinite;
   }
 
   .glass-button {
@@ -128,8 +152,39 @@
   }
 }
 
+@keyframes quantum-bg-shift {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 0% 100%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .bg-grid-pattern {
   background-image: linear-gradient(to right, #1f2937 1px, transparent 1px),
     linear-gradient(to bottom, #1f2937 1px, transparent 1px);
   background-size: 40px 40px;
+}
+
+/* Scrollbar-hide utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

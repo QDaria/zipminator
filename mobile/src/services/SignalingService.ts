@@ -18,7 +18,7 @@ const RECONNECT_MAX_ATTEMPTS = 5;
 class SignalingService extends EventEmitter {
     private socket: WebSocket | null = null;
     private clientId: string | null = null;
-    private baseUrl: string = 'ws://localhost:8000/ws'; // In prod, use secure backend URL
+    private baseUrl: string = 'wss://localhost:8000/ws';
     private messageQueue: Array<QueuedMessage> = [];
     private reconnectAttempts: number = 0;
     private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -29,6 +29,9 @@ class SignalingService extends EventEmitter {
     }
 
     connect(clientId: string) {
+        if (!this.baseUrl.startsWith('wss://') && typeof __DEV__ !== 'undefined' && !__DEV__) {
+            throw new Error('Insecure WebSocket not allowed in production');
+        }
         this.clientId = clientId;
         this.intentionalDisconnect = false;
         this._openSocket();
@@ -47,8 +50,12 @@ class SignalingService extends EventEmitter {
         };
 
         this.socket.onmessage = (event) => {
-            const message: SignalingMessage = JSON.parse(event.data);
-            console.log('Signaling: Received', message.type, 'from', message.sender);
+            let message: SignalingMessage;
+            try {
+                message = JSON.parse(event.data);
+            } catch {
+                return;
+            }
             this.emit('message', message);
         };
 

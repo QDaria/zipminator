@@ -7,7 +7,7 @@ const features = [
   {
     icon: Atom,
     title: 'True Quantum Randomness',
-    description: 'Entropy harvested from IBM\'s 127-qubit quantum computer, not pseudo-random algorithms',
+    description: 'Entropy harvested from IBM\'s 156-qubit quantum computer, not pseudo-random algorithms',
     gradient: 'from-quantum-500 via-blue-500 to-purple-500',
     animationDelay: 0,
   },
@@ -67,10 +67,10 @@ const KeyFeatures = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance">
             Why <span className="gradient-text">Zipminator-PQC?</span>
           </h2>
-          <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto">
+          <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto text-balance">
             The only encryption platform powered by{' '}
             <span className="text-quantum-400 font-semibold">real quantum hardware</span>
           </p>
@@ -88,7 +88,7 @@ const KeyFeatures = () => {
               className="group relative"
             >
               {/* Card Container */}
-              <div className="relative h-full bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-800 hover:border-transparent transition-all duration-300 overflow-hidden">
+              <div className="relative h-full bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/[0.08] hover:border-transparent transition-all duration-300 overflow-hidden">
                 {/* Gradient Border on Hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl`} />
                 <div className="absolute inset-[1px] bg-gray-900 rounded-2xl" />

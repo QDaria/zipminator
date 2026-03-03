@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useExpertise } from '../context/ExpertiseContext';
 
 // Native PQC Module bridge
@@ -39,7 +39,7 @@ export default function KeyGenerator() {
                 setIsGenerating(false);
                 try {
                     // Natively call into Swift/Kotlin/C++ via JSI Bridge!
-                    const generatedKeys = ZipminatorCrypto.generateKEMKeyPair('ML-KEM-768');
+                    const generatedKeys = ZipminatorCrypto.generateKEMKeyPair('Kyber768');
                     setKeys(generatedKeys);
                 } catch (error) {
                     console.error("Native Crypto Module Error:", error);

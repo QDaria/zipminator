@@ -65,7 +65,7 @@ export default function AnonymizationPanel() {
                 {level >= 4 && <Text className="text-green-500 font-mono text-[10px]">2. K_ANONYMITY(k=5)</Text>}
                 {level >= 6 && <Text className="text-green-500 font-mono text-[10px]">3. DIFFERENTIAL_PRIVACY(epsilon=0.1)</Text>}
                 {level >= 8 && <Text className="text-quantum-400 font-mono text-[10px]">4. QRNG_NOISE_INJECTION(source=qbraid)</Text>}
-                {level >= 10 && <Text className="text-quantum-400 font-mono text-[10px] animate-pulse">5. QUANTUM_PSEUDOANONYMIZATION(active)</Text>}
+                {level >= 10 && <Text className="text-quantum-400 font-mono text-[10px]">5. QUANTUM_PSEUDOANONYMIZATION(active)</Text>}
             </View>
 
             <View className="flex-row items-center w-full justify-between mb-6">

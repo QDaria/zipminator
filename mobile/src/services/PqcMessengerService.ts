@@ -181,11 +181,9 @@ export class PqcMessengerService extends EventEmitter {
     }
 
     private async _handleChatMessage(msg: SignalingMessage): Promise<void> {
-        // Mark Bob as secure once the first chat message arrives (ratchet is ready)
         if (!this.ratchetState.isSecure) {
-            this.handshakeStep = STEP_COMPLETE;
-            this.ratchetState = { ...this.ratchetState, epoch: 1, isSecure: true };
-            this._setConnectionState('secure', this.ratchetState);
+            this._emitError('HANDSHAKE_INCOMPLETE', 'Chat message received before handshake completed');
+            return;
         }
 
         const encryptedMsg: EncryptedMessage = msg.payload;
@@ -194,9 +192,7 @@ export class PqcMessengerService extends EventEmitter {
             const plaintext = await this.decryptMessage(encryptedMsg);
             this.emit('incoming_message', plaintext, msg.sender);
         } catch (err) {
-            console.error('PQC: Decryption failed', err);
             this._emitError('DECRYPTION_FAILED', String(err));
-            this.emit('incoming_message', '[decryption failed]', msg.sender);
         }
     }
 
@@ -210,8 +206,7 @@ export class PqcMessengerService extends EventEmitter {
      */
     async encryptMessage(text: string): Promise<EncryptedMessage> {
         if (!this.ratchetState.isSecure) {
-            // Return a sentinel that callers can detect as unencrypted
-            return { header: '', ciphertext: text };
+            throw new Error('Session not secure: cannot encrypt');
         }
 
         const result = await ZipminatorCrypto.ratchetEncrypt(text);
@@ -229,7 +224,7 @@ export class PqcMessengerService extends EventEmitter {
      */
     async decryptMessage(msg: EncryptedMessage): Promise<string> {
         if (!this.ratchetState.isSecure) {
-            return msg.ciphertext; // Return raw (sentinel / plaintext fallback)
+            throw new Error('Session not secure: cannot decrypt');
         }
 
         const plaintext = await ZipminatorCrypto.ratchetDecrypt(

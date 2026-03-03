@@ -19,10 +19,9 @@
     "framer-motion": "^11.18.2",
     "gemini-flow": "^2.1.0-alpha.1",
     "lucide-react": "^0.363.0",
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "react-router-dom": "^7.13.1",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "sharp": "^0.34.5",
     "tailwind-merge": "^2.6.1",
     "three": "^0.181.2"

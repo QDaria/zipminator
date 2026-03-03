@@ -84,7 +84,7 @@ export default function SecureMessenger() {
     });
 
     const [myId] = useState(`user_${Math.floor(Math.random() * 10000)}`);
-    const [targetId] = useState('user_target');
+    const [targetId, setTargetId] = useState('');
 
     // Track next message id
     const nextId = useRef(1);
@@ -92,7 +92,9 @@ export default function SecureMessenger() {
     useEffect(() => {
         // Connect signaling and initialise the messenger
         signalingService.connect(myId);
-        pqcMessenger.initialize(targetId);
+        if (targetId) {
+            pqcMessenger.initialize(targetId);
+        }
 
         // ── PqcMessengerService events ────────────────────────────────────────
 
@@ -140,7 +142,7 @@ export default function SecureMessenger() {
             signalingService.disconnect();
             pqcMessenger.destroy();
         };
-    }, []);
+    }, [targetId]);
 
     const startHandshake = () => {
         pqcMessenger.startHandshake();
@@ -209,6 +211,17 @@ export default function SecureMessenger() {
                             {isSecure ? 'Re-Verify' : 'Verify Security'}
                         </Text>
                     </TouchableOpacity>
+                </View>
+
+                {/* Peer ID Input */}
+                <View className="px-4 pt-3 pb-1 border-b border-white/10">
+                    <TextInput
+                        value={targetId}
+                        onChangeText={setTargetId}
+                        placeholder="Enter peer ID to connect..."
+                        placeholderTextColor="#6b7280"
+                        className="bg-black/50 text-white rounded-lg px-3 py-2 text-sm border border-white/10"
+                    />
                 </View>
 
                 {/* Message List */}
@@ -288,8 +301,19 @@ export default function SecureMessenger() {
                 </View>
 
                 <Text className="text-gray-500 font-mono text-[10px]">
-                    MY_UID: {myId} | PEER: {targetId}
+                    MY_UID: {myId}
                 </Text>
+
+                <View className="flex-row items-center mt-1">
+                    <Text className="text-gray-500 font-mono text-[10px] mr-1">PEER:</Text>
+                    <TextInput
+                        value={targetId}
+                        onChangeText={setTargetId}
+                        placeholder="ENTER_PEER_UID"
+                        placeholderTextColor="#4b5563"
+                        className="flex-1 bg-black text-quantum-100 font-mono text-[10px] border-b border-white/20 py-0 px-1"
+                    />
+                </View>
 
                 <Text style={{ color: statusColor }} className="font-mono text-[10px] mt-1">
                     {statusLine}

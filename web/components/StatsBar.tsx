@@ -12,7 +12,7 @@ const stats = [
   },
   {
     icon: Cpu,
-    value: '127',
+    value: '156',
     label: 'Qubits',
     description: 'Real quantum hardware access',
   },
@@ -41,7 +41,7 @@ const StatsBar = () => {
           transition={{ duration: 0.6 }}
           className="bg-gradient-to-r from-quantum-900/50 to-purple-900/50 backdrop-blur-sm rounded-2xl p-12 border border-quantum-500/20"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 divide-y md:divide-y-0 md:divide-x divide-white/10">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -49,12 +49,12 @@ const StatsBar = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="text-center"
+                className="text-center px-6 py-8 md:py-0"
               >
-                <div className="w-16 h-16 bg-quantum-900/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-quantum-900/50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-quantum-500/20">
                   <stat.icon className="w-8 h-8 text-quantum-400" />
                 </div>
-                <div className="text-4xl font-bold gradient-text mb-2">
+                <div className="text-4xl font-bold gradient-text mb-2 tabular-nums">
                   {stat.value}
                 </div>
                 <div className="text-lg font-semibold text-white mb-2">

@@ -42,7 +42,7 @@ const Hero = () => {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden py-32 pt-24">
       {/* Animated Quantum Background */}
       <QuantumBackground />
 
@@ -70,12 +70,12 @@ const Hero = () => {
           {/* Main Headline */}
           <motion.h1
             variants={itemVariants}
-            className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-[1.1] tracking-tight"
+            className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-[1.05] tracking-tight"
           >
-            <span className="block gradient-text drop-shadow-2xl">
+            <span className="block bg-gradient-to-r from-quantum-300 via-quantum-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
               The Quantum-Secure
             </span>
-            <span className="block text-white drop-shadow-lg">
+            <span className="block text-white drop-shadow-lg mt-2">
               Encryption Platform
             </span>
           </motion.h1>
@@ -83,10 +83,10 @@ const Hero = () => {
           {/* Subheadline */}
           <motion.p
             variants={itemVariants}
-            className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
+            className="text-lg md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
           >
             Real quantum entropy from{' '}
-            <span className="text-quantum-400 font-bold">127-qubit IBM hardware</span>
+            <span className="text-quantum-400 font-bold">156-qubit IBM hardware</span>
             {' '}combined with{' '}
             <span className="text-quantum-400 font-bold">NIST FIPS 203 Kyber768</span>
             {' '}cryptography for unbreakable security
@@ -106,11 +106,11 @@ const Hero = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-quantum-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Link>
             <Link
-              href="/docs"
+              href="/features"
               className="btn-secondary flex items-center space-x-2 group px-8 py-4 text-lg font-semibold hover:border-quantum-400 transition-all duration-300"
             >
               <Book className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
-              <span>View Documentation</span>
+              <span>Explore Features</span>
             </Link>
           </motion.div>
 
@@ -164,7 +164,7 @@ const Hero = () => {
                   <Cpu className="w-7 h-7 text-quantum-400" />
                 </div>
                 <div className="text-3xl font-bold bg-gradient-to-br from-quantum-400 to-purple-400 bg-clip-text text-transparent mb-2">
-                  127 Qubits
+                  156 Qubits
                 </div>
                 <div className="text-gray-400 font-medium">IBM Quantum Hardware</div>
               </div>

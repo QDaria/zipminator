@@ -44,7 +44,7 @@ export default function NetworkShield() {
                         Hide your entire phone's internet connection using our unbreakable post-quantum tunnel.
                     </Text>
 
-                    <View className={`w-24 h-24 rounded-full items-center justify-center mb-4 transition-all duration-300 ${vpnEnabled ? 'bg-green-500/20 border-4 border-green-500 shadow-lg shadow-green-500/50' : 'bg-white/10 border-4 border-white/20'}`}>
+                    <View className={`w-24 h-24 rounded-full items-center justify-center mb-4 ${vpnEnabled ? 'bg-green-500/20 border-4 border-green-500' : 'bg-white/10 border-4 border-white/20'}`}>
                         <Text className={`font-bold ${vpnEnabled ? 'text-green-400' : 'text-gray-400'}`}>
                             {vpnEnabled ? "SHIELDED" : "OFF"}
                         </Text>
@@ -68,7 +68,7 @@ export default function NetworkShield() {
                     >
                         <Text className="text-white font-bold">{inCall ? "END" : "CALL"}</Text>
                     </TouchableOpacity>
-                    {inCall && <Text className="text-green-400 font-bold mt-3 animate-pulse">Connected securely...</Text>}
+                    {inCall && <Text className="text-green-400 font-bold mt-3">Connected securely...</Text>}
                 </View>
             </View>
         );
@@ -118,7 +118,7 @@ export default function NetworkShield() {
 
                 {inCall && (
                     <View className="mt-3 bg-black/50 p-3 flex-row justify-between items-center rounded border border-green-900/50">
-                        <Text className="text-green-500 font-mono text-[10px] animate-pulse">PACKETS ALIVE - Latency: 42ms</Text>
+                        <Text className="text-green-500 font-mono text-[10px]">PACKETS ALIVE - Latency: 42ms</Text>
                         <Text className="text-green-500 font-mono text-[10px]">Jitter: 2ms</Text>
                     </View>
                 )}

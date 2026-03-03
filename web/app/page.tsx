@@ -1,9 +1,16 @@
 import Hero from '@/components/Hero'
 import ProviderShowcase from '@/components/ProviderShowcase'
-import TrustSignals from '@/components/TrustSignals'
+import SS7Killer from '@/components/SS7Killer'
+import SuperAppShowcase from '@/components/SuperAppShowcase'
+import DeviceShield from '@/components/DeviceShield'
 import KeyFeatures from '@/components/KeyFeatures'
-import HowItWorks from '@/components/HowItWorks'
+import EncryptionStack from '@/components/EncryptionStack'
+import ProjectScale from '@/components/ProjectScale'
 import StatsBar from '@/components/StatsBar'
+import WorldFirst from '@/components/WorldFirst'
+import IndustryImpact from '@/components/IndustryImpact'
+import HowItWorks from '@/components/HowItWorks'
+import TrustSignals from '@/components/TrustSignals'
 import UseCases from '@/components/UseCases'
 import CTA from '@/components/CTA'
 
@@ -12,10 +19,17 @@ export default function Home() {
     <>
       <Hero />
       <ProviderShowcase />
-      <TrustSignals />
+      <SS7Killer />
+      <SuperAppShowcase />
+      <DeviceShield />
       <KeyFeatures />
-      <HowItWorks />
+      <EncryptionStack />
+      <ProjectScale />
       <StatsBar />
+      <WorldFirst />
+      <IndustryImpact />
+      <HowItWorks />
+      <TrustSignals />
       <UseCases />
       <CTA />
     </>

@@ -308,8 +308,9 @@ const HowItWorks = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-16 text-center"
         >
+          {/* TODO: Inconsistent CTA - manually recreates gradient style instead of using btn-primary class from globals.css */}
           <a
-            href="https://github.com/mosoftwareenterprises/zipminator-pqc"
+            href="https://github.com/qdaria/zipminator-pqc"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-quantum-500 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-quantum-500/50 transition-all duration-300 hover:scale-105"

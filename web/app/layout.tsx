@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, JetBrains_Mono } from 'next/font/google'
+import { Inter, JetBrains_Mono, Outfit } from 'next/font/google'
 import './globals.css'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
@@ -17,9 +17,15 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 })
 
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
   title: 'Zipminator-PQC | Quantum-Secure Encryption Platform by QDaria',
-  description: 'Real quantum entropy from 127-qubit IBM hardware + NIST FIPS 203 Kyber768 cryptography. Post-quantum encryption that\'s fast, secure, and easy to integrate.',
+  description: 'Real quantum entropy from 156-qubit IBM hardware + NIST FIPS 203 Kyber768 cryptography. Post-quantum encryption that\'s fast, secure, and easy to integrate.',
   keywords: [
     'quantum encryption',
     'post-quantum cryptography',
@@ -48,7 +54,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Zipminator-PQC | Quantum-Secure Encryption Platform by QDaria',
-    description: 'Real quantum entropy from 127-qubit IBM hardware + NIST FIPS 203 Kyber768 cryptography. Post-quantum encryption that\'s fast, secure, and easy to integrate.',
+    description: 'Real quantum entropy from 156-qubit IBM hardware + NIST FIPS 203 Kyber768 cryptography. Post-quantum encryption that\'s fast, secure, and easy to integrate.',
     url: 'https://zipminator.zip',
     siteName: 'Zipminator-PQC',
     images: [
@@ -66,7 +72,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Zipminator-PQC | Quantum-Secure Encryption Platform by QDaria',
-    description: 'Real quantum entropy from 127-qubit IBM hardware + NIST FIPS 203 Kyber768 cryptography. Post-quantum encryption that\'s fast, secure, and easy to integrate.',
+    description: 'Real quantum entropy from 156-qubit IBM hardware + NIST FIPS 203 Kyber768 cryptography. Post-quantum encryption that\'s fast, secure, and easy to integrate.',
     images: ['/og-image.png'],
     site: '@qdaria',
     creator: '@qdaria',
@@ -84,23 +90,17 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
       { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
-      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
   manifest: '/manifest.json',
-  verification: {
-    google: 'your-google-verification-code-here',
-    yandex: 'your-yandex-verification-code-here',
-    other: {
-      'msvalidate.01': 'your-bing-verification-code-here',
-    },
-  },
+  // verification: {
+  //   google: 'your-google-verification-code-here',
+  //   yandex: 'your-yandex-verification-code-here',
+  //   other: {
+  //     'msvalidate.01': 'your-bing-verification-code-here',
+  //   },
+  // },
   category: 'technology',
 }
 
@@ -131,7 +131,7 @@ const softwareSchema = {
   name: 'Zipminator-PQC',
   applicationCategory: 'SecurityApplication',
   operatingSystem: 'Cross-platform',
-  description: 'Real quantum entropy from 127-qubit IBM hardware + NIST FIPS 203 Kyber768 cryptography. Post-quantum encryption that\'s fast, secure, and easy to integrate.',
+  description: 'Real quantum entropy from 156-qubit IBM hardware + NIST FIPS 203 Kyber768 cryptography. Post-quantum encryption that\'s fast, secure, and easy to integrate.',
   offers: {
     '@type': 'Offer',
     price: '0',
@@ -144,14 +144,9 @@ const softwareSchema = {
     url: 'https://qdaria.com',
   },
   softwareVersion: '1.0.0',
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '5',
-    ratingCount: '1',
-  },
   featureList: [
     'NIST FIPS 203 Kyber768 encryption',
-    'Real quantum entropy from IBM 127-qubit hardware',
+    'Real quantum entropy from IBM 156-qubit hardware',
     'Cross-platform support (Rust, Python, JavaScript)',
     'Easy integration',
     'Open source',
@@ -188,7 +183,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans bg-gray-950 text-white antialiased`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} ${outfit.variable} font-sans bg-gray-950 text-white antialiased`}>
         <Navigation />
         <main className="min-h-screen">
           {children}
