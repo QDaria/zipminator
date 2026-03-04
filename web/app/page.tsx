@@ -13,6 +13,7 @@ import HowItWorks from '@/components/HowItWorks'
 import TrustSignals from '@/components/TrustSignals'
 import UseCases from '@/components/UseCases'
 import CTA from '@/components/CTA'
+import WaitlistForm from '@/components/WaitlistForm'
 
 export default function Home() {
   return (
@@ -31,6 +32,7 @@ export default function Home() {
       <HowItWorks />
       <TrustSignals />
       <UseCases />
+      <WaitlistForm />
       <CTA />
     </>
   )

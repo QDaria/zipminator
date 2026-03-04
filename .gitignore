@@ -80,6 +80,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+!web/lib/
 lib64/
 parts/
 sdist/
@@ -367,3 +368,4 @@ deprecated/
 !quantum_entropy/README.md
 .claude/worktrees/
 web/screenshots/
+.vercel

@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono, Outfit } from 'next/font/google'
 import './globals.css'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
+import SessionProvider from '@/components/auth/SessionProvider'
 import Script from 'next/script'
 
 const inter = Inter({
@@ -57,15 +58,6 @@ export const metadata: Metadata = {
     description: 'Real quantum entropy from 156-qubit IBM hardware + NIST FIPS 203 Kyber768 cryptography. Post-quantum encryption that\'s fast, secure, and easy to integrate.',
     url: 'https://zipminator.zip',
     siteName: 'Zipminator-PQC',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Zipminator-PQC - Quantum-Secure Encryption Platform',
-        type: 'image/png',
-      },
-    ],
     locale: 'en_US',
     type: 'website',
   },
@@ -73,7 +65,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Zipminator-PQC | Quantum-Secure Encryption Platform by QDaria',
     description: 'Real quantum entropy from 156-qubit IBM hardware + NIST FIPS 203 Kyber768 cryptography. Post-quantum encryption that\'s fast, secure, and easy to integrate.',
-    images: ['/og-image.png'],
     site: '@qdaria',
     creator: '@qdaria',
   },
@@ -94,13 +85,6 @@ export const metadata: Metadata = {
     ],
   },
   manifest: '/manifest.json',
-  // verification: {
-  //   google: 'your-google-verification-code-here',
-  //   yandex: 'your-yandex-verification-code-here',
-  //   other: {
-  //     'msvalidate.01': 'your-bing-verification-code-here',
-  //   },
-  // },
   category: 'technology',
 }
 
@@ -111,7 +95,6 @@ export const viewport = {
   themeColor: '#6366f1',
 }
 
-// Schema.org structured data
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -161,13 +144,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark scroll-smooth">
       <head>
-        {/* Additional Meta Tags */}
         <meta name="theme-color" content="#6366f1" />
         <meta name="color-scheme" content="dark" />
         <meta name="language" content="English" />
         <link rel="canonical" href="https://zipminator.zip" />
 
-        {/* Schema.org JSON-LD */}
         <Script
           id="organization-schema"
           type="application/ld+json"
@@ -184,11 +165,13 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${outfit.variable} font-sans bg-gray-950 text-white antialiased`}>
-        <Navigation />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
+        <SessionProvider>
+          <Navigation />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Footer />
+        </SessionProvider>
       </body>
     </html>
   )
