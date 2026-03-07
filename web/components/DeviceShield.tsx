@@ -156,12 +156,12 @@ const DeviceShield = () => {
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
               <span className="text-white">Install Once.</span>
               <br />
-              <span className="gradient-text">Secure Everything.</span>
+              <span className="gradient-text">Secure Every Communication.</span>
             </h2>
 
             <p className="text-lg text-gray-400 mb-10 leading-relaxed">
-              Just installing Zipminator activates a quantum shield around your
-              entire device. No configuration, no technical knowledge needed.
+              Just installing Zipminator activates a quantum shield around every
+              communication channel. No configuration, no technical knowledge needed.
             </p>
 
             {/* Protection layers */}

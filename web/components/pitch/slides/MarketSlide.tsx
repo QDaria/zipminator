@@ -16,15 +16,27 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  AreaChart,
+  Area,
+  ReferenceLine,
 } from 'recharts'
-import { TrendingUp, Target, BarChart3 } from 'lucide-react'
+import { TrendingUp, Target, BarChart3, AlertTriangle, Calendar } from 'lucide-react'
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5, delay },
-})
+import { fadeUpInView as fadeUp } from '../slide-utils'
+
+const marketGrowthData = [
+  { year: 2024, tam: 0.9 },
+  { year: 2025, tam: 1.2 },
+  { year: 2026, tam: 1.8 },
+  { year: 2027, tam: 2.8 },
+  { year: 2028, tam: 4.5 },
+  { year: 2029, tam: 7.2 },
+  { year: 2030, tam: 10.5 },
+  { year: 2031, tam: 13.0 },
+  { year: 2032, tam: 15.5 },
+  { year: 2033, tam: 17.5 },
+  { year: 2034, tam: 18.7 },
+]
 
 type Tab = 'consensus' | 'tam-sam-som'
 
@@ -96,6 +108,15 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
             {label}
           </button>
         ))}
+      </motion.div>
+
+      {/* Market Gap Indicator */}
+      <motion.div {...fadeUp(0.07)} className="flex items-center gap-3 px-5 py-3 rounded-xl bg-red-500/[0.06] border border-red-500/15 mb-6">
+        <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />
+        <p className="text-sm text-gray-300">
+          <span className="text-red-400 font-semibold">91% of businesses lack a PQC roadmap</span>{' '}
+          &mdash; the window to capture early adopters is now.
+        </p>
       </motion.div>
 
       {tab === 'consensus' ? (
@@ -182,6 +203,66 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
               </table>
             </div>
           </motion.div>
+
+          {/* TAM Growth Projection */}
+          <motion.div {...fadeUp(0.25)} className="card-quantum mt-4">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-quantum-400" />
+              <h3 className="text-lg font-semibold text-white">
+                PQC TAM Growth Projection (2024-2034)
+              </h3>
+            </div>
+            <div className="h-[280px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={marketGrowthData} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+                  <defs>
+                    <linearGradient id="tamGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="year"
+                    tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }}
+                    axisLine={{ stroke: '#374151' }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }}
+                    axisLine={{ stroke: '#374151' }}
+                    tickLine={false}
+                    tickFormatter={(v: number) => `$${v}B`}
+                  />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}
+                    labelStyle={{ color: '#fff', fontSize: 12 }}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    formatter={(value: any) => [`$${value}B`, 'TAM']}
+                  />
+                  <ReferenceLine
+                    x={2027}
+                    stroke="#ef4444"
+                    strokeDasharray="5 5"
+                    label={{ value: 'CNSA 2.0', position: 'top', fill: '#ef4444', fontSize: 11 }}
+                  />
+                  <ReferenceLine
+                    x={2034}
+                    stroke="#22c55e"
+                    strokeDasharray="5 5"
+                    label={{ value: 'Full Migration', position: 'top', fill: '#22c55e', fontSize: 11 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="tam"
+                    stroke="#6366f1"
+                    fill="url(#tamGradient)"
+                    strokeWidth={2}
+                    animationDuration={1200}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
         </>
       ) : (
         /* TAM / SAM / SOM Tab */
@@ -212,6 +293,7 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
                   desc: TAM_SAM_SOM.tamDesc,
                   color: 'text-quantum-400',
                   bg: 'bg-quantum-500/10',
+                  border: 'border-quantum-500/20',
                 },
                 {
                   label: 'SAM',
@@ -220,6 +302,7 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
                   desc: TAM_SAM_SOM.samDesc,
                   color: 'text-quantum-300',
                   bg: 'bg-quantum-400/10',
+                  border: 'border-quantum-400/20',
                 },
                 {
                   label: 'SOM',
@@ -228,11 +311,12 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
                   desc: TAM_SAM_SOM.somDesc,
                   color: 'text-quantum-200',
                   bg: 'bg-quantum-300/10',
+                  border: 'border-quantum-300/20',
                 },
               ].map((m) => (
-                <div key={m.label} className="flex items-start gap-4">
+                <div key={m.label} className={`flex items-start gap-4 rounded-xl px-4 py-3 ${m.bg} border ${m.border}`}>
                   <div
-                    className={`shrink-0 w-12 h-12 rounded-xl ${m.bg} flex items-center justify-center`}
+                    className="shrink-0 w-12 h-12 rounded-xl bg-white/[0.06] flex items-center justify-center"
                   >
                     <span className={`text-lg font-bold font-mono ${m.color}`}>
                       {m.label}
@@ -248,12 +332,34 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
             </div>
           </div>
 
+          {/* Government Mandate Timeline */}
+          <motion.div {...fadeUp(0.18)} className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Calendar className="w-4 h-4 text-quantum-400" />
+              <h3 className="text-sm font-semibold text-white">Government Mandate Timeline</h3>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { year: '2026', label: 'EU PQC Strategy', detail: 'European quantum transition roadmap', color: 'border-blue-500/30 bg-blue-500/10', textColor: 'text-blue-400' },
+                { year: '2027', label: 'CNSA 2.0 Deadline', detail: 'All new NSS equipment PQC-compliant', color: 'border-orange-500/30 bg-orange-500/10', textColor: 'text-orange-400' },
+                { year: '2035', label: 'Full Migration', detail: 'Complete PQC transition mandated', color: 'border-red-500/30 bg-red-500/10', textColor: 'text-red-400' },
+              ].map((m) => (
+                <div key={m.year} className={`rounded-xl border px-4 py-3 text-center ${m.color}`}>
+                  <p className={`text-xl font-bold font-mono ${m.textColor}`}>{m.year}</p>
+                  <p className="text-xs font-semibold text-white mt-1">{m.label}</p>
+                  <p className="text-[11px] text-gray-400 mt-0.5">{m.detail}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
           {/* Government Spend Context */}
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-4 gap-4">
             {[
               { label: 'US Gov Spend', value: '$7.1B', detail: 'PQC migration budget' },
               { label: 'Norway', value: '$175M', detail: 'Quantum Initiative' },
               { label: 'EU Investment', value: 'EUR 400M+', detail: 'Quantum Flagship Phase 2' },
+              { label: 'Nordic Cyber Market', value: '$13.8B', detail: '10.1% CAGR (Mordor Intelligence)' },
             ].map((g) => (
               <div key={g.label} className="card-quantum text-center">
                 <p className="text-xs text-gray-500 font-mono mb-1">{g.label}</p>

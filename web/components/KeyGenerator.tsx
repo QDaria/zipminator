@@ -79,11 +79,12 @@ const KeyGenerator = () => {
                             </h2>
                             <p className="text-gray-400">
                                 Generate quantum-safe cryptographic keys using real entropy.
+                                <span className="block text-xs text-gray-500 mt-1">Interactive visualization</span>
                             </p>
                         </div>
                         <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-black/30 border border-white/5">
-                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            <span className="text-sm font-mono text-quantum-300">System Online</span>
+                            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                            <span className="text-sm font-mono text-quantum-300">Visual Demo</span>
                         </div>
                     </div>
 

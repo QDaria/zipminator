@@ -2,16 +2,12 @@
 
 import { motion } from 'framer-motion'
 import SlideWrapper from '../SlideWrapper'
-import { COMPETITORS } from '@/lib/pitch-data'
+import { COMPETITORS, COMPETITOR_DETAILS } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
-import { Swords, Check, X, Minus } from 'lucide-react'
+import { Swords, Check, X, Minus, DollarSign, TrendingUp, AlertTriangle } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5, delay },
-})
+import { fadeUpInView as fadeUp } from '../slide-utils'
 
 const FEATURES = [
   { key: 'messenger' as const, label: 'PQC Messenger' },
@@ -126,8 +122,95 @@ export default function CompetitiveSlide({ scenario: _scenario }: { scenario?: S
         </span>
       </motion.div>
 
+      {/* Feature Score Chart */}
+      <motion.div {...fadeUp(0.16)} className="card-quantum mt-6">
+        <h4 className="text-sm font-semibold text-white mb-4">Feature Coverage Score</h4>
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart
+            layout="vertical"
+            data={COMPETITORS.map(comp => ({
+              name: comp.name,
+              score: FEATURES.reduce((sum, f) => sum + (comp[f.key] === true ? 1 : comp[f.key] === 'partial' ? 0.5 : 0), 0),
+            }))}
+            margin={{ top: 0, right: 20, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+            <XAxis type="number" domain={[0, 8]} tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }} tickLine={false} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
+            <YAxis type="category" dataKey="name" width={90} tick={{ fill: '#d1d5db', fontSize: 11, fontFamily: 'monospace' }} tickLine={false} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
+            <Tooltip
+              contentStyle={{ backgroundColor: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontFamily: 'monospace', fontSize: 12 }}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              formatter={(value: any) => [`${value} / 8 features`, 'Score']}
+            />
+            <Bar dataKey="score" radius={[0, 4, 4, 0]} animationDuration={1200}>
+              {COMPETITORS.map((comp) => (
+                <Cell key={comp.name} fill={comp.name === 'Zipminator' ? '#6366f1' : '#4b5563'} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </motion.div>
+
+      {/* Market Gap callout */}
+      <motion.div {...fadeUp(0.18)} className="mt-6 flex items-center gap-3 px-5 py-3 rounded-xl bg-orange-500/[0.06] border border-orange-500/15">
+        <AlertTriangle className="w-5 h-5 text-orange-400 shrink-0" />
+        <p className="text-sm text-gray-300">
+          <span className="text-orange-400 font-semibold">Market Gap:</span>{' '}
+          Between free (Cloudflare TLS) and enterprise ($100K+/year). Zipminator fills it at $0&ndash;99/mo.
+        </p>
+      </motion.div>
+
+      {/* Funding Comparison */}
+      <motion.div {...fadeUp(0.22)} className="mt-4">
+        <div className="flex items-center gap-2 mb-3">
+          <DollarSign className="w-4 h-4 text-quantum-400" />
+          <h3 className="text-sm font-semibold text-white">Competitor Funding &amp; Pricing</h3>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {COMPETITOR_DETAILS.slice(0, 6).map((comp) => (
+            <div key={comp.name} className="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm font-semibold text-white">{comp.name}</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-quantum-500/10 text-quantum-400 border border-quantum-500/20">
+                  {comp.funding.split('(')[0].trim()}
+                </span>
+              </div>
+              <p className="text-[11px] text-gray-500">{comp.pricing}</p>
+              <p className="text-[11px] text-gray-600 mt-0.5 italic">{comp.weakness}</p>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Funding validation badges */}
+      <motion.div {...fadeUp(0.26)} className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-quantum-400" />
+          <span className="text-xs font-semibold text-white">Market Validated by:</span>
+        </div>
+        {[
+          { name: 'SandboxAQ', amount: '$950M raised', valuation: '$5.75B' },
+          { name: 'PQShield', amount: '$70M raised', valuation: 'Series B' },
+          { name: 'Zipminator', amount: 'Seed stage', valuation: '870K LOC built' },
+        ].map((badge) => (
+          <div
+            key={badge.name}
+            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono ${
+              badge.name === 'Zipminator'
+                ? 'bg-quantum-500/10 border-quantum-500/30 text-quantum-400'
+                : 'bg-white/[0.03] border-white/10 text-gray-400'
+            }`}
+          >
+            <span className="font-semibold text-white">{badge.name}</span>
+            <span>{badge.amount}</span>
+            <span className="text-gray-600">|</span>
+            <span>{badge.valuation}</span>
+          </div>
+        ))}
+      </motion.div>
+
       {/* Moat summary */}
-      <motion.div {...fadeUp(0.2)} className="grid sm:grid-cols-3 gap-4 mt-6">
+      <motion.div {...fadeUp(0.3)} className="grid sm:grid-cols-3 gap-4 mt-6">
         {[
           {
             title: 'Integration Moat',

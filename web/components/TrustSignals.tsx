@@ -3,13 +3,6 @@
 import { motion } from 'framer-motion'
 import { Shield, Award, Lock } from 'lucide-react'
 
-const clients = [
-  { name: 'Fortune 500', category: 'Enterprise' },
-  { name: 'Government', category: 'Defense' },
-  { name: 'Healthcare', category: 'HIPAA Compliant' },
-  { name: 'Finance', category: 'Banking' },
-]
-
 const certifications = [
   {
     name: 'NIST FIPS 203',
@@ -46,32 +39,6 @@ const TrustSignals = () => {
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
             Leading enterprises securing quantum-safe data with Zipminator-PQC
           </p>
-        </motion.div>
-
-        {/* Client Logos */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20"
-        >
-          {clients.map((client, index) => (
-            <motion.div
-              key={client.name}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="card-quantum text-center hover:scale-105 transition-transform"
-            >
-              <div className="text-3xl font-bold gradient-text mb-2">
-                {client.name.charAt(0)}
-              </div>
-              <div className="font-semibold text-white mb-1">{client.name}</div>
-              <div className="text-sm text-gray-400">{client.category}</div>
-            </motion.div>
-          ))}
         </motion.div>
 
         {/* Certifications */}

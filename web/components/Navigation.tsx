@@ -3,15 +3,17 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Menu, X, ChevronDown } from 'lucide-react'
+import { Menu, X, ChevronDown, Sun, Moon } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AuthButton from '@/components/auth/AuthButton'
+import { useTheme } from '@/components/ThemeProvider'
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isProductsOpen, setIsProductsOpen] = useState(false)
   const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -72,20 +74,25 @@ const Navigation = () => {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2.5 group focus:outline-none focus:ring-2 focus:ring-quantum-500 rounded-lg px-1"
+            className="flex items-center space-x-4 group focus:outline-none focus:ring-2 focus:ring-quantum-500 rounded-lg px-1"
             aria-label="Zipminator homepage"
           >
             <Image
-              src="/logos/Z.svg"
+              src="/logos/Z-new.svg"
               alt="Zipminator"
-              width={32}
-              height={32}
+              width={40}
+              height={40}
               className="transform group-hover:scale-110 transition-transform duration-200"
               priority
             />
-            <span className="hidden sm:block font-semibold text-lg tracking-tight text-white group-hover:text-quantum-400 transition-colors">
-              Zipminator
-            </span>
+            <Image
+              src={theme === 'dark' ? '/logos/Zipminator_0_light.svg' : '/logos/Zipminator_0.svg'}
+              alt="Zipminator"
+              width={140}
+              height={24}
+              className="hidden sm:block"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -101,7 +108,7 @@ const Navigation = () => {
                     setIsProductsOpen(false)
                   }
                 }}
-                className="flex items-center space-x-1 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200 text-sm font-medium"
+                className="nav-glow flex items-center space-x-1 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200 text-sm font-medium"
                 aria-expanded={isProductsOpen}
                 aria-haspopup="true"
               >
@@ -146,11 +153,20 @@ const Navigation = () => {
               <Link
                 key={link.name}
                 href={link.href}
-                className="px-3 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200 font-medium"
+                className="nav-glow px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200 font-medium"
               >
                 {link.name}
               </Link>
             ))}
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="nav-glow p-2 text-gray-400 hover:text-white transition-colors"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
 
             {/* Separator */}
             <div className="h-5 w-px bg-gray-700/50 mx-1" aria-hidden="true" />

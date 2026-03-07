@@ -136,7 +136,7 @@ const KeyFeatures = () => {
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900/50 border border-quantum-500/30 rounded-full">
             <div className="w-2 h-2 bg-quantum-400 rounded-full animate-pulse" />
             <span className="text-gray-300">
-              Join <span className="text-quantum-400 font-semibold">500+</span> organizations securing their quantum future
+              Start securing your quantum future today
             </span>
           </div>
         </motion.div>

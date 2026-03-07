@@ -6,15 +6,20 @@ import PitchSidebar from '@/components/pitch/PitchSidebar'
 import { SLIDE_TITLES, type Scenario } from '@/lib/pitch-data'
 
 import TitleSlide from '@/components/pitch/slides/TitleSlide'
+import CompanySlide from '@/components/pitch/slides/CompanySlide'
 import ProblemSlide from '@/components/pitch/slides/ProblemSlide'
+import WhyNowSlide from '@/components/pitch/slides/WhyNowSlide'
 import SolutionSlide from '@/components/pitch/slides/SolutionSlide'
 import ProductSlide from '@/components/pitch/slides/ProductSlide'
+import DemoSlide from '@/components/pitch/slides/DemoSlide'
 import TechnologySlide from '@/components/pitch/slides/TechnologySlide'
+import UseCasesSlide from '@/components/pitch/slides/UseCasesSlide'
 import MarketSlide from '@/components/pitch/slides/MarketSlide'
 import CompetitiveSlide from '@/components/pitch/slides/CompetitiveSlide'
 import TractionSlide from '@/components/pitch/slides/TractionSlide'
 import BusinessModelSlide from '@/components/pitch/slides/BusinessModelSlide'
 import TeamSlide from '@/components/pitch/slides/TeamSlide'
+import RoadmapSlide from '@/components/pitch/slides/RoadmapSlide'
 import FinancialsSlide from '@/components/pitch/slides/FinancialsSlide'
 import FundingStrategySlide from '@/components/pitch/slides/FundingStrategySlide'
 import RiskSlide from '@/components/pitch/slides/RiskSlide'
@@ -22,27 +27,32 @@ import AskSlide from '@/components/pitch/slides/AskSlide'
 import ContactSlide from '@/components/pitch/slides/ContactSlide'
 
 const SLIDES = [
-  TitleSlide,
-  ProblemSlide,
-  SolutionSlide,
-  ProductSlide,
-  TechnologySlide,
-  MarketSlide,
-  CompetitiveSlide,
-  TractionSlide,
-  BusinessModelSlide,
-  TeamSlide,
-  FinancialsSlide,
-  FundingStrategySlide,
-  RiskSlide,
-  AskSlide,
-  ContactSlide,
+  TitleSlide,         // 1
+  CompanySlide,       // 2
+  ProblemSlide,       // 3
+  WhyNowSlide,        // 4
+  SolutionSlide,      // 5
+  ProductSlide,       // 6
+  DemoSlide,          // 7
+  TechnologySlide,    // 8
+  UseCasesSlide,      // 9
+  MarketSlide,        // 10
+  CompetitiveSlide,   // 11
+  TractionSlide,      // 12
+  BusinessModelSlide, // 13
+  TeamSlide,          // 14
+  RoadmapSlide,       // 15
+  FinancialsSlide,    // 16
+  FundingStrategySlide, // 17
+  RiskSlide,          // 18
+  AskSlide,           // 19
+  ContactSlide,       // 20
 ]
 
 export default function InvestPage() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [scenario, setScenario] = useState<Scenario>('base')
+  const [scenario, setScenario] = useState<Scenario>('all')
 
   const totalSlides = SLIDES.length
 
@@ -109,7 +119,7 @@ export default function InvestPage() {
   const CurrentSlide = SLIDES[currentSlide]
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-[calc(100vh-4rem)] mt-16">
       <PitchSidebar
         slides={SLIDE_TITLES}
         currentSlide={currentSlide}
@@ -121,9 +131,7 @@ export default function InvestPage() {
       />
 
       <main
-        className={`flex-1 h-full overflow-hidden transition-all duration-300 ${
-          sidebarOpen ? 'ml-0' : 'ml-0'
-        }`}
+        className="relative flex-1 h-full overflow-hidden"
       >
         {/* Mobile hamburger */}
         <button

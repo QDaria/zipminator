@@ -1,21 +1,26 @@
-export type Scenario = 'base' | 'upside' | 'conservative'
+export type Scenario = 'all' | 'base' | 'upside' | 'conservative'
 
 export const SLIDE_TITLES = [
-  'Zipminator-PQC',
-  'The Threat',
-  'Our Solution',
-  'Product Suite',
-  'Technology',
-  'Market Opportunity',
-  'Competitive Landscape',
-  'Traction',
-  'Business Model',
-  'Team',
-  'Financial Projections',
-  'Funding Strategy',
-  'Risk Analysis',
-  'The Ask',
-  'Contact',
+  'Zipminator-PQC',        // 1 - Title
+  'QDaria',                // 2 - Company
+  'The Threat',            // 3 - Problem
+  'Why Now',               // 4 - Urgency
+  'Our Solution',          // 5 - Solution
+  'Product Suite',         // 6 - Products
+  'Product Demo',          // 7 - Interactive demo
+  'Technology',            // 8 - Tech stack
+  'Use Cases',             // 9 - Industries
+  'Market Opportunity',    // 10 - Market
+  'Competitive Landscape', // 11 - Competition
+  'Traction',              // 12 - Progress
+  'Business Model',        // 13 - Revenue
+  'Team',                  // 14 - People
+  'Roadmap',               // 15 - Timeline
+  'Financial Projections', // 16 - Financials
+  'Funding Strategy',      // 17 - Grants/funding
+  'Risk Analysis',         // 18 - Risks
+  'The Ask',               // 19 - What we need
+  'Contact',               // 20 - Get in touch
 ]
 
 export const THREAT_DATA = [
@@ -376,7 +381,7 @@ export const TEAM_TOTAL = {
 }
 
 export const REVENUE_PROJECTIONS: Record<
-  Scenario,
+  Exclude<Scenario, 'all'>,
   Array<{ year: number; revenue: number; users: number }>
 > = {
   base: [
@@ -537,4 +542,243 @@ export const COMPARABLE_RAISES = [
     valuation: '50% YoY growth',
     focus: 'Quantum technologies',
   },
+]
+
+export const COMPANY_STATS = [
+  { label: 'Founded', value: '2024' },
+  { label: 'Products', value: '8' },
+  { label: 'Code Base', value: '870K+ LOC' },
+  { label: 'Technologies', value: '26' },
+]
+
+// --- Green & Sustainability Credentials ---
+export const GREEN_CREDENTIALS = {
+  headline: 'Built Green from Day One',
+  subtitle: 'Norwegian hydropower meets quantum-efficient cryptography',
+  stats: [
+    { label: 'Renewable Energy', value: '98%', detail: 'Norway\'s grid is 98% renewable hydropower (IEA 2024)' },
+    { label: 'PQC vs RSA Energy', value: '~1000x', detail: 'Kyber768 key generation uses ~1000x less energy than RSA-4096 (NIST benchmark)' },
+    { label: 'Data Center PUE', value: '1.08', detail: 'Norwegian data centers rank among world\'s most efficient (Digiplex, Green Mountain)' },
+    { label: 'Carbon Intensity', value: '29g CO₂/kWh', detail: 'Norway: 29g vs EU avg 230g vs US avg 390g CO₂/kWh (EEA 2024)' },
+  ],
+  pillars: [
+    {
+      title: 'Norwegian Green Infrastructure',
+      items: [
+        '98% renewable electricity (hydropower dominant)',
+        'Natural cooling from Arctic climate reduces PUE to 1.08',
+        'EU\'s cleanest grid carbon intensity: 29g CO₂/kWh',
+        'Green Mountain & Digiplex certified carbon-neutral data centers',
+      ],
+    },
+    {
+      title: 'Quantum-Efficient Cryptography',
+      items: [
+        'Lattice-based crypto (Kyber) is inherently energy-efficient vs RSA',
+        'No prime factorization: constant-time operations, lower CPU cycles',
+        'QRNG harvesting reuses existing quantum hardware (no dedicated infrastructure)',
+        'Rust engine: zero-overhead abstractions, minimal memory footprint',
+      ],
+    },
+    {
+      title: 'Sustainable by Design',
+      items: [
+        'Single super-app replaces 5-8 separate security tools (less total compute)',
+        'Edge-first architecture minimizes cloud round-trips',
+        'On-device AI processing: no data center inference costs',
+        'Open-source core: shared innovation, reduced industry duplication',
+      ],
+    },
+  ],
+}
+
+// --- Social Responsibility & ESG ---
+export const SOCIAL_RESPONSIBILITY = {
+  headline: 'Security as a Human Right',
+  commitments: [
+    {
+      title: 'Privacy as a Fundamental Right',
+      icon: 'Shield',
+      description: 'GDPR Article 8 enshrines data protection as a human right. Zipminator makes post-quantum privacy accessible to everyone, not just enterprises.',
+      impact: 'Freemium tier ensures quantum-safe messaging for all users regardless of ability to pay',
+    },
+    {
+      title: 'Protecting Vulnerable Data',
+      icon: 'Heart',
+      description: 'Healthcare records, children\'s data, and elderly care information require decades of confidentiality. Current encryption won\'t survive quantum decryption.',
+      impact: 'Healthcare and social services sectors get priority pricing and onboarding support',
+    },
+    {
+      title: 'Digital Sovereignty for Europe',
+      icon: 'Flag',
+      description: 'European citizens deserve encryption infrastructure owned and operated within European jurisdiction, free from foreign surveillance mandates.',
+      impact: 'Norwegian-owned, GDPR-native, no Five Eyes jurisdiction exposure',
+    },
+    {
+      title: 'Open Source & Community',
+      icon: 'GitBranch',
+      description: 'Core cryptographic primitives are open-source (MIT licensed), enabling community audit, academic verification, and industry-wide security improvement.',
+      impact: '870K+ LOC of security infrastructure contributed to the global commons',
+    },
+    {
+      title: 'Ethical AI Commitment',
+      icon: 'Brain',
+      description: 'On-device AI with zero telemetry. No user data is harvested for model training. AI serves the user, not the platform.',
+      impact: 'Zero-knowledge AI architecture: your prompts never leave your device',
+    },
+    {
+      title: 'Critical Infrastructure Protection',
+      icon: 'Building',
+      description: 'Power grids, water systems, and hospitals are increasingly targeted. Quantum-safe encryption protects the systems society depends on.',
+      impact: 'Government and infrastructure pricing subsidized through grant funding',
+    },
+  ],
+}
+
+// --- Competitive Pricing & Funding Details ---
+export const COMPETITOR_DETAILS = [
+  {
+    name: 'SandboxAQ',
+    funding: '$950M+ (Series A-E)',
+    valuation: '$5.75B',
+    pricing: 'Enterprise-only, custom contracts ($500K+ annually)',
+    target: 'Fortune 500, Government',
+    weakness: 'No consumer products, no messaging/VPN/browser',
+  },
+  {
+    name: 'PQShield',
+    funding: '$70M (Series B, June 2024)',
+    valuation: 'Undisclosed',
+    pricing: 'IP licensing per chip ($0.01-0.10/unit at volume)',
+    target: 'Semiconductor, IoT',
+    weakness: 'Hardware IP only, no software products for end users',
+  },
+  {
+    name: 'ISARA',
+    funding: '$50M+ (acquired by Thales 2023)',
+    valuation: 'N/A (acquired)',
+    pricing: 'Enterprise SDK licensing ($100K-500K/year)',
+    target: 'PKI migration, certificate management',
+    weakness: 'PKI-only focus, no consumer tools',
+  },
+  {
+    name: 'Signal',
+    funding: 'Non-profit ($50M+ in donations)',
+    valuation: 'N/A (non-profit)',
+    pricing: 'Free (donation-supported)',
+    target: 'Privacy-conscious consumers',
+    weakness: 'Only PQXDH for messaging; no VPN, browser, email, or QRNG',
+  },
+  {
+    name: 'ProtonMail',
+    funding: '$100M+ (self-funded + equity)',
+    valuation: '$1B+ estimated',
+    pricing: '$4-24/mo consumer; enterprise custom',
+    target: 'Privacy consumers, SMBs',
+    weakness: 'Classical crypto only, PQC announced but not shipped',
+  },
+  {
+    name: 'NordVPN (Nord Security)',
+    funding: '$100M (Warburg Pincus, 2022)',
+    valuation: '$1.6B',
+    pricing: '$3-15/mo consumer',
+    target: 'Mass market VPN',
+    weakness: 'VPN only, no PQC, no messaging, Panama jurisdiction concerns',
+  },
+]
+
+// --- Norwegian Ecosystem Context ---
+export const NORWEGIAN_ECOSYSTEM = {
+  headline: 'Norway: The Ideal PQC Launchpad',
+  advantages: [
+    { title: 'NOK 1.75B Quantum Initiative', detail: 'PM Store personally launched Norway\'s quantum commitment (2025)', icon: 'Landmark' },
+    { title: 'NATO DIANA Hub in Trondheim', detail: 'Direct access to NATO defense procurement pipeline', icon: 'Shield' },
+    { title: '98% Renewable Energy Grid', detail: 'World\'s cleanest computing infrastructure (hydropower)', icon: 'Leaf' },
+    { title: 'GDPR Gold Standard', detail: 'EEA membership + strongest privacy enforcement in Europe', icon: 'Lock' },
+    { title: 'Nordic Cyber Market: $13.8B', detail: 'Fastest growing in EU at 10.1% CAGR (Mordor Intelligence)', icon: 'TrendingUp' },
+    { title: 'Four New Quantum Research Centres', detail: 'NOK 244M over 5 years, announced 2025', icon: 'GraduationCap' },
+  ],
+  buildCostComparison: {
+    title: 'Build Cost: Norway vs Silicon Valley',
+    rows: [
+      { category: 'Senior Engineer Salary', norway: '$120-160K', valley: '$200-350K', savings: '40-55%' },
+      { category: 'Office Space (per desk/year)', norway: '$8K', valley: '$18-25K', savings: '55-68%' },
+      { category: 'Energy Cost (per kWh)', norway: '$0.05', valley: '$0.20', savings: '75%' },
+      { category: 'Data Center (per rack/mo)', norway: '$800', valley: '$2,500', savings: '68%' },
+    ],
+  },
+}
+
+export const ROADMAP_PHASES = [
+  { name: 'Quantum Vault', phase: 1, status: 'done' as const, description: 'Core encryption engine' },
+  { name: 'Secure Messenger', phase: 2, status: 'progress' as const, progress: 70, description: 'E2E encrypted chat' },
+  { name: 'VoIP & Q-VPN', phase: 3, status: 'progress' as const, progress: 30, description: 'Encrypted calls and VPN' },
+  { name: 'Anonymizer', phase: 4, status: 'done' as const, description: '10-level data protection' },
+  { name: 'AI Assistant', phase: 5, status: 'done' as const, description: 'On-device PQC AI' },
+  { name: 'MCP Server', phase: 6, status: 'done' as const, description: 'Developer tools and API' },
+  { name: 'Quantum Email', phase: 7, status: 'planned' as const, description: 'Self-destructing secure email' },
+  { name: 'ZipBrowser', phase: 8, status: 'planned' as const, description: 'Quantum-safe AI browser' },
+]
+
+export const ROADMAP_MILESTONES = [
+  { date: 'Q2 2026', label: 'MVP Launch' },
+  { date: 'Q4 2026', label: 'Mobile Apps' },
+  { date: 'Q2 2027', label: 'Enterprise' },
+  { date: 'Q4 2027', label: 'Full Super-App' },
+]
+
+export const REVENUE_MODULES = [
+  { name: 'PQC Messenger', share: 25 },
+  { name: 'Q-VPN', share: 20 },
+  { name: 'Enterprise API', share: 20 },
+  { name: 'Quantum Mail', share: 15 },
+  { name: 'ZipBrowser', share: 10 },
+  { name: 'QRNG Engine', share: 10 },
+]
+
+export const COST_COMPARISON_NUMERIC = [
+  { category: 'Engineer Salary', norway: 140, valley: 275, unit: 'K/yr' },
+  { category: 'Office Space', norway: 8, valley: 21.5, unit: 'K/desk/yr' },
+  { category: 'Energy Cost', norway: 0.05, valley: 0.20, unit: '$/kWh' },
+  { category: 'Data Center', norway: 0.8, valley: 2.5, unit: 'K/rack/mo' },
+]
+
+export const GRANT_AMOUNTS_NUMERIC = [
+  { name: 'Norwegian Quantum Initiative', amount: 17.5, region: 'norway' },
+  { name: 'Research Council of Norway', amount: 7, region: 'norway' },
+  { name: 'National Budget 2026', amount: 15, region: 'norway' },
+  { name: 'NATO DIANA', amount: 0.11, region: 'nato' },
+  { name: 'Horizon Europe PQC', amount: 17.6, region: 'eu' },
+  { name: 'Digital Europe', amount: 16.5, region: 'eu' },
+  { name: 'Quantum Flagship', amount: 44, region: 'eu' },
+  { name: 'DARPA', amount: 5, region: 'us' },
+]
+
+export const THREAT_SEVERITY = [
+  { threat: 'HNDL Attacks', severity: 95, urgency: 90 },
+  { threat: 'SS7 Exploits', severity: 85, urgency: 95 },
+  { threat: 'Quantum Decrypt', severity: 100, urgency: 70 },
+  { threat: 'Supply Chain', severity: 75, urgency: 80 },
+  { threat: 'Insider Threat', severity: 65, urgency: 60 },
+  { threat: 'Zero-Day PQC', severity: 80, urgency: 50 },
+]
+
+export const DEVELOPMENT_TIMELINE = [
+  { phase: 'Quantum Vault', status: 'done', progress: 100 },
+  { phase: 'PQC Messenger', status: 'progress', progress: 70 },
+  { phase: 'VoIP & Q-VPN', status: 'progress', progress: 30 },
+  { phase: 'Anonymizer', status: 'done', progress: 100 },
+  { phase: 'AI Assistant', status: 'done', progress: 100 },
+  { phase: 'MCP Server', status: 'done', progress: 100 },
+  { phase: 'Quantum Email', status: 'planned', progress: 0 },
+  { phase: 'ZipBrowser', status: 'planned', progress: 0 },
+]
+
+export const USE_CASE_INDUSTRIES = [
+  { name: 'Government & Defense', icon: 'Shield', color: 'blue', description: 'Protect classified communications from harvest-now-decrypt-later attacks', compliance: ['CNSA 2.0', 'FedRAMP', 'NATO DIANA'] },
+  { name: 'Healthcare', icon: 'Heart', color: 'red', description: 'Patient records with 50+ year confidentiality requirements', compliance: ['HIPAA', 'GDPR', 'NHD Act'] },
+  { name: 'Finance & Banking', icon: 'Landmark', color: 'green', description: 'Transaction data and trading algorithms quantum-proofed', compliance: ['PCI-DSS', 'SOX', 'SWIFT PQC'] },
+  { name: 'Critical Infrastructure', icon: 'Zap', color: 'orange', description: 'Power grids, water systems, telecom. SS7 attacks stop here', compliance: ['NERC CIP', 'ICS-CERT', 'EU NIS2'] },
+  { name: 'Legal & IP', icon: 'Scale', color: 'purple', description: 'Attorney-client privilege and trade secrets protected for decades', compliance: ['ABA Rules', 'GDPR', 'IP Law'] },
+  { name: 'Enterprise Tech', icon: 'Server', color: 'cyan', description: 'API security, code signing, and DevOps secrets with PQC', compliance: ['SOC 2', 'ISO 27001', 'FIPS 140-3'] },
 ]

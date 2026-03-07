@@ -3,29 +3,9 @@
 import { motion } from 'framer-motion'
 import SlideWrapper from '../SlideWrapper'
 import { SUPER_APP_MODULES } from '@/lib/pitch-data'
-import {
-  MessageSquare,
-  Phone,
-  Shield,
-  Globe,
-  Mail,
-  Cpu,
-  Eye,
-  Bot,
-  Sparkles,
-} from 'lucide-react'
+import { Shield, Sparkles, Leaf, DollarSign } from 'lucide-react'
 import type { Scenario } from '@/lib/pitch-data'
-
-const ICON_MAP: Record<string, typeof Shield> = {
-  MessageSquare,
-  Phone,
-  Shield,
-  Globe,
-  Mail,
-  Cpu,
-  Eye,
-  Bot,
-}
+import { MODULE_ICON_MAP } from '../slide-utils'
 
 export default function SolutionSlide({ scenario: _scenario }: { scenario?: Scenario }) {
   return (
@@ -40,7 +20,7 @@ export default function SolutionSlide({ scenario: _scenario }: { scenario?: Scen
         <div className="flex items-center gap-3 mb-3">
           <Sparkles className="w-5 h-5 text-quantum-400" />
           <span className="text-xs font-mono uppercase tracking-widest text-quantum-400/80">
-            Slide 3 / 15
+            Slide 5 / 20
           </span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
@@ -51,12 +31,22 @@ export default function SolutionSlide({ scenario: _scenario }: { scenario?: Scen
           Instead of juggling multiple security tools, Zipminator unifies every
           communication channel under one post-quantum encryption umbrella.
         </p>
+        <div className="flex flex-wrap items-center gap-3 mt-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-quantum-500/10 border border-quantum-500/20 text-sm text-quantum-300 font-medium">
+            <DollarSign className="w-4 h-4" />
+            Single App, 5-8 Tools Replaced
+          </span>
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-sm text-green-400 font-medium">
+            <Leaf className="w-3.5 h-3.5" />
+            Single app = less compute = smaller carbon footprint
+          </span>
+        </div>
       </motion.div>
 
       {/* Module grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
         {SUPER_APP_MODULES.map((mod, index) => {
-          const Icon = ICON_MAP[mod.icon] || Shield
+          const Icon = MODULE_ICON_MAP[mod.icon] || Shield
           return (
             <motion.div
               key={mod.name}
@@ -79,20 +69,29 @@ export default function SolutionSlide({ scenario: _scenario }: { scenario?: Scen
         })}
       </div>
 
-      {/* Center callout */}
+      {/* Center callout with cost comparison */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
-        className="flex items-center justify-center gap-4 px-6 py-4 rounded-xl bg-quantum-500/[0.06] border border-quantum-500/15"
+        className="flex flex-col sm:flex-row items-center justify-center gap-4 px-6 py-4 rounded-xl bg-quantum-500/[0.06] border border-quantum-500/15"
       >
         <Shield className="w-8 h-8 text-quantum-400 shrink-0" />
-        <div>
+        <div className="text-center sm:text-left">
           <p className="text-white font-semibold text-sm">
             Install once, secure everything.
           </p>
           <p className="text-gray-400 text-xs mt-0.5">
             8 integrated modules. One quantum-secure platform. Zero fragmentation.
+          </p>
+        </div>
+        <div className="shrink-0 h-px sm:h-10 w-full sm:w-px bg-white/10" />
+        <div className="text-center sm:text-left shrink-0">
+          <p className="text-xs text-gray-500">
+            <span className="line-through">5-8 separate tools: $200-500/mo</span>
+          </p>
+          <p className="text-sm font-semibold text-green-400 mt-0.5">
+            Zipminator Pro: $99/mo
           </p>
         </div>
       </motion.div>

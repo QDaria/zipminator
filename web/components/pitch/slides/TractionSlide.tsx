@@ -3,16 +3,20 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import SlideWrapper from '../SlideWrapper'
-import { TRACTION_STATS } from '@/lib/pitch-data'
+import { TRACTION_STATS, DEVELOPMENT_TIMELINE } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
-import { Rocket, Code2, Smartphone, Layers, Languages, Shield, FlaskConical } from 'lucide-react'
+import { Rocket, Code2, Smartphone, Layers, Languages, Shield, FlaskConical, Target, DollarSign, Github, Flag } from 'lucide-react'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from 'recharts'
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5, delay },
-})
+import { fadeUpInView as fadeUp } from '../slide-utils'
 
 const STAT_ICONS: Record<string, typeof Code2> = {
   'Lines of Code': Code2,
@@ -76,7 +80,7 @@ function AnimatedCounter({ target }: { target: string }) {
   return <span ref={ref}>{display}</span>
 }
 
-const DEVELOPMENT_TIMELINE = [
+const DEVELOPMENT_TIMELINE_DETAILS = [
   { phase: 'Core Engine', detail: 'Rust Kyber768 + PyO3 bindings' },
   { phase: 'PQC Messenger', detail: 'End-to-end PQ Double Ratchet' },
   { phase: 'Quantum VoIP', detail: 'PQ-SRTP voice/video' },
@@ -86,6 +90,12 @@ const DEVELOPMENT_TIMELINE = [
   { phase: 'QRNG Engine', detail: '156-qubit IBM integration' },
   { phase: 'Web Dashboard', detail: 'Next.js 16 landing + admin' },
 ]
+
+const STATUS_COLORS: Record<string, string> = {
+  done: '#22c55e',
+  progress: '#6366f1',
+  planned: '#6b7280',
+}
 
 export default function TractionSlide({ scenario: _scenario }: { scenario?: Scenario }) {
   return (
@@ -134,7 +144,7 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
           <h3 className="text-lg font-semibold text-white">Development Progress</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {DEVELOPMENT_TIMELINE.map((item, i) => (
+          {DEVELOPMENT_TIMELINE_DETAILS.map((item, i) => (
             <motion.div
               key={item.phase}
               initial={{ opacity: 0, x: -10 }}
@@ -158,8 +168,119 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
         </div>
       </motion.div>
 
+      {/* Development Phase Progress Chart */}
+      <motion.div {...fadeUp(0.18)} className="card-quantum mt-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Phase Progress</h3>
+        <div className="h-[320px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={DEVELOPMENT_TIMELINE}
+              layout="vertical"
+              margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+            >
+              <XAxis
+                type="number"
+                domain={[0, 100]}
+                tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }}
+                axisLine={{ stroke: '#374151' }}
+                tickLine={false}
+                label={{ value: 'Progress %', position: 'insideBottomRight', offset: -5, fill: '#6b7280', fontSize: 11 }}
+              />
+              <YAxis
+                type="category"
+                dataKey="phase"
+                width={120}
+                tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }}
+                axisLine={{ stroke: '#374151' }}
+                tickLine={false}
+              />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}
+                labelStyle={{ color: '#fff', fontSize: 12 }}
+                itemStyle={{ color: '#9ca3af', fontSize: 12 }}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                formatter={(value: any) => [`${value}%`, 'Progress']}
+              />
+              <Bar dataKey="progress" radius={[0, 6, 6, 0]} maxBarSize={28} animationDuration={1200}>
+                {DEVELOPMENT_TIMELINE.map((entry, index) => (
+                  <Cell key={index} fill={STATUS_COLORS[entry.status] || '#6b7280'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="flex items-center gap-4 mt-3 justify-center">
+          {[
+            { label: 'Complete', color: '#22c55e' },
+            { label: 'In Progress', color: '#6366f1' },
+            { label: 'Planned', color: '#6b7280' },
+          ].map((l) => (
+            <div key={l.label} className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: l.color }} />
+              <span className="text-xs text-gray-400">{l.label}</span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Market Traction & Partnerships */}
+      <motion.div {...fadeUp(0.2)} className="card-quantum mt-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Target className="w-5 h-5 text-quantum-400" />
+          <h3 className="text-lg font-semibold text-white">Market Traction</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            { label: 'Innovation Norway Grant', status: 'Submitted', statusColor: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', icon: Flag },
+            { label: 'NATO DIANA Trondheim', status: 'Pipeline', statusColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Shield },
+            { label: 'Waitlist', status: 'Growing', statusColor: 'bg-green-500/20 text-green-400 border-green-500/30', icon: Rocket },
+            { label: 'Norwegian Quantum Initiative', status: 'Aligned', statusColor: 'bg-purple-500/20 text-purple-400 border-purple-500/30', icon: Flag },
+          ].map((item, i) => {
+            const Icon = item.icon
+            return (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.25 + i * 0.04 }}
+                className="flex items-center gap-3 rounded-lg bg-white/[0.03] border border-white/5 px-3 py-2.5"
+              >
+                <div className="w-6 h-6 rounded-full bg-quantum-500/15 border border-quantum-500/25 flex items-center justify-center shrink-0">
+                  <Icon className="w-3 h-3 text-quantum-400" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-white truncate">{item.label}</p>
+                </div>
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border shrink-0 uppercase ${item.statusColor}`}>
+                  {item.status}
+                </span>
+              </motion.div>
+            )
+          })}
+        </div>
+      </motion.div>
+
+      {/* Build Cost & Community */}
+      <motion.div {...fadeUp(0.28)} className="mt-4 grid sm:grid-cols-2 gap-4">
+        <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-green-500/[0.06] border border-green-500/15">
+          <DollarSign className="w-5 h-5 text-green-400 shrink-0" />
+          <div>
+            <p className="text-sm text-white font-semibold">$25M equivalent build value</p>
+            <p className="text-xs text-gray-400">40-55% savings from Norwegian base vs Silicon Valley rates</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-quantum-500/[0.06] border border-quantum-500/15">
+          <Github className="w-5 h-5 text-quantum-400 shrink-0" />
+          <div>
+            <p className="text-sm text-white font-semibold">Open Source Core</p>
+            <p className="text-xs text-gray-400">MIT-licensed crypto primitives, community-auditable</p>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Bottom callout */}
-      <motion.div {...fadeUp(0.25)} className="mt-6 flex items-center gap-3 px-5 py-3 rounded-xl bg-quantum-500/[0.06] border border-quantum-500/15">
+      <motion.div {...fadeUp(0.32)} className="mt-4 flex items-center gap-3 px-5 py-3 rounded-xl bg-quantum-500/[0.06] border border-quantum-500/15">
         <Rocket className="w-5 h-5 text-quantum-400 shrink-0" />
         <p className="text-sm text-gray-300">
           <span className="text-quantum-400 font-semibold">Zero vaporware.</span>{' '}

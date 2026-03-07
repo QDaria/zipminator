@@ -4,25 +4,60 @@ import { motion } from 'framer-motion'
 import SlideWrapper from '../SlideWrapper'
 import { TEAM_ROLES, TEAM_TOTAL } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
-import { Users, Briefcase, Clock } from 'lucide-react'
+import { Users, Briefcase, Clock, GraduationCap, Building2, UserCheck } from 'lucide-react'
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts'
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5, delay },
-})
+import { fadeUpInView as fadeUp } from '../slide-utils'
 
-const PRIORITY_STYLES: Record<string, { label: string; bg: string; text: string }> = {
-  immediate: { label: 'Immediate', bg: 'bg-green-500/20', text: 'text-green-400' },
-  year1: { label: 'Year 1', bg: 'bg-quantum-500/20', text: 'text-quantum-400' },
-  year2: { label: 'Year 2', bg: 'bg-gray-500/20', text: 'text-gray-400' },
+const PRIORITY_STYLES: Record<string, { label: string; bg: string; text: string; dot: string }> = {
+  immediate: { label: 'Immediate', bg: 'bg-emerald-500/20', text: 'text-emerald-400', dot: 'bg-emerald-500/60' },
+  year1: { label: 'Year 1', bg: 'bg-quantum-500/20', text: 'text-quantum-400', dot: 'bg-quantum-500/60' },
+  year2: { label: 'Year 2', bg: 'bg-gray-500/20', text: 'text-gray-400', dot: 'bg-gray-500/60' },
 }
 
 const BAR_COLORS: Record<string, string> = {
-  immediate: 'from-green-600 to-green-400',
+  immediate: 'from-emerald-600 to-emerald-400',
   year1: 'from-quantum-600 to-quantum-400',
   year2: 'from-gray-600 to-gray-400',
+}
+
+const COST_COMPARISON = [
+  { role: 'Senior Engineer', norway: '$120-160K', valley: '$200-350K', savings: '40-55%' },
+  { role: 'Data Center (rack)', norway: '$800/mo', valley: '$2,500/mo', savings: '68%' },
+  { role: 'Office Space (m\u00B2)', norway: '$350/mo', valley: '$1,200/mo', savings: '71%' },
+]
+
+const PRIORITY_CHART_DATA = [
+  { name: 'Immediate', value: TEAM_ROLES.filter((r) => r.priority === 'immediate').reduce((s, r) => s + r.count, 0), color: '#22c55e' },
+  { name: 'Year 1', value: TEAM_ROLES.filter((r) => r.priority === 'year1').reduce((s, r) => s + r.count, 0), color: '#6366f1' },
+  { name: 'Year 2', value: TEAM_ROLES.filter((r) => r.priority === 'year2').reduce((s, r) => s + r.count, 0), color: '#6b7280' },
+]
+const TOTAL_HEADCOUNT = PRIORITY_CHART_DATA.reduce((s, d) => s + d.value, 0)
+
+interface PieLabelProps {
+  cx: number
+  cy: number
+  midAngle: number
+  innerRadius: number
+  outerRadius: number
+  value: number
+}
+
+function renderCustomLabel({ cx, cy, midAngle, innerRadius, outerRadius, value }: PieLabelProps) {
+  const RADIAN = Math.PI / 180
+  const radius = innerRadius + (outerRadius - innerRadius) * 1.4
+  const x = cx + radius * Math.cos(-midAngle * RADIAN)
+  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+  return (
+    <text x={x} y={y} fill="#d1d5db" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={12} fontWeight={600}>
+      {value}
+    </text>
+  )
 }
 
 export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario }) {
@@ -35,7 +70,7 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
   return (
     <SlideWrapper>
       {/* Header */}
-      <motion.div {...fadeUp()} className="text-center mb-10">
+      <motion.div {...fadeUp()} className="text-center mb-8">
         <p className="text-quantum-400 font-mono text-sm tracking-widest uppercase mb-3">
           Team
         </p>
@@ -48,7 +83,7 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
       </motion.div>
 
       {/* Key Stats */}
-      <motion.div {...fadeUp(0.05)} className="grid grid-cols-3 gap-4 mb-10">
+      <motion.div {...fadeUp(0.05)} className="grid grid-cols-3 gap-4 mb-8">
         {[
           { icon: Users, label: 'Target Headcount', value: TEAM_TOTAL.headcount },
           { icon: Briefcase, label: 'Annual Cost', value: TEAM_TOTAL.annualCost },
@@ -63,7 +98,7 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
       </motion.div>
 
       {/* Role Breakdown */}
-      <motion.div {...fadeUp(0.1)} className="card-quantum">
+      <motion.div {...fadeUp(0.1)} className="card-quantum mb-6">
         <div className="flex items-center gap-2 mb-6">
           <Users className="w-5 h-5 text-quantum-400" />
           <h3 className="text-lg font-semibold text-white">Team Composition</h3>
@@ -111,12 +146,119 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
         </div>
       </motion.div>
 
+      {/* Hiring by Priority Donut */}
+      <motion.div {...fadeUp(0.12)} className="card-quantum mb-6">
+        <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+          <Users className="w-4 h-4 text-quantum-400" />
+          Hiring Priority Breakdown
+        </h3>
+        <div className="flex items-center justify-center gap-8">
+          <div className="relative">
+            <ResponsiveContainer width={200} height={200}>
+              <PieChart>
+                <Pie
+                  data={PRIORITY_CHART_DATA}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={85}
+                  dataKey="value"
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  label={renderCustomLabel as any}
+                  animationDuration={1200}
+                >
+                  {PRIORITY_CHART_DATA.map((entry, index) => (
+                    <Cell key={index} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            {/* Center text */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-2xl font-bold text-white font-mono">{TOTAL_HEADCOUNT}</span>
+              <span className="text-[10px] text-gray-400">Total</span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            {PRIORITY_CHART_DATA.map((d) => (
+              <span key={d.name} className="flex items-center gap-2 text-xs text-gray-400">
+                <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: d.color }} />
+                {d.name} ({d.value})
+              </span>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Norwegian Talent Pipeline + Cost Advantage */}
+      <motion.div {...fadeUp(0.15)} className="grid sm:grid-cols-2 gap-4 mb-6">
+        {/* Talent Pipeline */}
+        <div className="card-quantum border-l-2 border-emerald-500/40">
+          <div className="flex items-center gap-2 mb-3">
+            <GraduationCap className="w-5 h-5 text-emerald-400" />
+            <h4 className="text-sm font-semibold text-emerald-400">Norwegian Talent Pipeline</h4>
+          </div>
+          <p className="text-xs text-gray-400 leading-relaxed mb-3">
+            Norway is investing <span className="text-white font-semibold">NOK 244M</span> in 4 new quantum
+            research centres, creating a deep talent pool for Zipminator to recruit from.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {['NTNU Quantum', 'UiO Centre', 'SINTEF Digital', 'Simula Research'].map((centre) => (
+              <span
+                key={centre}
+                className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400/80 border border-emerald-500/20"
+              >
+                {centre}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Build Cost Advantage */}
+        <div className="card-quantum border-l-2 border-quantum-500/40">
+          <div className="flex items-center gap-2 mb-3">
+            <Building2 className="w-5 h-5 text-quantum-400" />
+            <h4 className="text-sm font-semibold text-quantum-400">Build Cost Advantage</h4>
+          </div>
+          <div className="space-y-2">
+            {COST_COMPARISON.map((row) => (
+              <div key={row.role} className="flex items-center justify-between text-xs">
+                <span className="text-gray-400 truncate mr-2">{row.role}</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="font-mono text-emerald-400">{row.norway}</span>
+                  <span className="text-gray-600">vs</span>
+                  <span className="font-mono text-gray-500 line-through">{row.valley}</span>
+                  <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                    -{row.savings}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Advisory Board Placeholder */}
+      <motion.div {...fadeUp(0.2)} className="card-quantum border border-dashed border-white/10 mb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <UserCheck className="w-4 h-4 text-gray-500" />
+          <h4 className="text-sm font-semibold text-gray-400">Advisory Board</h4>
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+            Forming
+          </span>
+        </div>
+        <p className="text-xs text-gray-500">
+          Actively recruiting advisors across quantum cryptography, Nordic venture capital, defense/NATO procurement,
+          and enterprise security. Target: 4-6 advisors by Q3 2026.
+        </p>
+      </motion.div>
+
       {/* Hiring Legend + Build Cost */}
-      <motion.div {...fadeUp(0.2)} className="flex flex-wrap items-center justify-between gap-4 mt-6">
+      <motion.div {...fadeUp(0.25)} className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
           {Object.entries(PRIORITY_STYLES).map(([key, style]) => (
             <span key={key} className="flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full ${style.bg.replace('/20', '/60')}`} />
+              <span className={`w-2 h-2 rounded-full ${style.dot}`} />
               {style.label}
             </span>
           ))}

@@ -4,7 +4,9 @@ import './globals.css'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import SessionProvider from '@/components/auth/SessionProvider'
+import ThemeProvider from '@/components/ThemeProvider'
 import Script from 'next/script'
+import { GA_TRACKING_ID } from '@/lib/analytics'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -145,7 +147,30 @@ export default function RootLayout({
     <html lang="en" className="dark scroll-smooth">
       <head>
         <meta name="theme-color" content="#6366f1" />
-        <meta name="color-scheme" content="dark" />
+        <meta name="color-scheme" content="dark light" />
+
+        {GA_TRACKING_ID && (
+          <>
+            <Script
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+            />
+            <Script
+              id="google-analytics"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_TRACKING_ID}', {
+                    page_path: window.location.pathname,
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
         <meta name="language" content="English" />
         <link rel="canonical" href="https://zipminator.zip" />
 
@@ -166,11 +191,13 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${outfit.variable} font-sans bg-gray-950 text-white antialiased`}>
         <SessionProvider>
-          <Navigation />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
+          <ThemeProvider>
+            <Navigation />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>

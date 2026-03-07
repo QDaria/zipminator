@@ -15,21 +15,23 @@ import {
   Clock,
   CheckCircle2,
   ArrowRight,
+  Sparkles,
+  ShieldCheck,
+  Smartphone,
+  Users,
+  FileCheck,
+  TrendingUp,
+  MapPin,
 } from 'lucide-react'
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5, delay },
-})
+import { fadeUpInView as fadeUp } from '../slide-utils'
 
 const PIE_COLORS = [
-  '#6366f1', // Engineering -- quantum-500
-  '#a78bfa', // Security -- purple-400
-  '#818cf8', // Go-to-Market -- indigo-400
-  '#4338ca', // Infrastructure -- quantum-700
-  '#312e81', // Operations -- quantum-900
+  '#22c55e', // Engineering -- green-500
+  '#6366f1', // Security -- quantum-500
+  '#a78bfa', // Go-to-Market -- purple-400
+  '#f59e0b', // Infrastructure -- amber-500
+  '#818cf8', // Operations -- indigo-400
 ]
 
 function buildConicGradient(
@@ -53,7 +55,7 @@ const MILESTONES = [
       'Secure government grants',
       'MVP launch (Messenger + VPN)',
       'First 500 users',
-      'SOC 2 Type I',
+      'SOC 2 readiness',
     ],
   },
   {
@@ -78,8 +80,17 @@ const MILESTONES = [
   },
 ]
 
+const SEED_DELIVERABLES = [
+  { icon: Users, label: 'MVP launch with 500+ beta users' },
+  { icon: ShieldCheck, label: 'SOC 2 readiness assessment' },
+  { icon: FileCheck, label: '2-3 enterprise pilot agreements' },
+  { icon: Sparkles, label: 'FIPS 140-3 validation initiated' },
+  { icon: Smartphone, label: 'Full mobile app (iOS + Android)' },
+]
+
 export default function AskSlide({ scenario = 'base' }: { scenario?: Scenario }) {
-  const data = REVENUE_PROJECTIONS[scenario]
+  const key: Exclude<Scenario, 'all'> = scenario === 'all' ? 'base' : scenario
+  const data = REVENUE_PROJECTIONS[key]
   const yr3Revenue = data[2].revenue
   const yr5Revenue = data[4].revenue
 
@@ -99,7 +110,7 @@ export default function AskSlide({ scenario = 'base' }: { scenario?: Scenario })
       </motion.div>
 
       {/* Three Funding Phases */}
-      <motion.div {...fadeUp(0.05)} className="grid sm:grid-cols-3 gap-4 mb-10">
+      <motion.div {...fadeUp(0.05)} className="grid sm:grid-cols-3 gap-4 mb-8">
         {[
           {
             icon: Target,
@@ -128,11 +139,53 @@ export default function AskSlide({ scenario = 'base' }: { scenario?: Scenario })
         ))}
       </motion.div>
 
+      {/* What $3-5M Seed Gets You */}
+      <motion.div {...fadeUp(0.08)} className="mb-8">
+        <div className="rounded-xl bg-gradient-to-r from-green-500/[0.06] to-quantum-500/[0.06] border border-green-500/20 p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="w-5 h-5 text-green-400" />
+            <h3 className="text-base font-semibold text-white">What $3-5M Seed Gets You</h3>
+          </div>
+          <div className="grid sm:grid-cols-5 gap-3 mb-4">
+            {SEED_DELIVERABLES.map((d) => (
+              <div key={d.label} className="flex flex-col items-center text-center gap-2 p-3 rounded-lg bg-white/[0.02]">
+                <d.icon className="w-5 h-5 text-green-400" />
+                <p className="text-xs text-gray-300 leading-snug">{d.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Norwegian cost advantage */}
+          <div className="flex items-center justify-center gap-3 pt-3 border-t border-white/5">
+            <MapPin className="w-4 h-4 text-quantum-400" />
+            <p className="text-sm text-gray-300">
+              <span className="font-semibold text-quantum-400">$3-5M in Norway = $6-10M equivalent in Silicon Valley</span>
+              <span className="text-gray-500"> (40-55% lower costs across salaries, infrastructure, energy)</span>
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Comparable Seed Rounds Callout */}
+      <motion.div {...fadeUp(0.1)} className="mb-8">
+        <div className="rounded-xl bg-purple-500/[0.05] border border-purple-500/15 p-4 flex items-start gap-3">
+          <TrendingUp className="w-5 h-5 text-purple-400 mt-0.5 shrink-0" />
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-1">Market Context: Comparable Seed Rounds</h4>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Cybersecurity median seed round: <span className="text-purple-400 font-semibold">$3-4M</span>.
+              PQ-specific companies have raised <span className="text-purple-400 font-semibold">$18-70M at Series A</span> (PQShield $37M, Sandbox $500M+ Series A).
+              Our ask is at the conservative end with the highest product completeness.
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Use of Funds + Pie Chart */}
       <div className="grid lg:grid-cols-2 gap-6 mb-10">
         {/* CSS Donut Chart */}
         <motion.div
-          {...fadeUp(0.1)}
+          {...fadeUp(0.12)}
           className="card-quantum flex flex-col items-center justify-center py-8"
         >
           <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">

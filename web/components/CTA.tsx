@@ -154,20 +154,20 @@ const CTA = () => {
           >
             <div className="flex items-center space-x-2">
               <Star className="w-4 h-4 text-quantum-400" />
-              <span className="font-semibold text-white">10,000+</span>
-              <span>Downloads</span>
+              <span className="font-semibold text-white">Open Source</span>
+              <span>Apache-2.0 Licensed</span>
             </div>
             <div className="hidden md:block w-px h-6 bg-gray-700" />
             <div className="flex items-center space-x-2">
               <Clock className="w-4 h-4 text-quantum-400" />
-              <span className="font-semibold text-white">99.9%</span>
-              <span>Uptime</span>
+              <span className="font-semibold text-white">166/166</span>
+              <span>Tests Passing</span>
             </div>
             <div className="hidden md:block w-px h-6 bg-gray-700" />
             <div className="flex items-center space-x-2">
               <Shield className="w-4 h-4 text-quantum-400" />
               <span className="font-semibold text-white">SOC 2</span>
-              <span>Certified</span>
+              <span>Ready</span>
             </div>
           </motion.div>
 
@@ -179,7 +179,7 @@ const CTA = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="text-sm text-gray-500 mb-12"
           >
-            No credit card required • Free forever for open source projects
+            No credit card required
           </motion.div>
 
           {/* Quick Links */}
@@ -219,7 +219,7 @@ const CTA = () => {
             transition={{ duration: 0.6, delay: 0.7 }}
             className="mt-20 pt-12 border-t border-gray-800/50"
           >
-            <p className="text-sm text-gray-500 mb-8 uppercase tracking-wider">Trusted By</p>
+            <p className="text-sm text-gray-500 mb-8 uppercase tracking-wider">Built For</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
               <div className="text-2xl font-bold text-gray-600 hover:text-gray-500 transition-colors">
                 Fortune 500

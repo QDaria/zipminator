@@ -267,7 +267,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-2 group cursor-default">
                 <div className="w-4 h-4 bg-purple-600 rounded group-hover:scale-110 transition-transform" />
-                <span className="group-hover:text-gray-400 transition-colors">SOC 2 Type II</span>
+                <span className="group-hover:text-gray-400 transition-colors">SOC 2 Ready</span>
               </div>
             </div>
           </div>

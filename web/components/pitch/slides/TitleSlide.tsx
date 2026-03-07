@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import SlideWrapper from '../SlideWrapper'
-import { Shield, Lock, Cpu } from 'lucide-react'
+import { Shield, Lock, Cpu, Leaf, MapPin } from 'lucide-react'
 import type { Scenario } from '@/lib/pitch-data'
 
 const floatingIcons = [
@@ -45,17 +45,25 @@ export default function TitleSlide({ scenario: _scenario }: { scenario?: Scenari
         transition={{ delay: 0.1, duration: 0.6 }}
         className="relative z-10"
       >
-        {/* QDaria badge */}
+        {/* QDaria badge + Norwegian trust */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-quantum-500/30 bg-quantum-500/10 mb-8"
+          className="flex items-center justify-center gap-3 mb-8"
         >
-          <div className="w-2 h-2 rounded-full bg-quantum-400 animate-pulse" />
-          <span className="text-xs font-medium text-quantum-300 tracking-wider uppercase">
-            QDaria
-          </span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-quantum-500/30 bg-quantum-500/10">
+            <div className="w-2 h-2 rounded-full bg-quantum-400 animate-pulse" />
+            <span className="text-xs font-medium text-quantum-300 tracking-wider uppercase">
+              QDaria
+            </span>
+          </div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.04]">
+            <MapPin className="w-3 h-3 text-red-400" />
+            <span className="text-[11px] font-medium text-gray-400 tracking-wide">
+              Norwegian-Built
+            </span>
+          </div>
         </motion.div>
 
         {/* Title */}
@@ -98,14 +106,27 @@ export default function TitleSlide({ scenario: _scenario }: { scenario?: Scenari
           ))}
         </motion.div>
 
+        {/* Green badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+          className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/[0.07]"
+        >
+          <Leaf className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="text-xs font-medium text-emerald-300/90 tracking-wide">
+            Powered by 98% Renewable Energy
+          </span>
+        </motion.div>
+
         {/* Tagline */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.6 }}
-          className="mt-12 text-sm text-gray-600 font-mono tracking-wider"
+          className="mt-8 text-sm text-gray-500 font-mono tracking-wider"
         >
-          INVESTOR PRESENTATION 2026
+          SEED ROUND 2026 &middot; QUANTUM-SAFE FROM DAY ONE
         </motion.p>
       </motion.div>
     </SlideWrapper>

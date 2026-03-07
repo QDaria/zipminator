@@ -3,7 +3,7 @@
   "short_name": "Zipminator",
   "description": "Quantum-Secure Encryption Platform",
   "start_url": "/",
-  "display": "standalone",
+  "display": "minimal-ui",
   "background_color": "#030712",
   "theme_color": "#6366f1",
   "icons": [
