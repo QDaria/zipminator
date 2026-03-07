@@ -358,19 +358,65 @@ The wrapper supports all three Kyber security levels (512, 768, 1024), though th
 
 ---
 
-## Web Dashboard (`web/`)
+## Web Frontend (`web/`)
 
-The web frontend is a Next.js application with the following components:
+The web frontend is a Next.js 16 application with Tailwind CSS (custom `quantum-*` tokens), Framer Motion, and next-auth v5 beta.
 
-- **Hero** -- Product landing section
-- **KeyGenerator** -- Interactive keypair generation
-- **FileVault** -- Encrypted file management
-- **TerminalViewer** -- Live CLI output display
-- **ProviderShowcase** -- Quantum entropy provider status
-- **StatsBar** -- Real-time encryption statistics
-- **DocumentationViewer** -- Embedded documentation
+**Production:** [zipminator.zip](https://zipminator.zip) (Vercel)
 
-The dashboard communicates with the FastAPI backend for all cryptographic operations.
+### Routes
+
+| Route | Purpose |
+|-------|---------|
+| `/` | Landing page (Hero, SS7 threat, 8 modules, tech stack, stats, use cases, CTA) |
+| `/features` | Feature showcase |
+| `/demo` | Interactive demo |
+| `/dashboard` | 9-tab dashboard (requires auth) |
+| `/impact` | Environmental and social impact |
+| `/invest` | 21-slide investor pitch deck (public) |
+| `/auth/login` | OAuth sign-in (GitHub, Google, LinkedIn) |
+
+### Key Components
+
+- **Hero** -- Product landing with animated quantum particles
+- **SS7ThreatSection** -- 4 attack vectors blocked by Zipminator
+- **ModulesSection** -- 8 super-app modules with icons and descriptions
+- **EncryptionStackSection** -- 16 security technologies explained
+- **StatsSection** -- Animated counters (870K+ LOC, 156 qubits, etc.)
+- **CompetitorSection** -- Signal vs ProtonMail vs NordVPN comparison
+- **21 Pitch Slides** -- TitleSlide through ContactSlide with scenario toggles
+- **WaitlistForm** -- Supabase-backed with Zod validation and rate limiting
+
+### Design System
+
+- Fonts: Inter (body), JetBrains Mono (code), Outfit (headings)
+- Colors: `quantum-300` to `quantum-700` gradient palette
+- Classes: `btn-primary`, `card-quantum`, `gradient-text`, `container-custom`
+
+The dashboard communicates with the FastAPI backend for cryptographic operations. Auth is handled by next-auth v5 beta with PKCE S256.
+
+## ZipBrowser (`browser/`)
+
+A Tauri 2.x PQC-enabled desktop browser with:
+
+- PQC TLS proxy (ML-KEM-768 key exchange detection)
+- Built-in Q-VPN (PQ-WireGuard tunnel with kill switch)
+- OpenClaw AI sidebar (summarization, writing assist, chat)
+- PQC password vault (Argon2 master key, ML-KEM encrypted entries)
+- Cookie rotation and fingerprint resistance
+- Zero telemetry architecture
+- Tab management, address bar, navigation controls
+
+## Mobile App (`mobile/`)
+
+An Expo React Native app with:
+
+- PQC Messenger (Double Ratchet, SignalingService)
+- VoIP (WebRTC + PQ-SRTP)
+- Q-VPN toggle
+- Key generator
+- PII scanner
+- 11 test suites, 267+ tests passing
 
 ---
 

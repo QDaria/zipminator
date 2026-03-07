@@ -9,9 +9,11 @@ This guide walks you through installing Zipminator from source, running your fir
 | Requirement | Minimum Version | Purpose |
 |---|---|---|
 | Rust toolchain | 1.70+ | Compiles the Kyber-768 core |
-| Python | 3.8+ | SDK, API server, CLI |
+| Python | 3.11+ | SDK, API server, CLI |
+| micromamba | latest | Python environment manager (preferred over conda/pip) |
 | maturin | 1.0+ | Builds Rust-to-Python bindings via PyO3 |
 | Git | 2.x | Clone the repository |
+| Node.js | 18+ | Web landing, mobile (Expo), browser (Tauri) |
 | PostgreSQL | 15+ | API persistence (optional for SDK-only usage) |
 | Redis | 7+ | Rate limiting and caching (optional for SDK-only usage) |
 
@@ -22,11 +24,21 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source $HOME/.cargo/env
 ```
 
-Install maturin globally:
+Set up the Python environment with micromamba (recommended):
 
 ```bash
-pip install maturin>=1.0
+# Install micromamba if not present
+"${SHELL}" <(curl -L micro.mamba.pm/install.sh)
+
+# Create and activate the zip-pqc environment
+micromamba create -n zip-pqc python=3.11 -c conda-forge -y
+micromamba activate zip-pqc
+
+# Install maturin via uv pip (preferred over pip)
+uv pip install maturin>=1.0
 ```
+
+> **Important:** Always activate `zip-pqc` before running any Python/pip commands. Always use `uv pip install` instead of `pip install`.
 
 ---
 
@@ -50,13 +62,20 @@ This compiles `zipminator-core` (the CRYSTALS-Kyber-768 implementation in Rust) 
 ### 3. Install Python dependencies
 
 ```bash
-pip install -e ".[dev]"
+micromamba activate zip-pqc
+uv pip install -e ".[dev]"
 ```
 
 For quantum provider support (IBM Quantum, Rigetti via qBraid):
 
 ```bash
-pip install -e ".[quantum]"
+uv pip install -e ".[quantum]"
+```
+
+For the full data science stack (JupyterLab, pandas, etc.):
+
+```bash
+bash scripts/install-jupyter-env.sh
 ```
 
 ### 4. Verify the installation
@@ -258,8 +277,33 @@ Ensure you compiled with `--release`. Debug builds are orders of magnitude slowe
 
 ---
 
+## Web Landing & Pitch Deck
+
+The Next.js web frontend runs on port 3099:
+
+```bash
+cd web && npm install --legacy-peer-deps && npm run dev
+```
+
+- Landing page: `http://localhost:3099`
+- 21-slide investor pitch deck: `http://localhost:3099/invest`
+- Dashboard (9 tabs): `http://localhost:3099/dashboard`
+- Production: `https://zipminator.zip`
+
+OAuth providers (GitHub, Google, LinkedIn) are configured in `web/.env.local` with `AUTH_URL=http://localhost:3099`.
+
+## Mobile App (Expo)
+
+```bash
+cd mobile && npm install && npx expo start
+```
+
+11 test suites, 267+ tests passing.
+
 ## Next Steps
 
 - [Architecture Guide](architecture.md) -- understand the system internals
 - [API Reference](api-reference.md) -- full endpoint documentation
 - [Deployment Guide](deployment.md) -- production deployment instructions
+- [Features Matrix](FEATURES.md) -- subscription tiers and module status
+- [Investor Overview](investor-overview.md) -- business case and market opportunity
