@@ -19,8 +19,9 @@ export const SLIDE_TITLES = [
   'Financial Projections', // 16 - Financials
   'Funding Strategy',      // 17 - Grants/funding
   'Risk Analysis',         // 18 - Risks
-  'The Ask',               // 19 - What we need
-  'Contact',               // 20 - Get in touch
+  'Pricing',               // 19 - Pricing tiers
+  'The Ask',               // 20 - What we need
+  'Contact',               // 21 - Get in touch
 ]
 
 export const THREAT_DATA = [
@@ -270,46 +271,95 @@ export const TRACTION_STATS = [
 
 export const PRICING_TIERS = [
   {
-    name: 'Freemium',
+    name: 'Free',
+    characterName: 'Amir',
     price: '$0',
-    target: 'Consumers',
-    features: ['Basic PQC messenger', 'Limited VPN (1GB/mo)', 'Community support'],
+    priceStandard: '$0',
+    target: 'Individual users',
+    levels: '1-3',
+    features: [
+      'Basic PQC messenger',
+      'Anonymization levels 1-3',
+      'Community support',
+      '1 GB data limit',
+    ],
     highlighted: false,
+    earlyAdopter: false,
+    cta: 'Star us on GitHub',
   },
   {
     name: 'Developer',
-    price: '$29/mo',
+    characterName: 'Nils',
+    price: '$9/mo',
+    priceStandard: '$29/mo',
     target: 'Indie devs, small teams',
-    features: ['PQC API access', 'SDK integration', '10GB VPN', 'Priority support'],
+    levels: '1-5',
+    features: [
+      'PQC API access',
+      'Anonymization levels 1-5',
+      '10 GB data limit',
+      'Email support',
+      'SDK integration',
+    ],
     highlighted: false,
+    earlyAdopter: true,
+    cta: 'Start Free Trial',
   },
   {
     name: 'Pro',
-    price: '$99/mo',
+    characterName: 'Solveig',
+    price: '$29/mo',
+    priceStandard: '$69/mo',
     target: 'SMBs, security teams',
+    levels: '1-7',
     features: [
       'Full super-app access',
-      'Unlimited VPN',
-      'QRNG entropy',
-      'Team management',
-      'SLA guarantee',
+      'Anonymization levels 1-7',
+      '100 GB data limit',
+      'Team management & SSO',
+      'Priority support',
     ],
     highlighted: true,
+    earlyAdopter: true,
+    cta: 'Start Free Trial',
   },
   {
     name: 'Enterprise',
+    characterName: 'Robindra',
     price: 'Custom',
+    priceStandard: '$5K-$50K/mo',
     target: 'Government, military, banking',
+    levels: '1-10',
     features: [
+      'All anonymization levels + QRNG',
       'On-premise deployment',
-      'Custom integrations',
-      'Dedicated support',
-      'Compliance reporting',
-      'FIPS 140-3 validation',
+      'HSM support & SLA 99.99%',
+      'Workshops & certifications',
+      'Dedicated CSM',
     ],
     highlighted: false,
+    earlyAdopter: false,
+    cta: 'Contact Sales',
   },
 ]
+
+export const GITHUB_STAR_FEATURES = {
+  headline: 'Star us on GitHub, unlock Developer features free',
+  reward: 'GHSTAR-LEVEL5',
+  unlockedFeatures: [
+    'Anonymization levels 1-5 (normally $9/mo)',
+    'PQC API access',
+    '10 GB data limit',
+    'Email support',
+    'Star Supporter badge',
+    'Share on LinkedIn for social proof',
+  ],
+  badgeColors: {
+    background: '#92400E',
+    border: '#FF6600',
+    text: '#FFFFFF',
+  },
+}
 
 export const TEAM_ROLES = [
   {

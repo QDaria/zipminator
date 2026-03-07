@@ -24,6 +24,7 @@ import FinancialsSlide from '@/components/pitch/slides/FinancialsSlide'
 import FundingStrategySlide from '@/components/pitch/slides/FundingStrategySlide'
 import RiskSlide from '@/components/pitch/slides/RiskSlide'
 import AskSlide from '@/components/pitch/slides/AskSlide'
+import PricingSlide from '@/components/pitch/slides/PricingSlide'
 import ContactSlide from '@/components/pitch/slides/ContactSlide'
 
 const SLIDES = [
@@ -45,8 +46,9 @@ const SLIDES = [
   FinancialsSlide,    // 16
   FundingStrategySlide, // 17
   RiskSlide,          // 18
-  AskSlide,           // 19
-  ContactSlide,       // 20
+  PricingSlide,       // 19
+  AskSlide,           // 20
+  ContactSlide,       // 21
 ]
 
 export default function InvestPage() {

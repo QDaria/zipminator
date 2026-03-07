@@ -5,27 +5,27 @@ This module manages the 4-tier subscription system with activation code validati
 and feature access control. It enforces tier-based limitations on anonymization
 levels, quantum RNG access, and data processing limits.
 
-Character-Named Tiers:
-- Amir (Developers): Free tier with levels 1-3
-- Nils (Professional): $99/mo with levels 4-5
-- Solveig (Teams): $399/mo with levels 6-7
-- Robindra (Enterprise): Custom pricing with levels 8-10 + QRNG
+Hybrid Naming (Public / Internal Character):
+- Free / Amir (Developers): $0 with levels 1-3
+- Developer / Nils (Professional): $9/mo early-adopter, $29/mo standard with levels 1-5
+- Pro / Solveig (Teams): $29/mo early-adopter, $69/mo standard with levels 1-7
+- Enterprise / Robindra: Custom ($5K-$50K/mo) with levels 1-10 + QRNG
 
 License: MIT + Commercial (see LICENSE file)
 """
 
 import re
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
 
 
 class SubscriptionTier(Enum):
     """Subscription tier levels with character names."""
-    DEVELOPERS = "amir"      # Free tier
-    PROFESSIONAL = "nils"    # $99/mo
-    TEAMS = "solveig"        # $399/mo
-    ENTERPRISE = "robindra"  # Contact sales
+    DEVELOPERS = "amir"      # Free ($0)
+    PROFESSIONAL = "nils"    # Developer ($9/mo early, $29/mo standard)
+    TEAMS = "solveig"        # Pro ($29/mo early, $69/mo standard)
+    ENTERPRISE = "robindra"  # Enterprise (custom $5K-$50K/mo)
 
 
 class AnonymizationLevel(Enum):
@@ -35,15 +35,15 @@ class AnonymizationLevel(Enum):
     PARTIAL_REDACTION = 2         # Remove partial data
     STATIC_MASKING = 3            # Static replacement values
 
-    # Tier 2: Professional (Nils) - $99/mo
+    # Tier 2: Developer (Nils) - $9/mo early, $29/mo standard
     HASH_BASED = 4                # SHA-256 hashing
     K_ANONYMITY = 5               # k-anonymity grouping
 
-    # Tier 3: Teams (Solveig) - $399/mo
+    # Tier 3: Pro (Solveig) - $29/mo early, $69/mo standard
     L_DIVERSITY = 6               # l-diversity protection
     T_CLOSENESS = 7               # t-closeness distribution
 
-    # Tier 4: Enterprise (Robindra) - Contact sales
+    # Tier 4: Enterprise (Robindra) - $5K-$50K/mo
     DIFFERENTIAL_PRIVACY = 8      # Differential privacy noise
     GENERALIZATION = 9            # Data generalization
     QUANTUM_PSEUDOANONYMIZATION = 10  # Quantum-enhanced + QRNG
@@ -54,6 +54,7 @@ class SubscriptionFeatures:
     """Features available for each subscription tier."""
     tier: SubscriptionTier
     character_name: str
+    public_name: str
     max_level: int
     qrng_access: bool
     data_limit_gb: Optional[int]  # None = unlimited
@@ -66,6 +67,11 @@ class SubscriptionFeatures:
     sla_guarantee: bool
     on_premise_deployment: bool
     price_monthly: Optional[str]  # None = contact sales
+    price_monthly_standard: Optional[str] = None  # Post-beta price
+    workshops: bool = False
+    certifications: bool = False
+    dedicated_csm: bool = False
+    industry_certifications: Optional[List[str]] = None
 
 
 # Tier configuration
@@ -73,6 +79,7 @@ TIER_FEATURES = {
     SubscriptionTier.DEVELOPERS: SubscriptionFeatures(
         tier=SubscriptionTier.DEVELOPERS,
         character_name="Amir",
+        public_name="Free",
         max_level=3,
         qrng_access=False,
         data_limit_gb=1,
@@ -84,11 +91,13 @@ TIER_FEATURES = {
         hsm_support=False,
         sla_guarantee=False,
         on_premise_deployment=False,
-        price_monthly="Free"
+        price_monthly="$0",
+        price_monthly_standard="$0",
     ),
     SubscriptionTier.PROFESSIONAL: SubscriptionFeatures(
         tier=SubscriptionTier.PROFESSIONAL,
         character_name="Nils",
+        public_name="Developer",
         max_level=5,
         qrng_access=False,
         data_limit_gb=10,
@@ -100,11 +109,13 @@ TIER_FEATURES = {
         hsm_support=False,
         sla_guarantee=False,
         on_premise_deployment=False,
-        price_monthly="$99"
+        price_monthly="$9",
+        price_monthly_standard="$29",
     ),
     SubscriptionTier.TEAMS: SubscriptionFeatures(
         tier=SubscriptionTier.TEAMS,
         character_name="Solveig",
+        public_name="Pro",
         max_level=7,
         qrng_access=False,
         data_limit_gb=100,
@@ -116,11 +127,13 @@ TIER_FEATURES = {
         hsm_support=False,
         sla_guarantee=False,
         on_premise_deployment=False,
-        price_monthly="$399"
+        price_monthly="$29",
+        price_monthly_standard="$69",
     ),
     SubscriptionTier.ENTERPRISE: SubscriptionFeatures(
         tier=SubscriptionTier.ENTERPRISE,
         character_name="Robindra",
+        public_name="Enterprise",
         max_level=10,
         qrng_access=True,
         data_limit_gb=None,  # Unlimited
@@ -132,8 +145,18 @@ TIER_FEATURES = {
         hsm_support=True,
         sla_guarantee=True,
         on_premise_deployment=True,
-        price_monthly=None  # Contact sales
-    )
+        price_monthly="Custom",
+        price_monthly_standard="$5,000-$50,000",
+        workshops=True,
+        certifications=True,
+        dedicated_csm=True,
+        industry_certifications=[
+            "Quantum Computing Fundamentals",
+            "Quantum Machine Learning (QML)",
+            "Quantum+AI Integration",
+            "Post-Quantum Cryptography Specialist",
+        ],
+    ),
 }
 
 
@@ -169,6 +192,7 @@ class SubscriptionManager:
         "ENTERPRISE": SubscriptionTier.ENTERPRISE,
         "PRO": SubscriptionTier.PROFESSIONAL,
         "TEAM": SubscriptionTier.TEAMS,
+        "GHSTAR": SubscriptionTier.PROFESSIONAL,  # GitHub star supporters -> Developer tier
     }
 
     # Regex pattern for activation codes: PREFIX-LEVELX
@@ -486,13 +510,17 @@ class SubscriptionManager:
             result.append({
                 "tier": tier.value,
                 "character_name": features.character_name,
+                "public_name": features.public_name,
                 "levels": f"1-{features.max_level}",
-                "price": features.price_monthly,
+                "price_early_adopter": features.price_monthly,
+                "price_standard": features.price_monthly_standard,
                 "qrng_access": features.qrng_access,
                 "data_limit_gb": features.data_limit_gb or "Unlimited",
                 "support": features.support_level,
                 "api_access": features.api_access,
-                "team_features": features.team_features
+                "team_features": features.team_features,
+                "workshops": features.workshops,
+                "certifications": features.certifications,
             })
         return result
 

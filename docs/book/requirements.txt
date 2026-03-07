@@ -1,0 +1,7 @@
+jupyter-book>=0.15
+matplotlib
+numpy
+pandas
+sphinx-book-theme
+myst-nb
+sphinx-design

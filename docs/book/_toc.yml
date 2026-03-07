@@ -1,0 +1,40 @@
+format: jb-book
+root: index
+
+parts:
+  - caption: Introduction
+    chapters:
+      - file: content/intro
+
+  - caption: Getting Started
+    chapters:
+      - file: content/getting_started
+
+  - caption: Anonymization
+    chapters:
+      - file: content/anonymization_levels
+
+  - caption: API Reference
+    chapters:
+      - file: content/api_reference
+
+  - caption: CLI Reference
+    chapters:
+      - file: content/cli_reference
+
+  - caption: Compliance
+    chapters:
+      - file: content/compliance
+
+  - caption: Tutorials
+    chapters:
+      - file: notebooks/01_quickstart
+      - file: notebooks/02_anonymization
+      - file: notebooks/03_qrng_entropy
+      - file: notebooks/04_compliance
+      - file: notebooks/05_shor_demo
+      - file: notebooks/06_quantum_capabilities
+
+  - caption: Appendix
+    chapters:
+      - file: content/appendix

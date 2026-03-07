@@ -26,13 +26,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return true
     },
-    jwt({ token, user }) {
+    jwt({ token, user, account }) {
       if (user?.id) token.id = user.id
+      // Persist the GitHub access token for star checking
+      if (account?.provider === "github" && account.access_token) {
+        token.githubAccessToken = account.access_token
+      }
       return token
     },
     session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string
+      }
+      // Pass GitHub access token to session for star verification API
+      if (token.githubAccessToken) {
+        ;(session as any).accessToken = token.githubAccessToken
       }
       return session
     },

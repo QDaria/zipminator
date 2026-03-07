@@ -1,0 +1,41 @@
+# Jupyter Book configuration for Zipminator
+# https://jupyterbook.org/customize/config.html
+
+title: "Zipminator"
+author: "Daniel Mo Houshmand - QDaria"
+copyright: "2026"
+logo: ""
+
+execute:
+  execute_notebooks: "off"
+
+sphinx:
+  extra_extensions:
+    - sphinx_design
+  config:
+    html_theme: sphinx_book_theme
+    html_theme_options:
+      repository_url: "https://github.com/qdaria/zipminator"
+      use_repository_button: true
+      use_issues_button: true
+      use_edit_page_button: false
+      launch_buttons:
+        notebook_interface: "jupyterlab"
+    suppress_warnings:
+      - myst.header
+
+parse:
+  myst_enable_extensions:
+    - colon_fence
+    - deflist
+    - dollarmath
+    - fieldlist
+    - html_admonition
+    - html_image
+    - linkify
+    - replacements
+    - smartquotes
+    - substitution
+    - tasklist
+
+bibtex_bibfiles: []

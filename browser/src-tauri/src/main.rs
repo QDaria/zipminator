@@ -5,11 +5,14 @@ mod commands;
 #[allow(dead_code)]
 mod extensions;
 mod navigation;
+mod pqc;
 mod state;
 mod tabs;
 
 // Domain modules (declared in lib.rs, re-used here via crate path)
-use state::{AppState, VpnState};
+use state::AppState;
+#[cfg(feature = "vpn")]
+use state::VpnState;
 use tauri::{Listener, Manager};
 
 fn main() {
@@ -21,7 +24,7 @@ fn main() {
         )
         .init();
 
-    tracing::info!("Starting ZipBrowser v0.1.0");
+    tracing::info!("Starting Zipminator v0.2.0");
 
     // Verify TLS provider before launching the app.
     if let Err(e) = zipbrowser::verify_tls() {
@@ -54,33 +57,29 @@ fn main() {
             });
 
             // ── Domain 3: Initialize the VPN manager ──────────────────────
-            // This ensures the SharedVpnManager is allocated before any Tauri
-            // commands that use `zipbrowser::init_vpn_manager()` are called.
             zipbrowser::init_vpn_manager();
 
-            // Listen for VPN state changes so the AppState mirror stays current.
-            let vpn_handle = app_handle.clone();
-            app.listen("vpn-state-changed", move |event| {
-                let payload_str = event.payload();
-                // The vpn::state::VpnState enum payload is different from
-                // the AppState VpnState struct.  We update the `connected`
-                // field by checking the discriminant string.
-                let managed: tauri::State<'_, AppState> = vpn_handle.state();
-                if let Ok(mut vpn) = managed.vpn_state.lock() {
-                    // Parse the tagged enum { "state": "Connected" | "Disconnected" | … }
-                    if let Ok(v) = serde_json::from_str::<serde_json::Value>(payload_str) {
-                        let state_str = v.get("state").and_then(|s| s.as_str()).unwrap_or("");
-                        vpn.connected = matches!(state_str, "Connected" | "Rekeying");
-                        if vpn.connected {
-                            vpn.protocol = Some("PQ-WireGuard".to_string());
-                        } else {
-                            vpn.protocol = None;
-                            vpn.uptime_secs = 0;
+            #[cfg(feature = "vpn")]
+            {
+                let vpn_handle = app_handle.clone();
+                app.listen("vpn-state-changed", move |event| {
+                    let payload_str = event.payload();
+                    let managed: tauri::State<'_, AppState> = vpn_handle.state();
+                    if let Ok(mut vpn) = managed.vpn_state.lock() {
+                        if let Ok(v) = serde_json::from_str::<serde_json::Value>(payload_str) {
+                            let state_str = v.get("state").and_then(|s| s.as_str()).unwrap_or("");
+                            vpn.connected = matches!(state_str, "Connected" | "Rekeying");
+                            if vpn.connected {
+                                vpn.protocol = Some("PQ-WireGuard".to_string());
+                            } else {
+                                vpn.protocol = None;
+                                vpn.uptime_secs = 0;
+                            }
                         }
                     }
-                }
-                tracing::info!("VPN state updated from event");
-            });
+                    tracing::info!("VPN state updated from event");
+                });
+            }
 
             // ── Domain 1: Restore persisted state ─────────────────────────
             if let Ok(data_dir) = app.path().app_data_dir() {
@@ -150,7 +149,15 @@ fn main() {
             commands::vpn_get_status,
             // Entropy status (Domain 5: privacy engine)
             commands::get_entropy_status,
+            // ── PQC Kyber768 commands (zipminator-core) ───────────────────
+            pqc::pqc_info,
+            pqc::pqc_keygen,
+            pqc::pqc_encapsulate,
+            pqc::pqc_decapsulate,
+            pqc::pqc_self_test,
+            // ── PQC Scanning ─────────────────────────────────────────────
+            commands::scan_pqc_endpoint,
         ])
         .run(tauri::generate_context!())
-        .expect("error running ZipBrowser");
+        .expect("error running Zipminator");
 }

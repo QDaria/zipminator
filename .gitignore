@@ -114,6 +114,8 @@ coverage.xml
 # Jupyter Notebook
 .ipynb_checkpoints
 *.ipynb
+!docs/book/notebooks/*.ipynb
+!examples/notebooks/*.ipynb
 
 # pyenv
 .python-version
@@ -369,3 +371,4 @@ deprecated/
 .claude/worktrees/
 web/screenshots/
 .vercel
+_screenshots/
