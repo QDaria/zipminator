@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import SlideWrapper from '../SlideWrapper'
 import { Shield, Lock, Cpu, Leaf, MapPin } from 'lucide-react'
 import type { Scenario } from '@/lib/pitch-data'
@@ -67,9 +68,16 @@ export default function TitleSlide({ scenario: _scenario }: { scenario?: Scenari
         </motion.div>
 
         {/* Title */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-6">
-          <span className="gradient-text">Zipminator</span>
-          <span className="text-white/40 font-light">-PQC</span>
+        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-6 flex items-end justify-center gap-1">
+          <Image
+            src="/logos/Zipminator_0_gradient.svg"
+            alt="Zipminator"
+            width={500}
+            height={83}
+            className="h-[0.75em] w-auto"
+            priority
+          />
+          <span className="text-white/40 font-light leading-none">-PQC</span>
         </h1>
 
         {/* Subtitle */}

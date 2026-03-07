@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import SlideWrapper from '../SlideWrapper'
 import { CONTACT_INFO } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
@@ -71,11 +72,15 @@ export default function ContactSlide({ scenario: _scenario = 'base' }: { scenari
             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
           />
 
-          {/* Z Letter */}
-          <div className="relative w-28 h-28 rounded-2xl bg-gradient-to-br from-quantum-500 to-quantum-700 flex items-center justify-center shadow-2xl shadow-quantum-500/30">
-            <span className="text-6xl font-display font-black text-white select-none">
-              Z
-            </span>
+          {/* Z Logo */}
+          <div className="relative w-28 h-28 rounded-2xl bg-gradient-to-br from-amber-800 to-amber-950 flex items-center justify-center shadow-2xl shadow-amber-800/30">
+            <Image
+              src="/logos/Z-new.svg"
+              alt="Z"
+              width={80}
+              height={80}
+              className="w-20 h-20 select-none"
+            />
           </div>
         </motion.div>
 
