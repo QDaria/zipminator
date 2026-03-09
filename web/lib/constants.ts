@@ -38,9 +38,9 @@ export const SITE_CONFIG = {
 export const QUANTUM_PROVIDERS = [
   {
     name: 'IBM Quantum',
-    qubits: 127,
+    qubits: 156,
     type: 'Superconducting',
-    processor: 'IBM Brisbane',
+    processor: 'IBM Marrakesh',
   },
   {
     name: 'IonQ',
@@ -70,9 +70,9 @@ export const QUANTUM_PROVIDERS = [
 
 export const PERFORMANCE_STATS = {
   encryptionSpeed: '0.034ms',
-  qubits: 127,
+  qubits: 156,
   securityLevel: 'NIST Level 3',
-  testCoverage: '95%+',
+  testsPassing: '287+',
   costReduction: '15x',
   memoryReduction: '32.3%',
 }

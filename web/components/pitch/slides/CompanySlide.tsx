@@ -58,7 +58,7 @@ const DIFFERENTIATORS = [
 const STAT_BADGES = [
   { Icon: Calendar, label: 'Founded 2024', color: 'text-quantum-400' },
   { Icon: Package, label: '8 Products', color: 'text-purple-400' },
-  { Icon: Code2, label: '870K+ LOC', color: 'text-cyan-400' },
+  { Icon: Code2, label: '300K+ LOC', color: 'text-cyan-400' },
   { Icon: Wrench, label: '26 Technologies', color: 'text-emerald-400' },
 ]
 

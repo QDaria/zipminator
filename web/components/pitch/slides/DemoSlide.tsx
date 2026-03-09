@@ -304,7 +304,7 @@ const MODULES: ModuleTab[] = [
     name: 'Quantum Vault',
     tagline: 'Lock your files with math that quantum computers can\'t crack',
     icon: Shield,
-    keyPoint: 'Military-grade self-destruct. Files overwritten 3 times then deleted.',
+    keyPoint: 'NIST-standardized self-destruct. Files overwritten 3 times then deleted.',
     accentColor: 'text-quantum-400',
     accentBg: 'bg-quantum-500/10',
     accentBorder: 'border-quantum-500/20',

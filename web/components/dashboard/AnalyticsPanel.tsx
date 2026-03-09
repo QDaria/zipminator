@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 
 const STATS = [
-  { label: 'Lines of Code', value: 289000, suffix: '+', icon: Code2, color: 'text-quantum-400' },
+  { label: 'Lines of Code', value: 300000, suffix: '+', icon: Code2, color: 'text-quantum-400' },
   { label: 'Source Files', value: 1780, suffix: '+', icon: FileCode2, color: 'text-purple-400' },
   { label: 'Encryption Algorithms', value: 11, suffix: '+', icon: Shield, color: 'text-green-400' },
   { label: 'Security Layers', value: 10, suffix: '', icon: Layers, color: 'text-yellow-400' },

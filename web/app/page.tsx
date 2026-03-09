@@ -19,19 +19,19 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <WorldFirst />
+      <ProjectScale />
       <ProviderShowcase />
       <SS7Killer />
       <SuperAppShowcase />
       <DeviceShield />
       <KeyFeatures />
       <EncryptionStack />
-      <ProjectScale />
       <StatsBar />
-      <WorldFirst />
       <IndustryImpact />
-      <HowItWorks />
       <TrustSignals />
       <UseCases />
+      <HowItWorks />
       <WaitlistForm />
       <CTA />
     </>

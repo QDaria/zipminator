@@ -108,7 +108,7 @@ export default function TitleSlide({ scenario: _scenario }: { scenario?: Scenari
           {[
             { label: 'NIST FIPS 203', desc: 'Kyber768' },
             { label: '156 Qubits', desc: 'QRNG' },
-            { label: '870K+ LOC', desc: 'Production Code' },
+            { label: '300K+ LOC', desc: 'Production Code' },
             { label: '8 Modules', desc: 'Super-App' },
           ].map((stat, i) => (
             <div key={i} className="text-center">

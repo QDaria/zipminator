@@ -110,7 +110,7 @@ Zipminator is a production-grade post-quantum cryptography platform built on NIS
 **Core Technology:**
 - Kyber768 KEM (FIPS 203 ML-KEM) implemented in Rust with constant-time guarantees
 - Quantum entropy harvesting from NISQ quantum processors (IBM, Rigetti, qBraid -- 156 qubits)
-- 870,000+ lines of code across 8 integrated modules
+- 300K+ lines of code across 8 integrated modules
 
 **Defense-Relevant Modules:**
 1. **Encrypted Messaging:** Quantum-safe messaging for command and control
@@ -147,7 +147,7 @@ Zipminator is a production-grade post-quantum cryptography platform built on NIS
 
 - **Interoperability:** Standards-based (NIST FIPS 203/204/205) ensures cross-ally compatibility
 - **Sovereignty:** Norwegian-developed, NATO-ally owned IP -- no foreign dependency
-- **Speed to deployment:** 870K+ LOC already built; not starting from scratch
+- **Speed to deployment:** 300K+ LOC already built; not starting from scratch
 - **Scalability:** Modular architecture deploys from single-user to theater-wide
 - **Quantum entropy:** Unique differentiator -- true quantum randomness for key generation
 

@@ -224,7 +224,7 @@ Our Phase I research will:
 - **Market**: Global PQC market projected at USD 17.2B by 2030
 - **Customers**: US federal agencies (DoD, DHS, NSA), critical infrastructure operators, financial institutions
 - **Revenue model**: SaaS licensing, enterprise site licenses, managed PQC-as-a-Service
-- **Competitive advantage**: Only integrated PQC platform with quantum entropy; Rust-native Kyber768 with 870K+ LOC across 8 modules
+- **Competitive advantage**: Only integrated PQC platform with quantum entropy; Rust-native Kyber768 with 300K+ LOC across 8 modules
 - **Phase III path**: DoD adoption via CNSA 2.0 mandate; DHS critical infrastructure protection
 
 #### Team

@@ -124,7 +124,7 @@ const softwareSchema = {
     '@type': 'Offer',
     price: '0',
     priceCurrency: 'USD',
-    description: 'Open source with MIT and commercial licensing options',
+    description: 'Open-source licensed with MIT and commercial licensing options',
   },
   author: {
     '@type': 'Organization',
@@ -137,7 +137,7 @@ const softwareSchema = {
     'Real quantum entropy from IBM 156-qubit hardware',
     'Cross-platform support (Rust, Python, JavaScript)',
     'Easy integration',
-    'Open source',
+    'Open-source licensed',
   ],
 }
 

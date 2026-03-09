@@ -189,7 +189,7 @@ QDaria has developed Zipminator, a production-grade PQC platform with:
 2. **8 communication modules** -- simultaneous PQC transition for messaging, file encryption, VPN, browser, VoIP, email, device protection, and key management
 3. **Quantum entropy pipeline** -- real quantum random number generation from 156-qubit quantum processors (IBM, Rigetti, qBraid), exceeding NIST SP 800-90B entropy requirements
 4. **Crypto-agile architecture** -- algorithm-swappable design allows transition to future NIST standards without platform replacement
-5. **870,000+ lines of production code** -- not a prototype; ready for operational testing
+5. **300,000+ lines of production code** -- not a prototype; ready for operational testing
 
 #### Key Innovation
 Integration of quantum-sourced entropy into a full-stack PQC platform. While classical CSPRNGs are computationally secure, true quantum randomness from physical quantum processes provides information-theoretic security guarantees for key generation. This is unique among PQC implementations.

@@ -86,12 +86,12 @@ export default function ContactSlide({ scenario: _scenario = 'base' }: { scenari
 
         {/* Heading */}
         <motion.div {...fadeUp(0.1)}>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-4">
             Let&apos;s Build the Future
             <br />
             <span className="gradient-text">of Security</span>
           </h2>
-          <p className="text-lg text-gray-400 max-w-xl mx-auto mb-4">
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-4">
             Quantum threats are not theoretical. The migration deadline is real.
             We are building the tools the world needs.
           </p>
@@ -118,7 +118,7 @@ export default function ContactSlide({ scenario: _scenario = 'base' }: { scenari
 
         {/* Next Steps */}
         <motion.div {...fadeUp(0.17)} className="w-full max-w-2xl mb-10">
-          <h3 className="text-base font-semibold text-white mb-4">Next Steps</h3>
+          <h3 className="text-sm font-semibold text-white mb-4">Next Steps</h3>
           <div className="grid sm:grid-cols-3 gap-4">
             {NEXT_STEPS.map((s) => (
               <div key={s.step} className="card-quantum flex flex-col items-center gap-2 py-4 relative">
@@ -170,8 +170,8 @@ export default function ContactSlide({ scenario: _scenario = 'base' }: { scenari
           <p className="text-lg text-gray-300 font-display">Thank you.</p>
           <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
             <span className="w-1.5 h-1.5 rounded-full bg-quantum-500" />
-            <span>
-              A <span className="text-gray-400 font-semibold">QDaria</span> Company
+            <span className="inline-flex items-center gap-1.5">
+              A <Image src="/logos/QDwordmark2.svg" alt="QDaria" width={80} height={20} className="inline-block align-baseline" /> Company
             </span>
           </div>
         </motion.div>

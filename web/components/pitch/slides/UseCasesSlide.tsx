@@ -111,7 +111,7 @@ const INDUSTRIES: IndustryCard[] = [
     name: 'Enterprise Tech',
     icon: Server,
     description: 'API security, code signing, and DevOps secrets with PQC',
-    badges: ['SOC 2', 'ISO 27001', '3-Line SDK'],
+    badges: ['NIST FIPS 203', 'PQC-Ready', '3-Line SDK'],
     accentColor: 'text-cyan-400',
     accentBg: 'bg-cyan-500/15',
     accentBorder: 'border-cyan-500/25',

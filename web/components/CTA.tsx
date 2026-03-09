@@ -154,13 +154,13 @@ const CTA = () => {
           >
             <div className="flex items-center space-x-2">
               <Star className="w-4 h-4 text-quantum-400" />
-              <span className="font-semibold text-white">Open Source</span>
-              <span>Apache-2.0 Licensed</span>
+              <span className="font-semibold text-white">Open-Source Licensed (MIT)</span>
+              <span>Apache-2.0 Crypto Core</span>
             </div>
             <div className="hidden md:block w-px h-6 bg-gray-700" />
             <div className="flex items-center space-x-2">
               <Clock className="w-4 h-4 text-quantum-400" />
-              <span className="font-semibold text-white">166/166</span>
+              <span className="font-semibold text-white">287/287</span>
               <span>Tests Passing</span>
             </div>
             <div className="hidden md:block w-px h-6 bg-gray-700" />

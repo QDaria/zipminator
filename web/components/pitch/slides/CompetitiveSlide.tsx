@@ -273,7 +273,7 @@ export default function CompetitiveSlide({ scenario: _scenario }: { scenario?: S
         {[
           { name: 'SandboxAQ', amount: '$950M raised', valuation: '$5.75B' },
           { name: 'PQShield', amount: '$70M raised', valuation: 'Series B' },
-          { name: 'Zipminator', amount: 'Seed stage', valuation: '870K LOC built' },
+          { name: 'Zipminator', amount: 'Seed stage', valuation: '300K LOC built' },
         ].map((badge) => (
           <div
             key={badge.name}

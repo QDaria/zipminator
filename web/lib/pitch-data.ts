@@ -261,7 +261,7 @@ export const COMPETITORS = [
 ]
 
 export const TRACTION_STATS = [
-  { label: 'Lines of Code', value: '870K+', detail: 'Production-quality codebase' },
+  { label: 'Lines of Code', value: '300K+', detail: 'Production-quality codebase' },
   { label: 'Platforms', value: '5', detail: 'Web, iOS, Android, Desktop, API' },
   { label: 'Technologies', value: '26', detail: 'Integrated security stack' },
   { label: 'Languages', value: '7', detail: 'Rust, Python, TypeScript, Swift, Kotlin, Go, C' },
@@ -519,7 +519,7 @@ export const RISK_MATRIX = [
     risk: 'Big tech enters PQC consumer market',
     impact: 'high' as const,
     probability: 'medium' as const,
-    mitigation: 'First-mover advantage; 870K LOC head start; super-app integration moat',
+    mitigation: 'First-mover advantage; 300K LOC head start; super-app integration moat',
   },
   {
     risk: 'NIST algorithm vulnerabilities discovered',
@@ -597,7 +597,7 @@ export const COMPARABLE_RAISES = [
 export const COMPANY_STATS = [
   { label: 'Founded', value: '2024' },
   { label: 'Products', value: '8' },
-  { label: 'Code Base', value: '870K+ LOC' },
+  { label: 'Code Base', value: '300K+ LOC' },
   { label: 'Technologies', value: '26' },
 ]
 
@@ -668,7 +668,7 @@ export const SOCIAL_RESPONSIBILITY = {
       title: 'Open Source & Community',
       icon: 'GitBranch',
       description: 'Core cryptographic primitives are open-source (MIT licensed), enabling community audit, academic verification, and industry-wide security improvement.',
-      impact: '870K+ LOC of security infrastructure contributed to the global commons',
+      impact: '300K+ LOC of security infrastructure contributed to the global commons',
     },
     {
       title: 'Ethical AI Commitment',
@@ -830,5 +830,5 @@ export const USE_CASE_INDUSTRIES = [
   { name: 'Finance & Banking', icon: 'Landmark', color: 'green', description: 'Transaction data and trading algorithms quantum-proofed', compliance: ['PCI-DSS', 'SOX', 'SWIFT PQC'] },
   { name: 'Critical Infrastructure', icon: 'Zap', color: 'orange', description: 'Power grids, water systems, telecom. SS7 attacks stop here', compliance: ['NERC CIP', 'ICS-CERT', 'EU NIS2'] },
   { name: 'Legal & IP', icon: 'Scale', color: 'purple', description: 'Attorney-client privilege and trade secrets protected for decades', compliance: ['ABA Rules', 'GDPR', 'IP Law'] },
-  { name: 'Enterprise Tech', icon: 'Server', color: 'cyan', description: 'API security, code signing, and DevOps secrets with PQC', compliance: ['SOC 2', 'ISO 27001', 'FIPS 140-3'] },
+  { name: 'Enterprise Tech', icon: 'Server', color: 'cyan', description: 'API security, code signing, and DevOps secrets with PQC', compliance: ['NIST FIPS 203', 'PQC-Ready', '3-Line SDK'] },
 ]

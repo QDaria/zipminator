@@ -248,7 +248,7 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
           <span className="text-quantum-400 font-semibold">Market context:</span>{' '}
           SandboxAQ reached $5.75B valuation. PQC market growing{' '}
           <span className="text-white font-semibold">39-46% CAGR</span> through 2030.
-          NIST mandate deadline (2035) creates guaranteed demand curve.
+          NIST mandate deadline (2035) creates projected demand curve.
         </p>
       </motion.div>
 

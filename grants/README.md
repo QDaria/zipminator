@@ -1,7 +1,7 @@
 # Zipminator Grant Applications Index
 
 **Applicant:** QDaria AS (Norwegian company, Org.nr: TBD)
-**Product:** Zipminator -- Post-Quantum Cryptography Platform (Kyber768 engine, 870K+ LOC, 8 product modules)
+**Product:** Zipminator -- Post-Quantum Cryptography Platform (Kyber768 engine, 300K+ LOC, 8 product modules)
 **Stage:** Seed / Pre-Series A
 **Total Funding Targeted:** ~EUR 12-15M across all programs
 

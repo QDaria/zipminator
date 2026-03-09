@@ -51,7 +51,7 @@ const docSections = [
   { icon: Code2, title: 'API Reference', desc: 'Full SDK documentation for Python, Rust, and Node.js bindings.', href: '#sdk', color: 'text-blue-400' },
   { icon: Terminal, title: 'CLI Reference', desc: 'Command-line tool for key management, encryption, and PII scanning.', href: '#sdk', color: 'text-purple-400' },
   { icon: Layers, title: '10-Level Anonymization', desc: 'From basic redaction to quantum-secure k-anonymity with differential privacy.', href: '#anonymization', color: 'text-orange-400' },
-  { icon: Shield, title: 'Compliance & Certifications', desc: 'NIST FIPS 203 (ML-KEM-768), NIST Security Level 3, KAT vector verification.', href: '#compliance', color: 'text-cyan-400' },
+  { icon: Shield, title: 'Compliance & Standards', desc: 'NIST FIPS 203 (ML-KEM-768), NIST Security Level 3, KAT vector verification.', href: '#compliance', color: 'text-cyan-400' },
   { icon: FlaskConical, title: 'JupyterLab Integration', desc: 'Magic commands, interactive widgets, and quantum entropy visualization.', href: '#jupyter', color: 'text-yellow-400' },
 ]
 

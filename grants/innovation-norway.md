@@ -75,7 +75,7 @@ Innovation Norway is the Norwegian government's instrument for innovation and de
 
 #### 1. Company Description
 
-**QDaria AS** is a Norwegian deep-tech startup developing Zipminator, a post-quantum cryptography (PQC) platform built on NIST-standardized Kyber768 lattice-based key encapsulation. The platform comprises 870,000+ lines of code across 8 product modules, delivering quantum-resistant encryption for enterprise, government, and critical infrastructure.
+**QDaria AS** is a Norwegian deep-tech startup developing Zipminator, a post-quantum cryptography (PQC) platform built on NIST-standardized Kyber768 lattice-based key encapsulation. The platform comprises 300K+ lines of code across 8 product modules, delivering quantum-resistant encryption for enterprise, government, and critical infrastructure.
 
 **Founded:** [YEAR]
 **Org.nr:** [TBD]

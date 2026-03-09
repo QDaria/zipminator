@@ -254,7 +254,7 @@ const Footer = () => {
             <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-500">
               <div className="flex items-center space-x-2 group cursor-default">
                 <div className="w-4 h-4 bg-blue-600 rounded group-hover:scale-110 transition-transform" />
-                <span className="group-hover:text-gray-400 transition-colors">NIST FIPS 203 Compliant</span>
+                <span className="group-hover:text-gray-400 transition-colors">NIST FIPS 203 Standard</span>
               </div>
               <div className="flex items-center space-x-2 group cursor-default">
                 <div className="w-4 h-4 bg-green-600 rounded group-hover:scale-110 transition-transform" />

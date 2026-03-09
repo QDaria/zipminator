@@ -185,8 +185,8 @@ const EncryptionStack = () => {
           </h2>
 
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Every layer of communication protected by military-grade,
-            NIST-approved post-quantum cryptography
+            Every layer of communication protected by NIST-approved
+            post-quantum cryptography
           </p>
         </motion.div>
 

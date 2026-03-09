@@ -109,7 +109,7 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
           Traction
         </p>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
-          <span className="gradient-text">870K+ Lines</span> of Production Code
+          <span className="gradient-text">300K+ Lines</span> of Production Code
         </h2>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           Not a whitepaper. A working system across 5 platforms, 7 languages, and 26 integrated technologies.

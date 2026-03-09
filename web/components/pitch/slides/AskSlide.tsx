@@ -55,7 +55,7 @@ const MILESTONES = [
       'Secure government grants',
       'MVP launch (Messenger + VPN)',
       'First 500 users',
-      'SOC 2 readiness',
+      'SOC 2 readiness assessment planned',
     ],
   },
   {
@@ -84,7 +84,7 @@ const SEED_DELIVERABLES = [
   { icon: Users, label: 'MVP launch with 500+ beta users' },
   { icon: ShieldCheck, label: 'SOC 2 readiness assessment' },
   { icon: FileCheck, label: '2-3 enterprise pilot agreements' },
-  { icon: Sparkles, label: 'FIPS 140-3 validation initiated' },
+  { icon: Sparkles, label: 'FIPS 140-3 validation planned (roadmap)' },
   { icon: Smartphone, label: 'Full mobile app (iOS + Android)' },
 ]
 

@@ -36,7 +36,7 @@ function useCounter(end: number, duration = 1400, start = 0) {
 }
 
 const stats = [
-  { icon: Code2, end: 870000, suffix: '+', label: 'Total Project Lines', format: true },
+  { icon: Code2, end: 300000, suffix: '+', label: 'Total Project Lines', format: true },
   { icon: FileText, end: 1902, suffix: '+', label: 'Project Files', format: true },
   { icon: Shield, end: 26, suffix: '', label: 'Security Technologies', format: false },
   { icon: Layers, end: 10, suffix: '', label: 'Anonymization Levels', format: false },

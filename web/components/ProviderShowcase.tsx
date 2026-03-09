@@ -110,7 +110,7 @@ const ProviderShowcase = () => {
           </h2>
 
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Powered by real quantum hardware and certified cryptographic standards
+            Powered by real quantum hardware and NIST-standardized cryptographic algorithms
           </p>
         </motion.div>
 
@@ -181,12 +181,12 @@ const ProviderShowcase = () => {
 
           <div className="card-quantum text-center">
             <div className="text-3xl font-bold text-quantum-400 mb-2">NIST Level 3</div>
-            <div className="text-gray-400">Security Certification</div>
+            <div className="text-gray-400">Security Level</div>
           </div>
 
           <div className="card-quantum text-center">
             <div className="text-3xl font-bold text-quantum-400 mb-2">100%</div>
-            <div className="text-gray-400">Open Source</div>
+            <div className="text-gray-400">Open-Source Licensed (MIT)</div>
           </div>
         </motion.div>
 

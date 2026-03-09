@@ -11,12 +11,12 @@ const certifications = [
   },
   {
     name: 'Memory-Safe Rust',
-    description: 'Zero vulnerabilities, 100% safe',
+    description: 'No unsafe blocks in crypto core',
     icon: Lock,
   },
   {
     name: 'NIST Level 3',
-    description: 'Highest security classification',
+    description: 'AES-192 equivalent post-quantum security',
     icon: Award,
   },
 ]
@@ -50,7 +50,7 @@ const TrustSignals = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-center mb-8"
           >
-            <h3 className="text-2xl font-bold text-white mb-2">Industry Certifications</h3>
+            <h3 className="text-2xl font-bold text-white mb-2">Security Standards</h3>
             <p className="text-gray-400">Meeting the highest standards in post-quantum cryptography</p>
           </motion.div>
 
@@ -88,7 +88,7 @@ const TrustSignals = () => {
         >
           <div className="inline-block bg-quantum-900/30 border border-quantum-500/30 rounded-full px-6 py-3">
             <p className="text-lg text-quantum-300">
-              <span className="font-bold">95%+</span> test coverage • <span className="font-bold">100%</span> memory-safe • <span className="font-bold">0</span> vulnerabilities
+              <span className="font-bold">287</span> tests passing • <span className="font-bold">Memory-safe</span> Rust core • <span className="font-bold">Constant-time</span> crypto
             </p>
           </div>
         </motion.div>

@@ -89,7 +89,7 @@ The Research Council of Norway (Norges forskningsrad) is the primary funder of r
 
 #### 2. Project Summary
 
-Q-SAFE will advance the state of the art in post-quantum cryptographic deployment for Norwegian critical infrastructure. Building on QDaria's Zipminator platform (Kyber768 KEM engine, 870K+ LOC), this project will conduct R&D on:
+Q-SAFE will advance the state of the art in post-quantum cryptographic deployment for Norwegian critical infrastructure. Building on QDaria's Zipminator platform (Kyber768 KEM engine, 300K+ LOC), this project will conduct R&D on:
 
 - Hybrid classical/post-quantum key exchange protocols optimized for Norwegian telecom networks
 - Quantum entropy harvesting from NISQ-era quantum processors for cryptographic seed generation

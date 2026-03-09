@@ -40,7 +40,7 @@ export default function ImpactPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
           >
-            289,000 lines of code. 35+ engineers worth of expertise.
+            300K+ lines of production code.
             Delivered as a single installable application.
           </motion.p>
         </div>

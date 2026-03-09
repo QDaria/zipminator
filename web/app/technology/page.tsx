@@ -228,7 +228,7 @@ export default function TechnologyPage() {
           >
             <span className="text-quantum-400 font-semibold">26 security technologies</span>,{' '}
             <span className="text-quantum-400 font-semibold">8 integrated modules</span>, and{' '}
-            <span className="text-quantum-400 font-semibold">870K+ lines of code</span>{' '}
+            <span className="text-quantum-400 font-semibold">300K+ lines of code</span>{' '}
             engineered to withstand quantum-era threats.
           </motion.p>
 

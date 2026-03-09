@@ -89,7 +89,7 @@ const Hero = () => {
             <span className="text-quantum-400 font-bold">156-qubit IBM hardware</span>
             {' '}combined with{' '}
             <span className="text-quantum-400 font-bold">NIST FIPS 203 Kyber768</span>
-            {' '}cryptography for unbreakable security
+            {' '}cryptography for quantum-resistant security
           </motion.p>
 
           {/* CTA Buttons */}

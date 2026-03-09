@@ -35,7 +35,7 @@ const useCases = [
     features: [
       'Classified data protection',
       'NIST compliance',
-      'Military-grade security',
+      'NIST-standardized post-quantum security',
       'Critical infrastructure',
     ],
     gradient: 'from-green-500 to-emerald-500',

@@ -111,7 +111,7 @@ Invited applicants with GO from Stage 1:
 
 The quantum computing revolution will break today's internet encryption. RSA and ECC, the cryptographic foundations of every secure website, banking app, and government system, will become vulnerable to quantum computers expected within 5-10 years. Adversaries are already executing "harvest now, decrypt later" attacks, storing encrypted data today for future quantum decryption. The EU has mandated PQC transition to begin by end of 2026.
 
-QDaria AS (Norway) has built Zipminator, the world's first integrated post-quantum cryptography platform. With 870,000+ lines of code, a Rust-native Kyber768 engine (NIST FIPS 203), and quantum entropy from real quantum hardware (156 qubits), Zipminator provides 8 quantum-safe product modules: encrypted messaging, file vault, VPN, secure browser, VoIP, email encryption, device shield, and key management.
+QDaria AS (Norway) has built Zipminator, the world's first integrated post-quantum cryptography platform. With 300,000+ lines of code, a Rust-native Kyber768 engine (NIST FIPS 203), and quantum entropy from real quantum hardware (156 qubits), Zipminator provides 8 quantum-safe product modules: encrypted messaging, file vault, VPN, secure browser, VoIP, email encryption, device shield, and key management.
 
 **Market:** The global PQC market is projected at USD 17.2B by 2030. Every organization handling sensitive data will need to transition. Our beachhead: European critical infrastructure operators facing the 2030 EU PQC deadline.
 
@@ -128,7 +128,7 @@ QDaria AS (Norway) has built Zipminator, the world's first integrated post-quant
 "Zipminator is the post-quantum cryptography platform that makes this transition possible. Built in Rust for maximum performance and security, our Kyber768 engine implements the NIST standard for quantum-resistant encryption. But we go further: we harvest true randomness from quantum computers for key generation. No other platform combines standardized PQC algorithms with quantum entropy in a single, deployable product suite."
 
 **[1:15-2:00] The Product and Traction**
-"Zipminator includes 8 modules: encrypted messaging, file vault, VPN, secure browser, VoIP, email encryption, device shield, and key management. 870,000 lines of production code. We have [NUMBER] pilot customers and [NUMBER] letters of intent. [MENTION any revenue, awards, partnerships]."
+"Zipminator includes 8 modules: encrypted messaging, file vault, VPN, secure browser, VoIP, email encryption, device shield, and key management. 300,000 lines of production code. We have [NUMBER] pilot customers and [NUMBER] letters of intent. [MENTION any revenue, awards, partnerships]."
 
 **[2:00-2:30] The Market and Business Model**
 "The global post-quantum cryptography market will reach USD 17 billion by 2030. We sell via SaaS subscriptions to enterprises and per-seat licenses to government. Our beachhead is European critical infrastructure, driven by the EU's 2030 PQC mandate. We then expand to defense, financial services, and healthcare globally."

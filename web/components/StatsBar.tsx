@@ -24,8 +24,8 @@ const stats = [
   },
   {
     icon: CheckCircle,
-    value: '95%+',
-    label: 'Test Coverage',
+    value: '287+',
+    label: 'Tests Passing',
     description: 'Comprehensive quality assurance',
   },
 ]

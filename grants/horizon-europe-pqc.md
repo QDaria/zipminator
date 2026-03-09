@@ -96,7 +96,7 @@ Zipminator/QDaria should form a consortium with partners such as:
 
 #### 2. Project Summary
 
-PQ-TRANSIT will develop, validate, and demonstrate the integration of NIST-standardized post-quantum cryptographic algorithms (ML-KEM/Kyber768, ML-DSA/Dilithium) into production-grade high-level protocols including TLS 1.3, IPsec/IKEv2, S/MIME, and Signal Protocol. Building on QDaria's Zipminator platform (870K+ LOC, Kyber768 engine), the project will deliver open-source hybrid PQC transition tools, performance benchmarks for European network infrastructure, and pilot deployments in telecom, healthcare, and government environments across 4 European countries.
+PQ-TRANSIT will develop, validate, and demonstrate the integration of NIST-standardized post-quantum cryptographic algorithms (ML-KEM/Kyber768, ML-DSA/Dilithium) into production-grade high-level protocols including TLS 1.3, IPsec/IKEv2, S/MIME, and Signal Protocol. Building on QDaria's Zipminator platform (300K+ LOC, Kyber768 engine), the project will deliver open-source hybrid PQC transition tools, performance benchmarks for European network infrastructure, and pilot deployments in telecom, healthcare, and government environments across 4 European countries.
 
 #### 3. Consortium
 

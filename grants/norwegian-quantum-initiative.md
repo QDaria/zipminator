@@ -91,7 +91,7 @@ Establish Norway as a global leader in post-quantum cryptographic infrastructure
 
 QDaria brings the most mature PQC technology platform in Norway:
 
-- **Zipminator Platform:** 870,000+ LOC, production-grade Kyber768 engine in Rust
+- **Zipminator Platform:** 300K+ LOC, production-grade Kyber768 engine in Rust
 - **8 Product Modules:** Encrypted messaging, file vault, VPN, browser, VoIP, email, device shield, key management
 - **Quantum Entropy Harvesting:** Integration with IBM, Rigetti, and qBraid quantum hardware (156 qubits)
 - **NIST Compliance:** Built on FIPS 203 (ML-KEM/Kyber768), FIPS 204 (ML-DSA/Dilithium)
@@ -153,4 +153,4 @@ QDaria brings the most mature PQC technology platform in Norway:
 
 #### 7. Why QDaria / Zipminator is Critical
 
-No other Norwegian entity has a production-grade PQC platform. Zipminator's 870K+ LOC codebase, Kyber768 engine, and 8 product modules represent years of development that would take a consortium starting from scratch 3-5 years to replicate. QDaria provides the technology foundation that makes a 5-year quantum-safe Norway achievable.
+No other Norwegian entity has a production-grade PQC platform. Zipminator's 300K+ LOC codebase, Kyber768 engine, and 8 product modules represent years of development that would take a consortium starting from scratch 3-5 years to replicate. QDaria provides the technology foundation that makes a 5-year quantum-safe Norway achievable.

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 
 const stats = [
-  { icon: Code2, value: 870000, suffix: '+', label: 'Total Project Lines', format: true },
+  { icon: Code2, value: 300000, suffix: '+', label: 'Total Project Lines', format: true },
   { icon: FileCode, value: 1902, suffix: '+', label: 'Project Files', format: true },
   { icon: Lock, value: 26, suffix: '', label: 'Security Technologies', format: false },
   { icon: Layers, value: 10, suffix: '', label: 'Anonymization Levels', format: false },
