@@ -108,15 +108,20 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(value: any) => <span style={{ color: '#d1d5db', fontSize: 12 }}>{SCENARIO_META[value as Scenario]?.label ?? value}</span>}
             />
-            {scenario === 'all' ? (
-              <>
-                <Area type="monotone" dataKey="conservative" stroke="#3b82f6" fill="url(#gradScenarioConservative)" strokeWidth={2} animationDuration={1200} />
-                <Area type="monotone" dataKey="base" stroke="#6366f1" fill="url(#gradScenarioBase)" strokeWidth={2} animationDuration={1200} />
-                <Area type="monotone" dataKey="upside" stroke="#22c55e" fill="url(#gradScenarioUpside)" strokeWidth={2} animationDuration={1200} />
-              </>
-            ) : (
-              <Area type="monotone" dataKey={effectiveScenario} stroke={SCENARIO_COLORS[effectiveScenario]} fill={`url(#gradScenario${effectiveScenario.charAt(0).toUpperCase() + effectiveScenario.slice(1)})`} strokeWidth={2} animationDuration={1200} />
-            )}
+            {(scenario === 'all'
+              ? (['conservative', 'base', 'upside'] as const)
+              : [effectiveScenario]
+            ).map((key) => (
+              <Area
+                key={key}
+                type="monotone"
+                dataKey={key}
+                stroke={SCENARIO_COLORS[key]}
+                fill={`url(#gradScenario${key.charAt(0).toUpperCase() + key.slice(1)})`}
+                strokeWidth={2}
+                animationDuration={1200}
+              />
+            ))}
           </AreaChart>
         </ResponsiveContainer>
       </motion.div>
