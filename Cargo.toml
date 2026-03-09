@@ -1,10 +1,12 @@
 [workspace]
 members = [
     "crates/zipminator-core",
+    "crates/zipminator-app",
     "crates/zipminator-fuzz",
     "crates/zipminator-nist",
     "crates/zipminator-bench",
     "browser/src-tauri",
+    "app/rust",
 ]
 resolver = "2"
 

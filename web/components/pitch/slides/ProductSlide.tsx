@@ -54,6 +54,7 @@ const MODULE_NAME_TO_ROADMAP: Record<string, string> = {
   'QRNG Engine': 'Quantum Vault',
   'PII Anonymizer': 'Anonymizer',
   'AI Assistant': 'AI Assistant',
+  'Q-Sense Mesh': 'Q-Sense Mesh',
 }
 
 function getModuleStatus(moduleName: string) {
@@ -86,7 +87,7 @@ export default function ProductSlide({ scenario: _scenario }: { scenario?: Scena
           <span className="gradient-text">Suite</span>
         </h2>
         <p className="text-lg text-gray-400 max-w-2xl">
-          Eight deeply integrated modules, each built on NIST-approved
+          Nine deeply integrated modules, each built on NIST-approved
           post-quantum cryptography from the ground up.
         </p>
       </motion.div>

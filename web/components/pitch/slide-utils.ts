@@ -19,6 +19,7 @@ import {
   Database,
   Zap,
   AlertTriangle,
+  Wifi,
 } from 'lucide-react'
 
 // ---------------------------------------------------------------------------
@@ -169,4 +170,5 @@ export const MODULE_ICON_MAP: Record<string, typeof Shield> = {
   Database,
   Zap,
   AlertTriangle,
+  Wifi,
 }

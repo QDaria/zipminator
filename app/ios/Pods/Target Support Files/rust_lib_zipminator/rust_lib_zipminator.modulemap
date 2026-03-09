@@ -1,0 +1,6 @@
+framework module rust_lib_zipminator {
+  umbrella header "rust_lib_zipminator-umbrella.h"
+
+  export *
+  module * { export * }
+}

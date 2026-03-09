@@ -297,7 +297,7 @@ export default function CompetitiveSlide({ scenario: _scenario }: { scenario?: S
           {
             title: 'Integration Moat',
             detail:
-              'No one ships all 8 modules. Each integration deepens the switching cost.',
+              'No one ships all 9 modules. Each integration deepens the switching cost.',
           },
           {
             title: 'PQC-Native',

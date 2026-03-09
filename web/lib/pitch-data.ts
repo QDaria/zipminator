@@ -107,6 +107,12 @@ export const SUPER_APP_MODULES = [
     description: 'Security-aware AI with quantum context',
     tech: 'LLM + PQC awareness',
   },
+  {
+    name: 'Q-Sense Mesh',
+    icon: 'Wifi',
+    description: 'Quantum-secured WiFi sensing — presence, vitals, pose detection through walls',
+    tech: 'RuView + ML-KEM-768 + QRNG',
+  },
 ]
 
 export const TECHNOLOGY_STACK = [
@@ -769,6 +775,7 @@ export const ROADMAP_PHASES = [
   { name: 'AI Assistant', phase: 6, status: 'progress' as const, progress: 85, description: 'On-device PQC AI' },
   { name: 'Quantum Email', phase: 7, status: 'progress' as const, progress: 90, description: 'PQC-encrypted secure email' },
   { name: 'ZipBrowser', phase: 8, status: 'progress' as const, progress: 75, description: 'Quantum-safe AI browser' },
+  { name: 'Q-Sense Mesh', phase: 9, status: 'progress' as const, progress: 30, description: 'Quantum-secured WiFi sensing' },
 ]
 
 export const ROADMAP_MILESTONES = [
@@ -823,6 +830,7 @@ export const DEVELOPMENT_TIMELINE = [
   { phase: 'AI Assistant', status: 'progress', progress: 85 },
   { phase: 'Quantum Email', status: 'progress', progress: 90 },
   { phase: 'ZipBrowser', status: 'progress', progress: 75 },
+  { phase: 'Q-Sense Mesh', status: 'progress', progress: 30 },
 ]
 
 export const USE_CASE_INDUSTRIES = [

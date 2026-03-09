@@ -1,0 +1,23 @@
+[package]
+name = "zipminator-app"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Platform-agnostic Rust API for Flutter (via flutter_rust_bridge)"
+
+[dependencies]
+zipminator-core = { path = "../zipminator-core" }
+pqcrypto-kyber = "0.8"
+pqcrypto-traits = "0.3"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[dev-dependencies]
+# Tests use the same deps as the main crate
+
+[lib]
+name = "zipminator_app"
+crate-type = ["lib", "cdylib", "staticlib"]

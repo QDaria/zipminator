@@ -8,7 +8,6 @@
 //! Target: Match or exceed C++/AVX2 baseline of ~0.034ms for full Kyber-768 operation
 
 #![allow(dead_code)]
-#![cfg_attr(target_arch = "x86_64", feature(stdarch_x86_avx512))]
 
 pub mod constants;
 pub mod email_crypto;

@@ -81,6 +81,7 @@ eggs/
 .eggs/
 lib/
 !web/lib/
+!app/lib/
 lib64/
 parts/
 sdist/
@@ -172,6 +173,7 @@ demo/*.rpm
 *.exe
 *.out
 *.app
+!app/
 src/cpp/qrng/build/
 src/cpp/*.out
 src/cpp/kyber768_test

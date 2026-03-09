@@ -189,7 +189,7 @@ export default function SolutionSlide({ scenario: _scenario }: { scenario?: Scen
             Install once, secure everything.
           </p>
           <p className="text-gray-400 text-xs mt-0.5">
-            8 integrated modules. One quantum-secure platform. Zero fragmentation.
+            9 integrated modules. One quantum-secure platform. Zero fragmentation.
           </p>
         </div>
         <div className="shrink-0 h-px sm:h-10 w-full sm:w-px bg-white/10" />

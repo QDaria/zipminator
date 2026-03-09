@@ -51,13 +51,13 @@ const DIFFERENTIATORS = [
     Icon: Layers,
     title: 'Full-Stack Security',
     description:
-      'From the math (Rust constant-time crypto core) to the app (8 integrated security modules). One team owns the entire stack, top to bottom.',
+      'From the math (Rust constant-time crypto core) to the app (9 integrated security modules). One team owns the entire stack, top to bottom.',
   },
 ]
 
 const STAT_BADGES = [
   { Icon: Calendar, label: 'Founded 2024', color: 'text-quantum-400' },
-  { Icon: Package, label: '8 Products', color: 'text-purple-400' },
+  { Icon: Package, label: '9 Products', color: 'text-purple-400' },
   { Icon: Code2, label: '300K+ LOC', color: 'text-cyan-400' },
   { Icon: Wrench, label: '26 Technologies', color: 'text-emerald-400' },
 ]
@@ -66,7 +66,7 @@ const PRODUCT_ROADMAP = [
   {
     name: 'Zipminator-PQC',
     status: 'Flagship',
-    detail: 'World\'s first PQC super-app with 8 integrated security modules',
+    detail: 'World\'s first PQC super-app with 9 integrated security modules',
     statusColor: 'bg-green-500/20 text-green-400 border-green-500/30',
   },
   {
