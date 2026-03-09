@@ -85,7 +85,7 @@ export default function ProductSlide({ scenario: _scenario }: { scenario?: Scena
           Product{' '}
           <span className="gradient-text">Suite</span>
         </h2>
-        <p className="text-gray-400 max-w-2xl text-lg">
+        <p className="text-lg text-gray-400 max-w-2xl">
           Eight deeply integrated modules, each built on NIST-approved
           post-quantum cryptography from the ground up.
         </p>

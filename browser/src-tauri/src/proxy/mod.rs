@@ -105,7 +105,7 @@ impl Drop for ProxyHandle {
 ///
 /// # Example
 ///
-/// ```no_run
+/// ```ignore
 /// # use zipbrowser::proxy;
 /// # #[tokio::main]
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {

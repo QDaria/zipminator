@@ -8,6 +8,7 @@ import {
   Wifi,
   Globe,
   Compass,
+  Mail,
   Sparkles,
 } from 'lucide-react'
 
@@ -41,6 +42,12 @@ const firsts = [
     claim: 'First browser with built-in PQC TLS + Q-VPN + AI',
     detail:
       'ZipBrowser combines quantum-safe transport, integrated VPN tunnel, and privacy-first AI in one',
+  },
+  {
+    icon: Mail,
+    claim: 'First email client with PQC encryption and zero-knowledge headers',
+    detail:
+      'Quantum-secure email with automatic key discovery via WKD, protecting both content and metadata',
   },
 ]
 

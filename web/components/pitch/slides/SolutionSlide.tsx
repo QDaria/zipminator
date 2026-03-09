@@ -12,6 +12,7 @@ import {
   Pie,
   Cell,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from 'recharts'
 
@@ -80,7 +81,7 @@ export default function SolutionSlide({ scenario: _scenario }: { scenario?: Scen
           One App.{' '}
           <span className="gradient-text">Total Protection.</span>
         </h2>
-        <p className="text-gray-400 max-w-2xl text-lg">
+        <p className="text-lg text-gray-400 max-w-2xl">
           Instead of juggling multiple security tools, Zipminator unifies every
           communication channel under one post-quantum encryption umbrella.
         </p>
@@ -133,6 +134,10 @@ export default function SolutionSlide({ scenario: _scenario }: { scenario?: Scen
                 {...TOOLTIP_STYLE}
                 formatter={(value: number, name: string) => [`${value}%`, name]}
               />
+              <Legend
+                verticalAlign="bottom"
+                wrapperStyle={{ fontSize: 10, fontFamily: 'monospace', color: '#9ca3af' }}
+              />
               {/* Center text */}
               <text x="50%" y="48%" textAnchor="middle" fill="#fff" fontSize={18} fontWeight={700}>
                 8
@@ -142,14 +147,6 @@ export default function SolutionSlide({ scenario: _scenario }: { scenario?: Scen
               </text>
             </PieChart>
           </ResponsiveContainer>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
-          {MODULE_WEIGHTS.map((m) => (
-            <span key={m.name} className="flex items-center gap-1.5 text-[10px] text-gray-500">
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: m.color }} />
-              {m.name}
-            </span>
-          ))}
         </div>
       </motion.div>
 

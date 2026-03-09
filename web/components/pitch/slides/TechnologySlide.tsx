@@ -95,7 +95,7 @@ export default function TechnologySlide({ scenario: _scenario }: { scenario?: Sc
           Built on{' '}
           <span className="gradient-text">Proven Standards</span>
         </h2>
-        <p className="text-gray-400 max-w-2xl text-lg">
+        <p className="text-lg text-gray-400 max-w-2xl">
           Every layer of our stack is grounded in NIST-approved algorithms,
           battle-tested protocols, and constant-time implementations.
         </p>

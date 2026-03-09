@@ -24,7 +24,7 @@ import {
   MapPin,
 } from 'lucide-react'
 
-import { fadeUpInView as fadeUp } from '../slide-utils'
+import { fadeUp } from '../slide-utils'
 
 const PIE_COLORS = [
   '#22c55e', // Engineering -- green-500
@@ -97,14 +97,14 @@ export default function AskSlide({ scenario = 'base' }: { scenario?: Scenario })
   return (
     <SlideWrapper>
       {/* Header */}
-      <motion.div {...fadeUp()} className="text-center mb-10">
-        <p className="text-quantum-400 font-mono text-sm tracking-widest uppercase mb-3">
+      <motion.div {...fadeUp()} className="text-center mb-8">
+        <p className="text-xs font-mono uppercase tracking-widest text-quantum-400/80 mb-3">
           The Path Forward
         </p>
-        <h2 className="text-4xl sm:text-5xl font-display font-bold text-white mb-3">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
           Building from <span className="gradient-text">Strength</span>
         </h2>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           Grants-first strategy preserves equity while validating product-market fit
         </p>
       </motion.div>
@@ -133,8 +133,8 @@ export default function AskSlide({ scenario = 'base' }: { scenario?: Scenario })
         ].map((item) => (
           <div key={item.label} className="card-quantum text-center">
             <item.icon className={`w-6 h-6 ${item.color} mx-auto mb-2`} />
-            <p className="text-xs text-gray-400 mb-1 font-mono">{item.label}</p>
-            <p className="text-sm font-semibold text-white">{item.value}</p>
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">{item.label}</p>
+            <p className="text-base font-semibold text-white">{item.value}</p>
           </div>
         ))}
       </motion.div>
@@ -144,7 +144,7 @@ export default function AskSlide({ scenario = 'base' }: { scenario?: Scenario })
         <div className="rounded-xl bg-gradient-to-r from-green-500/[0.06] to-quantum-500/[0.06] border border-green-500/20 p-5">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="w-5 h-5 text-green-400" />
-            <h3 className="text-base font-semibold text-white">What $3-5M Seed Gets You</h3>
+            <h3 className="text-sm font-semibold text-white">What $3-5M Seed Gets You</h3>
           </div>
           <div className="grid sm:grid-cols-5 gap-3 mb-4">
             {SEED_DELIVERABLES.map((d) => (
@@ -188,8 +188,8 @@ export default function AskSlide({ scenario = 'base' }: { scenario?: Scenario })
           {...fadeUp(0.12)}
           className="card-quantum flex flex-col items-center justify-center py-8"
         >
-          <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-quantum-400" />
+          <h3 className="text-sm font-semibold text-white mb-6 flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-quantum-400" />
             Use of Funds
           </h3>
           <div className="relative w-52 h-52">
@@ -223,7 +223,7 @@ export default function AskSlide({ scenario = 'base' }: { scenario?: Scenario })
 
         {/* Allocation Breakdown Bars */}
         <motion.div {...fadeUp(0.15)} className="card-quantum">
-          <h3 className="text-lg font-semibold text-white mb-4">Allocation Breakdown</h3>
+          <h3 className="text-sm font-semibold text-white mb-4">Allocation Breakdown</h3>
           <div className="space-y-3">
             {FUNDING_ASK.useOfFunds.map((seg, i) => (
               <div key={seg.category}>
@@ -259,8 +259,8 @@ export default function AskSlide({ scenario = 'base' }: { scenario?: Scenario })
 
       {/* Timeline Milestones */}
       <motion.div {...fadeUp(0.2)} className="card-quantum">
-        <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-          <Clock className="w-5 h-5 text-quantum-400" />
+        <h3 className="text-sm font-semibold text-white mb-6 flex items-center gap-2">
+          <Clock className="w-4 h-4 text-quantum-400" />
           36-Month Roadmap
         </h3>
         <div className="grid sm:grid-cols-3 gap-6">

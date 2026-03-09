@@ -186,7 +186,7 @@ export default function WhyNowSlide({ scenario: _scenario }: { scenario?: Scenar
           Why{' '}
           <span className="gradient-text">Now?</span>
         </h2>
-        <p className="text-gray-400 max-w-2xl text-lg">
+        <p className="text-lg text-gray-400 max-w-2xl">
           Multiple converging deadlines are creating a narrow window of opportunity.
           The quantum threat is no longer theoretical.
         </p>
@@ -394,10 +394,10 @@ export default function WhyNowSlide({ scenario: _scenario }: { scenario?: Scenar
             className={`card-quantum text-center py-4 ${stat.isGreen ? 'border-emerald-500/25 bg-emerald-500/[0.04]' : ''}`}
           >
             <stat.Icon className={`w-5 h-5 ${stat.color} mx-auto mb-2`} />
-            <p className={`text-2xl font-bold font-mono ${stat.isGreen ? 'text-emerald-400' : 'gradient-text'}`}>
+            <p className="text-2xl font-bold gradient-text font-mono">
               {stat.value}
             </p>
-            <p className="text-[11px] text-gray-500 mt-1">{stat.label}</p>
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-1">{stat.label}</p>
           </motion.div>
         ))}
       </motion.div>

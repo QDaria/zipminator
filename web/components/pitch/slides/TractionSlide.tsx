@@ -18,7 +18,7 @@ import {
   LabelList,
 } from 'recharts'
 
-import { fadeUpInView as fadeUp } from '../slide-utils'
+import { fadeUp } from '../slide-utils'
 import { TOOLTIP_STYLE } from '../chart-config'
 
 const STAT_ICONS: Record<string, typeof Code2> = {
@@ -104,76 +104,21 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
   return (
     <SlideWrapper>
       {/* Header */}
-      <motion.div {...fadeUp()} className="text-center mb-10">
+      <motion.div {...fadeUp()} className="text-center mb-8">
         <p className="text-quantum-400 font-mono text-sm tracking-widest uppercase mb-3">
           Traction
         </p>
-        <h2 className="text-4xl sm:text-5xl font-display font-bold text-white mb-3">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
           <span className="gradient-text">870K+ Lines</span> of Production Code
         </h2>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           Not a whitepaper. A working system across 5 platforms, 7 languages, and 26 integrated technologies.
         </p>
       </motion.div>
 
-      {/* Animated Counter Grid */}
-      <motion.div {...fadeUp(0.05)} className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
-        {TRACTION_STATS.map((stat, i) => {
-          const Icon = STAT_ICONS[stat.label] || Code2
-          return (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 + i * 0.06 }}
-              className="card-quantum text-center group"
-            >
-              <Icon className="w-5 h-5 text-quantum-400 mx-auto mb-2 group-hover:text-quantum-300 transition-colors" />
-              <p className="text-3xl sm:text-4xl font-bold gradient-text font-mono">
-                <AnimatedCounter target={stat.value} />
-              </p>
-              <p className="text-sm font-semibold text-white mt-1">{stat.label}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{stat.detail}</p>
-            </motion.div>
-          )
-        })}
-      </motion.div>
-
-      {/* Development Timeline */}
-      <motion.div {...fadeUp(0.15)} className="card-quantum">
-        <div className="flex items-center gap-2 mb-5">
-          <Rocket className="w-5 h-5 text-quantum-400" />
-          <h3 className="text-lg font-semibold text-white">Development Progress</h3>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {DEVELOPMENT_TIMELINE_DETAILS.map((item, i) => (
-            <motion.div
-              key={item.phase}
-              initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 + i * 0.04 }}
-              className="flex items-center gap-3 rounded-lg bg-white/[0.03] border border-white/5 px-3 py-2.5"
-            >
-              <div className="w-6 h-6 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center shrink-0">
-                <div className="w-2 h-2 rounded-full bg-green-400" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-white truncate">{item.phase}</p>
-                <p className="text-[11px] text-gray-500">{item.detail}</p>
-              </div>
-              <span className="text-[10px] font-mono text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full shrink-0 uppercase">
-                Built
-              </span>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Development Phase Progress Chart */}
-      <motion.div {...fadeUp(0.18)} className="card-quantum mt-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Phase Progress</h3>
+      {/* Development Phase Progress Chart — moved to upper half */}
+      <motion.div {...fadeUp(0.05)} className="card-quantum chart-glow mb-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Phase Progress</h3>
         <div className="h-[320px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -245,11 +190,66 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
         </div>
       </motion.div>
 
+      {/* Animated Counter Grid */}
+      <motion.div {...fadeUp(0.1)} className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        {TRACTION_STATS.map((stat, i) => {
+          const Icon = STAT_ICONS[stat.label] || Code2
+          return (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 + i * 0.06 }}
+              className="card-quantum text-center group"
+            >
+              <Icon className="w-5 h-5 text-quantum-400 mx-auto mb-2 group-hover:text-quantum-300 transition-colors" />
+              <p className="text-2xl font-bold gradient-text font-mono">
+                <AnimatedCounter target={stat.value} />
+              </p>
+              <p className="text-base font-semibold text-white mt-1">{stat.label}</p>
+              <p className="text-sm text-gray-400 leading-relaxed mt-0.5">{stat.detail}</p>
+            </motion.div>
+          )
+        })}
+      </motion.div>
+
+      {/* Development Timeline */}
+      <motion.div {...fadeUp(0.15)} className="card-quantum mb-6">
+        <div className="flex items-center gap-2 mb-5">
+          <Rocket className="w-5 h-5 text-quantum-400" />
+          <h3 className="text-sm font-semibold text-white">Development Progress</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {DEVELOPMENT_TIMELINE_DETAILS.map((item, i) => (
+            <motion.div
+              key={item.phase}
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 + i * 0.04 }}
+              className="flex items-center gap-3 rounded-lg bg-white/[0.03] border border-white/5 px-3 py-2.5"
+            >
+              <div className="w-6 h-6 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center shrink-0">
+                <div className="w-2 h-2 rounded-full bg-green-400" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-base font-semibold text-white truncate">{item.phase}</p>
+                <p className="text-sm text-gray-400 leading-relaxed">{item.detail}</p>
+              </div>
+              <span className="text-xs font-mono text-gray-500 uppercase tracking-widest bg-green-500/10 px-2 py-0.5 rounded-full shrink-0">
+                Built
+              </span>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
       {/* Market Traction & Partnerships */}
-      <motion.div {...fadeUp(0.2)} className="card-quantum mt-6">
+      <motion.div {...fadeUp(0.2)} className="card-quantum mb-6">
         <div className="flex items-center gap-2 mb-4">
           <Target className="w-5 h-5 text-quantum-400" />
-          <h3 className="text-lg font-semibold text-white">Market Traction</h3>
+          <h3 className="text-sm font-semibold text-white">Market Traction</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[

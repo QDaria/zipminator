@@ -412,7 +412,7 @@ export default function DemoSlide({ scenario: _scenario }: { scenario?: Scenario
           Product{' '}
           <span className="gradient-text">Demo</span>
         </h2>
-        <p className="text-gray-400 max-w-2xl text-lg">
+        <p className="text-lg text-gray-400 max-w-2xl">
           Eight modules. One quantum-safe super app. Tap each to explore.
         </p>
         <p className="text-gray-600 text-sm mt-1 sm:hidden">

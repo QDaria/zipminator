@@ -22,9 +22,9 @@ const stats = [
   { icon: Lock, value: 26, suffix: '', label: 'Security Technologies', format: false },
   { icon: Layers, value: 10, suffix: '', label: 'Anonymization Levels', format: false },
   { icon: Cpu, value: 156, suffix: '-qubit', label: 'Quantum Hardware', format: false },
-  { icon: Monitor, value: 5, suffix: '', label: 'Platforms', format: false },
+  { icon: Monitor, value: 6, suffix: '', label: 'Platforms', format: false },
   { icon: Puzzle, value: 8, suffix: '', label: 'Security Modules', format: false },
-  { icon: Terminal, value: 7, suffix: '', label: 'Programming Languages', format: false },
+  { icon: Terminal, value: 5, suffix: '', label: 'Programming Languages', format: false },
 ]
 
 function AnimatedNumber({

@@ -152,7 +152,7 @@ export default function UseCasesSlide({ scenario: _scenario }: { scenario?: Scen
           <span className="gradient-text">Needs</span>{' '}
           Zipminator
         </h2>
-        <p className="text-gray-400 max-w-2xl text-lg">
+        <p className="text-lg text-gray-400 max-w-2xl">
           Any organization where data stolen today could be decrypted tomorrow.
           That means everyone handling sensitive information.
         </p>

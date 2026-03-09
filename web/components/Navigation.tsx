@@ -38,26 +38,32 @@ const Navigation = () => {
     {
       name: 'Zipminator-PQC',
       href: '/',
-      description: 'Quantum-secure file encryption',
+      description: 'Quantum-secure encryption super-app',
       current: true,
     },
     {
-      name: 'QDaria Platform',
-      href: 'https://qdaria.com',
-      description: 'Enterprise quantum solutions',
+      name: 'ZipBrowser',
+      href: '/technology#browser',
+      description: 'PQC browser with built-in Q-VPN & AI',
     },
     {
       name: 'Quantum SDK',
-      href: 'https://qdaria.com/technology/sdk',
-      description: 'Developer tools for quantum computing',
+      href: '/technology#sdk',
+      description: 'Python, Rust, Node.js developer tools',
+    },
+    {
+      name: 'Documentation',
+      href: '/docs',
+      description: 'Jupyter Book guides & API reference',
     },
   ]
 
   const navLinks = [
     { name: 'Features', href: '/features' },
+    { name: 'Technology', href: '/technology' },
     { name: 'Demo', href: '/demo' },
+    { name: 'Docs', href: '/docs' },
     { name: 'Dashboard', href: '/dashboard' },
-    { name: 'Impact', href: '/impact' },
     { name: 'Invest', href: '/invest' },
   ]
 

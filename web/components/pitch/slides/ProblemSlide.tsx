@@ -13,8 +13,10 @@ import {
   PolarRadiusAxis,
   Radar,
   Legend,
+  Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import { TOOLTIP_STYLE } from '../chart-config'
 
 const EXTRA_THREAT = {
   title: '91% Unprotected',
@@ -43,78 +45,20 @@ export default function ProblemSlide({ scenario: _scenario }: { scenario?: Scena
           The Threat is Real{' '}
           <span className="text-red-400">&mdash; and Accelerating</span>
         </h2>
-        <p className="text-gray-400 max-w-2xl text-lg">
+        <p className="text-lg text-gray-400 max-w-2xl">
           State-sponsored actors are already harvesting encrypted data today,
           betting on quantum computers to break it tomorrow.
         </p>
       </motion.div>
 
-      {/* Threat cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        {[...THREAT_DATA, EXTRA_THREAT].map((threat, index) => {
-          const Icon = MODULE_ICON_MAP[threat.icon] || Shield
-          return (
-            <motion.div
-              key={threat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 + index * 0.08 }}
-              className="card-quantum group relative overflow-hidden"
-            >
-              {/* Red accent top border */}
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-red-500/60 via-orange-500/40 to-transparent" />
-
-              <div className="flex items-start gap-3">
-                <div className="shrink-0 w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-red-400" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-white text-sm mb-1.5">
-                    {threat.title}
-                  </h3>
-                  <p className="text-gray-400 text-xs leading-relaxed mb-2">
-                    {threat.detail}
-                  </p>
-                  <p className="text-[10px] text-gray-600 font-mono">
-                    Source: {threat.source}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          )
-        })}
-
-        {/* Key stat card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.65 }}
-          className="card-quantum relative overflow-hidden border-orange-500/20 bg-orange-500/[0.03]"
-        >
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-orange-500/60 via-yellow-500/40 to-transparent" />
-
-          <div className="flex flex-col items-center justify-center h-full text-center py-2">
-            <span className="text-3xl font-display font-bold text-orange-400 mb-1">
-              $7.1B
-            </span>
-            <span className="text-sm text-gray-300 font-medium mb-1">
-              US Government Migration Budget
-            </span>
-            <span className="text-[10px] text-gray-600 font-mono">
-              Source: White House PQC Migration Estimate
-            </span>
-          </div>
-        </motion.div>
-      </div>
-
       {/* Threat Severity Radar */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-        className="card-quantum mb-4"
+        transition={{ delay: 0.15 }}
+        className="card-quantum mb-8"
       >
-        <h3 className="text-lg font-semibold text-white mb-4">Threat Severity Assessment</h3>
+        <h3 className="text-sm font-semibold text-white mb-4">Threat Severity Assessment</h3>
         <div className="h-[320px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={THREAT_SEVERITY}>
@@ -144,6 +88,11 @@ export default function ProblemSlide({ scenario: _scenario }: { scenario?: Scena
                 fillOpacity={0.25}
                 animationDuration={1200}
               />
+              <Tooltip
+                contentStyle={TOOLTIP_STYLE.contentStyle}
+                labelStyle={TOOLTIP_STYLE.labelStyle}
+                formatter={(value: number, name: string) => [`${value}%`, name]}
+              />
               <Legend
                 verticalAlign="bottom"
                 wrapperStyle={{ fontSize: 12, color: '#9ca3af' }}
@@ -152,6 +101,64 @@ export default function ProblemSlide({ scenario: _scenario }: { scenario?: Scena
           </ResponsiveContainer>
         </div>
       </motion.div>
+
+      {/* Threat cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        {[...THREAT_DATA, EXTRA_THREAT].map((threat, index) => {
+          const Icon = MODULE_ICON_MAP[threat.icon] || Shield
+          return (
+            <motion.div
+              key={threat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + index * 0.08 }}
+              className="card-quantum group relative overflow-hidden"
+            >
+              {/* Red accent top border */}
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-red-500/60 via-orange-500/40 to-transparent" />
+
+              <div className="flex items-start gap-3">
+                <div className="shrink-0 w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-red-400" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-base font-semibold text-white mb-1.5">
+                    {threat.title}
+                  </h3>
+                  <p className="text-sm text-gray-400 leading-relaxed mb-2">
+                    {threat.detail}
+                  </p>
+                  <p className="text-[10px] text-gray-600 font-mono">
+                    Source: {threat.source}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )
+        })}
+
+        {/* Key stat card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65 }}
+          className="card-quantum relative overflow-hidden border-orange-500/20 bg-orange-500/[0.03]"
+        >
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-orange-500/60 via-yellow-500/40 to-transparent" />
+
+          <div className="flex flex-col items-center justify-center h-full text-center py-2">
+            <span className="text-2xl font-bold gradient-text font-mono mb-1">
+              $7.1B
+            </span>
+            <span className="text-sm text-gray-400 leading-relaxed mb-1">
+              US Government Migration Budget
+            </span>
+            <span className="text-[10px] text-gray-600 font-mono">
+              Source: White House PQC Migration Estimate
+            </span>
+          </div>
+        </motion.div>
+      </div>
 
       {/* Floating stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
@@ -165,8 +172,8 @@ export default function ProblemSlide({ scenario: _scenario }: { scenario?: Scena
             {...staggerItem(i, 0.75)}
             className={`rounded-xl border ${stat.border} ${stat.bg} px-4 py-3 text-center`}
           >
-            <p className={`text-xl font-bold font-mono ${stat.color}`}>{stat.value}</p>
-            <p className="text-xs text-gray-400 mt-1">{stat.label}</p>
+            <p className={`text-2xl font-bold gradient-text font-mono`}>{stat.value}</p>
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-1">{stat.label}</p>
           </motion.div>
         ))}
       </div>

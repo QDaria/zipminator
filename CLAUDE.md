@@ -14,6 +14,33 @@ uv pip install -r requirements.txt
 uv pip install maturin
 ```
 
+## Product Identity
+
+Zipminator is the world's first PQC super-app — a QCaaS/QCaaP cybersecurity platform with 8 pillars of military-grade encryption infrastructure. It shields device network traffic, stored credentials, and data at rest from both classical and quantum adversaries. It is encryption infrastructure, NOT antivirus/EDR.
+
+## Mandatory Session-Start Reads (EVERY session)
+
+Before answering ANY prompt, read these files to understand the product:
+1. `docs/guides/FEATURES.md` — Product spec (8 pillars, code-verified status, pricing)
+2. `docs/guides/architecture.md` — System architecture (crypto core, layers)
+3. `docs/guides/implementation_plan.md` — Roadmap (9 phases, completion %)
+4. `MEMORY.md` (auto-loaded) — Cross-session state
+
+After EVERY response that changes code or status:
+- Update the relevant pillar status in `docs/guides/FEATURES.md`
+- Update `docs/guides/implementation_plan.md` phase checkboxes
+- Note progress in commit message or session summary
+
+## Progress Tracking Protocol
+
+After completing any task, record:
+1. Which pillar(s) affected and new % complete
+2. Which tests pass/fail (with counts)
+3. Any new gaps discovered
+4. Files modified
+
+Format: `[Pillar N] X% -> Y% | tests: pass/fail | gap: description`
+
 ## Project Structure
 - `crates/` -- Rust workspace (Kyber768 core, fuzz, NIST-KAT, benchmarks)
 - `src/zipminator/` -- Python package with PyO3 bindings
@@ -21,10 +48,12 @@ uv pip install maturin
 - `web/` -- Next.js dashboard (port 3099)
 - `tests/` -- All tests (Python, Rust, integration)
 - `mobile/` -- Expo React Native app
-- `browser/` -- Tauri 2.x PQC browser
+- `browser/` -- Tauri 2.x PQC browser (DMG at target/release/bundle/dmg/)
 - `docs/guides/` -- Documentation
+- `docs/guides/FEATURES.md` -- **Canonical product spec** (single source of truth for pillar status)
 - `docs/guides/claude-flow-v3/` -- Orchestration guide (RALPH, agent teams, skills, recipes)
 - `grants/` -- Grant templates (10 institutions)
+- `_archive/` -- Archived docs (old FEATURES.md versions, etc.)
 
 ## Build Commands
 ```bash
@@ -53,7 +82,7 @@ docker-compose up
 
 ## Testing (TDD-First -- Red/Green/Refactor)
 ```bash
-cargo test --workspace          # Rust tests (166 passed)
+cargo test --workspace          # Rust tests (268 passed, includes browser/src-tauri)
 micromamba activate zip-pqc && pytest tests/  # Python tests
 cargo fuzz run fuzz_keygen      # Fuzzing
 cd web && npm run build         # Next.js build check
@@ -64,8 +93,8 @@ cd mobile && npm test           # Expo tests (11/11 suites)
 ```bash
 cd web && npm run dev    # runs on port 3099
 ```
-- OAuth: AUTH_URL=http://localhost:3099 in web/.env.local
-- Providers: GitHub, Google, LinkedIn (credentials in .env.local)
+- OAuth: AUTH_URL=http://localhost:3099 in web/.env.local (production: https://www.zipminator.zip)
+- Providers: GitHub, Google, LinkedIn (credentials in .env.local, all callback URLs registered)
 - Auth config: web/lib/auth.ts (next-auth v5 beta)
 
 ## Key Architecture Decisions
@@ -347,8 +376,14 @@ This exports:
 - [x] Research open source PQC strategy (Apache-2.0 for crypto, proprietary for apps)
 - [x] Update CLAUDE.md: ruflo v3.5 always-on, micromamba+uv pip, RALPH, zero-hallucination
 
-### In Progress
-- [ ] OAuth provider console callback registration (needs manual browser login to Google/GitHub/LinkedIn consoles)
+### Completed (2026-03-09)
+- [x] FEATURES.md consolidated: single source of truth at docs/guides/FEATURES.md (code-verified percentages)
+- [x] Root FEATURES.md archived to _archive/FEATURES-v0.2-2026-03-02.md
+- [x] CLAUDE.md: added mandatory session-start reads, product identity, progress tracking protocol
+- [x] implementation_plan.md: corrected Phase 7/8 status to match code audit
+- [x] DMG tested on M1 Max: mounts, launches, ad-hoc signed (aarch64 = all Apple Silicon)
+- [x] MEMORY.md updated: product identity, DMG path, correct test counts, doc locations
+- [x] OAuth provider console callback registration (all 3 providers verified working)
 
 ### Completed (2026-03-08)
 - [x] Remove /invest from protectedPaths in auth.ts (was inconsistent with middleware.ts)

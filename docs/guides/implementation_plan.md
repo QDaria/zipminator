@@ -112,36 +112,42 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 * [x] **Slash Command: `/quantum-status`**: Detailed telemetry on entropy pool levels and IBM/Rigetti availability.
 * [x] **Agent Skill: `PQC-Expert`**: Specialized system prompts for the agent to use `liboqs` correctly.
 
-### Phase 7: Quantum-Secure Email (`@zipminator.zip`) ✅
+### Phase 7: Quantum-Secure Email (`@zipminator.zip`) 🟡 90%
 
 * [x] Register `zipminator.zip` domain and configure DNS (MX, SPF, DKIM, DMARC).
-* [x] Deploy PQC-secured SMTP/IMAP mail server (Postfix/Dovecot + ML-KEM-768 TLS).
+* [ ] Deploy PQC-secured SMTP/IMAP mail server (Postfix/Dovecot + ML-KEM-768 TLS). *(crypto library ready, server not deployed)*
 * [x] Build webmail UI (React/Next.js) with quantum-purple design language.
 * [x] Integrate PII scanner into compose flow (auto-warn before sending sensitive data).
-* [x] Implement self-destructing emails (time-based + read-receipt triggered).
+* [x] Implement self-destructing emails (time-based + read-receipt triggered). *(crypto protocol complete, no transport integration)*
 * [x] Add 10-level anonymization for outgoing file attachments.
 * [x] Build mobile email client component (`ZipMail.tsx`) in the Expo app.
 * [x] QRNG-seeded session tokens and per-message encryption keys.
 
-### Phase 8: ZipBrowser — PQC AI Browser ✅
+### Phase 8: ZipBrowser — PQC AI Browser 🟡 75%
 
-* [x] Build Tauri 2.x desktop browser shell (`browser/src-tauri/`).
-* [x] Integrate PQC TLS (ML-KEM-768 key exchange for all HTTPS connections).
-* [x] Embed Q-VPN (PQ-WireGuard) as always-on tunnel for all browser traffic.
-* [x] Integrate OpenClaw AI sidebar (page summarization, agentic tasks, writing assist).
+* [x] Build Tauri 2.x desktop browser shell (`browser/src-tauri/`). *(compiles, DMG at target/release/bundle/dmg/)*
+* [x] Integrate PQC TLS (ML-KEM-768 key exchange for all HTTPS connections). *(proxy layer with ML-KEM-768)*
+* [x] Embed Q-VPN (PQ-WireGuard) as always-on tunnel for all browser traffic. *(state machine + kill switch, packet wrapping has shortcuts)*
+* [ ] Integrate OpenClaw AI sidebar (page summarization, agentic tasks, writing assist). *(not yet integrated into browser)*
 * [x] QRNG-seeded session tokens and cookie rotation for fingerprint resistance.
 * [x] Zero telemetry architecture — no data leaves device unless PQC-tunneled.
-* [x] Build extension system for PQC password manager and form autofill.
-* [x] Mobile browser component via WebView with PQC proxy.
+* [x] Build extension system for PQC password manager and form autofill. *(Argon2 vault implemented)*
+* [ ] Mobile browser component via WebView with PQC proxy. *(planned)*
+* **103 Rust tests passing** | 7 privacy subsystems implemented | DMG 5.7MB aarch64
 
-### Phase 9: Production & Go-to-Market 🟡
+### Phase 9: Production & Go-to-Market 🟡 60%
 
-* [x] Deploy web landing at `https://zipminator.zip` (Vercel).
+* [x] Deploy web landing at `https://zipminator.zip` (Vercel). *(22 routes, 0 errors)*
 * [x] Build 21-slide investor pitch deck at `/invest`.
-* [x] Configure OAuth (GitHub, Google, LinkedIn) with next-auth v5 beta.
+* [x] Configure OAuth (GitHub, Google, LinkedIn) with next-auth v5 beta. *(all 3 callback URLs registered)*
 * [x] Set up Supabase waitlist with rate limiting and Zod validation.
 * [x] Create grant templates for 10 institutions.
 * [x] SVG gradient wordmark branding across pitch deck.
+* [x] og:image, sitemap.xml, robots.txt for SEO. *(Session 1 complete)*
+* [x] Production deploy with AUTH_URL fix. *(Session 2 complete)*
+* [ ] Blog posts for qdaria.com (3 posts). *(Session 3)*
+* [ ] LinkedIn + social launch content. *(Session 4)*
+* [ ] GitHub Release v1.0.0-beta.1 tag. *(Session 5)*
 * [ ] FIPS 140-3 certification process initiation.
 * [ ] SOC 2 Type II audit preparation.
 * [ ] Enterprise pilot deployments.

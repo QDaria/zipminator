@@ -20,11 +20,11 @@ export const SITE_CONFIG = {
   ],
   links: {
     github: 'https://github.com/qdaria/zipminator-pqc',
-    docs: 'https://docs.zipminator.zip',
-    api: 'https://docs.zipminator.zip/api',
+    docs: '/docs',
+    api: '/docs#api',
     qdaria: 'https://qdaria.com',
-    qdariaProducts: 'https://qdaria.com/technology/products',
-    qdariaZipminator: 'https://qdaria.com/technology/products/zipminator',
+    qdariaProducts: '/technology',
+    qdariaZipminator: '/',
   },
   company: {
     name: 'QDaria',
@@ -87,11 +87,12 @@ export const NIST_COMPLIANCE = {
 }
 
 export const NAVIGATION_ITEMS = [
-  { name: 'Features', href: '#features' },
-  { name: 'How It Works', href: '#how-it-works' },
-  { name: 'Use Cases', href: '#use-cases' },
-  { name: 'Pricing', href: '#pricing' },
-  { name: 'Documentation', href: SITE_CONFIG.links.docs },
+  { name: 'Features', href: '/features' },
+  { name: 'Technology', href: '/technology' },
+  { name: 'Demo', href: '/demo' },
+  { name: 'Docs', href: '/docs' },
+  { name: 'Dashboard', href: '/dashboard' },
+  { name: 'Invest', href: '/invest' },
   { name: 'GitHub', href: SITE_CONFIG.links.github },
 ]
 
@@ -99,41 +100,36 @@ export const FOOTER_SECTIONS = [
   {
     title: 'Product',
     links: [
-      { name: 'Features', href: '#features' },
-      { name: 'Pricing', href: '#pricing' },
-      { name: 'Documentation', href: SITE_CONFIG.links.docs },
-      { name: 'API Reference', href: SITE_CONFIG.links.api },
+      { name: 'Features', href: '/features' },
+      { name: 'Pricing', href: '/invest' },
+      { name: 'Documentation', href: '/docs' },
+      { name: 'API Reference', href: '/docs#api' },
       { name: 'Changelog', href: `${SITE_CONFIG.links.github}/releases` },
     ],
   },
   {
     title: 'Company',
     links: [
-      { name: 'About QDaria', href: `${SITE_CONFIG.company.url}/about` },
-      { name: 'Careers', href: `${SITE_CONFIG.company.url}/careers` },
-      { name: 'Blog', href: `${SITE_CONFIG.company.url}/blog` },
-      { name: 'Press Kit', href: `${SITE_CONFIG.company.url}/press` },
-      { name: 'Contact', href: `${SITE_CONFIG.company.url}/contact` },
+      { name: 'About QDaria', href: '/impact' },
+      { name: 'Careers', href: 'mailto:careers@qdaria.com' },
+      { name: 'Blog', href: `${SITE_CONFIG.links.github}/releases` },
+      { name: 'Contact', href: 'mailto:contact@qdaria.com' },
     ],
   },
   {
     title: 'Resources',
     links: [
-      { name: 'Getting Started', href: `${SITE_CONFIG.links.docs}/getting-started` },
-      { name: 'Tutorials', href: `${SITE_CONFIG.links.docs}/tutorials` },
+      { name: 'Getting Started', href: '/docs' },
       { name: 'Community', href: `${SITE_CONFIG.links.github}/discussions` },
-      { name: 'Support', href: `${SITE_CONFIG.company.url}/support` },
-      { name: 'Status', href: 'https://status.zipminator.zip' },
+      { name: 'Technology', href: '/technology' },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { name: 'Privacy Policy', href: `${SITE_CONFIG.company.url}/privacy` },
-      { name: 'Terms of Service', href: `${SITE_CONFIG.company.url}/terms` },
-      { name: 'Cookie Policy', href: `${SITE_CONFIG.company.url}/cookies` },
-      { name: 'GDPR', href: `${SITE_CONFIG.company.url}/gdpr` },
-      { name: 'Security', href: `${SITE_CONFIG.company.url}/security` },
+      { name: 'Privacy Policy', href: '#' },
+      { name: 'Terms of Service', href: '#' },
+      { name: 'Cookie Policy', href: '#' },
     ],
   },
 ]

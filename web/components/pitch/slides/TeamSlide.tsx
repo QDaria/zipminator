@@ -14,7 +14,7 @@ import {
   Legend,
 } from 'recharts'
 
-import { fadeUpInView as fadeUp, useAnimatedCounter } from '../slide-utils'
+import { fadeUp, useAnimatedCounter } from '../slide-utils'
 import { TOOLTIP_STYLE } from '../chart-config'
 
 const PRIORITY_STYLES: Record<string, { label: string; bg: string; text: string; dot: string }> = {
@@ -78,16 +78,69 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
         <p className="text-quantum-400 font-mono text-sm tracking-widest uppercase mb-3">
           Team
         </p>
-        <h2 className="text-4xl sm:text-5xl font-display font-bold text-white mb-3">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
           Building a <span className="gradient-text">World-Class</span> Team
         </h2>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           {TEAM_TOTAL.headcount} people across cryptography, systems engineering, mobile, and security
         </p>
       </motion.div>
 
+      {/* Hiring by Priority Donut — moved to upper half */}
+      <motion.div {...fadeUp(0.05)} className="card-quantum chart-glow mb-6">
+        <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+          <Users className="w-4 h-4 text-quantum-400" />
+          Hiring Priority Breakdown
+        </h3>
+        <div className="flex items-center justify-center gap-8">
+          <div className="relative">
+            <ResponsiveContainer width={260} height={260}>
+              <PieChart>
+                <Pie
+                  data={PRIORITY_CHART_DATA}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={110}
+                  dataKey="value"
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  label={renderCustomLabel as any}
+                  animationDuration={1200}
+                >
+                  {PRIORITY_CHART_DATA.map((entry, index) => (
+                    <Cell key={index} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  {...TOOLTIP_STYLE}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  formatter={(value: any, name: any) => [`${value} people`, name]}
+                />
+                <Legend
+                  verticalAlign="bottom"
+                  wrapperStyle={{ fontSize: 11, color: '#9ca3af', paddingTop: 8 }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            {/* Center animated counter */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span ref={counterRef as React.RefObject<HTMLSpanElement>} className="text-2xl font-bold gradient-text font-mono">{animatedTotal}</span>
+              <span className="text-xs font-mono text-gray-500 uppercase tracking-widest">Total</span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            {PRIORITY_CHART_DATA.map((d) => (
+              <span key={d.name} className="flex items-center gap-2 text-sm text-gray-400 leading-relaxed">
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
+                {d.name} ({d.value})
+              </span>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
       {/* Key Stats */}
-      <motion.div {...fadeUp(0.05)} className="grid grid-cols-3 gap-4 mb-8">
+      <motion.div {...fadeUp(0.08)} className="grid grid-cols-3 gap-4 mb-6">
         {[
           { icon: Users, label: 'Target Headcount', value: TEAM_TOTAL.headcount },
           { icon: Briefcase, label: 'Annual Cost', value: TEAM_TOTAL.annualCost },
@@ -96,7 +149,7 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
           <div key={s.label} className="card-quantum text-center">
             <s.icon className="w-5 h-5 text-quantum-400 mx-auto mb-2" />
             <p className="text-2xl font-bold gradient-text font-mono">{s.value}</p>
-            <p className="text-xs text-gray-400 mt-1">{s.label}</p>
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-1">{s.label}</p>
           </div>
         ))}
       </motion.div>
@@ -105,7 +158,7 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
       <motion.div {...fadeUp(0.1)} className="card-quantum mb-6">
         <div className="flex items-center gap-2 mb-6">
           <Users className="w-5 h-5 text-quantum-400" />
-          <h3 className="text-lg font-semibold text-white">Team Composition</h3>
+          <h3 className="text-sm font-semibold text-white">Team Composition</h3>
         </div>
         <div className="space-y-3">
           {TEAM_ROLES.map((role, i) => {
@@ -147,55 +200,6 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
               </motion.div>
             )
           })}
-        </div>
-      </motion.div>
-
-      {/* Hiring by Priority Donut */}
-      <motion.div {...fadeUp(0.12)} className="card-quantum mb-6">
-        <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-          <Users className="w-4 h-4 text-quantum-400" />
-          Hiring Priority Breakdown
-        </h3>
-        <div className="flex items-center justify-center gap-8">
-          <div className="relative">
-            <ResponsiveContainer width={260} height={260}>
-              <PieChart>
-                <Pie
-                  data={PRIORITY_CHART_DATA}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={70}
-                  outerRadius={110}
-                  dataKey="value"
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  label={renderCustomLabel as any}
-                  animationDuration={1200}
-                >
-                  {PRIORITY_CHART_DATA.map((entry, index) => (
-                    <Cell key={index} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  {...TOOLTIP_STYLE}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={(value: any, name: any) => [`${value} people`, name]}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            {/* Center animated counter */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span ref={counterRef as React.RefObject<HTMLSpanElement>} className="text-3xl font-bold text-white font-mono">{animatedTotal}</span>
-              <span className="text-[10px] text-gray-400">Total</span>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            {PRIORITY_CHART_DATA.map((d) => (
-              <span key={d.name} className="flex items-center gap-2 text-xs text-gray-400">
-                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
-                {d.name} ({d.value})
-              </span>
-            ))}
-          </div>
         </div>
       </motion.div>
 

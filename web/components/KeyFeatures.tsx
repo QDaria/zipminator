@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Atom, ShieldCheck, Zap, Github, PuzzleIcon, Clock } from 'lucide-react'
+import { Atom, ShieldCheck, Zap, Github, FlaskConical, Clock } from 'lucide-react'
 
 const features = [
   {
@@ -33,9 +33,9 @@ const features = [
     animationDelay: 0.3,
   },
   {
-    icon: PuzzleIcon,
-    title: 'Multi-Language SDKs',
-    description: 'Python, Rust, C++, Node.js with simple APIs',
+    icon: FlaskConical,
+    title: 'JupyterLab Integration',
+    description: 'Interactive quantum cryptography notebooks with magic commands and live widgets',
     gradient: 'from-blue-500 via-indigo-500 to-purple-500',
     animationDelay: 0.4,
   },

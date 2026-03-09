@@ -19,7 +19,7 @@ import {
   Landmark,
 } from 'lucide-react'
 
-import { fadeUpInView as fadeUp } from '../slide-utils'
+import { fadeUp } from '../slide-utils'
 
 const SOCIAL_LINKS = [
   {

@@ -5,9 +5,10 @@ import SlideWrapper from '../SlideWrapper'
 import { RISK_MATRIX } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
 import { ShieldAlert, AlertTriangle, CheckCircle2, TrendingUp, Leaf } from 'lucide-react'
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts'
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
 
-import { fadeUpInView as fadeUp } from '../slide-utils'
+import { fadeUp } from '../slide-utils'
+import { TOOLTIP_STYLE } from '../chart-config'
 
 const LEVEL_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
   high: { bg: 'bg-red-500/15', text: 'text-red-400', dot: 'bg-red-500' },
@@ -72,61 +73,20 @@ export default function RiskSlide({ scenario: _scenario = 'base' }: { scenario?:
   return (
     <SlideWrapper>
       {/* Header */}
-      <motion.div {...fadeUp()} className="text-center mb-10">
-        <p className="text-quantum-400 font-mono text-sm tracking-widest uppercase mb-3">
+      <motion.div {...fadeUp()} className="text-center mb-6">
+        <p className="text-xs font-mono uppercase tracking-widest text-quantum-400/80 mb-3">
           Risk Analysis
         </p>
-        <h2 className="text-4xl sm:text-5xl font-display font-bold text-white mb-3">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
           Risks, <span className="gradient-text">Mitigations &amp; Opportunities</span>
         </h2>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           Every risk has a concrete mitigation plan and an opportunity reframing
         </p>
       </motion.div>
 
-      {/* Summary Badges */}
-      <motion.div {...fadeUp(0.05)} className="flex items-center justify-center gap-4 mb-6">
-        <div className="card-quantum flex items-center gap-3 px-5 py-3">
-          <AlertTriangle className="w-5 h-5 text-red-400" />
-          <div>
-            <p className="text-xl font-bold text-white font-mono">{highRisks}</p>
-            <p className="text-xs text-gray-400">High-Impact</p>
-          </div>
-        </div>
-        <div className="card-quantum flex items-center gap-3 px-5 py-3">
-          <ShieldAlert className="w-5 h-5 text-yellow-400" />
-          <div>
-            <p className="text-xl font-bold text-white font-mono">{totalRisks}</p>
-            <p className="text-xs text-gray-400">Risks Tracked</p>
-          </div>
-        </div>
-        <div className="card-quantum flex items-center gap-3 px-5 py-3">
-          <CheckCircle2 className="w-5 h-5 text-green-400" />
-          <div>
-            <p className="text-xl font-bold text-white font-mono">{totalRisks}/{totalRisks}</p>
-            <p className="text-xs text-gray-400">Mitigated</p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Severity Heat Map Legend */}
-      <motion.div {...fadeUp(0.07)} className="flex items-center justify-center gap-6 mb-8">
-        <div className="flex items-center gap-2 text-xs text-gray-400">
-          <span className="w-3 h-3 rounded-full bg-red-500" />
-          <span>Critical (high x high/med)</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-gray-400">
-          <span className="w-3 h-3 rounded-full bg-yellow-500" />
-          <span>Elevated (med x med)</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-gray-400">
-          <span className="w-3 h-3 rounded-full bg-green-500" />
-          <span>Manageable (low probability)</span>
-        </div>
-      </motion.div>
-
-      {/* Risk Matrix Scatter Plot */}
-      <motion.div {...fadeUp(0.08)} className="card-quantum mb-8">
+      {/* Risk Matrix Scatter Plot -- MOVED UP to upper half */}
+      <motion.div {...fadeUp(0.04)} className="card-quantum mb-6">
         <h4 className="text-sm font-semibold text-white mb-4">Risk Matrix</h4>
         <ResponsiveContainer width="100%" height={280}>
           <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
@@ -168,7 +128,7 @@ export default function RiskSlide({ scenario: _scenario = 'base' }: { scenario?:
               label={{ value: 'Impact', angle: -90, position: 'insideLeft', offset: 10, style: { fill: '#6b7280', fontSize: 11, fontFamily: 'monospace' } }}
             />
             <Tooltip
-              contentStyle={{ backgroundColor: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontFamily: 'monospace', fontSize: 12 }}
+              {...TOOLTIP_STYLE}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(value: any, name: any) => {
                 if (name === 'probability' || name === 'impact') {
@@ -177,6 +137,15 @@ export default function RiskSlide({ scenario: _scenario = 'base' }: { scenario?:
                 return [value, name]
               }}
               labelFormatter={() => ''}
+            />
+            <Legend
+              verticalAlign="bottom"
+              height={24}
+              payload={[
+                { value: 'Critical', type: 'circle', color: '#ef4444' },
+                { value: 'Elevated', type: 'circle', color: '#eab308' },
+                { value: 'Manageable', type: 'circle', color: '#22c55e' },
+              ]}
             />
             <Scatter
               data={ALL_RISKS.map((r) => ({
@@ -201,6 +170,31 @@ export default function RiskSlide({ scenario: _scenario = 'base' }: { scenario?:
             />
           </ScatterChart>
         </ResponsiveContainer>
+      </motion.div>
+
+      {/* Summary Badges */}
+      <motion.div {...fadeUp(0.08)} className="flex items-center justify-center gap-4 mb-6">
+        <div className="card-quantum flex items-center gap-3 px-5 py-3">
+          <AlertTriangle className="w-5 h-5 text-red-400" />
+          <div>
+            <p className="text-2xl font-bold gradient-text font-mono">{highRisks}</p>
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">High-Impact</p>
+          </div>
+        </div>
+        <div className="card-quantum flex items-center gap-3 px-5 py-3">
+          <ShieldAlert className="w-5 h-5 text-yellow-400" />
+          <div>
+            <p className="text-2xl font-bold gradient-text font-mono">{totalRisks}</p>
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">Risks Tracked</p>
+          </div>
+        </div>
+        <div className="card-quantum flex items-center gap-3 px-5 py-3">
+          <CheckCircle2 className="w-5 h-5 text-green-400" />
+          <div>
+            <p className="text-2xl font-bold gradient-text font-mono">{totalRisks}/{totalRisks}</p>
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">Mitigated</p>
+          </div>
+        </div>
       </motion.div>
 
       {/* Risk Cards */}

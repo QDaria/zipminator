@@ -201,9 +201,7 @@ const CTA = () => {
             </Link>
             <div className="hidden md:block w-px h-6 bg-gray-700" />
             <Link
-              href="https://docs.zipminator.zip"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/docs"
               className="flex items-center space-x-2 text-gray-400 hover:text-quantum-400 transition-colors group"
             >
               <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" />

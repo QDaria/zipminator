@@ -7,7 +7,7 @@ import type { Scenario } from '@/lib/pitch-data'
 import { BarChart3, Users, DollarSign, TrendingUp, Gift, Layers, Award } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 
-import { fadeUpInView as fadeUp, useAnimatedCounter } from '../slide-utils'
+import { fadeUp, useAnimatedCounter } from '../slide-utils'
 import { TOOLTIP_STYLE, GRADIENT_DEFS } from '../chart-config'
 
 const SCENARIO_META: Record<Scenario, { label: string; accent: string }> = {
@@ -56,78 +56,23 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
   return (
     <SlideWrapper>
       {/* Header */}
-      <motion.div {...fadeUp()} className="text-center mb-8">
-        <p className="text-quantum-400 font-mono text-sm tracking-widest uppercase mb-3">
+      <motion.div {...fadeUp()} className="text-center mb-6">
+        <p className="text-xs font-mono uppercase tracking-widest text-quantum-400/80 mb-3">
           Revenue Projections
         </p>
-        <h2 className="text-4xl sm:text-5xl font-display font-bold text-white mb-3">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
           Path to <span className="gradient-text">${yr5Revenue}M</span> ARR
         </h2>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           Five-year financial model across three scenarios
         </p>
       </motion.div>
 
-      {/* Non-Dilutive Funding Callout */}
-      <motion.div
-        {...fadeUp(0.03)}
-        className="mb-8 flex items-center gap-4 px-5 py-4 rounded-xl bg-emerald-500/[0.06] border border-emerald-500/15"
-      >
-        <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
-          <Gift className="w-5 h-5 text-emerald-400" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-emerald-400 mb-0.5">Non-Dilutive Funding First</p>
-          <p className="text-xs text-gray-400">
-            Grants-first strategy: Innovation Norway, Research Council, NATO DIANA, and Horizon Europe
-            fund R&amp;D before equity rounds. Preserves founder equity through critical early stages.
-          </p>
-        </div>
-      </motion.div>
-
-      {/* Scenario Selector Tabs */}
-      <motion.div {...fadeUp(0.05)} className="flex items-center justify-center gap-2 mb-8">
-        {(['conservative', 'base', 'upside'] as Scenario[]).map((s) => {
-          const meta = SCENARIO_META[s]
-          const isActive = s === scenario
-          return (
-            <div
-              key={s}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-mono text-sm transition-all ${
-                isActive
-                  ? 'bg-white/10 border border-white/20 text-white'
-                  : 'bg-white/[0.03] border border-transparent text-gray-500'
-              }`}
-            >
-              <span className={`w-2 h-2 rounded-full ${meta.accent}`} />
-              {meta.label}
-            </div>
-          )
-        })}
-      </motion.div>
-
-      {/* Headline Metrics */}
-      <motion.div {...fadeUp(0.1)} className="grid grid-cols-3 gap-4 mb-8">
-        {[
-          { icon: DollarSign, label: '5-Year Cumulative', value: `$${totalRevenue5yr.toFixed(1)}M` },
-          { icon: TrendingUp, label: 'Year 5 ARR', value: `$${yr5Revenue}M` },
-          { icon: Users, label: 'Year 5 Users', value: formatUsers(yr5Users) },
-        ].map((stat) => (
-          <div key={stat.label} className="card-quantum text-center">
-            <stat.icon className="w-5 h-5 text-quantum-400 mx-auto mb-2" />
-            <p className="text-2xl sm:text-3xl font-bold gradient-text font-mono">
-              {stat.value}
-            </p>
-            <p className="text-xs text-gray-400 mt-1">{stat.label}</p>
-          </div>
-        ))}
-      </motion.div>
-
-      {/* Area Chart */}
-      <motion.div {...fadeUp(0.15)} className="card-quantum mb-6">
-        <div className="flex items-center gap-2 mb-6">
-          <BarChart3 className="w-5 h-5 text-quantum-400" />
-          <h3 className="text-lg font-semibold text-white">
+      {/* Area Chart -- MOVED UP to upper half */}
+      <motion.div {...fadeUp(0.05)} className="card-quantum mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="w-4 h-4 text-quantum-400" />
+          <h3 className="text-sm font-semibold text-white">
             Annual Revenue &mdash; {SCENARIO_META[scenario].label}
           </h3>
         </div>
@@ -176,15 +121,70 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
         </ResponsiveContainer>
       </motion.div>
 
+      {/* Scenario Selector Tabs */}
+      <motion.div {...fadeUp(0.08)} className="flex items-center justify-center gap-2 mb-6">
+        {(['conservative', 'base', 'upside'] as Scenario[]).map((s) => {
+          const meta = SCENARIO_META[s]
+          const isActive = s === scenario
+          return (
+            <div
+              key={s}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-mono text-sm transition-all ${
+                isActive
+                  ? 'bg-white/10 border border-white/20 text-white'
+                  : 'bg-white/[0.03] border border-transparent text-gray-500'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${meta.accent}`} />
+              {meta.label}
+            </div>
+          )
+        })}
+      </motion.div>
+
+      {/* Non-Dilutive Funding Callout */}
+      <motion.div
+        {...fadeUp(0.1)}
+        className="mb-6 flex items-center gap-4 px-5 py-4 rounded-xl bg-emerald-500/[0.06] border border-emerald-500/15"
+      >
+        <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+          <Gift className="w-5 h-5 text-emerald-400" />
+        </div>
+        <div className="flex-1">
+          <p className="text-base font-semibold text-emerald-400 mb-0.5">Non-Dilutive Funding First</p>
+          <p className="text-sm text-gray-400 leading-relaxed">
+            Grants-first strategy: Innovation Norway, Research Council, NATO DIANA, and Horizon Europe
+            fund R&amp;D before equity rounds. Preserves founder equity through critical early stages.
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Headline Metrics */}
+      <motion.div {...fadeUp(0.12)} className="grid grid-cols-3 gap-4 mb-6">
+        {[
+          { icon: DollarSign, label: '5-Year Cumulative', value: `$${totalRevenue5yr.toFixed(1)}M` },
+          { icon: TrendingUp, label: 'Year 5 ARR', value: `$${yr5Revenue}M` },
+          { icon: Users, label: 'Year 5 Users', value: formatUsers(yr5Users) },
+        ].map((stat) => (
+          <div key={stat.label} className="card-quantum text-center">
+            <stat.icon className="w-5 h-5 text-quantum-400 mx-auto mb-2" />
+            <p className="text-2xl font-bold gradient-text font-mono">
+              {stat.value}
+            </p>
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-1">{stat.label}</p>
+          </div>
+        ))}
+      </motion.div>
+
       {/* Floating Metric Cards */}
-      <motion.div {...fadeUp(0.17)} className="grid grid-cols-2 gap-4 mb-6">
+      <motion.div {...fadeUp(0.15)} className="grid grid-cols-2 gap-4 mb-6">
         <div className="card-quantum text-center chart-glow">
-          <p className="text-xs text-gray-400 font-mono mb-1">Year 5 ARR</p>
-          <p ref={arrRef as React.RefObject<HTMLParagraphElement>} className="text-3xl font-bold gradient-text font-mono">${animatedARR}</p>
+          <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">Year 5 ARR</p>
+          <p ref={arrRef as React.RefObject<HTMLParagraphElement>} className="text-2xl font-bold gradient-text font-mono">${animatedARR}</p>
         </div>
         <div className="card-quantum text-center chart-glow">
-          <p className="text-xs text-gray-400 font-mono mb-1">Gross Margin</p>
-          <p ref={marginRef as React.RefObject<HTMLParagraphElement>} className="text-3xl font-bold gradient-text font-mono">{animatedMargin}</p>
+          <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">Gross Margin</p>
+          <p ref={marginRef as React.RefObject<HTMLParagraphElement>} className="text-2xl font-bold gradient-text font-mono">{animatedMargin}</p>
         </div>
       </motion.div>
 
@@ -255,7 +255,7 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
       {/* Key Assumptions */}
       <motion.div {...fadeUp(0.25)} className="grid sm:grid-cols-2 gap-4">
         <div className="card-quantum">
-          <h4 className="text-sm font-semibold text-quantum-400 mb-2">Revenue Drivers</h4>
+          <h4 className="text-base font-semibold text-white mb-2">Revenue Drivers</h4>
           <ul className="text-sm text-gray-400 space-y-1.5">
             <li className="flex items-start gap-2">
               <span className="w-1 h-1 rounded-full bg-quantum-500 mt-2 shrink-0" />
@@ -272,7 +272,7 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
           </ul>
         </div>
         <div className="card-quantum">
-          <h4 className="text-sm font-semibold text-quantum-400 mb-2">Key Assumptions</h4>
+          <h4 className="text-base font-semibold text-white mb-2">Key Assumptions</h4>
           <ul className="text-sm text-gray-400 space-y-1.5">
             <li className="flex items-start gap-2">
               <span className="w-1 h-1 rounded-full bg-quantum-500 mt-2 shrink-0" />

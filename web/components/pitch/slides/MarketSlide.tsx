@@ -23,7 +23,7 @@ import {
 } from 'recharts'
 import { TrendingUp, Target, BarChart3, AlertTriangle, Calendar } from 'lucide-react'
 
-import { fadeUpInView as fadeUp, useAnimatedCounter } from '../slide-utils'
+import { fadeUp, useAnimatedCounter } from '../slide-utils'
 import { TOOLTIP_STYLE } from '../chart-config'
 
 const marketGrowthData = [
@@ -102,10 +102,10 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
         <p className="text-quantum-400 font-mono text-sm tracking-widest uppercase mb-3">
           Market Opportunity
         </p>
-        <h2 className="text-4xl sm:text-5xl font-display font-bold text-white mb-3">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
           A <span className="gradient-text">${avgTam2034.toFixed(0)}B+</span> Market by 2034
         </h2>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           Seven independent analyst firms converge on 30-46% CAGR for post-quantum cryptography
         </p>
       </motion.div>
@@ -142,32 +142,11 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
 
       {tab === 'consensus' ? (
         <>
-          {/* Summary Stats */}
-          <motion.div {...fadeUp(0.1)} className="grid grid-cols-3 gap-4 mb-8">
-            {[
-              { label: 'Avg TAM 2034', value: `$${avgTam2034.toFixed(1)}B` },
-              { label: 'Avg CAGR', value: `${avgCagr.toFixed(0)}%` },
-              { label: 'Analyst Firms', value: '7' },
-            ].map((s) => (
-              <div key={s.label} className="card-quantum text-center">
-                <p className="text-2xl font-bold gradient-text font-mono">{s.value}</p>
-                <p className="text-xs text-gray-400 mt-1">{s.label}</p>
-              </div>
-            ))}
-          </motion.div>
-
-          {/* TAM Animated Counter */}
-          <motion.div {...fadeUp(0.12)} className="card-quantum text-center mb-6 py-5">
-            <p className="text-xs text-gray-500 font-mono uppercase mb-2">Total Addressable Market by 2034</p>
-            <TAMCounter />
-            <p className="text-sm text-gray-400 mt-1">across 7 independent analyst projections</p>
-          </motion.div>
-
-          {/* Recharts Bar Chart */}
-          <motion.div {...fadeUp(0.15)} className="card-quantum">
+          {/* Recharts Bar Chart — moved to upper half */}
+          <motion.div {...fadeUp(0.1)} className="card-quantum chart-glow mb-6">
             <div className="flex items-center gap-2 mb-4">
               <BarChart3 className="w-5 h-5 text-quantum-400" />
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-sm font-semibold text-white">
                 PQC Market Size by Analyst Firm (2034 TAM, $B)
               </h3>
             </div>
@@ -198,7 +177,13 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
                     tickFormatter={(v: number) => `$${v}B`}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="tam2034" radius={[6, 6, 0, 0]} maxBarSize={50} label={<BarValueLabel />}>
+                  <Legend
+                    wrapperStyle={{ fontSize: 11, color: '#9ca3af', paddingTop: 8 }}
+                    payload={[
+                      { value: '2034 TAM Projection', type: 'rect', color: '#6366f1' },
+                    ]}
+                  />
+                  <Bar dataKey="tam2034" radius={[6, 6, 0, 0]} maxBarSize={50} animationDuration={1200} label={<BarValueLabel />}>
                     {chartData.map((_, i) => (
                       <Cell key={i} fill={`url(#barGrad${i})`} />
                     ))}
@@ -208,43 +193,11 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
             </div>
           </motion.div>
 
-          {/* Per-Firm Detail Table */}
-          <motion.div {...fadeUp(0.2)} className="card-quantum mt-4">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-gray-500 text-xs font-mono uppercase border-b border-white/10">
-                    <th className="text-left py-2 pr-4">Firm</th>
-                    <th className="text-right py-2 px-2">2025</th>
-                    <th className="text-right py-2 px-2">2034</th>
-                    <th className="text-right py-2 pl-2">CAGR</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {MARKET_ANALYSTS.map((a, i) => (
-                    <tr key={a.firm} className="border-b border-white/5">
-                      <td className="py-2 pr-4 text-gray-300 flex items-center gap-2">
-                        <span
-                          className="w-2.5 h-2.5 rounded-sm shrink-0"
-                          style={{ backgroundColor: BAR_COLORS[i] }}
-                        />
-                        {a.firm}
-                      </td>
-                      <td className="py-2 px-2 text-right text-gray-400 font-mono">{a.tam2025}</td>
-                      <td className="py-2 px-2 text-right text-white font-mono font-semibold">{a.tam2034}</td>
-                      <td className="py-2 pl-2 text-right text-quantum-400 font-mono">{a.cagr}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
-
-          {/* TAM Growth Projection */}
-          <motion.div {...fadeUp(0.25)} className="card-quantum mt-4">
+          {/* TAM Growth Projection — area chart in upper half */}
+          <motion.div {...fadeUp(0.15)} className="card-quantum chart-glow mb-6">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-quantum-400" />
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-sm font-semibold text-white">
                 PQC TAM Growth Projection (2024-2034)
               </h3>
             </div>
@@ -311,6 +264,59 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
                   />
                 </AreaChart>
               </ResponsiveContainer>
+            </div>
+          </motion.div>
+
+          {/* Summary Stats */}
+          <motion.div {...fadeUp(0.2)} className="grid grid-cols-3 gap-4 mb-6">
+            {[
+              { label: 'Avg TAM 2034', value: `$${avgTam2034.toFixed(1)}B` },
+              { label: 'Avg CAGR', value: `${avgCagr.toFixed(0)}%` },
+              { label: 'Analyst Firms', value: '7' },
+            ].map((s) => (
+              <div key={s.label} className="card-quantum text-center">
+                <p className="text-2xl font-bold gradient-text font-mono">{s.value}</p>
+                <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-1">{s.label}</p>
+              </div>
+            ))}
+          </motion.div>
+
+          {/* TAM Animated Counter */}
+          <motion.div {...fadeUp(0.22)} className="card-quantum text-center mb-6 py-5">
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">Total Addressable Market by 2034</p>
+            <TAMCounter />
+            <p className="text-sm text-gray-400 leading-relaxed mt-1">across 7 independent analyst projections</p>
+          </motion.div>
+
+          {/* Per-Firm Detail Table */}
+          <motion.div {...fadeUp(0.25)} className="card-quantum">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-gray-500 text-xs font-mono uppercase border-b border-white/10">
+                    <th className="text-left py-2 pr-4">Firm</th>
+                    <th className="text-right py-2 px-2">2025</th>
+                    <th className="text-right py-2 px-2">2034</th>
+                    <th className="text-right py-2 pl-2">CAGR</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {MARKET_ANALYSTS.map((a, i) => (
+                    <tr key={a.firm} className="border-b border-white/5">
+                      <td className="py-2 pr-4 text-gray-300 flex items-center gap-2">
+                        <span
+                          className="w-2.5 h-2.5 rounded-sm shrink-0"
+                          style={{ backgroundColor: BAR_COLORS[i] }}
+                        />
+                        {a.firm}
+                      </td>
+                      <td className="py-2 px-2 text-right text-gray-400 font-mono">{a.tam2025}</td>
+                      <td className="py-2 px-2 text-right text-white font-mono font-semibold">{a.tam2034}</td>
+                      <td className="py-2 pl-2 text-right text-quantum-400 font-mono">{a.cagr}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </motion.div>
         </>

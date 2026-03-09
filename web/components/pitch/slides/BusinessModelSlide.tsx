@@ -19,7 +19,7 @@ import {
   ReferenceLine,
 } from 'recharts'
 
-import { fadeUpInView as fadeUp } from '../slide-utils'
+import { fadeUp } from '../slide-utils'
 import { TOOLTIP_STYLE, GRADIENT_DEFS } from '../chart-config'
 
 const MODULE_COLORS = ['#6366f1', '#22c55e', '#3b82f6', '#a855f7', '#f59e0b', '#ec4899']
@@ -80,106 +80,16 @@ export default function BusinessModelSlide({ scenario = 'all' }: { scenario?: Sc
         <p className="text-quantum-400 font-mono text-sm tracking-widest uppercase mb-3">
           Business Model
         </p>
-        <h2 className="text-4xl sm:text-5xl font-display font-bold text-white mb-3">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
           <span className="gradient-text">QCaaS + QCaaP</span> Dual Engine
         </h2>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           Two complementary revenue streams: consumer subscriptions and developer platform licensing
         </p>
       </motion.div>
 
-      {/* Gross Margin Headline + Norwegian Advantage */}
-      <motion.div {...fadeUp(0.03)} className="grid sm:grid-cols-2 gap-4 mb-8">
-        <div className="card-quantum flex items-center gap-4 border-l-2 border-quantum-500/50">
-          <div className="w-14 h-14 rounded-xl bg-quantum-500/10 flex items-center justify-center shrink-0">
-            <TrendingUp className="w-7 h-7 text-quantum-400" />
-          </div>
-          <div>
-            <p className="text-3xl font-bold gradient-text font-mono">70%+</p>
-            <p className="text-sm text-gray-300">Gross Margins</p>
-            <p className="text-xs text-gray-500 mt-0.5">Software-native model, minimal COGS</p>
-          </div>
-        </div>
-        <div className="card-quantum flex items-center gap-4 border-l-2 border-emerald-500/50">
-          <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
-            <MapPin className="w-7 h-7 text-emerald-400" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-emerald-400 mb-0.5">Norwegian Cost Advantage</p>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              Norwegian engineering base provides <span className="text-white font-semibold">40-55% cost savings</span> vs US,
-              with access to Europe&apos;s top quantum talent pipeline
-            </p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Revenue Streams */}
-      <motion.div {...fadeUp(0.05)} className="grid sm:grid-cols-2 gap-4 mb-8">
-        {REVENUE_STREAMS.map((rs) => (
-          <div key={rs.name} className="card-quantum border-t-2 border-quantum-500/30">
-            <div className="flex items-center gap-3 mb-3">
-              <rs.icon className="w-5 h-5 text-quantum-400" />
-              <div>
-                <span className="text-lg font-bold text-white font-mono">{rs.name}</span>
-                <span className="text-xs text-gray-500 ml-2">{rs.full}</span>
-              </div>
-            </div>
-            <p className="text-sm text-gray-400">{rs.detail}</p>
-          </div>
-        ))}
-      </motion.div>
-
-      {/* Market Gap Visualization */}
-      <motion.div {...fadeUp(0.08)} className="card-quantum mb-8">
-        <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-quantum-400" />
-          Market Pricing Gap
-        </h3>
-        <div className="relative h-16">
-          {/* Track */}
-          <div className="absolute top-6 left-0 right-0 h-1 bg-white/5 rounded-full" />
-          <div className="absolute top-6 left-[30%] right-[20%] h-1 bg-quantum-500/20 rounded-full" />
-
-          {/* Markers */}
-          {MARKET_GAP.map((item) => (
-            <motion.div
-              key={item.label}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="absolute flex flex-col items-center"
-              style={{ left: `${item.position}%`, transform: 'translateX(-50%)' }}
-            >
-              <div
-                className={`w-3 h-3 rounded-full ${
-                  item.highlight
-                    ? 'bg-quantum-400 shadow-lg shadow-quantum-400/40 ring-2 ring-quantum-400/30'
-                    : 'bg-gray-500'
-                }`}
-                style={{ marginTop: '18px' }}
-              />
-              <p className={`text-[10px] font-mono mt-1.5 ${item.highlight ? 'text-quantum-400 font-bold' : 'text-gray-500'}`}>
-                {item.price}
-              </p>
-              <p className={`text-[9px] ${item.highlight ? 'text-gray-300' : 'text-gray-600'}`}>
-                {item.label}
-              </p>
-            </motion.div>
-          ))}
-
-          {/* Gap Arrow */}
-          <div className="absolute top-1 left-[35%] right-[20%] flex items-center justify-center">
-            <span className="text-[9px] font-mono text-quantum-400/70 bg-quantum-500/10 px-2 py-0.5 rounded-full">
-              Massive gap -- Zipminator fills it
-            </span>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Revenue Projection Chart */}
-      <motion.div {...fadeUp(0.09)} className="card-quantum mb-8">
+      {/* Revenue Projection Chart — moved to upper half */}
+      <motion.div {...fadeUp(0.03)} className="card-quantum chart-glow mb-8">
         <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-quantum-400" />
           {scenario === 'all' ? 'Revenue Projections by Scenario ($M)' : `Revenue Breakdown: ${singleScenario} ($M)`}
@@ -254,6 +164,96 @@ export default function BusinessModelSlide({ scenario = 'all' }: { scenario?: Sc
             </AreaChart>
           )}
         </ResponsiveContainer>
+      </motion.div>
+
+      {/* Gross Margin Headline + Norwegian Advantage */}
+      <motion.div {...fadeUp(0.06)} className="grid sm:grid-cols-2 gap-4 mb-8">
+        <div className="card-quantum flex items-center gap-4 border-l-2 border-quantum-500/50">
+          <div className="w-14 h-14 rounded-xl bg-quantum-500/10 flex items-center justify-center shrink-0">
+            <TrendingUp className="w-7 h-7 text-quantum-400" />
+          </div>
+          <div>
+            <p className="text-3xl font-bold gradient-text font-mono">70%+</p>
+            <p className="text-sm text-gray-300">Gross Margins</p>
+            <p className="text-xs text-gray-500 mt-0.5">Software-native model, minimal COGS</p>
+          </div>
+        </div>
+        <div className="card-quantum flex items-center gap-4 border-l-2 border-emerald-500/50">
+          <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+            <MapPin className="w-7 h-7 text-emerald-400" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-emerald-400 mb-0.5">Norwegian Cost Advantage</p>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Norwegian engineering base provides <span className="text-white font-semibold">40-55% cost savings</span> vs US,
+              with access to Europe&apos;s top quantum talent pipeline
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Revenue Streams */}
+      <motion.div {...fadeUp(0.08)} className="grid sm:grid-cols-2 gap-4 mb-8">
+        {REVENUE_STREAMS.map((rs) => (
+          <div key={rs.name} className="card-quantum border-t-2 border-quantum-500/30">
+            <div className="flex items-center gap-3 mb-3">
+              <rs.icon className="w-5 h-5 text-quantum-400" />
+              <div>
+                <span className="text-lg font-bold text-white font-mono">{rs.name}</span>
+                <span className="text-xs text-gray-500 ml-2">{rs.full}</span>
+              </div>
+            </div>
+            <p className="text-sm text-gray-400">{rs.detail}</p>
+          </div>
+        ))}
+      </motion.div>
+
+      {/* Market Gap Visualization */}
+      <motion.div {...fadeUp(0.08)} className="card-quantum mb-8">
+        <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-quantum-400" />
+          Market Pricing Gap
+        </h3>
+        <div className="relative h-16">
+          {/* Track */}
+          <div className="absolute top-6 left-0 right-0 h-1 bg-white/5 rounded-full" />
+          <div className="absolute top-6 left-[30%] right-[20%] h-1 bg-quantum-500/20 rounded-full" />
+
+          {/* Markers */}
+          {MARKET_GAP.map((item) => (
+            <motion.div
+              key={item.label}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="absolute flex flex-col items-center"
+              style={{ left: `${item.position}%`, transform: 'translateX(-50%)' }}
+            >
+              <div
+                className={`w-3 h-3 rounded-full ${
+                  item.highlight
+                    ? 'bg-quantum-400 shadow-lg shadow-quantum-400/40 ring-2 ring-quantum-400/30'
+                    : 'bg-gray-500'
+                }`}
+                style={{ marginTop: '18px' }}
+              />
+              <p className={`text-[10px] font-mono mt-1.5 ${item.highlight ? 'text-quantum-400 font-bold' : 'text-gray-500'}`}>
+                {item.price}
+              </p>
+              <p className={`text-[9px] ${item.highlight ? 'text-gray-300' : 'text-gray-600'}`}>
+                {item.label}
+              </p>
+            </motion.div>
+          ))}
+
+          {/* Gap Arrow */}
+          <div className="absolute top-1 left-[35%] right-[20%] flex items-center justify-center">
+            <span className="text-[9px] font-mono text-quantum-400/70 bg-quantum-500/10 px-2 py-0.5 rounded-full">
+              Massive gap -- Zipminator fills it
+            </span>
+          </div>
+        </div>
       </motion.div>
 
       {/* Pricing Tiers */}

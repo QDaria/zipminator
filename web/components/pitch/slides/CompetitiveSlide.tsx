@@ -7,7 +7,7 @@ import type { Scenario } from '@/lib/pitch-data'
 import { Swords, Check, X, Minus, DollarSign, TrendingUp, AlertTriangle } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts'
 
-import { fadeUpInView as fadeUp } from '../slide-utils'
+import { fadeUp } from '../slide-utils'
 import { TOOLTIP_STYLE } from '../chart-config'
 
 const FEATURES = [
@@ -45,11 +45,11 @@ export default function CompetitiveSlide({ scenario: _scenario }: { scenario?: S
         <p className="text-quantum-400 font-mono text-sm tracking-widest uppercase mb-3">
           Competitive Landscape
         </p>
-        <h2 className="text-4xl sm:text-5xl font-display font-bold text-white mb-3">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
           No One Else Does{' '}
           <span className="gradient-text">All {zipFeatureCount}</span>
         </h2>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           Every competitor solves one piece. Zipminator is the first to unify
           messaging, VoIP, VPN, browser, email, and QRNG under post-quantum encryption.
         </p>
@@ -124,7 +124,7 @@ export default function CompetitiveSlide({ scenario: _scenario }: { scenario?: S
       </motion.div>
 
       {/* Feature Score Chart */}
-      <motion.div {...fadeUp(0.16)} className="card-quantum mt-6">
+      <motion.div {...fadeUp(0.16)} className="card-quantum chart-glow mt-6">
         <h4 className="text-sm font-semibold text-white mb-4">Feature Coverage Score</h4>
         <ResponsiveContainer width="100%" height={280}>
           <BarChart

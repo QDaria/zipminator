@@ -7,12 +7,11 @@ const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   const productLinks = [
-    { name: 'Documentation', href: 'https://docs.zipminator.zip' },
-    { name: 'API Reference', href: 'https://docs.zipminator.zip/api' },
-    { name: 'Pricing', href: '#pricing' },
+    { name: 'Documentation', href: '/docs' },
+    { name: 'API Reference', href: '/docs#api' },
+    { name: 'Pricing', href: '/invest' },
     { name: 'Changelog', href: 'https://github.com/qdaria/zipminator-pqc/releases' },
     { name: 'GitHub Repository', href: 'https://github.com/qdaria/zipminator-pqc' },
-    { name: 'Status Page', href: 'https://status.zipminator.zip' },
   ]
 
   const qdariaProducts = [
@@ -23,29 +22,29 @@ const Footer = () => {
     },
     {
       name: 'Zipminator-PQC',
-      href: 'https://zipminator.zip',
+      href: '/',
       description: 'Quantum-secure encryption',
       current: true
     },
     {
       name: 'Quantum SDK',
-      href: 'https://qdaria.com/products/sdk',
+      href: '/technology#sdk',
       description: 'Developer toolkit'
     },
     {
       name: 'Enterprise Solutions',
-      href: 'https://qdaria.com/enterprise',
+      href: '/technology#enterprise',
       description: 'Custom quantum security'
     },
   ]
 
   const companyLinks = [
-    { name: 'About QDaria', href: 'https://qdaria.com/about' },
-    { name: 'Careers', href: 'https://qdaria.com/careers' },
-    { name: 'Blog', href: 'https://qdaria.com/blog' },
-    { name: 'Contact', href: 'https://qdaria.com/contact' },
-    { name: 'Privacy Policy', href: 'https://qdaria.com/privacy' },
-    { name: 'Terms of Service', href: 'https://qdaria.com/terms' },
+    { name: 'About QDaria', href: '/impact' },
+    { name: 'Careers', href: 'mailto:careers@qdaria.com' },
+    { name: 'Blog', href: 'https://github.com/qdaria/zipminator-pqc/releases' },
+    { name: 'Contact', href: 'mailto:contact@qdaria.com' },
+    { name: 'Privacy Policy', href: '#' },
+    { name: 'Terms of Service', href: '#' },
   ]
 
   const socialLinks = [
@@ -191,7 +190,7 @@ const Footer = () => {
 
             {/* Explore all products link */}
             <Link
-              href="https://qdaria.com/products"
+              href="/technology"
               className="inline-flex items-center space-x-2 text-sm text-quantum-400 hover:text-quantum-300 transition-colors mt-4 group"
             >
               <span>Explore all products</span>
@@ -236,15 +235,15 @@ const Footer = () => {
 
             {/* Legal links */}
             <div className="flex items-center space-x-4 text-sm text-gray-400">
-              <Link href="https://qdaria.com/privacy" className="hover:text-quantum-400 transition-colors">
+              <Link href="#" className="hover:text-quantum-400 transition-colors">
                 Privacy
               </Link>
               <span>|</span>
-              <Link href="https://qdaria.com/terms" className="hover:text-quantum-400 transition-colors">
+              <Link href="#" className="hover:text-quantum-400 transition-colors">
                 Terms
               </Link>
               <span>|</span>
-              <Link href="https://qdaria.com/cookies" className="hover:text-quantum-400 transition-colors">
+              <Link href="#" className="hover:text-quantum-400 transition-colors">
                 Cookies
               </Link>
             </div>

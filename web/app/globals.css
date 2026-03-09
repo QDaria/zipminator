@@ -129,7 +129,10 @@ html {
 
   /* Quantum-themed card */
   .card-quantum {
-    @apply rounded-2xl bg-white/[0.04] backdrop-blur-xl border border-white/10 p-6 transition-all duration-300 hover:border-quantum-500/40 hover:bg-white/[0.06];
+    @apply rounded-2xl bg-white/[0.04] backdrop-blur-xl border border-white/10 p-6
+      transition-all duration-300
+      hover:border-quantum-500/40 hover:bg-white/[0.06]
+      hover:shadow-[0_0_15px_rgba(99,102,241,0.15)];
   }
 
   /* Container */

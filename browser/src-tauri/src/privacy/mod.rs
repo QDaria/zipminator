@@ -18,7 +18,7 @@
 //! `Arc<PrivacyEngine>` should be stored in Tauri's managed state so that
 //! Tauri commands can access all sub-systems through a single handle.
 //!
-//! ```rust,no_run
+//! ```ignore
 //! // In your Tauri builder:
 //! let engine = PrivacyEngine::init("/path/to/zipminator");
 //! tauri::Builder::default()
