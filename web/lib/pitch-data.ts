@@ -761,14 +761,14 @@ export const NORWEGIAN_ECOSYSTEM = {
 }
 
 export const ROADMAP_PHASES = [
-  { name: 'Quantum Vault', phase: 1, status: 'done' as const, description: 'Core encryption engine' },
-  { name: 'Secure Messenger', phase: 2, status: 'progress' as const, progress: 70, description: 'E2E encrypted chat' },
-  { name: 'VoIP & Q-VPN', phase: 3, status: 'progress' as const, progress: 30, description: 'Encrypted calls and VPN' },
-  { name: 'Anonymizer', phase: 4, status: 'done' as const, description: '10-level data protection' },
-  { name: 'AI Assistant', phase: 5, status: 'done' as const, description: 'On-device PQC AI' },
-  { name: 'MCP Server', phase: 6, status: 'done' as const, description: 'Developer tools and API' },
-  { name: 'Quantum Email', phase: 7, status: 'planned' as const, description: 'Self-destructing secure email' },
-  { name: 'ZipBrowser', phase: 8, status: 'planned' as const, description: 'Quantum-safe AI browser' },
+  { name: 'Quantum Vault', phase: 1, status: 'done' as const, progress: 95, description: 'Core encryption engine' },
+  { name: 'Secure Messenger', phase: 2, status: 'progress' as const, progress: 85, description: 'E2E encrypted chat' },
+  { name: 'Quantum VoIP', phase: 3, status: 'progress' as const, progress: 80, description: 'Encrypted calls & video' },
+  { name: 'Q-VPN', phase: 4, status: 'progress' as const, progress: 90, description: 'Quantum-safe VPN tunnel' },
+  { name: 'Anonymizer', phase: 5, status: 'done' as const, progress: 100, description: '10-level data protection' },
+  { name: 'AI Assistant', phase: 6, status: 'progress' as const, progress: 85, description: 'On-device PQC AI' },
+  { name: 'Quantum Email', phase: 7, status: 'progress' as const, progress: 90, description: 'PQC-encrypted secure email' },
+  { name: 'ZipBrowser', phase: 8, status: 'progress' as const, progress: 75, description: 'Quantum-safe AI browser' },
 ]
 
 export const ROADMAP_MILESTONES = [
@@ -815,14 +815,14 @@ export const THREAT_SEVERITY = [
 ]
 
 export const DEVELOPMENT_TIMELINE = [
-  { phase: 'Quantum Vault', status: 'done', progress: 100 },
-  { phase: 'PQC Messenger', status: 'progress', progress: 70 },
-  { phase: 'VoIP & Q-VPN', status: 'progress', progress: 30 },
+  { phase: 'Quantum Vault', status: 'done', progress: 95 },
+  { phase: 'PQC Messenger', status: 'progress', progress: 85 },
+  { phase: 'Quantum VoIP', status: 'progress', progress: 80 },
+  { phase: 'Q-VPN', status: 'progress', progress: 90 },
   { phase: 'Anonymizer', status: 'done', progress: 100 },
-  { phase: 'AI Assistant', status: 'done', progress: 100 },
-  { phase: 'MCP Server', status: 'done', progress: 100 },
-  { phase: 'Quantum Email', status: 'planned', progress: 0 },
-  { phase: 'ZipBrowser', status: 'planned', progress: 0 },
+  { phase: 'AI Assistant', status: 'progress', progress: 85 },
+  { phase: 'Quantum Email', status: 'progress', progress: 90 },
+  { phase: 'ZipBrowser', status: 'progress', progress: 75 },
 ]
 
 export const USE_CASE_INDUSTRIES = [

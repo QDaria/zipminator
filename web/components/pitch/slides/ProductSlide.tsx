@@ -47,11 +47,11 @@ const MODULE_STATUS_MAP: Record<string, { status: string; label: string; color: 
 // Map SUPER_APP_MODULES names to ROADMAP_PHASES names
 const MODULE_NAME_TO_ROADMAP: Record<string, string> = {
   'PQC Messenger': 'Secure Messenger',
-  'Quantum VoIP': 'VoIP & Q-VPN',
-  'Q-VPN': 'VoIP & Q-VPN',
+  'Quantum VoIP': 'Quantum VoIP',
+  'Q-VPN': 'Q-VPN',
   'ZipBrowser': 'ZipBrowser',
   'Quantum Mail': 'Quantum Email',
-  'QRNG Engine': 'MCP Server',
+  'QRNG Engine': 'Quantum Vault',
   'PII Anonymizer': 'Anonymizer',
   'AI Assistant': 'AI Assistant',
 }
