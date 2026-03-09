@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, JetBrains_Mono, Outfit } from 'next/font/google'
+import { Inter, JetBrains_Mono, Outfit, Geist } from 'next/font/google'
 import './globals.css'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
@@ -7,6 +7,9 @@ import SessionProvider from '@/components/auth/SessionProvider'
 import ThemeProvider from '@/components/ThemeProvider'
 import Script from 'next/script'
 import { GA_TRACKING_ID } from '@/lib/analytics'
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const inter = Inter({
   subsets: ['latin'],
@@ -144,7 +147,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark scroll-smooth">
+    <html lang="en" className={cn("dark scroll-smooth", "font-sans", geist.variable)}>
       <head>
         <meta name="theme-color" content="#6366f1" />
         <meta name="color-scheme" content="dark light" />

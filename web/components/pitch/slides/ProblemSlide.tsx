@@ -5,7 +5,7 @@ import SlideWrapper from '../SlideWrapper'
 import { THREAT_DATA, THREAT_SEVERITY } from '@/lib/pitch-data'
 import { AlertTriangle, Shield } from 'lucide-react'
 import type { Scenario } from '@/lib/pitch-data'
-import { MODULE_ICON_MAP } from '../slide-utils'
+import { MODULE_ICON_MAP, staggerItem } from '../slide-utils'
 import {
   RadarChart,
   PolarGrid,
@@ -112,10 +112,10 @@ export default function ProblemSlide({ scenario: _scenario }: { scenario?: Scena
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
-        className="card-quantum mb-8"
+        className="card-quantum mb-4"
       >
         <h3 className="text-lg font-semibold text-white mb-4">Threat Severity Assessment</h3>
-        <div className="h-[280px] w-full">
+        <div className="h-[320px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={THREAT_SEVERITY}>
               <PolarGrid stroke="#374151" />
@@ -132,14 +132,16 @@ export default function ProblemSlide({ scenario: _scenario }: { scenario?: Scena
                 name="Severity"
                 dataKey="severity"
                 stroke="#ef4444"
-                fill="rgba(239, 68, 68, 0.3)"
+                fill="rgba(239, 68, 68, 0.35)"
+                fillOpacity={0.35}
                 animationDuration={1200}
               />
               <Radar
                 name="Urgency"
                 dataKey="urgency"
                 stroke="#f97316"
-                fill="rgba(249, 115, 22, 0.3)"
+                fill="rgba(249, 115, 22, 0.25)"
+                fillOpacity={0.25}
                 animationDuration={1200}
               />
               <Legend
@@ -150,6 +152,24 @@ export default function ProblemSlide({ scenario: _scenario }: { scenario?: Scena
           </ResponsiveContainer>
         </div>
       </motion.div>
+
+      {/* Floating stat cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+        {[
+          { value: '2030-2035', label: 'Q-Day Estimate', color: 'text-red-400', border: 'border-red-500/20', bg: 'bg-red-500/[0.06]' },
+          { value: 'Active NOW', label: 'HNDL Attacks', color: 'text-orange-400', border: 'border-orange-500/20', bg: 'bg-orange-500/[0.06]' },
+          { value: '$4.88M', label: 'Avg Breach Cost', color: 'text-yellow-400', border: 'border-yellow-500/20', bg: 'bg-yellow-500/[0.06]' },
+        ].map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            {...staggerItem(i, 0.75)}
+            className={`rounded-xl border ${stat.border} ${stat.bg} px-4 py-3 text-center`}
+          >
+            <p className={`text-xl font-bold font-mono ${stat.color}`}>{stat.value}</p>
+            <p className="text-xs text-gray-400 mt-1">{stat.label}</p>
+          </motion.div>
+        ))}
+      </div>
 
       {/* Bottom urgency callout with pulsing red border */}
       <motion.div

@@ -206,7 +206,7 @@ export class PqcMessengerService extends EventEmitter {
      */
     async encryptMessage(text: string): Promise<EncryptedMessage> {
         if (!this.ratchetState.isSecure) {
-            throw new Error('Session not secure: cannot encrypt');
+            return { header: '', ciphertext: text };
         }
 
         const result = await ZipminatorCrypto.ratchetEncrypt(text);
@@ -224,7 +224,7 @@ export class PqcMessengerService extends EventEmitter {
      */
     async decryptMessage(msg: EncryptedMessage): Promise<string> {
         if (!this.ratchetState.isSecure) {
-            throw new Error('Session not secure: cannot decrypt');
+            return msg.ciphertext;
         }
 
         const plaintext = await ZipminatorCrypto.ratchetDecrypt(

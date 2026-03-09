@@ -20,7 +20,7 @@ import AnonymizationPanel from '../AnonymizationPanel'
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 // framer-motion: render children immediately without animation
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div {...props}>{children}</div>
@@ -36,13 +36,13 @@ function makeFile(name: string, sizeBytes = 1024): File {
   return new File([blob], name, { type: 'text/csv' })
 }
 
-const noop = jest.fn(() => Promise.resolve())
+const noop = vi.fn(() => Promise.resolve())
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('AnonymizationPanel', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders nothing when attachments array is empty', () => {
@@ -85,7 +85,7 @@ describe('AnonymizationPanel', () => {
   })
 
   it('calls onAnonymize with correct fileIndex and default level 5', async () => {
-    const onAnonymize = jest.fn(() => Promise.resolve())
+    const onAnonymize = vi.fn(() => Promise.resolve())
     const files = [makeFile('report.csv')]
     render(<AnonymizationPanel attachments={files} onAnonymize={onAnonymize} />)
 
@@ -160,7 +160,7 @@ describe('AnonymizationPanel', () => {
   })
 
   it('shows success state after onAnonymize resolves', async () => {
-    const onAnonymize = jest.fn(() => Promise.resolve())
+    const onAnonymize = vi.fn(() => Promise.resolve())
     render(<AnonymizationPanel attachments={[makeFile('emp.csv')]} onAnonymize={onAnonymize} />)
 
     await userEvent.click(screen.getByRole('button', { name: /^anonymize$/i }))
@@ -172,7 +172,7 @@ describe('AnonymizationPanel', () => {
   })
 
   it('shows error message when onAnonymize rejects', async () => {
-    const onAnonymize = jest.fn(() => Promise.reject(new Error('Server error')))
+    const onAnonymize = vi.fn(() => Promise.reject(new Error('Server error')))
     render(<AnonymizationPanel attachments={[makeFile('bad.csv')]} onAnonymize={onAnonymize} />)
 
     await userEvent.click(screen.getByRole('button', { name: /^anonymize$/i }))
@@ -183,7 +183,7 @@ describe('AnonymizationPanel', () => {
   })
 
   it('shows "All secure" when every attachment is anonymized', async () => {
-    const onAnonymize = jest.fn(() => Promise.resolve())
+    const onAnonymize = vi.fn(() => Promise.resolve())
     const files = [makeFile('x.csv')]
     render(<AnonymizationPanel attachments={files} onAnonymize={onAnonymize} />)
 
@@ -195,7 +195,7 @@ describe('AnonymizationPanel', () => {
   })
 
   it('"Anonymize all" calls onAnonymize for every attachment', async () => {
-    const onAnonymize = jest.fn(() => Promise.resolve())
+    const onAnonymize = vi.fn(() => Promise.resolve())
     const files = [makeFile('a.csv'), makeFile('b.csv'), makeFile('c.csv')]
     render(<AnonymizationPanel attachments={files} onAnonymize={onAnonymize} />)
 

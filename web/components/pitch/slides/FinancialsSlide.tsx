@@ -5,9 +5,10 @@ import SlideWrapper from '../SlideWrapper'
 import { REVENUE_PROJECTIONS, REVENUE_MODULES } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
 import { BarChart3, Users, DollarSign, TrendingUp, Gift, Layers, Award } from 'lucide-react'
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 
-import { fadeUpInView as fadeUp } from '../slide-utils'
+import { fadeUpInView as fadeUp, useAnimatedCounter } from '../slide-utils'
+import { TOOLTIP_STYLE, GRADIENT_DEFS } from '../chart-config'
 
 const SCENARIO_META: Record<Scenario, { label: string; accent: string }> = {
   all: { label: 'All Scenarios', accent: 'bg-purple-500' },
@@ -37,6 +38,9 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
   const totalRevenue5yr = data.reduce((sum, d) => sum + d.revenue, 0)
   const yr5Revenue = data[data.length - 1].revenue
   const yr5Users = data[data.length - 1].users
+
+  const { display: animatedARR, ref: arrRef } = useAnimatedCounter(yr5Revenue, { suffix: 'M', decimals: 0 })
+  const { display: animatedMargin, ref: marginRef } = useAnimatedCounter(70, { suffix: '%+', decimals: 0 })
 
   // Prepare chart data: merge all scenarios by year for overlay
   const chartData = REVENUE_PROJECTIONS.base.map((d, i) => ({
@@ -130,27 +134,58 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
 
         <ResponsiveContainer width="100%" height={256}>
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="gradScenarioBase" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={GRADIENT_DEFS.quantum.color} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={GRADIENT_DEFS.quantum.color} stopOpacity={0.05} />
+              </linearGradient>
+              <linearGradient id="gradScenarioUpside" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={GRADIENT_DEFS.green.color} stopOpacity={0.35} />
+                <stop offset="95%" stopColor={GRADIENT_DEFS.green.color} stopOpacity={0.05} />
+              </linearGradient>
+              <linearGradient id="gradScenarioConservative" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={GRADIENT_DEFS.blue.color} stopOpacity={0.35} />
+                <stop offset="95%" stopColor={GRADIENT_DEFS.blue.color} stopOpacity={0.05} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
             <XAxis dataKey="year" tick={{ fill: '#9ca3af', fontSize: 12, fontFamily: 'monospace' }} tickLine={false} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
             <YAxis tick={{ fill: '#9ca3af', fontSize: 12, fontFamily: 'monospace' }} tickLine={false} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} tickFormatter={(v: number) => `$${v}M`} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontFamily: 'monospace', fontSize: 12 }}
-              labelStyle={{ color: '#fff', fontWeight: 600 }}
+              {...TOOLTIP_STYLE}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(value: any, name: any) => [`$${value}M`, SCENARIO_META[name as Scenario]?.label ?? name]}
               labelFormatter={(label: any) => `Year ${label}`}
             />
+            <Legend
+              verticalAlign="bottom"
+              height={30}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              formatter={(value: any) => <span style={{ color: '#d1d5db', fontSize: 12 }}>{SCENARIO_META[value as Scenario]?.label ?? value}</span>}
+            />
             {scenario === 'all' ? (
               <>
-                <Area type="monotone" dataKey="conservative" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.08} strokeWidth={2} animationDuration={1200} />
-                <Area type="monotone" dataKey="base" stroke="#6366f1" fill="#6366f1" fillOpacity={0.12} strokeWidth={2} animationDuration={1200} />
-                <Area type="monotone" dataKey="upside" stroke="#22c55e" fill="#22c55e" fillOpacity={0.08} strokeWidth={2} animationDuration={1200} />
+                <Area type="monotone" dataKey="conservative" stroke="#3b82f6" fill="url(#gradScenarioConservative)" strokeWidth={2} animationDuration={1200} />
+                <Area type="monotone" dataKey="base" stroke="#6366f1" fill="url(#gradScenarioBase)" strokeWidth={2} animationDuration={1200} />
+                <Area type="monotone" dataKey="upside" stroke="#22c55e" fill="url(#gradScenarioUpside)" strokeWidth={2} animationDuration={1200} />
               </>
             ) : (
-              <Area type="monotone" dataKey={effectiveScenario} stroke={SCENARIO_COLORS[effectiveScenario]} fill={SCENARIO_COLORS[effectiveScenario]} fillOpacity={0.15} strokeWidth={2} animationDuration={1200} />
+              <Area type="monotone" dataKey={effectiveScenario} stroke={SCENARIO_COLORS[effectiveScenario]} fill={`url(#gradScenario${effectiveScenario.charAt(0).toUpperCase() + effectiveScenario.slice(1)})`} strokeWidth={2} animationDuration={1200} />
             )}
           </AreaChart>
         </ResponsiveContainer>
+      </motion.div>
+
+      {/* Floating Metric Cards */}
+      <motion.div {...fadeUp(0.17)} className="grid grid-cols-2 gap-4 mb-6">
+        <div className="card-quantum text-center chart-glow">
+          <p className="text-xs text-gray-400 font-mono mb-1">Year 5 ARR</p>
+          <p ref={arrRef as React.RefObject<HTMLParagraphElement>} className="text-3xl font-bold gradient-text font-mono">${animatedARR}</p>
+        </div>
+        <div className="card-quantum text-center chart-glow">
+          <p className="text-xs text-gray-400 font-mono mb-1">Gross Margin</p>
+          <p ref={marginRef as React.RefObject<HTMLParagraphElement>} className="text-3xl font-bold gradient-text font-mono">{animatedMargin}</p>
+        </div>
       </motion.div>
 
       {/* Revenue per Module Donut */}
@@ -161,7 +196,7 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-6">
           <div className="relative">
-            <ResponsiveContainer width={200} height={200}>
+            <ResponsiveContainer width={240} height={240}>
               <PieChart>
                 <Pie
                   data={REVENUE_MODULES}
@@ -169,8 +204,8 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
+                  innerRadius={55}
+                  outerRadius={95}
                   paddingAngle={2}
                   animationDuration={1200}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -181,7 +216,7 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontFamily: 'monospace', fontSize: 12 }}
+                  {...TOOLTIP_STYLE}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(value: any, name: any) => [`${value}%`, name]}
                 />

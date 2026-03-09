@@ -5,7 +5,60 @@ import SlideWrapper from '../SlideWrapper'
 import { SUPER_APP_MODULES } from '@/lib/pitch-data'
 import { Shield, Sparkles, Leaf, DollarSign } from 'lucide-react'
 import type { Scenario } from '@/lib/pitch-data'
-import { MODULE_ICON_MAP } from '../slide-utils'
+import { MODULE_ICON_MAP, chartEntrance } from '../slide-utils'
+import { TOOLTIP_STYLE, CHART_ANIMATION_DURATION } from '../chart-config'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
+
+const MODULE_WEIGHTS = [
+  { name: 'Messenger', value: 18, color: '#6366f1' },
+  { name: 'VoIP', value: 14, color: '#8b5cf6' },
+  { name: 'VPN', value: 16, color: '#3b82f6' },
+  { name: 'Browser', value: 12, color: '#06b6d4' },
+  { name: 'Email', value: 12, color: '#22c55e' },
+  { name: 'QRNG', value: 10, color: '#f59e0b' },
+  { name: 'PII', value: 8, color: '#ec4899' },
+  { name: 'AI', value: 10, color: '#a855f7' },
+]
+
+const RADIAN = Math.PI / 180
+function renderCustomLabel({
+  cx,
+  cy,
+  midAngle,
+  outerRadius,
+  name,
+  percent,
+}: {
+  cx: number
+  cy: number
+  midAngle: number
+  outerRadius: number
+  name: string
+  percent: number
+}) {
+  const radius = outerRadius + 18
+  const x = cx + radius * Math.cos(-midAngle * RADIAN)
+  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="#9ca3af"
+      textAnchor={x > cx ? 'start' : 'end'}
+      dominantBaseline="central"
+      fontSize={10}
+      fontFamily="monospace"
+    >
+      {name} ({(percent * 100).toFixed(0)}%)
+    </text>
+  )
+}
 
 export default function SolutionSlide({ scenario: _scenario }: { scenario?: Scenario }) {
   return (
@@ -40,6 +93,63 @@ export default function SolutionSlide({ scenario: _scenario }: { scenario?: Scen
             <Leaf className="w-3.5 h-3.5" />
             Single app = less compute = smaller carbon footprint
           </span>
+        </div>
+      </motion.div>
+
+      {/* Module Weight Donut */}
+      <motion.div {...chartEntrance(0.15)} className="card-quantum chart-glow mb-8">
+        <div className="flex items-center gap-2 mb-2">
+          <Shield className="w-4 h-4 text-quantum-400" />
+          <h3 className="text-sm font-semibold text-white">Platform Architecture</h3>
+        </div>
+        <div style={{ height: 240 }} className="w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <defs>
+                {MODULE_WEIGHTS.map((m) => (
+                  <linearGradient key={m.name} id={`grad-${m.name}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={m.color} stopOpacity={0.9} />
+                    <stop offset="100%" stopColor={m.color} stopOpacity={0.5} />
+                  </linearGradient>
+                ))}
+              </defs>
+              <Pie
+                data={MODULE_WEIGHTS}
+                cx="50%"
+                cy="50%"
+                innerRadius={55}
+                outerRadius={90}
+                paddingAngle={2}
+                dataKey="value"
+                animationDuration={CHART_ANIMATION_DURATION}
+                label={renderCustomLabel}
+                labelLine={false}
+              >
+                {MODULE_WEIGHTS.map((m) => (
+                  <Cell key={m.name} fill={`url(#grad-${m.name})`} stroke={m.color} strokeWidth={1} />
+                ))}
+              </Pie>
+              <Tooltip
+                {...TOOLTIP_STYLE}
+                formatter={(value: number, name: string) => [`${value}%`, name]}
+              />
+              {/* Center text */}
+              <text x="50%" y="48%" textAnchor="middle" fill="#fff" fontSize={18} fontWeight={700}>
+                8
+              </text>
+              <text x="50%" y="58%" textAnchor="middle" fill="#9ca3af" fontSize={10} fontFamily="monospace">
+                Modules
+              </text>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
+          {MODULE_WEIGHTS.map((m) => (
+            <span key={m.name} className="flex items-center gap-1.5 text-[10px] text-gray-500">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: m.color }} />
+              {m.name}
+            </span>
+          ))}
         </div>
       </motion.div>
 

@@ -27,9 +27,11 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  ReferenceLine,
 } from 'recharts'
 
 import { fadeUp } from '../slide-utils'
+import { TOOLTIP_STYLE } from '../chart-config'
 
 const DIFFERENTIATORS = [
   {
@@ -193,24 +195,53 @@ export default function CompanySlide({ scenario: _scenario }: { scenario?: Scena
       </motion.div>
 
       {/* Build Cost Comparison Chart */}
-      <motion.div {...fadeUp(0.55)} className="card-quantum mb-8">
+      <motion.div {...fadeUp(0.55)} className="card-quantum mb-8 relative">
         <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
           <Building2 className="w-4 h-4 text-emerald-400" />
           Build Cost: Norway vs Silicon Valley
         </h3>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={COST_COMPARISON_NUMERIC} margin={{ left: 10, right: 10 }}>
+
+        {/* Floating badge annotation */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8, duration: 0.4 }}
+          className="absolute top-3 right-4 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold"
+        >
+          40-60% Lower
+        </motion.div>
+
+        <ResponsiveContainer width="100%" height={260}>
+          <BarChart data={COST_COMPARISON_NUMERIC} margin={{ left: 10, right: 10, top: 10 }}>
+            <defs>
+              <linearGradient id="gradNorway" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#22c55e" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="#10b981" stopOpacity={0.5} />
+              </linearGradient>
+              <linearGradient id="gradValley" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ef4444" stopOpacity={0.7} />
+                <stop offset="100%" stopColor="#f87171" stopOpacity={0.3} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
             <XAxis dataKey="category" stroke="#6b7280" fontSize={11} />
             <YAxis stroke="#6b7280" fontSize={12} tickFormatter={(v: number) => `$${v}K`} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#1f2937', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }}
+              contentStyle={TOOLTIP_STYLE.contentStyle}
+              labelStyle={TOOLTIP_STYLE.labelStyle}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              formatter={(value: any, name: any) => [`$${value ?? 0}K`, name === 'norway' ? 'Norway' : 'Silicon Valley']}
+              formatter={(value: any, name: any) => [`$${value ?? 0}K`, name === 'norway' ? '🇳🇴 Norway' : '🇺🇸 Silicon Valley']}
             />
-            <Legend formatter={(value: string) => (value === 'norway' ? 'Norway' : 'Silicon Valley')} />
-            <Bar dataKey="norway" fill="#22c55e" radius={[4, 4, 0, 0]} animationDuration={1200} />
-            <Bar dataKey="valley" fill="rgba(248, 113, 113, 0.5)" radius={[4, 4, 0, 0]} animationDuration={1200} />
+            <ReferenceLine
+              y={COST_COMPARISON_NUMERIC.reduce((s, d) => s + ((d.norway + d.valley) / 2), 0) / COST_COMPARISON_NUMERIC.length}
+              stroke="#9ca3af"
+              strokeDasharray="4 4"
+              strokeOpacity={0.5}
+              label={{ value: 'Avg', position: 'right', fill: '#9ca3af', fontSize: 10 }}
+            />
+            <Legend formatter={(value: string) => (value === 'norway' ? '🇳🇴 Norway' : '🇺🇸 Silicon Valley')} />
+            <Bar dataKey="norway" fill="url(#gradNorway)" radius={[4, 4, 0, 0]} animationDuration={1200} />
+            <Bar dataKey="valley" fill="url(#gradValley)" radius={[4, 4, 0, 0]} animationDuration={1200} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>

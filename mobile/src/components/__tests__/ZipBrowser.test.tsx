@@ -13,6 +13,9 @@
 import React from 'react';
 import { create, act } from 'react-test-renderer';
 
+// React 19 requires this flag for act() to work in test environments
+(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
+
 // ---------------------------------------------------------------------------
 // Mock react-native (before any component imports)
 // ---------------------------------------------------------------------------

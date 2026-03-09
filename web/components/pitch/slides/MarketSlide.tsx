@@ -19,10 +19,12 @@ import {
   AreaChart,
   Area,
   ReferenceLine,
+  Legend,
 } from 'recharts'
 import { TrendingUp, Target, BarChart3, AlertTriangle, Calendar } from 'lucide-react'
 
-import { fadeUpInView as fadeUp } from '../slide-utils'
+import { fadeUpInView as fadeUp, useAnimatedCounter } from '../slide-utils'
+import { TOOLTIP_STYLE } from '../chart-config'
 
 const marketGrowthData = [
   { year: 2024, tam: 0.9 },
@@ -55,7 +57,7 @@ const BAR_COLORS = [
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; dataKey: string }>; label?: string }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-gray-900 border border-white/10 rounded-lg px-3 py-2 shadow-xl">
+    <div style={TOOLTIP_STYLE.contentStyle}>
       <p className="text-xs font-semibold text-white mb-1">{label}</p>
       {payload.map((p) => (
         <p key={p.dataKey} className="text-xs text-gray-300">
@@ -63,6 +65,25 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
         </p>
       ))}
     </div>
+  )
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function BarValueLabel(props: any) {
+  const { x, y, width, value } = props
+  return (
+    <text x={x + width / 2} y={y - 6} fill="#d1d5db" textAnchor="middle" fontSize={10} fontFamily="monospace">
+      ${value}B
+    </text>
+  )
+}
+
+function TAMCounter() {
+  const { display, ref } = useAnimatedCounter(18.7, { suffix: 'B', decimals: 1 })
+  return (
+    <span ref={ref as React.RefObject<HTMLSpanElement>} className="text-3xl font-bold gradient-text font-mono">
+      ${display}
+    </span>
   )
 }
 
@@ -135,6 +156,13 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
             ))}
           </motion.div>
 
+          {/* TAM Animated Counter */}
+          <motion.div {...fadeUp(0.12)} className="card-quantum text-center mb-6 py-5">
+            <p className="text-xs text-gray-500 font-mono uppercase mb-2">Total Addressable Market by 2034</p>
+            <TAMCounter />
+            <p className="text-sm text-gray-400 mt-1">across 7 independent analyst projections</p>
+          </motion.div>
+
           {/* Recharts Bar Chart */}
           <motion.div {...fadeUp(0.15)} className="card-quantum">
             <div className="flex items-center gap-2 mb-4">
@@ -145,7 +173,15 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
             </div>
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+                <BarChart data={chartData} margin={{ top: 20, right: 10, left: 0, bottom: 5 }}>
+                  <defs>
+                    {BAR_COLORS.map((color, i) => (
+                      <linearGradient key={i} id={`barGrad${i}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={color} stopOpacity={0.95} />
+                        <stop offset="100%" stopColor={color} stopOpacity={0.5} />
+                      </linearGradient>
+                    ))}
+                  </defs>
                   <XAxis
                     dataKey="firm"
                     tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }}
@@ -162,9 +198,9 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
                     tickFormatter={(v: number) => `$${v}B`}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="tam2034" radius={[6, 6, 0, 0]} maxBarSize={50}>
+                  <Bar dataKey="tam2034" radius={[6, 6, 0, 0]} maxBarSize={50} label={<BarValueLabel />}>
                     {chartData.map((_, i) => (
-                      <Cell key={i} fill={BAR_COLORS[i]} />
+                      <Cell key={i} fill={`url(#barGrad${i})`} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -234,8 +270,8 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
                     tickFormatter={(v: number) => `$${v}B`}
                   />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}
-                    labelStyle={{ color: '#fff', fontSize: 12 }}
+                    contentStyle={TOOLTIP_STYLE.contentStyle}
+                    labelStyle={TOOLTIP_STYLE.labelStyle}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(value: any) => [`$${value}B`, 'TAM']}
                   />
@@ -246,14 +282,28 @@ export default function MarketSlide({ scenario: _scenario }: { scenario?: Scenar
                     label={{ value: 'CNSA 2.0', position: 'top', fill: '#ef4444', fontSize: 11 }}
                   />
                   <ReferenceLine
+                    x={2030}
+                    stroke="#f59e0b"
+                    strokeDasharray="4 4"
+                    label={{ value: 'Q-Day Window', position: 'top', fill: '#f59e0b', fontSize: 10 }}
+                  />
+                  <ReferenceLine
                     x={2034}
                     stroke="#22c55e"
                     strokeDasharray="5 5"
                     label={{ value: 'Full Migration', position: 'top', fill: '#22c55e', fontSize: 11 }}
                   />
+                  <Legend
+                    verticalAlign="bottom"
+                    wrapperStyle={{ fontSize: 11, color: '#9ca3af', paddingTop: 8 }}
+                    payload={[
+                      { value: 'PQC TAM', type: 'circle', color: '#6366f1' },
+                    ]}
+                  />
                   <Area
                     type="monotone"
                     dataKey="tam"
+                    name="PQC TAM"
                     stroke="#6366f1"
                     fill="url(#tamGradient)"
                     strokeWidth={2}

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X, ChevronDown, Sun, Moon } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useSession } from 'next-auth/react'
 import AuthButton from '@/components/auth/AuthButton'
 import { useTheme } from '@/components/ThemeProvider'
 
@@ -13,6 +14,7 @@ const Navigation = () => {
   const [isProductsOpen, setIsProductsOpen] = useState(false)
   const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const { status: authStatus } = useSession()
   const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
@@ -168,6 +170,19 @@ const Navigation = () => {
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
+            {/* Join Beta CTA (unauthenticated only) */}
+            {authStatus !== 'authenticated' && (
+              <>
+                <div className="h-5 w-px bg-gray-700/50 mx-1" aria-hidden="true" />
+                <Link
+                  href="/#waitlist"
+                  className="btn-primary text-sm px-4 py-2"
+                >
+                  Join Beta
+                </Link>
+              </>
+            )}
+
             {/* Separator */}
             <div className="h-5 w-px bg-gray-700/50 mx-1" aria-hidden="true" />
 
@@ -245,11 +260,20 @@ const Navigation = () => {
                 </Link>
               ))}
 
-              {/* Mobile Sign In */}
-              <div className="pt-3 border-t border-gray-800">
+              {/* Mobile Join Beta + Sign In */}
+              <div className="pt-3 border-t border-gray-800 space-y-2">
+                {authStatus !== 'authenticated' && (
+                  <Link
+                    href="/#waitlist"
+                    className="block w-full text-center btn-primary text-sm py-2.5"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Join Beta
+                  </Link>
+                )}
                 <Link
                   href="/auth/login"
-                  className="block w-full text-center btn-primary text-sm py-2.5"
+                  className="block w-full text-center text-sm py-2.5 text-gray-300 hover:text-white transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   Sign In

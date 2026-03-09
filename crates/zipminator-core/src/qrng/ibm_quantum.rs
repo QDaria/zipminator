@@ -12,10 +12,10 @@
 /// - Thread-safe concurrent access
 
 use super::{HealthStatus, QrngDevice, QrngError};
-use log::{debug, error, info, warn};
+use log::{info, warn};
 use std::fs::File;
-use std::io::{Read, Seek, SeekFrom};
-use std::path::{Path, PathBuf};
+use std::io::Read;
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
 /// Configuration for IBM Quantum QRNG
@@ -44,7 +44,7 @@ impl Default for IBMQuantumConfig {
 
 /// Statistics for IBM Quantum QRNG
 #[derive(Debug, Default)]
-struct IBMQuantumStats {
+pub struct IBMQuantumStats {
     bytes_served: u64,
     bytes_from_quantum: u64,
     bytes_from_fallback: u64,

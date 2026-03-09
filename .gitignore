@@ -372,3 +372,4 @@ deprecated/
 web/screenshots/
 .vercel
 _screenshots/
+docs/book/_build/

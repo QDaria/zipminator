@@ -13,6 +13,7 @@ import os
 
 import pandas as pd
 import pytest
+import pytest_asyncio
 from fastapi import FastAPI
 from httpx import AsyncClient, ASGITransport
 
@@ -50,7 +51,7 @@ def app():
     return test_app
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client(app):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c

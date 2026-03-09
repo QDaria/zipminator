@@ -98,10 +98,10 @@ const Hero = () => {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
           >
             <Link
-              href="/dashboard"
+              href="#waitlist"
               className="btn-primary flex items-center space-x-2 group relative overflow-hidden px-8 py-4 text-lg font-semibold shadow-xl shadow-quantum-500/30 hover:shadow-quantum-500/50"
             >
-              <span className="relative z-10">Get Started Free</span>
+              <span className="relative z-10">Join the Beta</span>
               <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
               <div className="absolute inset-0 bg-gradient-to-r from-quantum-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Link>

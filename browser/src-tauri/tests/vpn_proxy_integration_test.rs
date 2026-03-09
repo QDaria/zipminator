@@ -1,3 +1,4 @@
+#![cfg(feature = "vpn")]
 //! VPN ↔ Proxy integration tests.
 //!
 //! Verifies that:

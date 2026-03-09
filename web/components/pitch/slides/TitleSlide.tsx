@@ -2,9 +2,12 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import SlideWrapper from '../SlideWrapper'
 import { Shield, Lock, Cpu, Leaf, MapPin } from 'lucide-react'
 import type { Scenario } from '@/lib/pitch-data'
+
+const QuantumParticleField = dynamic(() => import('../QuantumParticleField'), { ssr: false })
 
 const floatingIcons = [
   { Icon: Shield, delay: 0, x: -120, y: -80 },
@@ -15,6 +18,9 @@ const floatingIcons = [
 export default function TitleSlide({ scenario: _scenario }: { scenario?: Scenario }) {
   return (
     <SlideWrapper className="items-center text-center relative">
+      {/* Three.js quantum particle field */}
+      <QuantumParticleField />
+
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-quantum-500/10 rounded-full blur-[120px]" />

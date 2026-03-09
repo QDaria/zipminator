@@ -14,9 +14,12 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  Legend,
+  LabelList,
 } from 'recharts'
 
 import { fadeUpInView as fadeUp } from '../slide-utils'
+import { TOOLTIP_STYLE } from '../chart-config'
 
 const STAT_ICONS: Record<string, typeof Code2> = {
   'Lines of Code': Code2,
@@ -176,8 +179,22 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
             <BarChart
               data={DEVELOPMENT_TIMELINE}
               layout="vertical"
-              margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+              margin={{ top: 5, right: 40, left: 0, bottom: 5 }}
             >
+              <defs>
+                <linearGradient id="gradDone" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.7} />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.95} />
+                </linearGradient>
+                <linearGradient id="gradProgress" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.7} />
+                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.95} />
+                </linearGradient>
+                <linearGradient id="gradPlanned" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#4b5563" stopOpacity={0.5} />
+                  <stop offset="100%" stopColor="#6b7280" stopOpacity={0.7} />
+                </linearGradient>
+              </defs>
               <XAxis
                 type="number"
                 domain={[0, 100]}
@@ -195,31 +212,36 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
                 tickLine={false}
               />
               <Tooltip
-                contentStyle={{ backgroundColor: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}
-                labelStyle={{ color: '#fff', fontSize: 12 }}
-                itemStyle={{ color: '#9ca3af', fontSize: 12 }}
+                contentStyle={TOOLTIP_STYLE.contentStyle}
+                labelStyle={TOOLTIP_STYLE.labelStyle}
+                itemStyle={TOOLTIP_STYLE.itemStyle}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter={(value: any) => [`${value}%`, 'Progress']}
               />
+              <Legend
+                verticalAlign="bottom"
+                wrapperStyle={{ fontSize: 11, color: '#9ca3af', paddingTop: 8 }}
+                payload={[
+                  { value: 'Complete', type: 'rect', color: '#22c55e' },
+                  { value: 'In Progress', type: 'rect', color: '#6366f1' },
+                  { value: 'Planned', type: 'rect', color: '#6b7280' },
+                ]}
+              />
               <Bar dataKey="progress" radius={[0, 6, 6, 0]} maxBarSize={28} animationDuration={1200}>
-                {DEVELOPMENT_TIMELINE.map((entry, index) => (
-                  <Cell key={index} fill={STATUS_COLORS[entry.status] || '#6b7280'} />
-                ))}
+                {DEVELOPMENT_TIMELINE.map((entry, index) => {
+                  const gradId = entry.status === 'done' ? 'url(#gradDone)' : entry.status === 'progress' ? 'url(#gradProgress)' : 'url(#gradPlanned)'
+                  return <Cell key={index} fill={gradId} />
+                })}
+                <LabelList
+                  dataKey="progress"
+                  position="right"
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  formatter={(v: any) => `${v}%`}
+                  style={{ fill: '#d1d5db', fontSize: 10, fontFamily: 'monospace' }}
+                />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </div>
-        <div className="flex items-center gap-4 mt-3 justify-center">
-          {[
-            { label: 'Complete', color: '#22c55e' },
-            { label: 'In Progress', color: '#6366f1' },
-            { label: 'Planned', color: '#6b7280' },
-          ].map((l) => (
-            <div key={l.label} className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: l.color }} />
-              <span className="text-xs text-gray-400">{l.label}</span>
-            </div>
-          ))}
         </div>
       </motion.div>
 

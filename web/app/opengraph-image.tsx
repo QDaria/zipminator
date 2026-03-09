@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'Zipminator-PQC - Quantum-Secure Encryption Platform'
+export const alt = 'Zipminator-PQC - Post-Quantum Encryption for Everyone'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -16,18 +16,48 @@ export default async function Image() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a3a 40%, #0a0a2a 100%)',
+          background: 'linear-gradient(145deg, #0a0a0f 0%, #0d1117 50%, #0a0a0f 100%)',
           fontFamily: 'Inter, system-ui, sans-serif',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        {/* Large Z letter in quantum purple */}
+        {/* Subtle grid overlay */}
         <div
           style={{
-            fontSize: 120,
-            fontWeight: 800,
-            color: '#a78bfa',
-            marginBottom: 20,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage:
+              'linear-gradient(rgba(0,206,209,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,206,209,0.03) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
             display: 'flex',
+          }}
+        />
+        {/* Teal glow accent */}
+        <div
+          style={{
+            position: 'absolute',
+            top: -100,
+            right: -100,
+            width: 400,
+            height: 400,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(0,206,209,0.15) 0%, transparent 70%)',
+            display: 'flex',
+          }}
+        />
+        {/* Large Z lettermark */}
+        <div
+          style={{
+            fontSize: 140,
+            fontWeight: 900,
+            color: '#00CED1',
+            marginBottom: 16,
+            display: 'flex',
+            letterSpacing: '-4px',
           }}
         >
           Z
@@ -35,33 +65,50 @@ export default async function Image() {
         {/* Title */}
         <div
           style={{
-            fontSize: 48,
+            fontSize: 52,
             fontWeight: 700,
             color: '#ffffff',
-            marginBottom: 12,
+            marginBottom: 16,
             display: 'flex',
           }}
         >
-          Zipminator-PQC
+          Zipminator
         </div>
         {/* Tagline */}
         <div
           style={{
-            fontSize: 24,
-            color: '#9ca3af',
+            fontSize: 26,
+            color: '#00CED1',
             maxWidth: 700,
             textAlign: 'center',
             display: 'flex',
           }}
         >
-          World&apos;s First Post-Quantum Encryption Super-App
+          Post-Quantum Encryption for Everyone
+        </div>
+        {/* Subtitle */}
+        <div
+          style={{
+            fontSize: 16,
+            color: '#6b7280',
+            marginTop: 20,
+            display: 'flex',
+            gap: 16,
+          }}
+        >
+          <span>NIST FIPS 203</span>
+          <span style={{ color: '#00CED1' }}>|</span>
+          <span>Kyber768</span>
+          <span style={{ color: '#00CED1' }}>|</span>
+          <span>Quantum Entropy</span>
         </div>
         {/* By QDaria */}
         <div
           style={{
-            fontSize: 18,
-            color: '#7c3aed',
-            marginTop: 24,
+            position: 'absolute',
+            bottom: 30,
+            fontSize: 14,
+            color: '#4b5563',
             display: 'flex',
           }}
         >

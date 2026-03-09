@@ -196,6 +196,41 @@ Features:
 | GitHub Star Supporter CTA + LinkedIn badge sharing | Production |
 | Vercel production deployment | Live at zipminator.zip |
 
+## Waitlist OAuth Integration (March 2026)
+
+### Authentication Flow
+- **Provider**: next-auth v5 beta (JWT strategy, 30-day sessions)
+- **Providers**: Google, GitHub, LinkedIn (credentials in `web/.env.local`)
+- **Protected routes**: `/dashboard`, `/mail` (via `middleware.ts` matcher)
+- **Public routes**: `/`, `/features`, `/demo`, `/impact`, `/invest`
+- **Auth config**: `web/lib/auth.ts`
+
+### Waitlist Form (`web/components/WaitlistForm.tsx`)
+Three-state component based on `useSession()`:
+1. **Loading**: Spinner while auth status resolves
+2. **Unauthenticated**: Sign-in card with Google/GitHub/LinkedIn OAuth buttons
+3. **Authenticated**: Auto-filled form (name + email from session, readonly with lock icons)
+
+Features:
+- OAuth buttons redirect to `/#waitlist` after login (via `callbackUrl`)
+- Form submits `userId` from session for linking waitlist entry to OAuth account
+- Duplicate detection (409 response shows "already on the waitlist" message)
+- NDA consent checkbox required
+
+### Waitlist API (`web/app/api/waitlist/route.ts`)
+- **Validation**: Zod schema (fullName, companyName, email, industry enum, volume enum, ndaConsent)
+- **Rate limiting**: 3 requests/minute per IP (in-memory Map)
+- **Supabase**: Inserts to `waitlist` table; falls back to demo mode if Supabase not configured
+- **Duplicate handling**: PostgreSQL unique constraint (error code 23505) returns 409
+
+### Test Coverage (vitest v4 + @testing-library/react)
+| Suite | Tests | File |
+|-------|:-----:|------|
+| API route | 8 | `web/app/api/waitlist/__tests__/route.test.ts` |
+| Component | 7 | `web/components/__tests__/WaitlistForm.test.tsx` |
+
+Tests cover: Zod validation, rate limiting, NDA enforcement, all 9 industry enums, auth states, OAuth button clicks, form submission with userId, duplicate handling, success state.
+
 ## Recent Implementation (March 2026)
 
 ### Completed (WS1-WS6)
@@ -209,10 +244,12 @@ Features:
 
 ### Test Results
 
-- Rust core: 160/160 tests + 1 doc-test passed
-- Web build: 22+ pages, 0 errors
+- Rust core: 166/166 tests passed
+- Web build: 24 pages, 0 errors
+- Web tests (vitest): 15/15 passed (8 API + 7 component)
+- Mobile: 11/11 suites, 267/274 tests passed
 - Python modules: HNDL calculator, scanner, subscription all verified
-- Pre-existing issues (not from this work): 4 collection errors in email/mcp tests (missing aiosmtpd, pydantic incompatibility)
+- Pre-existing issues (not from this work): 4 collection errors in email/mcp tests (missing aiosmtpd, pydantic incompatibility); AnonymizationPanel.test.tsx uses jest.mock (needs vi.mock for vitest)
 
 ### Remaining Work
 

@@ -4,8 +4,6 @@ members = [
     "crates/zipminator-fuzz",
     "crates/zipminator-nist",
     "crates/zipminator-bench",
-]
-exclude = [
     "browser/src-tauri",
 ]
 resolver = "2"

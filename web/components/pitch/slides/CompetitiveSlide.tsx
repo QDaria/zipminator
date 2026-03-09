@@ -5,9 +5,10 @@ import SlideWrapper from '../SlideWrapper'
 import { COMPETITORS, COMPETITOR_DETAILS } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
 import { Swords, Check, X, Minus, DollarSign, TrendingUp, AlertTriangle } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts'
 
 import { fadeUpInView as fadeUp } from '../slide-utils'
+import { TOOLTIP_STYLE } from '../chart-config'
 
 const FEATURES = [
   { key: 'messenger' as const, label: 'PQC Messenger' },
@@ -134,21 +135,102 @@ export default function CompetitiveSlide({ scenario: _scenario }: { scenario?: S
             }))}
             margin={{ top: 0, right: 20, left: 0, bottom: 0 }}
           >
+            <defs>
+              <linearGradient id="gradZipminator" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#6366f1" stopOpacity={0.9} />
+                <stop offset="50%" stopColor="#8b5cf6" stopOpacity={0.95} />
+                <stop offset="100%" stopColor="#a855f7" stopOpacity={1} />
+              </linearGradient>
+              <linearGradient id="gradCompetitor" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#4b5563" stopOpacity={0.6} />
+                <stop offset="100%" stopColor="#6b7280" stopOpacity={0.4} />
+              </linearGradient>
+              <filter id="glowZip">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
             <XAxis type="number" domain={[0, 8]} tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }} tickLine={false} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
             <YAxis type="category" dataKey="name" width={90} tick={{ fill: '#d1d5db', fontSize: 11, fontFamily: 'monospace' }} tickLine={false} axisLine={{ stroke: 'rgba(255,255,255,0.1)' }} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontFamily: 'monospace', fontSize: 12 }}
+              contentStyle={TOOLTIP_STYLE.contentStyle}
+              labelStyle={TOOLTIP_STYLE.labelStyle}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(value: any) => [`${value} / 8 features`, 'Score']}
             />
+            <Legend
+              verticalAlign="bottom"
+              wrapperStyle={{ fontSize: 11, color: '#9ca3af', paddingTop: 8 }}
+              payload={[
+                { value: 'Zipminator', type: 'rect', color: '#6366f1' },
+                { value: 'Competitors', type: 'rect', color: '#4b5563' },
+              ]}
+            />
             <Bar dataKey="score" radius={[0, 4, 4, 0]} animationDuration={1200}>
               {COMPETITORS.map((comp) => (
-                <Cell key={comp.name} fill={comp.name === 'Zipminator' ? '#6366f1' : '#4b5563'} />
+                <Cell
+                  key={comp.name}
+                  fill={comp.name === 'Zipminator' ? 'url(#gradZipminator)' : 'url(#gradCompetitor)'}
+                  filter={comp.name === 'Zipminator' ? 'url(#glowZip)' : undefined}
+                />
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+      </motion.div>
+
+      {/* Heatmap Grid */}
+      <motion.div {...fadeUp(0.19)} className="card-quantum mt-4">
+        <h4 className="text-sm font-semibold text-white mb-4">Feature Heatmap</h4>
+        <div className="overflow-x-auto">
+          <div className="min-w-[640px]">
+            {/* Header row */}
+            <div className="grid gap-px mb-px" style={{ gridTemplateColumns: `120px repeat(${FEATURES.length}, 1fr)` }}>
+              <div className="text-[10px] font-mono text-gray-600 px-1 py-1" />
+              {FEATURES.map((f) => (
+                <div key={f.key} className="text-[9px] font-mono text-gray-500 text-center px-1 py-1 truncate">
+                  {f.label}
+                </div>
+              ))}
+            </div>
+            {/* Data rows */}
+            {COMPETITORS.map((comp, ri) => (
+              <div
+                key={comp.name}
+                className="grid gap-px mb-px"
+                style={{ gridTemplateColumns: `120px repeat(${FEATURES.length}, 1fr)` }}
+              >
+                <div className={`text-[11px] font-mono px-2 py-1.5 truncate ${comp.name === 'Zipminator' ? 'text-quantum-400 font-semibold' : 'text-gray-400'}`}>
+                  {comp.name}
+                </div>
+                {FEATURES.map((f, ci) => {
+                  const val = comp[f.key]
+                  const bg = val === true ? 'bg-green-500/30' : val === 'partial' ? 'bg-yellow-500/25' : 'bg-red-500/15'
+                  return (
+                    <motion.div
+                      key={f.key}
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.2 + ri * 0.03 + ci * 0.02, duration: 0.3 }}
+                      className={`rounded-sm ${bg} h-7`}
+                    />
+                  )
+                })}
+              </div>
+            ))}
+            {/* Heatmap legend */}
+            <div className="flex items-center justify-end gap-4 mt-2 text-[10px] text-gray-500">
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-green-500/30" /> Full</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-yellow-500/25" /> Partial</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-red-500/15" /> None</span>
+            </div>
+          </div>
+        </div>
       </motion.div>
 
       {/* Market Gap callout */}

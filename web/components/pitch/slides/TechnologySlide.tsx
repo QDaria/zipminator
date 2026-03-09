@@ -13,8 +13,23 @@ import {
   Zap,
   Leaf,
   Calendar,
+  Layers,
 } from 'lucide-react'
 import type { Scenario } from '@/lib/pitch-data'
+
+const TECH_LAYERS = [
+  { name: 'Hardware', items: ['156-qubit IBM Quantum', 'Marrakesh + Fez', 'OS Entropy'], color: 'orange' as const },
+  { name: 'Cryptography', items: ['ML-KEM Kyber768', 'FIPS 203', 'Constant-time Rust'], color: 'quantum' as const },
+  { name: 'Services', items: ['PyO3 Bridge', 'FastAPI', 'WireGuard', 'WebRTC'], color: 'cyan' as const },
+  { name: 'Applications', items: ['Messenger', 'VoIP', 'VPN', 'Browser', 'Email'], color: 'green' as const },
+]
+
+const LAYER_STYLES: Record<string, { bg: string; border: string; text: string; badge: string }> = {
+  orange: { bg: 'bg-orange-500/[0.06]', border: 'border-orange-500/20', text: 'text-orange-400', badge: 'bg-orange-500/15 text-orange-300 border-orange-500/25' },
+  quantum: { bg: 'bg-quantum-500/[0.06]', border: 'border-quantum-500/20', text: 'text-quantum-400', badge: 'bg-quantum-500/15 text-quantum-300 border-quantum-500/25' },
+  cyan: { bg: 'bg-cyan-500/[0.06]', border: 'border-cyan-500/20', text: 'text-cyan-400', badge: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/25' },
+  green: { bg: 'bg-green-500/[0.06]', border: 'border-green-500/20', text: 'text-green-400', badge: 'bg-green-500/15 text-green-300 border-green-500/25' },
+}
 
 const CATEGORY_ICONS: Record<string, typeof Lock> = {
   Cryptography: Lock,
@@ -106,6 +121,56 @@ export default function TechnologySlide({ scenario: _scenario }: { scenario?: Sc
             </span>
           </div>
         ))}
+      </motion.div>
+
+      {/* Layered Technology Stack */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.21 }}
+        className="card-quantum chart-glow mb-6"
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-lg bg-quantum-500/10 border border-quantum-500/20 flex items-center justify-center">
+            <Layers className="w-4 h-4 text-quantum-400" />
+          </div>
+          <h3 className="font-semibold text-white text-sm">Full-Stack Architecture</h3>
+        </div>
+        <div className="space-y-2" style={{ perspective: '800px' }}>
+          {[...TECH_LAYERS].reverse().map((layer, i) => {
+            const style = LAYER_STYLES[layer.color]
+            const fromRight = i % 2 === 0
+            return (
+              <motion.div
+                key={layer.name}
+                initial={{ opacity: 0, x: fromRight ? 60 : -60 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 120,
+                  damping: 18,
+                  delay: 0.3 + i * 0.15,
+                }}
+                className={`flex items-center justify-between px-4 py-2.5 rounded-lg border ${style.bg} ${style.border}`}
+                style={{ transform: 'rotateX(2deg)' }}
+              >
+                <span className={`text-xs font-semibold font-mono ${style.text} min-w-[90px]`}>
+                  {layer.name}
+                </span>
+                <div className="flex flex-wrap gap-1.5 justify-end">
+                  {layer.items.map((item) => (
+                    <span
+                      key={item}
+                      className={`text-[10px] px-2 py-0.5 rounded-full border ${style.badge}`}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
       </motion.div>
 
       {/* Energy Efficiency section */}

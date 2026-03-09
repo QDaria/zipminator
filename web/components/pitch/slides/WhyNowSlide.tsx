@@ -20,8 +20,19 @@ import {
   Leaf,
   Globe,
 } from 'lucide-react'
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ReferenceLine,
+  ResponsiveContainer,
+} from 'recharts'
 
-import { fadeUp } from '../slide-utils'
+import { fadeUp, chartEntrance } from '../slide-utils'
+import { TOOLTIP_STYLE, AXIS_STYLE, CHART_ANIMATION_DURATION } from '../chart-config'
 
 type TimelineEvent = {
   year: string
@@ -115,6 +126,45 @@ const REGULATORY_DEADLINES = [
   { date: '2035', mandate: 'Full Migration', detail: 'Complete PQC transition across all US national security systems' },
 ]
 
+const THREAT_TIMELINE = [
+  { year: 2020, threat: 10, label: 'HNDL begins' },
+  { year: 2022, threat: 15 },
+  { year: 2024, threat: 25, label: 'NIST PQC' },
+  { year: 2025, threat: 35, label: 'Salt Typhoon' },
+  { year: 2026, threat: 45, label: 'NOW' },
+  { year: 2027, threat: 60, label: 'CNSA 2.0' },
+  { year: 2029, threat: 75 },
+  { year: 2030, threat: 85, label: 'Q-Day Window' },
+  { year: 2033, threat: 92 },
+  { year: 2035, threat: 98, label: 'Full Migration' },
+]
+
+interface ThreatDot {
+  cx: number
+  cy: number
+  payload: (typeof THREAT_TIMELINE)[number]
+}
+
+function CustomDot({ cx, cy, payload }: ThreatDot) {
+  if (!payload.label) return null
+  const isNow = payload.label === 'NOW'
+  return (
+    <g>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={isNow ? 6 : 4}
+        fill={isNow ? '#f59e0b' : payload.threat > 70 ? '#ef4444' : '#6366f1'}
+        stroke={isNow ? '#fbbf24' : 'none'}
+        strokeWidth={isNow ? 2 : 0}
+      />
+      {isNow && (
+        <circle cx={cx} cy={cy} r={10} fill="none" stroke="#f59e0b" strokeWidth={1} opacity={0.5} />
+      )}
+    </g>
+  )
+}
+
 const BOTTOM_STATS = [
   { Icon: Building2, value: '40+', label: 'Countries with PQC mandates', color: 'text-quantum-400' },
   { Icon: Users, value: '67%', label: 'Enterprises unaware of PQC', color: 'text-quantum-400' },
@@ -140,6 +190,88 @@ export default function WhyNowSlide({ scenario: _scenario }: { scenario?: Scenar
           Multiple converging deadlines are creating a narrow window of opportunity.
           The quantum threat is no longer theoretical.
         </p>
+      </motion.div>
+
+      {/* Quantum Threat Timeline Chart */}
+      <motion.div {...chartEntrance(0.15)} className="card-quantum chart-glow mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <TrendingUp className="w-4 h-4 text-red-400" />
+          <div>
+            <h3 className="text-sm font-semibold text-white">Quantum Threat Level</h3>
+            <p className="text-[11px] text-gray-500">Projected risk of quantum cryptanalysis (2020-2035)</p>
+          </div>
+        </div>
+        <div style={{ height: 240 }} className="w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={THREAT_TIMELINE} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
+              <defs>
+                <linearGradient id="threatGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.4} />
+                  <stop offset="50%" stopColor="#f59e0b" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0.05} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <XAxis
+                dataKey="year"
+                {...AXIS_STYLE}
+                interval={0}
+                tickFormatter={(v: number) => `'${String(v).slice(2)}`}
+              />
+              <YAxis
+                {...AXIS_STYLE}
+                domain={[0, 100]}
+                tickFormatter={(v: number) => `${v}%`}
+              />
+              <Tooltip
+                {...TOOLTIP_STYLE}
+                formatter={(value: number) => [`${value}%`, 'Threat Level']}
+                labelFormatter={(label: number) => `Year ${label}`}
+              />
+              <ReferenceLine
+                x={2024}
+                stroke="#6366f1"
+                strokeDasharray="4 4"
+                strokeOpacity={0.6}
+                label={{ value: 'NIST', fill: '#6366f1', fontSize: 9, position: 'top' }}
+              />
+              <ReferenceLine
+                x={2027}
+                stroke="#f59e0b"
+                strokeDasharray="4 4"
+                strokeOpacity={0.6}
+                label={{ value: 'CNSA 2.0', fill: '#f59e0b', fontSize: 9, position: 'top' }}
+              />
+              <ReferenceLine
+                x={2026}
+                stroke="#f59e0b"
+                strokeWidth={2}
+                label={{ value: 'We Are Here', fill: '#f59e0b', fontSize: 10, position: 'insideTopRight', fontWeight: 700 }}
+              />
+              <Area
+                type="monotone"
+                dataKey="threat"
+                stroke="#ef4444"
+                strokeWidth={2}
+                fill="url(#threatGrad)"
+                animationDuration={CHART_ANIMATION_DURATION}
+                dot={(props: Record<string, unknown>) => <CustomDot cx={props.cx as number} cy={props.cy as number} payload={props.payload as (typeof THREAT_TIMELINE)[number]} />}
+                activeDot={{ r: 5, fill: '#ef4444', stroke: '#fff', strokeWidth: 1 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="flex items-center justify-center gap-4 mt-2">
+          <span className="flex items-center gap-1.5 text-[10px] text-gray-500">
+            <span className="w-2 h-2 rounded-full bg-green-500" /> Low Risk
+          </span>
+          <span className="flex items-center gap-1.5 text-[10px] text-gray-500">
+            <span className="w-2 h-2 rounded-full bg-yellow-500" /> Medium Risk
+          </span>
+          <span className="flex items-center gap-1.5 text-[10px] text-gray-500">
+            <span className="w-2 h-2 rounded-full bg-red-500" /> Critical
+          </span>
+        </div>
       </motion.div>
 
       {/* Timeline */}

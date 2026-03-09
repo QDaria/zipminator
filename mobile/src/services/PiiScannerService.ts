@@ -328,7 +328,7 @@ type PiiScanCallback = (result: PiiScanResult) => void;
 export class PiiScannerService {
     private config: Required<PiiScannerConfig>;
     private callbacks: PiiScanCallback[] = [];
-    private debouncedLayer2: (...args: [string, string[]]) => Promise<PiiMatch[] | undefined>;
+    private debouncedLayer2: (...args: [string, string[]]) => Promise<Promise<PiiMatch[]> | undefined>;
     private lastLayer1: PiiMatch[] = [];
 
     constructor(config: PiiScannerConfig = {}) {
@@ -376,8 +376,9 @@ export class PiiScannerService {
 
         // ── Layer 2: Debounced native scan ───────────────────────────────────
         if (this.config.enableNativeScan) {
-            this.debouncedLayer2(text, this.config.countries).then((layer2Matches) => {
-                if (!layer2Matches) return; // debounce cancelled
+            this.debouncedLayer2(text, this.config.countries).then(async (layer2Result) => {
+                if (!layer2Result) return; // debounce cancelled
+                const layer2Matches = await layer2Result;
 
                 const combined = deduplicateMatches([...this.lastLayer1, ...layer2Matches]);
                 this.emit({

@@ -17,12 +17,38 @@
  * Native module mocked via jest.mock() so tests run in Node without a device.
  */
 
-import { PqcMessengerService } from '../../services/PqcMessengerService';
-import type { EncryptedMessage } from '../../services/PqcMessengerService';
+import { PqcMessengerService } from '../services/PqcMessengerService';
+import type { EncryptedMessage } from '../services/PqcMessengerService';
 
 // ─── Module mocks ────────────────────────────────────────────────────────────
 
-// Mock base64-sized values to match real Kyber768 dimensions
+// Mock the native Expo module so tests run in Node without a physical device.
+// Values are defined inside the factory to avoid hoisting issues with jest.mock.
+jest.mock('../../modules/zipminator-crypto', () => {
+  const pk  = Buffer.alloc(1184).toString('base64');
+  const sk  = Buffer.alloc(2400).toString('base64');
+  const ct  = Buffer.alloc(1088).toString('base64');
+  const ss  = Buffer.alloc(32).toString('base64');
+  const hdr = Buffer.alloc(32, 0x01).toString('base64');
+  return {
+    __esModule: true,
+    default: {
+      generateKEMKeyPair: jest.fn().mockResolvedValue({ publicKey: pk, secretKey: sk }),
+      encapsulateSecret: jest.fn().mockResolvedValue({ ciphertext: ct, sharedSecret: ss }),
+      decapsulateSecret: jest.fn().mockResolvedValue(ss),
+      initRatchetAsBob: jest.fn().mockResolvedValue({ publicKey: pk }),
+      initRatchetAsAlice: jest.fn().mockResolvedValue(undefined),
+      ratchetEncrypt: jest.fn().mockImplementation((msg: string) =>
+        Promise.resolve({ header: hdr, ciphertext: Buffer.from(msg).toString('base64') })
+      ),
+      ratchetDecrypt: jest.fn().mockImplementation((_header: string, ciphertext: string) =>
+        Promise.resolve(Buffer.from(ciphertext, 'base64').toString('utf-8'))
+      ),
+    },
+  };
+});
+
+// Mock base64-sized values to match real Kyber768 dimensions (for use in test assertions)
 const MOCK_PK     = Buffer.alloc(1184).toString('base64');
 const MOCK_SK     = Buffer.alloc(2400).toString('base64');
 const MOCK_CT     = Buffer.alloc(1088).toString('base64');
@@ -30,35 +56,8 @@ const MOCK_SS     = Buffer.alloc(32).toString('base64');
 const MOCK_HEADER = Buffer.alloc(32, 0x01).toString('base64');
 const MOCK_CIPHER = Buffer.alloc(64, 0x02).toString('base64');
 
-// Mock the native Expo module so tests run in Node without a physical device.
-jest.mock('../../modules/zipminator-crypto', () => ({
-  __esModule: true,
-  default: {
-    generateKEMKeyPair: jest.fn().mockResolvedValue({
-      publicKey: MOCK_PK,
-      secretKey: MOCK_SK,
-    }),
-    encapsulateSecret: jest.fn().mockResolvedValue({
-      ciphertext: MOCK_CT,
-      sharedSecret: MOCK_SS,
-    }),
-    decapsulateSecret: jest.fn().mockResolvedValue(MOCK_SS),
-    initRatchetAsBob: jest.fn().mockResolvedValue({ publicKey: MOCK_PK }),
-    initRatchetAsAlice: jest.fn().mockResolvedValue(undefined),
-    ratchetEncrypt: jest.fn().mockImplementation((msg: string) =>
-      Promise.resolve({
-        header: MOCK_HEADER,
-        ciphertext: Buffer.from(msg).toString('base64'),
-      })
-    ),
-    ratchetDecrypt: jest.fn().mockImplementation((_header: string, ct: string) =>
-      Promise.resolve(Buffer.from(ct, 'base64').toString('utf-8'))
-    ),
-  },
-}));
-
 // Mock the signaling service so no actual WebSocket connections are made.
-jest.mock('../../services/SignalingService', () => {
+jest.mock('../services/SignalingService', () => {
   const EventEmitter = require('events');
   const emitter = new EventEmitter();
   return {
@@ -115,7 +114,7 @@ describe('PqcMessengerService – Handshake', () => {
    * Verifies the message shape: { target, type: 'pqc_handshake', payload.publicKey }.
    */
   test('test_messenger_handshake_completes: startHandshake sends public key to peer', async () => {
-    const { signalingService } = await import('../../services/SignalingService');
+    const { signalingService } = await import('../services/SignalingService');
     const service = new PqcMessengerService();
     await service.initialize('peer-bob');
     await service.startHandshake();

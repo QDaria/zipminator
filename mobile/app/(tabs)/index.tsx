@@ -1,13 +1,17 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView, StatusBar, ScrollView } from 'react-native';
+import React, { Suspense } from 'react';
+import { View, Text, TouchableOpacity, SafeAreaView, StatusBar, ScrollView, ActivityIndicator } from 'react-native';
 import { useExpertise } from '../../src/context/ExpertiseContext';
-import FileVault from '../../src/components/FileVault';
-import KeyGenerator from '../../src/components/KeyGenerator';
-import SecureMessenger from '../../src/components/SecureMessenger';
-import NetworkShield from '../../src/components/NetworkShield';
-import OpenClawChat from '../../src/components/OpenClawChat';
-import AnonymizationPanel from '../../src/components/AnonymizationPanel';
-import JupyterLabConnect from '../../src/components/JupyterLabConnect';
+
+// Lazy-load components that depend on the native crypto module.
+// This defers the requireNativeModule() call so the error boundary can catch
+// it when running in Expo Go (which cannot load custom native modules).
+const KeyGenerator = React.lazy(() => import('../../src/components/KeyGenerator'));
+const FileVault = React.lazy(() => import('../../src/components/FileVault'));
+const SecureMessenger = React.lazy(() => import('../../src/components/SecureMessenger'));
+const NetworkShield = React.lazy(() => import('../../src/components/NetworkShield'));
+const OpenClawChat = React.lazy(() => import('../../src/components/OpenClawChat'));
+const AnonymizationPanel = React.lazy(() => import('../../src/components/AnonymizationPanel'));
+const JupyterLabConnect = React.lazy(() => import('../../src/components/JupyterLabConnect'));
 
 // Error boundary for components that depend on the native crypto bridge.
 // Catches crashes when the native module is unavailable (e.g. Expo Go, web).
@@ -102,27 +106,29 @@ export default function HomeScreen() {
         )}
 
         {/* Feature Components rendering below the header */}
-        <NativeBridgeGuard label="Key Generator">
-          <KeyGenerator />
-        </NativeBridgeGuard>
-        <NativeBridgeGuard label="File Vault">
-          <FileVault />
-        </NativeBridgeGuard>
-        <NativeBridgeGuard label="Secure Messenger">
-          <SecureMessenger />
-        </NativeBridgeGuard>
-        <NativeBridgeGuard label="Network Shield">
-          <NetworkShield />
-        </NativeBridgeGuard>
-        <NativeBridgeGuard label="JupyterLab Connect">
-          <JupyterLabConnect />
-        </NativeBridgeGuard>
-        <NativeBridgeGuard label="Anonymization">
-          <AnonymizationPanel />
-        </NativeBridgeGuard>
-        <NativeBridgeGuard label="OpenClaw Chat">
-          <OpenClawChat />
-        </NativeBridgeGuard>
+        <Suspense fallback={<ActivityIndicator color="#8196f8" />}>
+          <NativeBridgeGuard label="Key Generator">
+            <KeyGenerator />
+          </NativeBridgeGuard>
+          <NativeBridgeGuard label="File Vault">
+            <FileVault />
+          </NativeBridgeGuard>
+          <NativeBridgeGuard label="Secure Messenger">
+            <SecureMessenger />
+          </NativeBridgeGuard>
+          <NativeBridgeGuard label="Network Shield">
+            <NetworkShield />
+          </NativeBridgeGuard>
+          <NativeBridgeGuard label="JupyterLab Connect">
+            <JupyterLabConnect />
+          </NativeBridgeGuard>
+          <NativeBridgeGuard label="Anonymization">
+            <AnonymizationPanel />
+          </NativeBridgeGuard>
+          <NativeBridgeGuard label="OpenClaw Chat">
+            <OpenClawChat />
+          </NativeBridgeGuard>
+        </Suspense>
 
       </ScrollView>
 

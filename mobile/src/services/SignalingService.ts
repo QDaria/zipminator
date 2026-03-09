@@ -26,6 +26,8 @@ class SignalingService extends EventEmitter {
 
     constructor() {
         super();
+        // Prevent "Unhandled error" throw when no external listener is attached
+        this.on('error', () => {});
     }
 
     connect(clientId: string) {

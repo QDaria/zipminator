@@ -24,13 +24,13 @@ export default function KeyGenerator() {
         return () => clearInterval(interval);
     }, []);
 
-    const generateKeys = () => {
+    const generateKeys = async () => {
         setIsGenerating(true);
         setProgress(0);
         setKeys(null);
 
         let currentProgress = 0;
-        const interval = setInterval(() => {
+        const interval = setInterval(async () => {
             currentProgress += 10;
             setProgress(currentProgress);
 
@@ -39,8 +39,8 @@ export default function KeyGenerator() {
                 setIsGenerating(false);
                 try {
                     // Natively call into Swift/Kotlin/C++ via JSI Bridge!
-                    const generatedKeys = ZipminatorCrypto.generateKEMKeyPair('Kyber768');
-                    setKeys(generatedKeys);
+                    const generatedKeys = await ZipminatorCrypto.generateKEMKeyPair('Kyber768');
+                    setKeys({ publicKey: generatedKeys.publicKey, secretKey: generatedKeys.secretKey });
                 } catch (error) {
                     console.error("Native Crypto Module Error:", error);
                     setKeys({

@@ -15,9 +15,12 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
+  ReferenceLine,
 } from 'recharts'
 
 import { fadeUpInView as fadeUp } from '../slide-utils'
+import { TOOLTIP_STYLE, GRADIENT_DEFS } from '../chart-config'
 
 const MODULE_COLORS = ['#6366f1', '#22c55e', '#3b82f6', '#a855f7', '#f59e0b', '#ec4899']
 
@@ -188,10 +191,17 @@ export default function BusinessModelSlide({ scenario = 'all' }: { scenario?: Sc
               <XAxis dataKey="year" stroke="#6b7280" fontSize={12} />
               <YAxis stroke="#6b7280" fontSize={12} tickFormatter={(v: number) => `$${v}M`} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }}
+                {...TOOLTIP_STYLE}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter={(value: any, name: any) => [`$${value}M`, String(name).charAt(0).toUpperCase() + String(name).slice(1)]}
               />
+              <Legend
+                verticalAlign="bottom"
+                height={30}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                formatter={(value: any) => <span style={{ color: '#d1d5db', fontSize: 12 }}>{String(value).charAt(0).toUpperCase() + String(value).slice(1)}</span>}
+              />
+              <ReferenceLine x={2028} stroke="#ef4444" strokeDasharray="5 5" label={{ value: 'Break-even', fill: '#ef4444', fontSize: 11, position: 'top' }} />
               {activeScenarios.map((s) => (
                 <Line
                   key={s}
@@ -199,21 +209,37 @@ export default function BusinessModelSlide({ scenario = 'all' }: { scenario?: Sc
                   dataKey={s}
                   stroke={SCENARIO_COLORS[s]}
                   strokeWidth={2}
-                  dot={{ r: 3, fill: SCENARIO_COLORS[s] }}
+                  strokeDasharray={s === 'conservative' ? '6 3' : undefined}
+                  dot={{ r: 4, fill: SCENARIO_COLORS[s], strokeWidth: 2, stroke: '#111827' }}
                   animationDuration={1200}
                 />
               ))}
             </LineChart>
           ) : (
             <AreaChart data={stackedData}>
+              <defs>
+                {REVENUE_MODULES.map((mod, i) => (
+                  <linearGradient key={mod.name} id={`gradModule${i}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={MODULE_COLORS[i]} stopOpacity={0.4} />
+                    <stop offset="95%" stopColor={MODULE_COLORS[i]} stopOpacity={0.05} />
+                  </linearGradient>
+                ))}
+              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
               <XAxis dataKey="year" stroke="#6b7280" fontSize={12} />
               <YAxis stroke="#6b7280" fontSize={12} tickFormatter={(v: number) => `$${v}M`} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }}
+                {...TOOLTIP_STYLE}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter={(value: any) => [`$${value}M`]}
               />
+              <Legend
+                verticalAlign="bottom"
+                height={30}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                formatter={(value: any) => <span style={{ color: '#d1d5db', fontSize: 12 }}>{value}</span>}
+              />
+              <ReferenceLine x={2028} stroke="#ef4444" strokeDasharray="5 5" label={{ value: 'Break-even', fill: '#ef4444', fontSize: 11, position: 'top' }} />
               {REVENUE_MODULES.map((mod, i) => (
                 <Area
                   key={mod.name}
@@ -221,24 +247,13 @@ export default function BusinessModelSlide({ scenario = 'all' }: { scenario?: Sc
                   dataKey={mod.name}
                   stackId="1"
                   stroke={MODULE_COLORS[i]}
-                  fill={MODULE_COLORS[i]}
-                  fillOpacity={0.3}
+                  fill={`url(#gradModule${i})`}
                   animationDuration={1200}
                 />
               ))}
             </AreaChart>
           )}
         </ResponsiveContainer>
-        {scenario === 'all' && (
-          <div className="flex flex-wrap gap-4 mt-3 justify-center">
-            {scenarios.map((s) => (
-              <span key={s} className="flex items-center gap-1.5 text-xs text-gray-400">
-                <span className="w-3 h-0.5 rounded-full" style={{ backgroundColor: SCENARIO_COLORS[s] }} />
-                {s.charAt(0).toUpperCase() + s.slice(1)}
-              </span>
-            ))}
-          </div>
-        )}
       </motion.div>
 
       {/* Pricing Tiers */}

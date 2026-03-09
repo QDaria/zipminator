@@ -7,6 +7,7 @@
 pub mod ai;
 pub mod privacy;
 pub mod proxy;
+#[cfg(feature = "vpn")]
 pub mod vpn;
 
 use std::sync::Mutex;
@@ -21,26 +22,16 @@ use proxy::ProxyHandle;
 static PROXY_HANDLE: once_cell::sync::OnceCell<Mutex<Option<ProxyHandle>>> =
     once_cell::sync::OnceCell::new();
 
-/// Global VPN manager, initialized at startup.
-///
-/// Stored as a `once_cell` global so it can be shared between the Tauri setup
-/// hook (which auto-connects) and the Tauri commands (which expose
-/// `vpn_connect` / `vpn_disconnect` to the frontend).
+#[cfg(feature = "vpn")]
 pub static VPN_MANAGER: once_cell::sync::OnceCell<vpn::SharedVpnManager> =
     once_cell::sync::OnceCell::new();
 
-/// Initialize the VPN manager and return a reference to it.
-///
-/// This must be called once during Tauri setup.  Subsequent calls are no-ops
-/// and return the existing manager.
+#[cfg(feature = "vpn")]
 pub fn init_vpn_manager() -> &'static vpn::SharedVpnManager {
     VPN_MANAGER.get_or_init(vpn::new_shared_manager)
 }
 
-/// Start the VPN and connect using the provided config.
-///
-/// The `emit_fn` callback forwards Tauri events (`vpn-state-changed`,
-/// `vpn-metrics-updated`) to all webview windows.
+#[cfg(feature = "vpn")]
 pub async fn start_vpn(
     config: vpn::config::VpnConfig,
     emit_fn: std::sync::Arc<dyn Fn(&str, serde_json::Value) + Send + Sync>,
@@ -52,6 +43,10 @@ pub async fn start_vpn(
         .await
         .map_err(|e| format!("VPN connect failed: {e}"))
 }
+
+#[cfg(not(feature = "vpn"))]
+pub fn init_vpn_manager() {}
+
 
 /// Initialize and start the PQC proxy during Tauri setup.
 ///

@@ -26,6 +26,7 @@ export type HandshakeMessage = {
 
 export type CryptoError =
     | 'HANDSHAKE_FAILED'
+    | 'HANDSHAKE_INCOMPLETE'
     | 'DECRYPTION_FAILED'
     | 'REPLAY_DETECTED'
     | 'KEY_EXHAUSTED';

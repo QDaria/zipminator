@@ -5,6 +5,7 @@
  * icon lookup that were previously duplicated across 13+ slide files.
  */
 
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   MessageSquare,
   Phone,
@@ -47,6 +48,104 @@ export function fadeUpInView(delay = 0) {
     viewport: { once: true },
     transition: { duration: 0.5, delay },
   }
+}
+
+/**
+ * Scale-up entrance animation for chart containers.
+ */
+export function chartEntrance(delay = 0) {
+  return {
+    initial: { opacity: 0, y: 20, scale: 0.97 },
+    animate: { opacity: 1, y: 0, scale: 1 },
+    transition: { duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] },
+  }
+}
+
+/**
+ * Staggered fade-in for list items (cards, bars, etc.)
+ */
+export function staggerItem(index: number, baseDelay = 0.1) {
+  return {
+    initial: { opacity: 0, y: 15 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.4, delay: baseDelay + index * 0.06 },
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Animated counter hook
+// ---------------------------------------------------------------------------
+
+/**
+ * Hook that animates a number from 0 to `target` with easeOutCubic.
+ * Returns the current display value as a string.
+ */
+export function useAnimatedCounter(
+  target: number,
+  options: { duration?: number; suffix?: string; decimals?: number } = {},
+) {
+  const { duration = 1200, suffix = '', decimals = 0 } = options
+  const [display, setDisplay] = useState('0' + suffix)
+  const ref = useRef<HTMLElement>(null)
+  const hasAnimated = useRef(false)
+
+  const animate = useCallback(() => {
+    if (hasAnimated.current) return
+    hasAnimated.current = true
+    const start = performance.now()
+
+    function tick(now: number) {
+      const elapsed = now - start
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      const current = eased * target
+
+      if (decimals > 0) {
+        setDisplay(current.toFixed(decimals) + suffix)
+      } else {
+        setDisplay(Math.floor(current).toLocaleString() + suffix)
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(tick)
+      } else {
+        if (decimals > 0) {
+          setDisplay(target.toFixed(decimals) + suffix)
+        } else {
+          setDisplay(target.toLocaleString() + suffix)
+        }
+      }
+    }
+
+    requestAnimationFrame(tick)
+  }, [target, duration, suffix, decimals])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) {
+      animate()
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) animate()
+      },
+      { threshold: 0.3 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [animate])
+
+  return { display, ref }
+}
+
+// ---------------------------------------------------------------------------
+// Chart responsive height helper
+// ---------------------------------------------------------------------------
+export function getChartHeight(base = 280): number {
+  if (typeof window === 'undefined') return base
+  return window.innerWidth < 640 ? Math.round(base * 0.75) : base
 }
 
 // ---------------------------------------------------------------------------

@@ -73,13 +73,13 @@ export default function ContactSlide({ scenario: _scenario = 'base' }: { scenari
           />
 
           {/* Z Logo */}
-          <div className="relative w-28 h-28 rounded-2xl bg-gradient-to-br from-amber-800 to-amber-950 flex items-center justify-center shadow-2xl shadow-amber-800/30">
+          <div className="relative w-40 h-24 rounded-2xl bg-gradient-to-br from-[#FF6600] to-[#CC5200] flex items-center justify-center shadow-2xl shadow-[#FF6600]/30">
             <Image
-              src="/logos/Z-new.svg"
+              src="/logos/Z-contact.svg"
               alt="Z"
-              width={80}
-              height={80}
-              className="w-20 h-20 select-none"
+              width={200}
+              height={120}
+              className="w-32 h-auto select-none"
             />
           </div>
         </motion.div>

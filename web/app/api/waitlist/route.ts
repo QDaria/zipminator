@@ -11,6 +11,7 @@ const waitlistSchema = z.object({
   useCase: z.string().max(500).optional(),
   couponCode: z.string().max(50).optional(),
   ndaConsent: z.boolean().refine(val => val === true, { message: 'NDA consent required' }),
+  userId: z.string().optional(),
 })
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
@@ -91,6 +92,7 @@ export async function POST(request: NextRequest) {
       ip_address: ip !== 'unknown' ? ip : undefined,
       user_agent: request.headers.get('user-agent') || undefined,
       referrer: request.headers.get('referer') || undefined,
+      user_id: data.userId || undefined,
     }])
     .select()
     .single()

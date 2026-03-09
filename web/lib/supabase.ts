@@ -23,6 +23,7 @@ export interface WaitlistSubmission {
   ip_address?: string
   user_agent?: string
   referrer?: string
+  user_id?: string
   utm_source?: string
   utm_medium?: string
   utm_campaign?: string

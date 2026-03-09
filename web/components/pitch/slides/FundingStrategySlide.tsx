@@ -26,9 +26,11 @@ import {
   Tooltip,
   Cell,
   ReferenceLine,
+  LabelList,
 } from 'recharts'
 
-import { fadeUpInView as fadeUp } from '../slide-utils'
+import { fadeUpInView as fadeUp, useAnimatedCounter } from '../slide-utils'
+import { TOOLTIP_STYLE, GRADIENT_DEFS } from '../chart-config'
 
 const REGION_COLORS: Record<string, string> = {
   norway: '#22c55e',
@@ -81,6 +83,8 @@ const INTL_CONTEXT = [
 ]
 
 export default function FundingStrategySlide({ scenario: _scenario = 'base' }: { scenario?: Scenario }) {
+  const { display: animatedTotal, ref: totalRef } = useAnimatedCounter(12, { suffix: 'M+', decimals: 0 })
+
   return (
     <SlideWrapper>
       {/* Header */}
@@ -181,30 +185,45 @@ export default function FundingStrategySlide({ scenario: _scenario = 'base' }: {
           Grant Program Amounts ($M)
         </h3>
         <ResponsiveContainer width="100%" height={320}>
-          <BarChart layout="vertical" data={GRANT_AMOUNTS_NUMERIC} margin={{ left: 10, right: 20 }}>
+          <BarChart layout="vertical" data={GRANT_AMOUNTS_NUMERIC} margin={{ left: 10, right: 40 }}>
+            <defs>
+              {Object.entries(REGION_COLORS).map(([region, color]) => (
+                <linearGradient key={region} id={`gradRegion-${region}`} x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="5%" stopColor={color} stopOpacity={0.9} />
+                  <stop offset="95%" stopColor={color} stopOpacity={0.5} />
+                </linearGradient>
+              ))}
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
             <XAxis type="number" stroke="#6b7280" fontSize={12} tickFormatter={(v: number) => `$${v}M`} />
             <YAxis type="category" dataKey="name" width={160} stroke="#6b7280" tick={{ fontSize: 11 }} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#1f2937', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }}
+              {...TOOLTIP_STYLE}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(value: any) => [`$${value}M`]}
             />
             <ReferenceLine x={3} stroke="#ef4444" strokeDasharray="5 5" label={{ value: '$3M Target', fill: '#ef4444', fontSize: 11, position: 'top' }} />
             <Bar dataKey="amount" radius={[0, 4, 4, 0]} animationDuration={1200}>
               {GRANT_AMOUNTS_NUMERIC.map((entry, index) => (
-                <Cell key={index} fill={REGION_COLORS[entry.region] || '#6366f1'} />
+                <Cell key={index} fill={`url(#gradRegion-${entry.region})`} />
               ))}
+              <LabelList dataKey="amount" position="right" style={{ fill: '#d1d5db', fontSize: 11, fontFamily: 'monospace' }} formatter={(v: number) => `$${v}M`} />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-        <div className="flex flex-wrap gap-4 mt-3 justify-center">
-          {Object.entries(REGION_COLORS).map(([region, color]) => (
-            <span key={region} className="flex items-center gap-1.5 text-xs text-gray-400">
-              <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
-              {region === 'norway' ? 'Norway' : region === 'eu' ? 'EU' : region === 'nato' ? 'NATO' : 'US'}
-            </span>
-          ))}
+        <div className="flex flex-wrap items-center justify-between gap-4 mt-3">
+          <div className="flex flex-wrap gap-4">
+            {Object.entries(REGION_COLORS).map(([region, color]) => (
+              <span key={region} className="flex items-center gap-1.5 text-xs text-gray-400">
+                <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+                {region === 'norway' ? 'Norway' : region === 'eu' ? 'EU' : region === 'nato' ? 'NATO' : 'US'}
+              </span>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 font-mono">Total Potential:</span>
+            <span ref={totalRef as React.RefObject<HTMLSpanElement>} className="text-lg font-bold gradient-text font-mono">${animatedTotal}</span>
+          </div>
         </div>
       </motion.div>
 

@@ -132,17 +132,17 @@ export default function RiskSlide({ scenario: _scenario = 'base' }: { scenario?:
           <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
             {/* Heatmap background zones */}
             {/* Green zones (low) */}
-            <ReferenceArea x1={0.5} x2={1.5} y1={0.5} y2={1.5} fill="rgba(34, 197, 94, 0.08)" fillOpacity={1} />
-            <ReferenceArea x1={0.5} x2={1.5} y1={1.5} y2={2.5} fill="rgba(34, 197, 94, 0.08)" fillOpacity={1} />
-            <ReferenceArea x1={0.5} x2={1.5} y1={2.5} y2={3.5} fill="rgba(234, 179, 8, 0.08)" fillOpacity={1} />
-            <ReferenceArea x1={1.5} x2={2.5} y1={0.5} y2={1.5} fill="rgba(34, 197, 94, 0.08)" fillOpacity={1} />
-            <ReferenceArea x1={2.5} x2={3.5} y1={0.5} y2={1.5} fill="rgba(34, 197, 94, 0.08)" fillOpacity={1} />
+            <ReferenceArea x1={0.5} x2={1.5} y1={0.5} y2={1.5} fill="rgba(34, 197, 94, 0.10)" fillOpacity={1} label={{ value: 'LOW', fill: 'rgba(34,197,94,0.3)', fontSize: 10, fontFamily: 'monospace', position: 'center' }} />
+            <ReferenceArea x1={0.5} x2={1.5} y1={1.5} y2={2.5} fill="rgba(34, 197, 94, 0.10)" fillOpacity={1} />
+            <ReferenceArea x1={0.5} x2={1.5} y1={2.5} y2={3.5} fill="rgba(234, 179, 8, 0.10)" fillOpacity={1} label={{ value: 'MED', fill: 'rgba(234,179,8,0.35)', fontSize: 10, fontFamily: 'monospace', position: 'center' }} />
+            <ReferenceArea x1={1.5} x2={2.5} y1={0.5} y2={1.5} fill="rgba(34, 197, 94, 0.10)" fillOpacity={1} />
+            <ReferenceArea x1={2.5} x2={3.5} y1={0.5} y2={1.5} fill="rgba(34, 197, 94, 0.10)" fillOpacity={1} />
             {/* Yellow zones */}
-            <ReferenceArea x1={1.5} x2={2.5} y1={1.5} y2={2.5} fill="rgba(234, 179, 8, 0.08)" fillOpacity={1} />
-            <ReferenceArea x1={2.5} x2={3.5} y1={1.5} y2={2.5} fill="rgba(239, 68, 68, 0.08)" fillOpacity={1} />
+            <ReferenceArea x1={1.5} x2={2.5} y1={1.5} y2={2.5} fill="rgba(234, 179, 8, 0.10)" fillOpacity={1} label={{ value: 'MED', fill: 'rgba(234,179,8,0.35)', fontSize: 10, fontFamily: 'monospace', position: 'center' }} />
+            <ReferenceArea x1={2.5} x2={3.5} y1={1.5} y2={2.5} fill="rgba(239, 68, 68, 0.12)" fillOpacity={1} label={{ value: 'HIGH', fill: 'rgba(239,68,68,0.35)', fontSize: 10, fontFamily: 'monospace', position: 'center' }} />
             {/* Red zones */}
-            <ReferenceArea x1={1.5} x2={2.5} y1={2.5} y2={3.5} fill="rgba(239, 68, 68, 0.08)" fillOpacity={1} />
-            <ReferenceArea x1={2.5} x2={3.5} y1={2.5} y2={3.5} fill="rgba(239, 68, 68, 0.08)" fillOpacity={1} />
+            <ReferenceArea x1={1.5} x2={2.5} y1={2.5} y2={3.5} fill="rgba(239, 68, 68, 0.12)" fillOpacity={1} label={{ value: 'HIGH', fill: 'rgba(239,68,68,0.35)', fontSize: 10, fontFamily: 'monospace', position: 'center' }} />
+            <ReferenceArea x1={2.5} x2={3.5} y1={2.5} y2={3.5} fill="rgba(239, 68, 68, 0.12)" fillOpacity={1} label={{ value: 'CRITICAL', fill: 'rgba(239,68,68,0.4)', fontSize: 9, fontFamily: 'monospace', position: 'center' }} />
 
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
             <XAxis
@@ -185,14 +185,15 @@ export default function RiskSlide({ scenario: _scenario = 'base' }: { scenario?:
                 name: r.risk.split(' ').slice(0, 3).join(' ') + '...',
                 z: r.impact === 'high' ? 200 : r.impact === 'medium' ? 150 : 100,
               }))}
-              animationDuration={1200}
+              animationDuration={1500}
               shape={(props: { cx?: number; cy?: number; payload?: { z: number; name: string; impact: number } }) => {
                 const { cx = 0, cy = 0, payload } = props
-                const size = (payload?.z ?? 100) / 15
+                const size = (payload?.impact ?? 1) === 3 ? 15 : (payload?.impact ?? 1) === 2 ? 12 : 9
                 const color = (payload?.impact ?? 1) === 3 ? '#ef4444' : (payload?.impact ?? 1) === 2 ? '#eab308' : '#22c55e'
                 return (
                   <g>
-                    <circle cx={cx} cy={cy} r={size} fill={color} fillOpacity={0.6} stroke={color} strokeWidth={1.5} />
+                    <circle cx={cx} cy={cy} r={size} fill={color} fillOpacity={0.5} stroke={color} strokeWidth={1.5} />
+                    <circle cx={cx} cy={cy} r={size * 0.4} fill={color} fillOpacity={0.9} />
                     <text x={cx} y={cy - size - 4} textAnchor="middle" fill="#d1d5db" fontSize={9} fontFamily="monospace">{payload?.name}</text>
                   </g>
                 )

@@ -5,11 +5,27 @@
     "CLAUDE_FLOW_HOOKS_ENABLED": "true",
     "CLAUDE_FLOW_TELEMETRY_ENABLED": "true",
     "CLAUDE_FLOW_REMOTE_EXECUTION": "true",
-    "CLAUDE_FLOW_CHECKPOINTS_ENABLED": "true"
+    "CLAUDE_FLOW_CHECKPOINTS_ENABLED": "true",
+    "RUFLO_INTELLIGENCE_PIPELINE": "true",
+    "RUFLO_AGENT_BOOSTER": "true",
+    "RUFLO_MODEL_ROUTING": "auto"
   },
   "permissions": {
     "allow": [
       "Bash(npx claude-flow:*)",
+      "Bash(npx ruflo:*)",
+      "Bash(npx next:*)",
+      "Bash(npx expo:*)",
+      "Bash(cargo:*)",
+      "Bash(cargo test:*)",
+      "Bash(cargo clippy:*)",
+      "Bash(cargo fuzz:*)",
+      "Bash(maturin:*)",
+      "Bash(micromamba:*)",
+      "Bash(uv:*)",
+      "Bash(pytest:*)",
+      "Bash(python:*)",
+      "Bash(bash .claude/helpers:*)",
       "Bash(npm run lint)",
       "Bash(npm run test:*)",
       "Bash(npm test:*)",
@@ -81,7 +97,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/bin/bash -c 'INPUT=$(cat); CUSTOM=$(echo \"$INPUT\" | jq -r \".custom_instructions // \\\"\\\"\"); echo \"🔄 PreCompact Guidance:\"; echo \"📋 IMPORTANT: Review CLAUDE.md in project root for:\"; echo \"   • 54 available agents and concurrent usage patterns\"; echo \"   • Swarm coordination strategies (hierarchical, mesh, adaptive)\"; echo \"   • SPARC methodology workflows with batchtools optimization\"; echo \"   • Critical concurrent execution rules (GOLDEN RULE: 1 MESSAGE = ALL OPERATIONS)\"; if [ -n \"$CUSTOM\" ]; then echo \"🎯 Custom compact instructions: $CUSTOM\"; fi; echo \"✅ Ready for compact operation\"'"
+            "command": "/bin/bash -c 'INPUT=$(cat); CUSTOM=$(echo \"$INPUT\" | jq -r \".custom_instructions // \\\"\\\"\"); echo \"🔄 PreCompact Guidance:\"; echo \"📋 IMPORTANT: Review CLAUDE.md in project root for:\"; echo \"   • 85 available agents and concurrent usage patterns\"; echo \"   • Swarm coordination strategies (hierarchical, mesh, adaptive)\"; echo \"   • SPARC + RALPH methodology workflows\"; echo \"   • Critical concurrent execution rules (GOLDEN RULE: 1 MESSAGE = ALL OPERATIONS)\"; echo \"   • .claude/rules/ files survive compaction (auto-reloaded)\"; echo \"📌 PRESERVE: Current RALPH phase, failing tests, active worktree branches\"; if [ -n \"$CUSTOM\" ]; then echo \"🎯 Custom compact instructions: $CUSTOM\"; fi; echo \"✅ Ready for compact operation\"'"
           }
         ]
       },
@@ -90,7 +106,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/bin/bash -c 'echo \"🔄 Auto-Compact Guidance (Context Window Full):\"; echo \"📋 CRITICAL: Before compacting, ensure you understand:\"; echo \"   • All 54 agents available in .claude/agents/ directory\"; echo \"   • Concurrent execution patterns from CLAUDE.md\"; echo \"   • Batchtools optimization for 300% performance gains\"; echo \"   • Swarm coordination strategies for complex tasks\"; echo \"⚡ Apply GOLDEN RULE: Always batch operations in single messages\"; echo \"✅ Auto-compact proceeding with full agent context\"'"
+            "command": "/bin/bash -c 'echo \"🔄 Auto-Compact Guidance (Context Window Full):\"; echo \"📋 CRITICAL: Before compacting, ensure you understand:\"; echo \"   • All 85 agents available in .claude/agents/ directory\"; echo \"   • Concurrent execution patterns from CLAUDE.md\"; echo \"   • RALPH loop phase and iteration count\"; echo \"   • Model routing rules in .claude/rules/model-routing.md\"; echo \"   • .claude/rules/ files survive compaction (auto-reloaded)\"; echo \"⚡ Apply GOLDEN RULE: Always batch operations in single messages\"; echo \"📌 PRESERVE: Failing test paths, worktree branches, RALPH state\"; echo \"✅ Auto-compact proceeding with full agent context\"'"
           }
         ]
       }
@@ -100,14 +116,14 @@
         "hooks": [
           {
             "type": "command",
-            "command": "npx claude-flow@alpha hooks session-end --generate-summary true --persist-state true --export-metrics true"
+            "command": "bash .claude/helpers/feedback-loop.sh --report 2>/dev/null; npx claude-flow@alpha hooks session-end --generate-summary true --persist-state true --export-metrics true"
           }
         ]
       }
     ]
   },
   "includeCoAuthoredBy": true,
-  "enabledMcpjsonServers": ["claude-flow", "ruv-swarm"],
+  "enabledMcpjsonServers": ["claude-flow", "ruv-swarm", "context7", "playwright"],
   "statusLine": {
     "type": "command",
     "command": ".claude/statusline-command.sh"

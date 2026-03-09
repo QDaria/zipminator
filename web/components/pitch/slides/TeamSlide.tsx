@@ -10,9 +10,12 @@ import {
   PieChart,
   Pie,
   Cell,
+  Tooltip,
+  Legend,
 } from 'recharts'
 
-import { fadeUpInView as fadeUp } from '../slide-utils'
+import { fadeUpInView as fadeUp, useAnimatedCounter } from '../slide-utils'
+import { TOOLTIP_STYLE } from '../chart-config'
 
 const PRIORITY_STYLES: Record<string, { label: string; bg: string; text: string; dot: string }> = {
   immediate: { label: 'Immediate', bg: 'bg-emerald-500/20', text: 'text-emerald-400', dot: 'bg-emerald-500/60' },
@@ -66,6 +69,7 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
     0
   )
   const maxCount = Math.max(...TEAM_ROLES.map((r) => r.count))
+  const { display: animatedTotal, ref: counterRef } = useAnimatedCounter(TOTAL_HEADCOUNT)
 
   return (
     <SlideWrapper>
@@ -154,14 +158,14 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
         </h3>
         <div className="flex items-center justify-center gap-8">
           <div className="relative">
-            <ResponsiveContainer width={200} height={200}>
+            <ResponsiveContainer width={260} height={260}>
               <PieChart>
                 <Pie
                   data={PRIORITY_CHART_DATA}
                   cx="50%"
                   cy="50%"
-                  innerRadius={55}
-                  outerRadius={85}
+                  innerRadius={70}
+                  outerRadius={110}
                   dataKey="value"
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   label={renderCustomLabel as any}
@@ -171,18 +175,23 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
                     <Cell key={index} fill={entry.color} />
                   ))}
                 </Pie>
+                <Tooltip
+                  {...TOOLTIP_STYLE}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  formatter={(value: any, name: any) => [`${value} people`, name]}
+                />
               </PieChart>
             </ResponsiveContainer>
-            {/* Center text */}
+            {/* Center animated counter */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-2xl font-bold text-white font-mono">{TOTAL_HEADCOUNT}</span>
+              <span ref={counterRef as React.RefObject<HTMLSpanElement>} className="text-3xl font-bold text-white font-mono">{animatedTotal}</span>
               <span className="text-[10px] text-gray-400">Total</span>
             </div>
           </div>
           <div className="flex flex-col gap-2">
             {PRIORITY_CHART_DATA.map((d) => (
               <span key={d.name} className="flex items-center gap-2 text-xs text-gray-400">
-                <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: d.color }} />
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
                 {d.name} ({d.value})
               </span>
             ))}

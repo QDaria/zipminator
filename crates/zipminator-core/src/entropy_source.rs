@@ -3,7 +3,7 @@
 /// Provides a unified interface for accessing entropy from multiple sources with
 /// automatic fallback handling.
 
-use crate::qrng::{ibm_quantum::IBMQuantumQRNG, mock::MockQrngDevice, QrngDevice, QrngError};
+use crate::qrng::{ibm_quantum::IBMQuantumQRNG, QrngDevice, QrngError};
 use log::{info, warn};
 
 /// Entropy source types

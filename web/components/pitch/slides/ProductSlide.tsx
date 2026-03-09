@@ -5,7 +5,19 @@ import SlideWrapper from '../SlideWrapper'
 import { SUPER_APP_MODULES, ROADMAP_PHASES } from '@/lib/pitch-data'
 import { Shield, Layers } from 'lucide-react'
 import type { Scenario } from '@/lib/pitch-data'
-import { MODULE_ICON_MAP } from '../slide-utils'
+import { MODULE_ICON_MAP, chartEntrance } from '../slide-utils'
+import { TOOLTIP_STYLE, AXIS_STYLE, CHART_ANIMATION_DURATION, PHASE_COLORS } from '../chart-config'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+} from 'recharts'
 
 // Style presets for each roadmap status
 const STATUS_STYLES: Record<string, { color: string; bgColor: string; borderColor: string }> = {
@@ -77,6 +89,86 @@ export default function ProductSlide({ scenario: _scenario }: { scenario?: Scena
           Eight deeply integrated modules, each built on NIST-approved
           post-quantum cryptography from the ground up.
         </p>
+      </motion.div>
+
+      {/* Progress Overview Chart */}
+      <motion.div {...chartEntrance(0.15)} className="card-quantum chart-glow mb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Layers className="w-4 h-4 text-quantum-400" />
+          <h3 className="text-sm font-semibold text-white">Development Progress</h3>
+        </div>
+        <div style={{ height: 280 }} className="w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={ROADMAP_PHASES.map((p) => ({
+                name: p.name,
+                progress: p.status === 'done' ? 100 : (p.status === 'progress' ? (p.progress ?? 50) : 0),
+                status: p.status,
+              }))}
+              layout="vertical"
+              margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+            >
+              <defs>
+                <linearGradient id="gradDone" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0.5} />
+                </linearGradient>
+                <linearGradient id="gradProgress" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0.5} />
+                </linearGradient>
+                <linearGradient id="gradPlanned" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#6b7280" stopOpacity={0.5} />
+                  <stop offset="100%" stopColor="#6b7280" stopOpacity={0.2} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+              <XAxis
+                type="number"
+                domain={[0, 100]}
+                {...AXIS_STYLE}
+                tickFormatter={(v: number) => `${v}%`}
+              />
+              <YAxis
+                type="category"
+                dataKey="name"
+                {...AXIS_STYLE}
+                width={110}
+                tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }}
+              />
+              <Tooltip
+                {...TOOLTIP_STYLE}
+                formatter={(value: number) => [`${value}%`, 'Progress']}
+              />
+              <Legend
+                wrapperStyle={{ fontSize: 10, fontFamily: 'monospace' }}
+                payload={[
+                  { value: 'Shipped', type: 'rect', color: PHASE_COLORS.done },
+                  { value: 'In Progress', type: 'rect', color: PHASE_COLORS.progress },
+                  { value: 'Planned', type: 'rect', color: PHASE_COLORS.planned },
+                ]}
+              />
+              <Bar
+                dataKey="progress"
+                animationDuration={CHART_ANIMATION_DURATION}
+                radius={[0, 4, 4, 0]}
+              >
+                {ROADMAP_PHASES.map((p) => (
+                  <Cell
+                    key={p.name}
+                    fill={
+                      p.status === 'done'
+                        ? 'url(#gradDone)'
+                        : p.status === 'progress'
+                          ? 'url(#gradProgress)'
+                          : 'url(#gradPlanned)'
+                    }
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </motion.div>
 
       {/* Product cards: 2 columns */}

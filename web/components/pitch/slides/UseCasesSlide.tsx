@@ -15,6 +15,29 @@ import {
   Globe,
   CheckCircle2,
 } from 'lucide-react'
+import { chartEntrance } from '../slide-utils'
+import { TOOLTIP_STYLE, AXIS_STYLE, CHART_ANIMATION_DURATION } from '../chart-config'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+} from 'recharts'
+
+const MARKET_BY_SECTOR = [
+  { sector: 'Finance', value: 90, color: '#22c55e' },
+  { sector: 'Government', value: 85, color: '#3b82f6' },
+  { sector: 'Defense', value: 78, color: '#6366f1' },
+  { sector: 'Healthcare', value: 72, color: '#ef4444' },
+  { sector: 'Enterprise', value: 65, color: '#06b6d4' },
+  { sector: 'Legal', value: 45, color: '#a855f7' },
+  { sector: 'Education', value: 38, color: '#818cf8' },
+]
 
 interface IndustryCard {
   name: string
@@ -153,6 +176,69 @@ export default function UseCasesSlide({ scenario: _scenario }: { scenario?: Scen
           <span className="text-xs font-mono text-green-400">
             12+ compliance frameworks supported
           </span>
+        </div>
+      </motion.div>
+
+      {/* Market Priority by Sector */}
+      <motion.div {...chartEntrance(0.15)} className="card-quantum chart-glow mb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Target className="w-4 h-4 text-quantum-400" />
+          <div>
+            <h3 className="text-sm font-semibold text-white">Market Priority by Sector</h3>
+            <p className="text-[11px] text-gray-500">PQC adoption urgency score (0-100)</p>
+          </div>
+        </div>
+        <div style={{ height: 260 }} className="w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={MARKET_BY_SECTOR}
+              layout="vertical"
+              margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+            >
+              <defs>
+                {MARKET_BY_SECTOR.map((s) => (
+                  <linearGradient key={s.sector} id={`grad-${s.sector}`} x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor={s.color} stopOpacity={0.85} />
+                    <stop offset="100%" stopColor={s.color} stopOpacity={0.4} />
+                  </linearGradient>
+                ))}
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+              <XAxis
+                type="number"
+                domain={[0, 100]}
+                {...AXIS_STYLE}
+                tickFormatter={(v: number) => `${v}`}
+              />
+              <YAxis
+                type="category"
+                dataKey="sector"
+                {...AXIS_STYLE}
+                width={85}
+                tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }}
+              />
+              <Tooltip
+                {...TOOLTIP_STYLE}
+                formatter={(value: number) => [`${value}/100`, 'Priority Score']}
+              />
+              <Legend
+                wrapperStyle={{ fontSize: 10, fontFamily: 'monospace' }}
+                payload={[
+                  { value: 'Primary Target (65+)', type: 'rect', color: '#22c55e' },
+                  { value: 'Secondary Target (<65)', type: 'rect', color: '#818cf8' },
+                ]}
+              />
+              <Bar
+                dataKey="value"
+                animationDuration={CHART_ANIMATION_DURATION}
+                radius={[0, 4, 4, 0]}
+              >
+                {MARKET_BY_SECTOR.map((s) => (
+                  <Cell key={s.sector} fill={`url(#grad-${s.sector})`} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </motion.div>
 

@@ -332,7 +332,7 @@ impl EmailCrypto {
             .map_err(|_| EmailCryptoError::InvalidPublicKey("invalid ML-KEM-768 public key"))?;
 
         let (ss, ct) = kyber768::encapsulate(&pk);
-        let mut shared_secret = SecretBytes32(
+        let shared_secret = SecretBytes32(
             ss.as_bytes()
                 .try_into()
                 .map_err(|_| EmailCryptoError::InvalidCiphertext("shared secret length"))?,
@@ -405,7 +405,7 @@ impl EmailCrypto {
             .map_err(|_| EmailCryptoError::InvalidCiphertext("invalid KEM ciphertext"))?;
 
         let ss = kyber768::decapsulate(&ct, &sk);
-        let mut shared_secret = SecretBytes32(
+        let shared_secret = SecretBytes32(
             ss.as_bytes()
                 .try_into()
                 .map_err(|_| EmailCryptoError::InvalidCiphertext("shared secret length"))?,
@@ -420,7 +420,7 @@ impl EmailCrypto {
 
         // 3. Unwrap CEK
         let cek_bytes = aes256_key_unwrap(&kek.0, &envelope.wrapped_cek)?;
-        let mut cek = SecretBytes32(
+        let cek = SecretBytes32(
             cek_bytes
                 .as_slice()
                 .try_into()

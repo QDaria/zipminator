@@ -126,7 +126,7 @@ const CTA = () => {
           >
             {/* TODO: Inconsistent CTA - manually recreates gradient style instead of using btn-primary class from globals.css */}
             <Link
-              href="#signup"
+              href="#waitlist"
               className="group relative inline-flex items-center space-x-2 bg-gradient-to-r from-quantum-500 to-purple-600 text-white font-semibold text-lg px-10 py-5 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-quantum-500/50 w-full sm:w-auto"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-quantum-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

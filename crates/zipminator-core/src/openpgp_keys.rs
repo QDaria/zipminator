@@ -286,7 +286,7 @@ pub fn composite_encrypt(
     let mlkem_pk = kyber768::PublicKey::from_bytes(&recipient.mlkem_pk)
         .map_err(|_| EmailCryptoError::InvalidPublicKey("invalid ML-KEM-768 public key"))?;
     let (mlkem_ss, mlkem_ct) = kyber768::encapsulate(&mlkem_pk);
-    let mut mlkem_secret = Secret32(
+    let mlkem_secret = Secret32(
         mlkem_ss
             .as_bytes()
             .try_into()
@@ -298,7 +298,7 @@ pub fn composite_encrypt(
     let x25519_ephemeral_pk = X25519PublicKey::from(&x25519_ephemeral);
     let x25519_recipient = X25519PublicKey::from(recipient.x25519_pk);
     let x25519_shared = x25519_ephemeral.diffie_hellman(&x25519_recipient);
-    let mut x25519_secret = Secret32(x25519_shared.to_bytes());
+    let x25519_secret = Secret32(x25519_shared.to_bytes());
 
     // 3. Combine shared secrets via HKDF
     //    IKM = mlkem_ss || x25519_ss
@@ -361,7 +361,7 @@ pub fn composite_decrypt(
     let mlkem_ct = kyber768::Ciphertext::from_bytes(&envelope.mlkem_ct)
         .map_err(|_| EmailCryptoError::InvalidCiphertext("invalid ML-KEM ciphertext"))?;
     let mlkem_ss = kyber768::decapsulate(&mlkem_ct, &mlkem_sk);
-    let mut mlkem_secret = Secret32(
+    let mlkem_secret = Secret32(
         mlkem_ss
             .as_bytes()
             .try_into()
@@ -372,7 +372,7 @@ pub fn composite_decrypt(
     let x25519_sk = StaticSecret::from(keypair.x25519_sk);
     let x25519_ephemeral_pk = X25519PublicKey::from(envelope.x25519_ephemeral_pk);
     let x25519_shared = x25519_sk.diffie_hellman(&x25519_ephemeral_pk);
-    let mut x25519_secret = Secret32(x25519_shared.to_bytes());
+    let x25519_secret = Secret32(x25519_shared.to_bytes());
 
     // 3. Combine shared secrets via HKDF (same as encrypt)
     let mut combined_ikm = [0u8; 64];

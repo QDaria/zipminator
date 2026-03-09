@@ -13,8 +13,20 @@ import {
   Banknote,
   FileText,
 } from 'lucide-react'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ReferenceLine,
+  ResponsiveContainer,
+  Cell,
+} from 'recharts'
 
-import { fadeUp } from '../slide-utils'
+import { fadeUp, chartEntrance } from '../slide-utils'
+import { TOOLTIP_STYLE, AXIS_STYLE, CHART_ANIMATION_DURATION, PHASE_COLORS } from '../chart-config'
 
 const GRANT_TRACK = [
   { name: 'Innovation Norway', timing: 'Q2 2026', status: 'progress' as const },
@@ -175,6 +187,97 @@ export default function RoadmapSlide({ scenario: _scenario }: { scenario?: Scena
         <p className="text-gray-400 max-w-2xl text-lg">
           Eight products. One quantum-secure super-app. Here is where each piece stands today.
         </p>
+      </motion.div>
+
+      {/* Gantt-style Progress Overview */}
+      <motion.div {...chartEntrance(0.12)} className="card-quantum chart-glow mb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Map className="w-4 h-4 text-quantum-400" />
+          <h3 className="text-sm font-semibold text-white">Phase Progress Overview</h3>
+        </div>
+        <div style={{ height: 220 }} className="w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={ROADMAP_PHASES.map((p) => ({
+                name: `P${p.phase} ${p.name}`,
+                completed: p.status === 'done' ? 100 : (p.status === 'progress' ? (p.progress ?? 50) : 0),
+                remaining: p.status === 'done' ? 0 : (p.status === 'progress' ? 100 - (p.progress ?? 50) : 100),
+                status: p.status,
+              }))}
+              layout="vertical"
+              margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+            >
+              <defs>
+                <linearGradient id="rmGradDone" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0.5} />
+                </linearGradient>
+                <linearGradient id="rmGradRemain" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#374151" stopOpacity={0.5} />
+                  <stop offset="100%" stopColor="#374151" stopOpacity={0.2} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+              <XAxis
+                type="number"
+                domain={[0, 100]}
+                {...AXIS_STYLE}
+                tickFormatter={(v: number) => `${v}%`}
+              />
+              <YAxis
+                type="category"
+                dataKey="name"
+                {...AXIS_STYLE}
+                width={130}
+                tick={{ fill: '#9ca3af', fontSize: 10, fontFamily: 'monospace' }}
+              />
+              <Tooltip
+                {...TOOLTIP_STYLE}
+                formatter={(value: number, name: string) => [
+                  `${value}%`,
+                  name === 'completed' ? 'Done' : 'Remaining',
+                ]}
+              />
+              <ReferenceLine
+                x={completionPct}
+                stroke="#f59e0b"
+                strokeDasharray="4 4"
+                label={{ value: 'Now', fill: '#f59e0b', fontSize: 10, position: 'top' }}
+              />
+              <Bar
+                dataKey="completed"
+                stackId="progress"
+                animationDuration={CHART_ANIMATION_DURATION}
+                radius={[0, 0, 0, 0]}
+              >
+                {ROADMAP_PHASES.map((p) => (
+                  <Cell
+                    key={`c-${p.name}`}
+                    fill={p.status === 'done' ? PHASE_COLORS.done : PHASE_COLORS.progress}
+                  />
+                ))}
+              </Bar>
+              <Bar
+                dataKey="remaining"
+                stackId="progress"
+                fill="url(#rmGradRemain)"
+                animationDuration={CHART_ANIMATION_DURATION}
+                radius={[0, 4, 4, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="flex items-center justify-center gap-4 mt-1">
+          <span className="flex items-center gap-1.5 text-[10px] text-gray-500">
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: PHASE_COLORS.done }} /> Shipped
+          </span>
+          <span className="flex items-center gap-1.5 text-[10px] text-gray-500">
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: PHASE_COLORS.progress }} /> In Progress
+          </span>
+          <span className="flex items-center gap-1.5 text-[10px] text-gray-500">
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#374151' }} /> Remaining
+          </span>
+        </div>
       </motion.div>
 
       {/* Timeline - two columns on desktop */}
