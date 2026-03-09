@@ -163,7 +163,7 @@ export default function RoadmapSlide({ scenario: _scenario }: { scenario?: Scena
           <div className="flex items-center gap-3">
             <Map className="w-5 h-5 text-quantum-400" />
             <span className="text-xs font-mono uppercase tracking-widest text-quantum-400/80">
-              Slide 15 / 20
+              Slide 15 / 22
             </span>
           </div>
           {/* Progress indicator */}

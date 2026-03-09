@@ -405,7 +405,7 @@ export default function DemoSlide({ scenario: _scenario }: { scenario?: Scenario
         <div className="flex items-center gap-3 mb-3">
           <Monitor className="w-5 h-5 text-quantum-400" />
           <span className="text-xs font-mono uppercase tracking-widest text-quantum-400/80">
-            Slide 7 / 20
+            Slide 7 / 22
           </span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-2">

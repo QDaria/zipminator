@@ -17,7 +17,6 @@ import {
   Users,
   DollarSign,
   Scale,
-  Leaf,
   Globe,
 } from 'lucide-react'
 import {
@@ -27,12 +26,13 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ReferenceLine,
   ResponsiveContainer,
 } from 'recharts'
 
 import { fadeUp, chartEntrance } from '../slide-utils'
-import { TOOLTIP_STYLE, AXIS_STYLE, CHART_ANIMATION_DURATION } from '../chart-config'
+import { TOOLTIP_STYLE, AXIS_STYLE, CHART_ANIMATION_DURATION, GRADIENT_DEFS } from '../chart-config'
 
 type TimelineEvent = {
   year: string
@@ -127,42 +127,22 @@ const REGULATORY_DEADLINES = [
 ]
 
 const THREAT_TIMELINE = [
-  { year: 2020, threat: 10, label: 'HNDL begins' },
-  { year: 2022, threat: 15 },
-  { year: 2024, threat: 25, label: 'NIST PQC' },
-  { year: 2025, threat: 35, label: 'Salt Typhoon' },
-  { year: 2026, threat: 45, label: 'NOW' },
-  { year: 2027, threat: 60, label: 'CNSA 2.0' },
-  { year: 2029, threat: 75 },
-  { year: 2030, threat: 85, label: 'Q-Day Window' },
-  { year: 2033, threat: 92 },
-  { year: 2035, threat: 98, label: 'Full Migration' },
+  { year: 2020, low: 8,  medium: 2,  high: 0,  label: 'HNDL begins' },
+  { year: 2022, low: 10, medium: 4,  high: 1  },
+  { year: 2024, low: 12, medium: 8,  high: 5,  label: 'NIST PQC' },
+  { year: 2025, low: 14, medium: 12, high: 9,  label: 'Salt Typhoon' },
+  { year: 2026, low: 15, medium: 15, high: 15, label: 'NOW' },
+  { year: 2027, low: 16, medium: 20, high: 24, label: 'CNSA 2.0' },
+  { year: 2029, low: 17, medium: 23, high: 35 },
+  { year: 2030, low: 18, medium: 25, high: 42, label: 'Q-Day Window' },
+  { year: 2033, low: 18, medium: 27, high: 47 },
+  { year: 2035, low: 18, medium: 28, high: 52, label: 'Full Migration' },
 ]
 
-interface ThreatDot {
-  cx: number
-  cy: number
-  payload: (typeof THREAT_TIMELINE)[number]
-}
-
-function CustomDot({ cx, cy, payload }: ThreatDot) {
-  if (!payload.label) return null
-  const isNow = payload.label === 'NOW'
-  return (
-    <g>
-      <circle
-        cx={cx}
-        cy={cy}
-        r={isNow ? 6 : 4}
-        fill={isNow ? '#f59e0b' : payload.threat > 70 ? '#ef4444' : '#6366f1'}
-        stroke={isNow ? '#fbbf24' : 'none'}
-        strokeWidth={isNow ? 2 : 0}
-      />
-      {isNow && (
-        <circle cx={cx} cy={cy} r={10} fill="none" stroke="#f59e0b" strokeWidth={1} opacity={0.5} />
-      )}
-    </g>
-  )
+const RISK_BANDS = {
+  low:    { name: 'Low Risk',       color: '#22c55e', gradientId: GRADIENT_DEFS.green.id },
+  medium: { name: 'Medium Risk',    color: '#f59e0b', gradientId: GRADIENT_DEFS.amber.id },
+  high:   { name: 'High / Critical', color: '#ef4444', gradientId: GRADIENT_DEFS.red.id },
 }
 
 const BOTTOM_STATS = [
@@ -179,7 +159,7 @@ export default function WhyNowSlide({ scenario: _scenario }: { scenario?: Scenar
         <div className="flex items-center gap-3 mb-3">
           <Clock className="w-5 h-5 text-quantum-400" />
           <span className="text-xs font-mono uppercase tracking-widest text-quantum-400/80">
-            Slide 4 / 20
+            Slide 4 / 22
           </span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
@@ -205,11 +185,12 @@ export default function WhyNowSlide({ scenario: _scenario }: { scenario?: Scenar
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={THREAT_TIMELINE} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
               <defs>
-                <linearGradient id="threatGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.4} />
-                  <stop offset="50%" stopColor="#f59e0b" stopOpacity={0.2} />
-                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0.05} />
-                </linearGradient>
+                {Object.values(GRADIENT_DEFS).map((g) => (
+                  <linearGradient key={g.id} id={g.id} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={g.color} stopOpacity={g.opacity[0]} />
+                    <stop offset="100%" stopColor={g.color} stopOpacity={g.opacity[1]} />
+                  </linearGradient>
+                ))}
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
               <XAxis
@@ -225,8 +206,22 @@ export default function WhyNowSlide({ scenario: _scenario }: { scenario?: Scenar
               />
               <Tooltip
                 {...TOOLTIP_STYLE}
-                formatter={(value: number) => [`${value}%`, 'Threat Level']}
+                formatter={(value: number, name: string) => {
+                  const band = RISK_BANDS[name as keyof typeof RISK_BANDS]
+                  return [`${value}%`, band?.name ?? name]
+                }}
                 labelFormatter={(label: number) => `Year ${label}`}
+              />
+              <Legend
+                verticalAlign="top"
+                align="right"
+                iconType="circle"
+                iconSize={8}
+                wrapperStyle={{ fontSize: 10, fontFamily: 'monospace', paddingBottom: 4 }}
+                formatter={(value: string) => {
+                  const band = RISK_BANDS[value as keyof typeof RISK_BANDS]
+                  return band?.name ?? value
+                }}
               />
               <ReferenceLine
                 x={2024}
@@ -250,27 +245,34 @@ export default function WhyNowSlide({ scenario: _scenario }: { scenario?: Scenar
               />
               <Area
                 type="monotone"
-                dataKey="threat"
-                stroke="#ef4444"
-                strokeWidth={2}
-                fill="url(#threatGrad)"
+                dataKey="low"
+                stackId="risk"
+                stroke={RISK_BANDS.low.color}
+                strokeWidth={1.5}
+                fill={`url(#${RISK_BANDS.low.gradientId})`}
                 animationDuration={CHART_ANIMATION_DURATION}
-                dot={(props: Record<string, unknown>) => <CustomDot cx={props.cx as number} cy={props.cy as number} payload={props.payload as (typeof THREAT_TIMELINE)[number]} />}
+              />
+              <Area
+                type="monotone"
+                dataKey="medium"
+                stackId="risk"
+                stroke={RISK_BANDS.medium.color}
+                strokeWidth={1.5}
+                fill={`url(#${RISK_BANDS.medium.gradientId})`}
+                animationDuration={CHART_ANIMATION_DURATION}
+              />
+              <Area
+                type="monotone"
+                dataKey="high"
+                stackId="risk"
+                stroke={RISK_BANDS.high.color}
+                strokeWidth={2}
+                fill={`url(#${RISK_BANDS.high.gradientId})`}
+                animationDuration={CHART_ANIMATION_DURATION}
                 activeDot={{ r: 5, fill: '#ef4444', stroke: '#fff', strokeWidth: 1 }}
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-        <div className="flex items-center justify-center gap-4 mt-2">
-          <span className="flex items-center gap-1.5 text-[10px] text-gray-500">
-            <span className="w-2 h-2 rounded-full bg-green-500" /> Low Risk
-          </span>
-          <span className="flex items-center gap-1.5 text-[10px] text-gray-500">
-            <span className="w-2 h-2 rounded-full bg-yellow-500" /> Medium Risk
-          </span>
-          <span className="flex items-center gap-1.5 text-[10px] text-gray-500">
-            <span className="w-2 h-2 rounded-full bg-red-500" /> Critical
-          </span>
         </div>
       </motion.div>
 

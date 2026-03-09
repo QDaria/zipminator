@@ -88,7 +88,7 @@ export default function TechnologySlide({ scenario: _scenario }: { scenario?: Sc
         <div className="flex items-center gap-3 mb-3">
           <Cpu className="w-5 h-5 text-quantum-400" />
           <span className="text-xs font-mono uppercase tracking-widest text-quantum-400/80">
-            Slide 8 / 20
+            Slide 8 / 22
           </span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">

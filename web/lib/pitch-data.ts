@@ -20,8 +20,9 @@ export const SLIDE_TITLES = [
   'Funding Strategy',      // 17 - Grants/funding
   'Risk Analysis',         // 18 - Risks
   'Pricing',               // 19 - Pricing tiers
-  'The Ask',               // 20 - What we need
-  'Contact',               // 21 - Get in touch
+  'ESG & Sustainability',  // 20 - ESG
+  'The Ask',               // 21 - What we need
+  'Contact',               // 22 - Get in touch
 ]
 
 export const THREAT_DATA = [
@@ -309,7 +310,7 @@ export const PRICING_TIERS = [
     name: 'Pro',
     characterName: 'Solveig',
     price: '$29/mo',
-    priceStandard: '$69/mo',
+    priceStandard: '$99/mo',
     target: 'SMBs, security teams',
     levels: '1-7',
     features: [
@@ -425,7 +426,7 @@ export const TEAM_ROLES = [
 ]
 
 export const TEAM_TOTAL = {
-  headcount: '21-50',
+  headcount: '34',
   annualCost: '$6-8M',
   buildCost: '~$25M over 24-36 months',
 }
@@ -831,4 +832,69 @@ export const USE_CASE_INDUSTRIES = [
   { name: 'Critical Infrastructure', icon: 'Zap', color: 'orange', description: 'Power grids, water systems, telecom. SS7 attacks stop here', compliance: ['NERC CIP', 'ICS-CERT', 'EU NIS2'] },
   { name: 'Legal & IP', icon: 'Scale', color: 'purple', description: 'Attorney-client privilege and trade secrets protected for decades', compliance: ['ABA Rules', 'GDPR', 'IP Law'] },
   { name: 'Enterprise Tech', icon: 'Server', color: 'cyan', description: 'API security, code signing, and DevOps secrets with PQC', compliance: ['NIST FIPS 203', 'PQC-Ready', '3-Line SDK'] },
+]
+
+// --- ESG: UN SDG Mapping ---
+export const SDG_MAPPING = [
+  {
+    number: 9,
+    name: 'Industry, Innovation & Infrastructure',
+    relevance: 'PQC encryption infrastructure for the post-quantum era. NIST FIPS 203 implementation.',
+  },
+  {
+    number: 11,
+    name: 'Sustainable Cities & Communities',
+    relevance: 'Secure smart city communications, IoT protection, and resilient urban infrastructure.',
+  },
+  {
+    number: 16,
+    name: 'Peace, Justice & Strong Institutions',
+    relevance: 'Privacy as a human right. Anti-surveillance tools. Protecting democratic processes.',
+  },
+  {
+    number: 17,
+    name: 'Partnerships for the Goals',
+    relevance: 'Open standards (NIST), open source core (Apache 2.0), NATO DIANA collaboration.',
+  },
+  {
+    number: 4,
+    name: 'Quality Education',
+    relevance: 'Secure academic networks and research data. Free tier for students and educators.',
+  },
+  {
+    number: 8,
+    name: 'Decent Work & Economic Growth',
+    relevance: 'Norwegian HQ with strongest labor protections. Fair wages, 5-week vacation, full benefits.',
+  },
+]
+
+// --- ESG: Green Energy Comparison ---
+export const ENERGY_COMPARISON = [
+  { name: 'Zipminator (Norway)', renewable: 98 },
+  { name: 'US Big Tech Avg', renewable: 52 },
+  { name: 'Global Cloud Avg', renewable: 30 },
+]
+
+// --- ESG: Carbon & Efficiency Metrics ---
+export const CARBON_METRICS = [
+  {
+    label: 'Carbon Intensity',
+    value: '29g',
+    detail: 'CO\u2082/kWh (Norway) vs 390g (US avg)',
+  },
+  {
+    label: 'Data Center PUE',
+    value: '1.1',
+    detail: 'Norway avg vs 1.6 global avg',
+  },
+  {
+    label: 'Cooling Savings',
+    value: '40-60%',
+    detail: 'Arctic climate = natural cooling',
+  },
+  {
+    label: 'PQC vs RSA Energy',
+    value: '~1000x',
+    detail: 'Less energy for key generation',
+  },
 ]

@@ -24,8 +24,8 @@ export default function SlideWrapper({
         <Image
           src="/logos/QDaria_logo_teal Large.png"
           alt="QDaria"
-          width={80}
-          height={32}
+          width={160}
+          height={64}
           className="opacity-40 hover:opacity-80 transition-opacity pointer-events-auto"
         />
       </div>

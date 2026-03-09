@@ -38,7 +38,7 @@ export default function ProblemSlide({ scenario: _scenario }: { scenario?: Scena
         <div className="flex items-center gap-3 mb-3">
           <AlertTriangle className="w-6 h-6 text-red-400" />
           <span className="text-xs font-mono uppercase tracking-widest text-red-400/80">
-            Slide 3 / 20
+            Slide 3 / 22
           </span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">

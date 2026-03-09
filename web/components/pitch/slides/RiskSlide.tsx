@@ -5,10 +5,8 @@ import SlideWrapper from '../SlideWrapper'
 import { RISK_MATRIX } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
 import { ShieldAlert, AlertTriangle, CheckCircle2, TrendingUp, Leaf } from 'lucide-react'
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceArea } from 'recharts'
 
 import { fadeUp } from '../slide-utils'
-import { TOOLTIP_STYLE } from '../chart-config'
 
 const LEVEL_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
   high: { bg: 'bg-red-500/15', text: 'text-red-400', dot: 'bg-red-500' },
@@ -66,9 +64,82 @@ const EXTRA_RISK = {
 
 const ALL_RISKS = [...RISK_MATRIX, EXTRA_RISK]
 
+// ---------------------------------------------------------------------------
+// Quadrant configuration
+// ---------------------------------------------------------------------------
+type Quadrant = 'green' | 'amber' | 'red' | 'blue'
+
+const QUADRANT_CONFIG: Record<Quadrant, { label: string; bg: string; border: string; labelColor: string }> = {
+  green: {
+    label: 'Low Risk',
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/20',
+    labelColor: 'text-emerald-400/50',
+  },
+  amber: {
+    label: 'Watch',
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/20',
+    labelColor: 'text-amber-400/50',
+  },
+  red: {
+    label: 'Critical',
+    bg: 'bg-red-500/10',
+    border: 'border-red-500/20',
+    labelColor: 'text-red-400/50',
+  },
+  blue: {
+    label: 'Monitor',
+    bg: 'bg-blue-500/10',
+    border: 'border-blue-500/20',
+    labelColor: 'text-blue-400/50',
+  },
+}
+
+function getQuadrant(impact: string, probability: string): Quadrant {
+  const isHighImpact = impact === 'high'
+  const isHighProb = probability === 'high'
+  if (isHighImpact && isHighProb) return 'red'
+  if (isHighImpact && !isHighProb) return 'amber'
+  if (!isHighImpact && isHighProb) return 'blue'
+  return 'green'
+}
+
+function getRiskDotColor(impact: string): string {
+  if (impact === 'high') return 'bg-red-500 border-red-400'
+  if (impact === 'medium') return 'bg-yellow-500 border-yellow-400'
+  return 'bg-emerald-500 border-emerald-400'
+}
+
+// Short labels for the quadrant dots
+function shortLabel(risk: string): string {
+  const map: Record<string, string> = {
+    'Quantum timeline accelerates faster than expected': 'Quantum Timeline',
+    'Big tech enters PQC consumer market': 'Big Tech Entry',
+    'NIST algorithm vulnerabilities discovered': 'NIST Vuln.',
+    'Key person dependency': 'Key Person',
+    'Regulatory changes': 'Regulation',
+    'Open source sustainability': 'Open Source',
+    'User adoption challenges': 'User Adoption',
+    'Climate & sustainability regulation tightens': 'Climate Reg.',
+  }
+  return map[risk] ?? risk.split(' ').slice(0, 2).join(' ')
+}
+
 export default function RiskSlide({ scenario: _scenario = 'base' }: { scenario?: Scenario }) {
   const highRisks = ALL_RISKS.filter((r) => r.impact === 'high').length
   const totalRisks = ALL_RISKS.length
+
+  // Group risks by quadrant
+  const quadrants: Record<Quadrant, typeof ALL_RISKS> = {
+    green: [],
+    amber: [],
+    red: [],
+    blue: [],
+  }
+  for (const r of ALL_RISKS) {
+    quadrants[getQuadrant(r.impact, r.probability)].push(r)
+  }
 
   return (
     <SlideWrapper>
@@ -85,91 +156,56 @@ export default function RiskSlide({ scenario: _scenario = 'base' }: { scenario?:
         </p>
       </motion.div>
 
-      {/* Risk Matrix Scatter Plot -- MOVED UP to upper half */}
+      {/* Colored Quadrant Grid */}
       <motion.div {...fadeUp(0.04)} className="card-quantum mb-6">
-        <h4 className="text-sm font-semibold text-white mb-4">Risk Matrix</h4>
-        <ResponsiveContainer width="100%" height={280}>
-          <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-            {/* Heatmap background zones */}
-            {/* Green zones (low) */}
-            <ReferenceArea x1={0.5} x2={1.5} y1={0.5} y2={1.5} fill="rgba(34, 197, 94, 0.10)" fillOpacity={1} label={{ value: 'LOW', fill: 'rgba(34,197,94,0.3)', fontSize: 10, fontFamily: 'monospace', position: 'center' }} />
-            <ReferenceArea x1={0.5} x2={1.5} y1={1.5} y2={2.5} fill="rgba(34, 197, 94, 0.10)" fillOpacity={1} />
-            <ReferenceArea x1={0.5} x2={1.5} y1={2.5} y2={3.5} fill="rgba(234, 179, 8, 0.10)" fillOpacity={1} label={{ value: 'MED', fill: 'rgba(234,179,8,0.35)', fontSize: 10, fontFamily: 'monospace', position: 'center' }} />
-            <ReferenceArea x1={1.5} x2={2.5} y1={0.5} y2={1.5} fill="rgba(34, 197, 94, 0.10)" fillOpacity={1} />
-            <ReferenceArea x1={2.5} x2={3.5} y1={0.5} y2={1.5} fill="rgba(34, 197, 94, 0.10)" fillOpacity={1} />
-            {/* Yellow zones */}
-            <ReferenceArea x1={1.5} x2={2.5} y1={1.5} y2={2.5} fill="rgba(234, 179, 8, 0.10)" fillOpacity={1} label={{ value: 'MED', fill: 'rgba(234,179,8,0.35)', fontSize: 10, fontFamily: 'monospace', position: 'center' }} />
-            <ReferenceArea x1={2.5} x2={3.5} y1={1.5} y2={2.5} fill="rgba(239, 68, 68, 0.12)" fillOpacity={1} label={{ value: 'HIGH', fill: 'rgba(239,68,68,0.35)', fontSize: 10, fontFamily: 'monospace', position: 'center' }} />
-            {/* Red zones */}
-            <ReferenceArea x1={1.5} x2={2.5} y1={2.5} y2={3.5} fill="rgba(239, 68, 68, 0.12)" fillOpacity={1} label={{ value: 'HIGH', fill: 'rgba(239,68,68,0.35)', fontSize: 10, fontFamily: 'monospace', position: 'center' }} />
-            <ReferenceArea x1={2.5} x2={3.5} y1={2.5} y2={3.5} fill="rgba(239, 68, 68, 0.12)" fillOpacity={1} label={{ value: 'CRITICAL', fill: 'rgba(239,68,68,0.4)', fontSize: 9, fontFamily: 'monospace', position: 'center' }} />
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-sm font-semibold text-white">Risk Matrix</h4>
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-mono text-gray-500 uppercase">Impact &uarr;</span>
+            <span className="text-[10px] font-mono text-gray-500 uppercase">Probability &rarr;</span>
+          </div>
+        </div>
 
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-            <XAxis
-              type="number"
-              dataKey="probability"
-              domain={[0.5, 3.5]}
-              ticks={[1, 2, 3]}
-              tickFormatter={(v: number) => v === 1 ? 'Low' : v === 2 ? 'Med' : 'High'}
-              tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }}
-              tickLine={false}
-              axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
-              label={{ value: 'Probability', position: 'insideBottom', offset: -5, style: { fill: '#6b7280', fontSize: 11, fontFamily: 'monospace' } }}
+        {/* Axis labels */}
+        <div className="flex">
+          {/* Y-axis label */}
+          <div className="flex flex-col justify-between pr-2 py-1">
+            <span className="text-[10px] font-mono text-gray-500 uppercase">High</span>
+            <span className="text-[10px] font-mono text-gray-500 uppercase">Low</span>
+          </div>
+
+          {/* 2x2 grid */}
+          <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-1.5 min-h-[260px]">
+            {/* Top-left: High Impact / Low Prob = Amber (Watch) */}
+            <QuadrantCell
+              quadrant="amber"
+              risks={quadrants.amber}
             />
-            <YAxis
-              type="number"
-              dataKey="impact"
-              domain={[0.5, 3.5]}
-              ticks={[1, 2, 3]}
-              tickFormatter={(v: number) => v === 1 ? 'Low' : v === 2 ? 'Med' : 'High'}
-              tick={{ fill: '#9ca3af', fontSize: 11, fontFamily: 'monospace' }}
-              tickLine={false}
-              axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
-              label={{ value: 'Impact', angle: -90, position: 'insideLeft', offset: 10, style: { fill: '#6b7280', fontSize: 11, fontFamily: 'monospace' } }}
+            {/* Top-right: High Impact / High Prob = Red (Critical) */}
+            <QuadrantCell
+              quadrant="red"
+              risks={quadrants.red}
             />
-            <Tooltip
-              {...TOOLTIP_STYLE}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              formatter={(value: any, name: any) => {
-                if (name === 'probability' || name === 'impact') {
-                  return [value === 1 ? 'Low' : value === 2 ? 'Medium' : 'High', String(name).charAt(0).toUpperCase() + String(name).slice(1)]
-                }
-                return [value, name]
-              }}
-              labelFormatter={() => ''}
+            {/* Bottom-left: Low Impact / Low Prob = Green (Low Risk) */}
+            <QuadrantCell
+              quadrant="green"
+              risks={quadrants.green}
             />
-            <Legend
-              verticalAlign="bottom"
-              height={24}
-              payload={[
-                { value: 'Critical', type: 'circle', color: '#ef4444' },
-                { value: 'Elevated', type: 'circle', color: '#eab308' },
-                { value: 'Manageable', type: 'circle', color: '#22c55e' },
-              ]}
+            {/* Bottom-right: Low Impact / High Prob = Blue (Monitor) */}
+            <QuadrantCell
+              quadrant="blue"
+              risks={quadrants.blue}
             />
-            <Scatter
-              data={ALL_RISKS.map((r) => ({
-                probability: r.probability === 'high' ? 3 : r.probability === 'medium' ? 2 : 1,
-                impact: r.impact === 'high' ? 3 : r.impact === 'medium' ? 2 : 1,
-                name: r.risk.split(' ').slice(0, 3).join(' ') + '...',
-                z: r.impact === 'high' ? 200 : r.impact === 'medium' ? 150 : 100,
-              }))}
-              animationDuration={1500}
-              shape={(props: { cx?: number; cy?: number; payload?: { z: number; name: string; impact: number } }) => {
-                const { cx = 0, cy = 0, payload } = props
-                const size = (payload?.impact ?? 1) === 3 ? 15 : (payload?.impact ?? 1) === 2 ? 12 : 9
-                const color = (payload?.impact ?? 1) === 3 ? '#ef4444' : (payload?.impact ?? 1) === 2 ? '#eab308' : '#22c55e'
-                return (
-                  <g>
-                    <circle cx={cx} cy={cy} r={size} fill={color} fillOpacity={0.5} stroke={color} strokeWidth={1.5} />
-                    <circle cx={cx} cy={cy} r={size * 0.4} fill={color} fillOpacity={0.9} />
-                    <text x={cx} y={cy - size - 4} textAnchor="middle" fill="#d1d5db" fontSize={9} fontFamily="monospace">{payload?.name}</text>
-                  </g>
-                )
-              }}
-            />
-          </ScatterChart>
-        </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* X-axis labels */}
+        <div className="flex mt-1.5 pl-10">
+          <div className="flex-1 grid grid-cols-2 gap-1.5">
+            <span className="text-center text-[10px] font-mono text-gray-500 uppercase">Low / Med Probability</span>
+            <span className="text-center text-[10px] font-mono text-gray-500 uppercase">High Probability</span>
+          </div>
+        </div>
       </motion.div>
 
       {/* Summary Badges */}
@@ -266,5 +302,44 @@ export default function RiskSlide({ scenario: _scenario = 'base' }: { scenario?:
         Risk matrix reviewed quarterly. Crypto-agile architecture is the primary systemic hedge.
       </motion.p>
     </SlideWrapper>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Quadrant Cell component
+// ---------------------------------------------------------------------------
+function QuadrantCell({
+  quadrant,
+  risks,
+}: {
+  quadrant: Quadrant
+  risks: typeof ALL_RISKS
+}) {
+  const cfg = QUADRANT_CONFIG[quadrant]
+
+  return (
+    <div className={`relative rounded-lg border ${cfg.bg} ${cfg.border} p-3 flex flex-col`}>
+      {/* Zone label */}
+      <span className={`text-lg font-display font-bold ${cfg.labelColor} mb-2`}>
+        {cfg.label}
+      </span>
+
+      {/* Risk dots/badges */}
+      <div className="flex flex-wrap gap-1.5 mt-auto">
+        {risks.map((r) => (
+          <span
+            key={r.risk}
+            className={`inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-full border ${getRiskDotColor(r.impact)} bg-opacity-20 text-white`}
+            title={r.risk}
+          >
+            <span className={`w-2 h-2 rounded-full ${r.impact === 'high' ? 'bg-red-300' : r.impact === 'medium' ? 'bg-yellow-300' : 'bg-emerald-300'}`} />
+            {shortLabel(r.risk)}
+          </span>
+        ))}
+        {risks.length === 0 && (
+          <span className="text-xs font-mono text-gray-600 italic">No risks in this zone</span>
+        )}
+      </div>
+    </div>
   )
 }

@@ -171,7 +171,7 @@ export default function ContactSlide({ scenario: _scenario = 'base' }: { scenari
           <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
             <span className="w-1.5 h-1.5 rounded-full bg-quantum-500" />
             <span className="inline-flex items-center gap-1.5">
-              A <Image src="/logos/QDwordmark2.svg" alt="QDaria" width={80} height={20} className="inline-block align-baseline" /> Company
+              A <Image src="/logos/QDwordmark2.svg" alt="QDaria" width={160} height={40} className="inline-block align-baseline" /> Company
             </span>
           </div>
         </motion.div>

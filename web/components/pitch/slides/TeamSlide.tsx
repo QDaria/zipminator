@@ -168,8 +168,7 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
               <motion.div
                 key={role.title}
                 initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.15 + i * 0.04 }}
               >
                 <div className="flex items-center justify-between mb-1.5">
@@ -192,8 +191,7 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
                   <motion.div
                     className={`h-full rounded-full bg-gradient-to-r ${BAR_COLORS[role.priority]}`}
                     initial={{ width: 0 }}
-                    whileInView={{ width: `${barWidth}%` }}
-                    viewport={{ once: true }}
+                    animate={{ width: `${barWidth}%` }}
                     transition={{ duration: 0.5, delay: 0.2 + i * 0.04 }}
                   />
                 </div>

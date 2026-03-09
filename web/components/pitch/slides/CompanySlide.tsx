@@ -91,11 +91,11 @@ export default function CompanySlide({ scenario: _scenario }: { scenario?: Scena
         <div className="flex items-center gap-3 mb-3">
           <Building2 className="w-5 h-5 text-quantum-400" />
           <span className="text-xs font-mono uppercase tracking-widest text-quantum-400/80">
-            Slide 2 / 20
+            Slide 2 / 22
           </span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
-          <span className="gradient-text"><Image src="/logos/QDwordmark2.svg" alt="QDaria" width={80} height={20} className="inline-block align-baseline" /> AS</span>
+          <span className="gradient-text"><Image src="/logos/QDwordmark2.svg" alt="QDaria" width={160} height={40} className="inline-block align-baseline" /></span>
         </h2>
         <p className="text-lg text-gray-400 max-w-2xl">
           A Norwegian quantum security company on a mission to make quantum-secure

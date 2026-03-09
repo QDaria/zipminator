@@ -34,25 +34,25 @@ export default function PricingSlide() {
                 : 'border-white/10 bg-white/5'
             }`}
           >
-            {tier.earlyAdopter && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-medium">
-                  <Sparkles className="w-3 h-3" />
-                  Early Adopter
-                </span>
+            {/* Badges row at top */}
+            {(tier.earlyAdopter || tier.highlighted) && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-2">
+                {tier.earlyAdopter && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-medium whitespace-nowrap">
+                    <Sparkles className="w-3 h-3" />
+                    Early Adopter
+                  </span>
+                )}
+                {tier.highlighted && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-quantum-500/30 border border-quantum-400/50 text-quantum-300 text-xs font-medium whitespace-nowrap">
+                    <Star className="w-3 h-3" />
+                    Most Popular
+                  </span>
+                )}
               </div>
             )}
 
-            {tier.highlighted && (
-              <div className="absolute -top-3 right-4">
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-quantum-500/30 border border-quantum-400/50 text-quantum-300 text-xs font-medium">
-                  <Star className="w-3 h-3" />
-                  Most Popular
-                </span>
-              </div>
-            )}
-
-            <div className="mb-4">
+            <div className="mb-4 mt-1">
               <h3 className="text-base font-semibold text-white">{tier.name}</h3>
               <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-0.5">
                 {tier.characterName} &middot; Levels {tier.levels}
@@ -60,11 +60,15 @@ export default function PricingSlide() {
             </div>
 
             <div className="mb-4">
-              <span className="text-2xl font-bold gradient-text font-mono">{tier.price}</span>
-              {tier.earlyAdopter && tier.priceStandard !== tier.price && (
-                <span className="ml-2 text-sm text-gray-500 line-through">
-                  {tier.priceStandard}
-                </span>
+              {tier.earlyAdopter && tier.priceStandard !== tier.price ? (
+                <>
+                  <span className="text-sm text-gray-500 line-through font-mono mr-2">
+                    {tier.priceStandard}
+                  </span>
+                  <span className="text-3xl font-bold gradient-text font-mono">{tier.price}</span>
+                </>
+              ) : (
+                <span className="text-3xl font-bold gradient-text font-mono">{tier.price}</span>
               )}
             </div>
 

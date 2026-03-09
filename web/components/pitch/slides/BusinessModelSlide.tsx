@@ -224,8 +224,7 @@ export default function BusinessModelSlide({ scenario = 'all' }: { scenario?: Sc
             <motion.div
               key={item.label}
               initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="absolute flex flex-col items-center"
               style={{ left: `${item.position}%`, transform: 'translateX(-50%)' }}
@@ -267,8 +266,7 @@ export default function BusinessModelSlide({ scenario = 'all' }: { scenario?: Sc
             <motion.div
               key={tier.name}
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 + i * 0.06 }}
               className={`card-quantum relative flex flex-col ${
                 tier.highlighted
@@ -291,11 +289,22 @@ export default function BusinessModelSlide({ scenario = 'all' }: { scenario?: Sc
               </div>
 
               <div className="mb-4">
-                <span className={`text-3xl font-bold font-mono ${tier.highlighted ? 'gradient-text' : 'gradient-text'}`}>
-                  {tier.price}
-                </span>
-                {tier.price !== '$0' && tier.price !== 'Custom' && !tier.price.includes('/mo') && (
-                  <span className="text-xs text-gray-500 ml-1">/mo</span>
+                {tier.earlyAdopter && tier.priceStandard !== tier.price ? (
+                  <>
+                    <span className="text-sm font-mono text-gray-500 line-through mr-2">
+                      {tier.priceStandard}
+                    </span>
+                    <span className={`text-3xl font-bold font-mono gradient-text`}>
+                      {tier.price}
+                    </span>
+                    <span className="block text-[10px] text-quantum-400 font-mono mt-1">
+                      Early Adopter Price
+                    </span>
+                  </>
+                ) : (
+                  <span className={`text-3xl font-bold font-mono gradient-text`}>
+                    {tier.price}
+                  </span>
                 )}
               </div>
 
