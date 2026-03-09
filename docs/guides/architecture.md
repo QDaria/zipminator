@@ -6,13 +6,19 @@ This document describes the internal architecture of Zipminator, from the low-le
 
 ## System Overview
 
-Zipminator is structured as a layered system with clear separation between the cryptographic core, language bindings, SDK, API, and presentation layers.
+Zipminator is structured as a layered system with clear separation between the cryptographic core, language bindings, SDK, API, and presentation layers. The Flutter super-app provides a single codebase for all 6 platforms via `flutter_rust_bridge`.
 
 ```mermaid
 graph TB
     subgraph "Presentation Layer"
-        WEB["Next.js Web Dashboard"]
+        FLUTTER["Flutter Super-App (macOS, iOS, Android, Windows, Linux, Web)"]
+        WEB["Next.js Web Dashboard (zipminator.zip)"]
         CLI_PY["Python CLI (Typer + Rich)"]
+    end
+
+    subgraph "Flutter Bridge Layer"
+        FRB["flutter_rust_bridge v2.11.1"]
+        APP_CRATE["zipminator-app (safe Rust types)"]
     end
 
     subgraph "API Layer"
@@ -45,6 +51,9 @@ graph TB
         MOCK["Mock QRNG (Testing)"]
     end
 
+    FLUTTER --> FRB
+    FRB --> APP_CRATE
+    APP_CRATE --> KYBER
     WEB --> API
     CLI_PY --> PQC
     API --> AUTH
@@ -406,6 +415,76 @@ A Tauri 2.x PQC-enabled desktop browser with:
 - Cookie rotation and fingerprint resistance
 - Zero telemetry architecture
 - Tab management, address bar, navigation controls
+
+## Flutter Super-App (`app/`)
+
+The Flutter super-app replaces the scattered Expo (mobile), Tauri (desktop), and Next.js (web) apps with a single codebase targeting all 6 platforms. It uses `flutter_rust_bridge` (FRB) v2.11.1 for type-safe Dart-Rust interop.
+
+### Architecture
+
+```
+Flutter UI (Dart)
+    ↓ Riverpod 3 Notifiers (state management)
+    ↓ Auto-generated Dart bindings (app/lib/src/rust/api/simple.dart)
+    ↓ flutter_rust_bridge v2.11.1 (app/rust/)
+    ↓ zipminator-app crate (safe Rust types, session store)
+    ↓ zipminator-core crate (ML-KEM-768, NTT, ratchet, SRTP)
+```
+
+### Bridge Layer (`crates/zipminator-app/`)
+
+Platform-agnostic bridge crate that wraps `zipminator-core` with safe types for FRB:
+
+- `crypto.rs` — `keypair()`, `encapsulate(pk)`, `decapsulate(ct, sk)`, `composite_keypair()`
+- `ratchet.rs` — Session-store pattern via `LazyLock<Mutex<HashMap<u64, PqRatchetSession>>>`. Flutter references sessions by opaque `u64` IDs.
+- `email.rs` — `encrypt_email()`, `decrypt_email()` wrapping `EmailCrypto`
+- `pii.rs` — `scan_text()`, `scan_text_json()` with JSON output for Dart parsing
+- `srtp.rs` — `derive_srtp_keys()` from Kyber shared secrets via HKDF-SHA-256
+
+### FRB Functions (16 total)
+
+| Function | Type | Description |
+|----------|------|-------------|
+| `init_app()` | `#[frb(init)]` | FRB initialization |
+| `version()` | `#[frb(sync)]` | Bridge version string |
+| `keypair()` | async | ML-KEM-768 key generation (PK: 1184B, SK: 2400B) |
+| `encapsulate(pk)` | async | KEM encapsulation (CT: 1088B, SS: 32B) |
+| `decapsulate(ct, sk)` | async | KEM decapsulation (SS: 32B) |
+| `composite_keypair()` | async | Composite KEM keypair (PK: 1216B, SK: 2432B) |
+| `ratchet_init_alice()` | async | Start ratchet session as initiator |
+| `ratchet_init_bob(pk)` | async | Join ratchet session as responder |
+| `ratchet_alice_finish(...)` | async | Complete handshake |
+| `ratchet_encrypt(id, pt)` | async | Encrypt message in session |
+| `ratchet_decrypt(id, hdr, ct)` | async | Decrypt message in session |
+| `ratchet_destroy(id)` | `#[frb(sync)]` | Destroy session |
+| `derive_srtp_keys(ss)` | async | PQ-SRTP key derivation |
+| `pii_scan(text, codes)` | `#[frb(sync)]` | PII detection (returns JSON) |
+| `email_encrypt(pk, pt, aad)` | async | PQC email encryption |
+| `email_decrypt(sk, env, aad)` | async | PQC email decryption |
+
+### State Management (Riverpod 3)
+
+7 Notifier providers managing all pillar state:
+
+| Provider | State | Pillar |
+|----------|-------|--------|
+| `cryptoProvider` | `KeypairState` | Vault |
+| `ratchetProvider` | `RatchetState` + `ChatMessage[]` | Messenger |
+| `voipProvider` | `VoipState` (SRTP keys, call status) | VoIP |
+| `vpnProvider` | `VpnState` (status, kill switch, traffic) | VPN |
+| `piiProvider` | `PiiScanState` + `PiiMatch[]` | Anonymizer |
+| `emailCryptoProvider` | `EmailCryptoState` | Email |
+| `themeModeProvider` | `ThemeMode` | Settings |
+
+### Design System (Quantum Theme)
+
+Material 3 with custom tokens:
+- **Colors**: quantumCyan(#00E5FF), quantumBlue(#2979FF), quantumPurple(#7C4DFF), quantumGreen(#00E676)
+- **Surfaces**: surfaceDark(#0A0A1A), surfaceCard(#111128), surfaceElevated(#1A1A3E)
+- **Fonts**: Outfit (headings), Inter (body), JetBrains Mono (labels/code)
+- **Modes**: Dark-first with light mode toggle
+
+---
 
 ## Mobile App (`mobile/`)
 

@@ -53,6 +53,12 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 * **Architecture:** Chromium-based (or Tauri-based for desktop), with OpenClaw AI sidebar, PQC TLS for all connections (ML-KEM-768 key exchange), built-in Q-VPN tunnel, QRNG-seeded session tokens, and zero telemetry. AI runs locally or through PQC-secured tunnels.
 * **Differentiator:** No AI browser (Atlas, Dia, Comet, Edge Copilot) uses PQC. Every one sends queries over classical TLS. Zipminator would be first to market.
 
+### 9️⃣ Q-Mesh — Quantum-Secured WiFi Sensing (RuView Integration)
+
+* **Function:** Quantum-secured WiFi sensing mesh that detects human pose, breathing, heartbeat, and presence through walls using ESP32-S3 CSI signals. No cameras, no wearables, no internet.
+* **Architecture:** [RuView](https://github.com/MoHoushmand/RuView) ESP32 mesh with ADR-032 security hardening (HMAC-SHA256 beacon auth + SipHash-2-4 frame integrity), where Zipminator's QRNG replaces classical random for mesh key generation and rotation. QUIC transport (TLS 1.3) for aggregator uplinks.
+* **Differentiator:** No WiFi sensing system uses quantum-random keys. Healthcare and defense deployments require the highest-grade entropy for tamper-proof mesh authentication. Zipminator + RuView is the only quantum-secured spatial awareness platform.
+
 ---
 
 ## 2. Unique UX/UI Concepts: Bridging the Gap
@@ -152,3 +158,52 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 * [ ] SOC 2 Type II audit preparation.
 * [ ] Enterprise pilot deployments.
 * [ ] App Store / Play Store submissions for mobile.
+
+### Phase 9b: Q-Mesh — Quantum-Secured WiFi Sensing (RuView) 🔴 15%
+
+* [ ] Create entropy bridge crate linking `zipminator-core` QRNG to RuView mesh key derivation.
+* [ ] Extend RuView `scripts/provision.py` to accept QRNG-seeded mesh keys via `--qrng-source` flag.
+* [ ] Implement shared NVS key management: quantum-random 16-byte mesh key provisioned to all ESP32-S3 nodes.
+* [ ] Build QRNG key rotation protocol: coordinator broadcasts new quantum-seeded key (signed with old key).
+* [ ] Integration tests: verify HMAC-SHA256 beacon auth and SipHash-2-4 frame integrity with QRNG-derived keys.
+* [ ] Healthcare demo: vital sign monitoring (breathing + heartbeat) with quantum-secured mesh.
+* [ ] Defense demo: through-wall personnel tracking with tamper-proof beacon authentication.
+* **External repo**: [MoHoushmand/RuView](https://github.com/MoHoushmand/RuView) | ADR-032 mesh security ready | 1300+ tests
+
+### Phase 10: Flutter Super-App — Single Codebase ✅ (NEW)
+
+**Replaces scattered Expo/Tauri/Next.js with one Flutter codebase for all platforms.**
+
+#### Wave 1: Foundation ✅
+* [x] Flutter 3.41.4 project setup (`app/`)
+* [x] `crates/zipminator-app/` safe Rust bridge layer (15 tests)
+* [x] `flutter_rust_bridge` v2.11.1 integration (16 FRB-annotated functions)
+* [x] Quantum Design System (Material 3 dark/light themes: cyan, purple, green, Inter/Outfit/JetBrains Mono)
+* [x] GoRouter with ShellRoute (responsive NavigationRail + bottom bar)
+* [x] Crypto roundtrip verified: keypair → encapsulate → decapsulate → 32-byte shared secret match
+
+#### Wave 2: All 8 Pillars ✅
+* [x] 7 Riverpod 3 Notifier providers (crypto, ratchet, pii, email, vpn, srtp, theme)
+* [x] Vault screen: ML-KEM-768 key generation + KEM roundtrip verification
+* [x] Messenger screen: PQ Double Ratchet chat with session management
+* [x] VoIP screen: PQ-SRTP key derivation + call state machine
+* [x] VPN screen: connect/disconnect lifecycle + kill switch toggle
+* [x] Anonymizer screen: PII scanning with sensitivity badges
+* [x] Q-AI screen: chat with model selector (auto/opus/sonnet/haiku/local)
+* [x] Email screen: PQC compose form with encrypt/decrypt roundtrip
+* [x] Browser screen: URL bar + PQC proxy toggle + privacy controls
+
+#### Wave 3: Integration + Polish ✅
+* [x] Theme mode provider (dark/light toggle)
+* [x] Settings screen (theme switch, Rust version, crypto engine info, licenses)
+* [x] Cross-pillar integration tests (navigate all 8 pillars, theme switching, shared state)
+* [x] GitHub Actions CI (flutter analyze + test on ubuntu + macOS, Rust bridge tests)
+* [x] 23 Flutter widget tests passing (5 core + 8 pillar + 5 extended + 5 cross-pillar)
+* [x] `flutter analyze`: 0 issues
+
+#### Platform Toolchain ✅
+* [x] Android SDK 36 + build-tools 36.0.0 + Java 21 (OpenJDK) — `flutter doctor` green
+* [x] Xcode installed — macOS/iOS builds ready
+* [ ] Rust NDK cross-compilation for Android APK (armv7/aarch64 targets)
+* [ ] Code signing (Apple Developer Program enrolled, TestFlight submission pending)
+* [ ] Play Store submission

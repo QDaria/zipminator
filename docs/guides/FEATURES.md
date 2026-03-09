@@ -3,16 +3,18 @@
 > **Single Source of Truth** for all pillar statuses. Updated after every code change session.
 >
 > Last verified: 2026-03-09 | Verifier: Claude Code audit
+>
+> **Major update**: Flutter Super-App (Wave 1-3 complete). Single codebase for all platforms.
 
 ---
 
 ## Product Identity
 
-**Zipminator** is the world's first Post-Quantum Cryptography (PQC) super-app — a QCaaS/QCaaP cybersecurity platform that harvests true quantum entropy from live quantum computers (IBM Quantum 156q, Rigetti) to power 8 pillars of military-grade encryption infrastructure for communications and data.
+**Zipminator** is the world's first Post-Quantum Cryptography (PQC) super-app — a QCaaS/QCaaP cybersecurity platform that harvests true quantum entropy from live quantum computers (IBM Quantum 156q, Rigetti) to power 9 pillars of military-grade encryption infrastructure for communications, data, and spatial awareness.
 
 ---
 
-## The 8-Pillar PQC Super-App — Code-Verified Status
+## The 9-Pillar PQC Super-App — Code-Verified Status
 
 | # | Pillar | Overall | Crypto | Tests | UI | Integration | Notes |
 |---|--------|:-------:|:------:|:-----:|:--:|:-----------:|-------|
@@ -24,6 +26,7 @@
 | 6 | **OpenClaw AI** | **85%** | Done | Done | Done | 85% | Local LLM needs model files |
 | 7 | **Quantum Mail** | **90%** | Done | Done | Partial | 90% | Crypto library complete, no SMTP/IMAP server |
 | 8 | **ZipBrowser** | **75%** | Done | 103 tests | Done | 75% | Compiles, no real browser engine integration |
+| 9 | **Q-Mesh (RuView)** | **15%** | Planned | Planned | Planned | 15% | QRNG integration planned; RuView ADR-032 mesh security ready |
 
 **Legend**: Done = code exists, tested, reviewed | Partial = code exists but incomplete | Planned = no code yet
 
@@ -214,6 +217,53 @@
 
 ---
 
+## Pillar 9: Q-Mesh — Quantum-Secured WiFi Sensing (15%)
+
+- **Integration**: [RuView](https://github.com/MoHoushmand/RuView) WiFi DensePose system with Zipminator QRNG entropy
+- **What RuView does**: ESP32-S3 mesh network that senses human pose, breathing, heartbeat, and presence through WiFi CSI signals. No cameras, no wearables, no internet required
+- **Security layer (ADR-032)**: HMAC-SHA256 authenticated TDM sync beacons (28-byte wire format with 4-byte nonce + 8-byte truncated HMAC tag) and SipHash-2-4 frame integrity for CSI data. Pre-shared 16-byte mesh key with replay protection (nonce window = 16)
+- **Zipminator integration**: Replace the classical random entropy source for mesh key generation and rotation with Zipminator's QRNG (IBM Quantum 156q). The QRNG harvester produces 50KB/cycle; a mesh key is 16 bytes. This creates quantum-secured WiFi sensing mesh
+- **QUIC transport (ADR-032a)**: Aggregator-class nodes use `midstreamer-quic` with TLS 1.3 AEAD. ESP32-S3 nodes retain manual HMAC/SipHash over UDP
+- **Use cases**: Healthcare (vital sign monitoring, fall detection), defense (through-wall personnel tracking), elder care, smart buildings
+- **Gap**: No code integration yet; RuView and Zipminator are separate repos. Integration requires: (1) QRNG-seeded key provisioning in `scripts/provision.py`, (2) entropy bridge crate linking `zipminator-core` QRNG to RuView mesh key derivation, (3) shared NVS key management
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Zipminator QRNG                                            │
+│  (IBM Quantum 156q → quantum_entropy_pool.bin)              │
+│       │                                                     │
+│       ▼  16-byte quantum-random mesh key                    │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  RuView Mesh Security (ADR-032)                     │    │
+│  │                                                     │    │
+│  │  Beacon Auth:  HMAC-SHA256(mesh_key, payload+nonce) │    │
+│  │  Frame MAC:    SipHash-2-4(derived_key, header+IQ)  │    │
+│  │  Key derive:   siphash_key = HMAC-SHA256(mesh_key,  │    │
+│  │                "csi-frame-siphash")[0..16]           │    │
+│  │  Replay:       Monotonic nonce, window=16           │    │
+│  │  Rotation:     Coordinator broadcast (90-day cycle) │    │
+│  └─────────────────────────────────────────────────────┘    │
+│       │                                                     │
+│       ▼                                                     │
+│  ESP32-S3 Mesh (4-6 nodes, ~$1/node)                        │
+│  WiFi CSI → Pose / Breathing / Heartbeat / Presence         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### File Paths (RuView — external repo)
+
+| Layer | Files |
+|-------|-------|
+| **Mesh security** | `crates/wifi-densepose-hardware/src/esp32/tdm.rs` (beacon auth), `firmware/esp32-csi-node/main/csi_collector.c` (SipHash frame MAC, NDP rate limiter) |
+| **Key management** | `scripts/provision.py` (mesh key provisioning + rotation), NVS namespace `mesh_sec` |
+| **QUIC transport** | `midstreamer-quic` v0.1.0 (TLS 1.3 AEAD for aggregator uplinks) |
+| **Signal processing** | `crates/wifi-densepose-signal/src/ruvsense/` (coherence gate, cross-room tracker) |
+| **Integration point** | Zipminator `crates/zipminator-core/src/qrng/` → RuView `scripts/provision.py --mesh-key` |
+
+---
+
 ## Subscription Tiers
 
 | Feature | Free (Amir) | Developer (Nils) | Pro (Solveig) | Enterprise (Robindra) |
@@ -291,9 +341,42 @@ crates/
 │   ├── email_crypto.rs     # Email encryption
 │   ├── srtp.rs             # PQ-SRTP
 │   └── qrng/ (5 files)     # Provider abstraction
+├── zipminator-app/     # Flutter bridge layer (safe Rust types for FRB)
+│   ├── crypto.rs           # ML-KEM-768 safe wrappers (keypair, encapsulate, decapsulate, composite)
+│   ├── ratchet.rs          # Session-store PQ Double Ratchet (LazyLock<Mutex<HashMap>>)
+│   ├── email.rs            # Email encrypt/decrypt wrappers
+│   ├── pii.rs              # PII scanning wrappers
+│   └── srtp.rs             # SRTP key derivation wrappers
 ├── zipminator-bench/   # Performance benchmarks
 ├── zipminator-fuzz/    # Fuzz testing
 └── zipminator-nist/    # NIST KAT compliance validation
+```
+
+### Flutter App (`app/`)
+
+```
+app/
+├── rust/                    # FRB bridge (flutter_rust_bridge v2.11.1)
+│   └── src/api/simple.rs   # 16 FRB-annotated functions → auto-generates Dart bindings
+├── lib/
+│   ├── main.dart            # Entry point (RustLib.init())
+│   ├── app.dart             # MaterialApp.router with Quantum theme
+│   ├── core/
+│   │   ├── router.dart      # GoRouter with ShellRoute (8 pillars + settings)
+│   │   ├── theme/quantum_theme.dart  # Material 3 dark/light themes
+│   │   └── providers/       # 7 Riverpod 3 Notifiers (crypto, ratchet, pii, email, vpn, srtp, theme)
+│   ├── features/            # 8 pillar screens + settings
+│   │   ├── vault/           # Key gen, KEM roundtrip
+│   │   ├── messenger/       # PQ Double Ratchet chat
+│   │   ├── voip/            # PQ-SRTP calls
+│   │   ├── vpn/             # Connect + kill switch
+│   │   ├── anonymizer/      # PII scanning
+│   │   ├── openclaw/        # Q-AI chat + model selector
+│   │   ├── email/           # PQC email compose
+│   │   ├── browser/         # PQC proxy browser
+│   │   └── settings/        # Theme toggle + app info
+│   └── shared/widgets/      # ShellScaffold (responsive nav rail/bottom bar)
+└── test/                    # 23 widget tests (core, pillar, cross-pillar)
 ```
 
 ### FastAPI Backend (`api/`)
@@ -333,6 +416,37 @@ crates/
 
 ## Platform Support
 
+### Flutter Super-App (NEW — Single Codebase)
+
+| Platform | Status | Build Command |
+|----------|--------|---------------|
+| macOS | Ready (pending Xcode config) | `flutter build macos` |
+| iOS | Ready (pending Xcode config) | `flutter build ios` |
+| Android | Ready (SDK 36 installed) | `flutter build apk` |
+| Windows | Ready | `flutter build windows` |
+| Linux | Ready | `flutter build linux` |
+| Web | Ready | `flutter build web` |
+
+**Technology**: Flutter 3.41.4 + `flutter_rust_bridge` v2.11.1 + Riverpod 3 + GoRouter + Material 3
+
+**Architecture**: `app/rust/` → FRB bridge → `crates/zipminator-app/` → `crates/zipminator-core/`
+
+All 8 pillars implemented with full Riverpod state management wired to Rust crypto:
+- Vault: ML-KEM-768 key generation + KEM roundtrip verification
+- Messenger: PQ Double Ratchet chat with session management
+- VoIP: PQ-SRTP key derivation + call state machine
+- VPN: Connect/disconnect lifecycle + kill switch toggle
+- Anonymizer: PII scanning with sensitivity badges
+- Q-AI: Chat interface with model selector (auto/opus/sonnet/haiku/local)
+- Email: Compose form with encrypt/decrypt roundtrip
+- Browser: URL bar + PQC proxy toggle + privacy controls (fingerprint, cookie rotation, telemetry)
+
+Settings screen: theme toggle (dark/light), Rust bridge version, crypto engine info, open source licenses.
+
+**Tests**: 23 Flutter widget tests (5 core + 8 pillar + 5 extended + 5 cross-pillar)
+
+### Legacy Platform Apps (still maintained)
+
 | Platform | Technology | Status | Key Files |
 |----------|-----------|--------|-----------|
 | Web | Next.js 16 + Tailwind + Framer Motion | Production (zipminator.zip) | `web/` |
@@ -351,9 +465,12 @@ crates/
 |-------|:-----:|---------|
 | Rust core | 160 | `cargo test -p zipminator-core` |
 | Rust browser | 103 | `cargo test -p zipbrowser` |
+| Rust app bridge | 15 | `cargo test -p zipminator-app` |
+| Rust FRB bridge | 17 | `cargo test -p rust_lib_zipminator` |
 | Rust NIST | 5 | `cargo test -p nist-kat` |
 | Rust bench | 17 | `cargo test -p zipminator-bench` |
-| **Rust total** | **285** | `cargo test --workspace --lib --tests` |
+| **Rust total** | **302** | `cargo test --workspace` |
+| Flutter widget | 23 | `cd app && flutter test` |
 | Web vitest | 15 | `cd web && npm test` |
 | Mobile Expo | 267/274 | `cd mobile && npm test` |
 | Python | 116 | `micromamba activate zip-pqc && pytest tests/` |
@@ -400,6 +517,17 @@ Location: `docs/book/`
 | Environment | `docs/book/environment.yml`, `requirements.txt` |
 
 Build: `jupyter-book build docs/book/`
+
+---
+
+## CI/CD
+
+| Workflow | File | Triggers |
+|----------|------|----------|
+| Flutter (analyze + test) | `.github/workflows/flutter.yml` | `app/**`, `crates/zipminator-app/**` on push/PR |
+| Rust bridge tests | `.github/workflows/flutter.yml` (rust-bridge job) | same as above |
+
+Matrix: ubuntu-latest + macos-latest for Flutter; ubuntu-latest for Rust bridge.
 
 ---
 
