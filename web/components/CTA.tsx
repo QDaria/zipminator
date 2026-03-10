@@ -98,10 +98,10 @@ const CTA = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
           >
-            Start Using{' '}
+            Be First to Access{' '}
             <span className="gradient-text">Quantum-Secure</span>
             <br />
-            Encryption Today
+            Encryption
           </motion.h2>
 
           {/* Subheadline */}
@@ -113,7 +113,7 @@ const CTA = () => {
             className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
           >
             Join leading organizations protecting their data with post-quantum cryptography.
-            Start for free in minutes.
+            Join the beta. Ships free to early adopters.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -131,7 +131,7 @@ const CTA = () => {
             >
               <span className="absolute inset-0 bg-gradient-to-r from-quantum-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <span className="relative flex items-center space-x-2">
-                <span>Get Started Free</span>
+                <span>Join the Beta — Free</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
             </Link>

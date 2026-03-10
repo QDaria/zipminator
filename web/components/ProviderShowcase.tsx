@@ -203,7 +203,7 @@ const ProviderShowcase = () => {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="#demo" className="btn-primary">
-              Get Started Free
+              Get Early Access
             </a>
             <a href="https://github.com/zipminator" target="_blank" rel="noopener noreferrer" className="btn-secondary flex items-center space-x-2">
               <GitBranch className="w-5 h-5" />

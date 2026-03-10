@@ -247,12 +247,20 @@ const HowItWorks = () => {
           className="text-center mb-12 md:mb-16"
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6">
-            How to Get Started with{' '}
-            <span className="gradient-text">Quantum Security</span>
+            <span className="gradient-text">Developer Preview</span>
           </h2>
-          <p className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto">
-            Deploy quantum-resistant encryption in minutes, not months
+          <p className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto mb-6">
+            Explore quantum-resistant encryption from source
           </p>
+          <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-3 max-w-3xl mx-auto">
+            <p className="text-sm text-cyan-300">
+              Beta Preview — Available via{' '}
+              <a href="https://github.com/qdaria/zipminator-pqc" target="_blank" rel="noopener noreferrer" className="underline hover:text-cyan-200">
+                GitHub source
+              </a>{' '}
+              only. PyPI and crates.io releases coming soon.
+            </p>
+          </div>
         </motion.div>
 
         {/* Code Terminal Card */}
@@ -330,7 +338,7 @@ const HowItWorks = () => {
             {/* Bottom Note */}
             <div className="bg-[#161b22] px-5 py-3 border-t border-gray-700/50">
               <p className="text-xs text-gray-500 text-center">
-                Coming soon:{' '}
+                Package registry releases coming soon:{' '}
                 <code className="text-gray-400 bg-gray-800/50 px-1.5 py-0.5 rounded">
                   pip install zipminator-pqc
                 </code>{' '}
