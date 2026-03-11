@@ -61,7 +61,7 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
           Revenue Projections
         </p>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-3">
-          Path to <span className="gradient-text">${yr5Revenue}M</span> ARR
+          Projected Path to <span className="gradient-text">${yr5Revenue}M</span> ARR
         </h2>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           Five-year financial model across three scenarios
@@ -158,8 +158,8 @@ export default function FinancialsSlide({ scenario = 'base' }: { scenario?: Scen
         <div className="flex-1">
           <p className="text-base font-semibold text-emerald-400 mb-0.5">Non-Dilutive Funding First</p>
           <p className="text-sm text-gray-400 leading-relaxed">
-            Grants-first strategy: Innovation Norway, Research Council, NATO DIANA, and Horizon Europe
-            fund R&amp;D before equity rounds. Preserves founder equity through critical early stages.
+            Grants-first strategy: targeting Innovation Norway, Research Council, NATO DIANA, and Horizon Europe
+            to fund R&amp;D before equity rounds. Preserves founder equity through critical early stages.
           </p>
         </div>
       </motion.div>

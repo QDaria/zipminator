@@ -54,7 +54,7 @@ const MILESTONES = [
     items: [
       'Secure government grants',
       'MVP launch (Messenger + VPN)',
-      'First 500 users',
+      'Beta program launch',
       'SOC 2 readiness assessment planned',
     ],
   },
@@ -81,10 +81,10 @@ const MILESTONES = [
 ]
 
 const SEED_DELIVERABLES = [
-  { icon: Users, label: 'MVP launch with 500+ beta users' },
+  { icon: Users, label: 'MVP launch with public beta program' },
   { icon: ShieldCheck, label: 'SOC 2 readiness assessment' },
-  { icon: FileCheck, label: '2-3 enterprise pilot agreements' },
-  { icon: Sparkles, label: 'FIPS 140-3 validation planned (roadmap)' },
+  { icon: FileCheck, label: 'Enterprise pilot program initiated' },
+  { icon: Sparkles, label: 'FIPS 203 (ML-KEM) KAT verified' },
   { icon: Smartphone, label: 'Full mobile app (iOS + Android)' },
 ]
 
@@ -174,7 +174,7 @@ export default function AskSlide({ scenario = 'base' }: { scenario?: Scenario })
             <h4 className="text-sm font-semibold text-white mb-1">Market Context: Comparable Seed Rounds</h4>
             <p className="text-xs text-gray-400 leading-relaxed">
               Cybersecurity median seed round: <span className="text-purple-400 font-semibold">$3-4M</span>.
-              PQ-specific companies have raised <span className="text-purple-400 font-semibold">$18-70M at Series A</span> (PQShield $37M, Sandbox $500M+ Series A).
+              PQ-specific companies have raised significantly more: <span className="text-purple-400 font-semibold">PQShield $70M (Series B), SandboxAQ $950M total</span>.
               Our ask is at the conservative end with the highest product completeness.
             </p>
           </div>

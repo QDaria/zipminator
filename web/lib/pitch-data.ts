@@ -434,7 +434,7 @@ export const TEAM_ROLES = [
 export const TEAM_TOTAL = {
   headcount: '34',
   annualCost: '$6-8M',
-  buildCost: '~$25M over 24-36 months',
+  buildCost: '34-person team over 24-36 months',
 }
 
 export const REVENUE_PROJECTIONS: Record<
@@ -749,7 +749,7 @@ export const NORWEGIAN_ECOSYSTEM = {
   headline: 'Norway: The Ideal PQC Launchpad',
   advantages: [
     { title: 'NOK 1.75B Quantum Initiative', detail: 'PM Store personally launched Norway\'s quantum commitment (2025)', icon: 'Landmark' },
-    { title: 'NATO DIANA Hub in Trondheim', detail: 'Direct access to NATO defense procurement pipeline', icon: 'Shield' },
+    { title: 'NATO DIANA Hub in Trondheim', detail: 'Grant-eligible accelerator for defense tech startups (application planned)', icon: 'Shield' },
     { title: '98% Renewable Energy Grid', detail: 'World\'s cleanest computing infrastructure (hydropower)', icon: 'Leaf' },
     { title: 'GDPR Gold Standard', detail: 'EEA membership + strongest privacy enforcement in Europe', icon: 'Lock' },
     { title: 'Nordic Cyber Market: $13.8B', detail: 'Fastest growing in EU at 10.1% CAGR (Mordor Intelligence)', icon: 'TrendingUp' },
@@ -862,7 +862,7 @@ export const SDG_MAPPING = [
   {
     number: 17,
     name: 'Partnerships for the Goals',
-    relevance: 'Open standards (NIST), open source core (Apache 2.0), NATO DIANA collaboration.',
+    relevance: 'Open standards (NIST), open source core (MIT license), international defense alignment.',
   },
   {
     number: 4,

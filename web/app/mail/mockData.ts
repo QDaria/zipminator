@@ -45,7 +45,7 @@ export const EMAIL_DB: Record<string, EmailDetail> = {
     subject: 'Re: Lattice-based KEM benchmarks for Q4 report',
     body: `Hi team,
 
-The ML-KEM-768 results from our latest test suite are promising. We achieved a median encapsulation time of 0.034ms across 10k iterations on the IBM Heron r2 processor.
+The ML-KEM-768 results from our latest test suite are promising. We achieved a median encapsulation time of 0.034ms across 10k iterations on a 156-qubit quantum processor.
 
 Key findings:
 - Keygen: 0.028ms median (std dev 0.003ms)
@@ -212,8 +212,8 @@ QDaria Inc.`,
 ==================================
 
 Harvest completed: 2026-03-03 02:00:00 UTC
-Backend: IBM Marrakesh via qBraid
-Fallback: IBM Fez (not needed)
+Backend: 156-qubit quantum processor via qBraid
+Fallback: Secondary processor (not needed)
 
 Results:
 - Bytes collected: 2,457,600

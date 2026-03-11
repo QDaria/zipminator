@@ -17,10 +17,10 @@ app/page.tsx (Main Landing Page)
 │   ├── Primary CTA (Start Free Trial)
 │   ├── Secondary CTA (See Demo)
 │   ├── Trust Badge (NIST FIPS 203)
-│   └── Animated Metrics (127 Qubits, 99.99% Uptime, Enterprise-Ready)
+│   └── Animated Metrics (156 Qubits, 99.99% Uptime, Enterprise-Ready)
 │
 ├── <StatsBar />
-│   ├── Stat: 127 IBM Qubits
+│   ├── Stat: 156 IBM Qubits
 │   ├── Stat: NIST FIPS 203
 │   ├── Stat: 99.99% Uptime
 │   └── Stat: Enterprise Grade
@@ -28,12 +28,12 @@ app/page.tsx (Main Landing Page)
 ├── <ProviderShowcase />
 │   ├── Headline: "Built on Quantum-Grade Infrastructure"
 │   └── Logo Grid
-│       ├── IBM Quantum (with "127-qubit" badge)
-│       ├── NIST (with "FIPS 203 Certified" badge)
+│       ├── IBM Quantum (with "156-qubit" badge)
+│       ├── NIST (with "FIPS 203" badge)
 │       └── Optional Partners (Amazon Braket, Rigetti, IonQ)
 │
 ├── <TrustSignals /> (3-Column Grid)
-│   ├── Card: NIST Certified
+│   ├── Card: NIST FIPS 203
 │   ├── Card: Quantum-Secure
 │   └── Card: Zero-Knowledge
 │
@@ -258,7 +258,7 @@ User scrolls → StatsBar enters viewport → useInView triggers → CountUp ani
 ```
 1. Land on Hero
 2. Scan StatsBar (99.99% uptime, enterprise-grade)
-3. Review TrustSignals (NIST certified, zero-knowledge)
+3. Review TrustSignals (NIST FIPS 203, zero-knowledge)
 4. Check UseCases (financial services, healthcare)
 5. Click "Schedule Demo" for sales call
 ```
@@ -329,8 +329,8 @@ User scrolls → StatsBar enters viewport → useInView triggers → CountUp ani
 - **Action-Oriented**: Strong CTAs, benefit-focused
 
 ### Key Messaging
-1. **Hero**: "Post-quantum security is here. NIST-certified. Quantum-powered."
-2. **Trust**: "Built on IBM's 127-qubit quantum hardware, certified by NIST."
+1. **Hero**: "Post-quantum security is here. NIST FIPS 203. Quantum-powered."
+2. **Trust**: "Built on IBM's 156-qubit quantum hardware, implementing NIST FIPS 203."
 3. **Performance**: "10,000+ operations/second. Zero compromise on speed."
 4. **Simplicity**: "One API. Every platform. Quantum-secure by default."
 

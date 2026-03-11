@@ -45,7 +45,7 @@ const DIFFERENTIATORS = [
     Icon: Cpu,
     title: 'Real Quantum Hardware',
     description:
-      'Not simulated. Real 156-qubit IBM quantum computers (Marrakesh and Fez processors) generate the entropy seeds that power our encryption.',
+      'Entropy harvested from 156-qubit IBM quantum processors (Marrakesh/Fez) via qBraid API, with OS entropy fallback for availability.',
   },
   {
     Icon: Layers,

@@ -20,7 +20,7 @@ A modern, qBraid-inspired landing page for Zipminator-PQC (zipminator.zip), show
    - Main headline: "Quantum-Secure Encryption for the Post-Quantum Era"
    - NIST FIPS 203 badge
    - Dual CTAs (Get Started Free + Request Demo)
-   - 3 key stat cards (0.034ms, 127 qubits, NIST Level 3)
+   - 3 key stat cards (0.034ms, 156 qubits, NIST Level 3)
    - Scroll indicator
 
 3. **Quantum Background** (`components/QuantumBackground.tsx`)
@@ -42,7 +42,7 @@ A modern, qBraid-inspired landing page for Zipminator-PQC (zipminator.zip), show
 
 6. **Key Features** (`components/KeyFeatures.tsx`)
    - 3 main feature cards:
-     - Real Quantum Hardware (127 qubits, 15x cost reduction)
+     - Real Quantum Hardware (156 qubits, 15x cost reduction)
      - NIST FIPS 203 Compliant (Level 3 security)
      - Memory-Safe Architecture (100% Rust, zero vulnerabilities)
    - 3 additional features: Lightning fast, developer friendly, multi-platform
@@ -56,7 +56,7 @@ A modern, qBraid-inspired landing page for Zipminator-PQC (zipminator.zip), show
    - Technical specifications grid
 
 8. **Stats Bar** (`components/StatsBar.tsx`)
-   - 4 key metrics: 0.034ms speed, 127 qubits, NIST Level 3, 95%+ coverage
+   - 4 key metrics: 0.034ms speed, 156 qubits, NIST Level 3, 95%+ coverage
    - Gradient background card
    - Icon-based presentation
 
@@ -184,7 +184,7 @@ A modern, qBraid-inspired landing page for Zipminator-PQC (zipminator.zip), show
 2. **NIST FIPS 203 Branding**: Government compliance prominently featured
 3. **QDaria Mother Company**: Clear breadcrumb and product switcher
 4. **Memory-Safe Rust**: Developer-focused messaging
-5. **Real Quantum Hardware**: IBM Brisbane 127-qubit integration highlighted
+5. **Real Quantum Hardware**: IBM Marrakesh/Fez 156-qubit integration highlighted
 
 ## Color Palette
 

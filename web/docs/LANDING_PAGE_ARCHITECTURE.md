@@ -24,10 +24,10 @@ This document defines the complete architecture for the Zipminator landing page,
 - **Elements**:
   - Animated quantum particle background (Three.js)
   - Headline: "Post-Quantum Encryption Platform"
-  - Subheadline: "NIST-approved Kyber768 powered by real 127-qubit IBM quantum hardware"
+  - Subheadline: "NIST-approved Kyber768 powered by real 156-qubit IBM quantum hardware"
   - Primary CTA: "Start Free Trial" (gradient button)
   - Secondary CTA: "See Demo" (ghost button)
-  - Trust badge: "NIST FIPS 203 Certified"
+  - Trust badge: "Implements NIST FIPS 203"
   - Animated metrics: "127 Qubits • 99.99% Uptime • Enterprise-Ready"
 - **Animations**:
   - Fade-in headline with stagger
@@ -49,8 +49,8 @@ This document defines the complete architecture for the Zipminator landing page,
 - **Headline**: "Built on Quantum-Grade Infrastructure"
 - **Layout**: Grid of provider logos (IBM, NIST, quantum hardware providers)
 - **Elements**:
-  - IBM Quantum logo (prominent, with "127-qubit" badge)
-  - NIST logo (with "FIPS 203 Certified" badge)
+  - IBM Quantum logo (prominent, with "156-qubit" badge)
+  - NIST logo (with "FIPS 203" badge)
   - Optional: Amazon Braket, Rigetti, IonQ
   - "Hardware-backed entropy" callout
 - **Animation**: Logo fade-in on scroll, hover glow effects
@@ -60,8 +60,8 @@ This document defines the complete architecture for the Zipminator landing page,
 - **Headline**: "Enterprise Trust & Compliance"
 - **Layout**: 3-column grid
 - **Cards**:
-  1. **NIST Certified**: "FIPS 203 approved Kyber768 implementation"
-  2. **Quantum-Secure**: "True quantum entropy from 127-qubit IBM hardware"
+  1. **NIST FIPS 203**: "Implements Kyber768 post-quantum cryptography"
+  2. **Quantum-Secure**: "True quantum entropy from 156-qubit IBM hardware"
   3. **Zero-Knowledge**: "Military-grade encryption with quantum randomness"
 - **Design**: Dark cards with purple accent borders, icons, hover lift effect
 
@@ -84,8 +84,8 @@ This document defines the complete architecture for the Zipminator landing page,
 - **Headline**: "Quantum-Secure by Design"
 - **Layout**: 2x3 or 3x2 grid (responsive)
 - **Features**:
-  1. **NIST FIPS 203**: "Certified Kyber768 implementation"
-  2. **Quantum Entropy**: "Real 127-qubit IBM hardware randomness"
+  1. **NIST FIPS 203**: "Implements Kyber768 post-quantum cryptography"
+  2. **Quantum Entropy**: "Real 156-qubit IBM hardware randomness"
   3. **Zero Trust Architecture**: "End-to-end quantum-secure encryption"
   4. **High Performance**: "Optimized Rust core, 10,000+ ops/sec"
   5. **Cross-Platform**: "Rust, Python, Node.js, WebAssembly"
@@ -139,7 +139,7 @@ This document defines the complete architecture for the Zipminator landing page,
 ### 1.11 Call-to-Action Section
 **Component**: `<CTA />`
 - **Headline**: "Ready for Quantum-Secure Encryption?"
-- **Subheadline**: "Join enterprises protecting data with NIST-certified quantum security"
+- **Subheadline**: "Join enterprises protecting data with NIST FIPS 203 quantum security"
 - **CTA Buttons**:
   - "Start Free Trial" (large gradient button)
   - "Schedule Demo" (secondary)
@@ -867,17 +867,17 @@ interface FeatureCardProps {
 ```typescript
 export const FEATURES = [
   {
-    id: 'nist-certified',
+    id: 'nist-fips-203',
     icon: ShieldCheck,
-    title: 'NIST FIPS 203 Certified',
-    description: 'Kyber768 implementation approved for post-quantum cryptography',
-    link: { text: 'View certification', href: '/docs/compliance' }
+    title: 'Implements NIST FIPS 203',
+    description: 'Kyber768 post-quantum cryptography implementation',
+    link: { text: 'View compliance', href: '/docs/compliance' }
   },
   {
     id: 'quantum-entropy',
     icon: Atom,
     title: 'True Quantum Entropy',
-    description: 'Real randomness from 127-qubit IBM quantum hardware',
+    description: 'Real randomness from 156-qubit IBM quantum hardware',
     link: { text: 'How it works', href: '/docs/quantum-entropy' }
   },
   // ... more features
@@ -1001,11 +1001,11 @@ const prefersReducedMotion = useReducedMotion()
 ```typescript
 export const metadata: Metadata = {
   title: 'Zipminator - Post-Quantum Encryption Platform | NIST FIPS 203',
-  description: 'Enterprise-grade quantum-secure encryption powered by IBM 127-qubit hardware and NIST-certified Kyber768. Protect your data against quantum threats.',
+  description: 'Enterprise-grade quantum-secure encryption powered by IBM 156-qubit hardware and NIST FIPS 203 Kyber768. Protect your data against quantum threats.',
   keywords: ['post-quantum cryptography', 'Kyber768', 'NIST FIPS 203', 'quantum encryption', 'IBM quantum'],
   openGraph: {
     title: 'Zipminator - Quantum-Secure Encryption',
-    description: 'NIST-certified post-quantum cryptography with real quantum entropy',
+    description: 'NIST FIPS 203 post-quantum cryptography with real quantum entropy',
     images: ['/og-image.png'],
     type: 'website'
   },

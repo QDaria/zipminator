@@ -56,7 +56,7 @@ const INDUSTRIES: IndustryCard[] = [
     name: 'Government & Defense',
     icon: Shield,
     description: 'Protect classified communications from harvest-now-decrypt-later attacks',
-    badges: ['CNSA 2.0', 'FedRAMP', 'NATO DIANA'],
+    badges: ['CNSA 2.0', 'FedRAMP'],
     accentColor: 'text-blue-400',
     accentBg: 'bg-blue-500/15',
     accentBorder: 'border-blue-500/25',

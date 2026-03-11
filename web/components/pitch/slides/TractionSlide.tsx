@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import SlideWrapper from '../SlideWrapper'
 import { TRACTION_STATS, DEVELOPMENT_TIMELINE } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
-import { Rocket, Code2, Smartphone, Layers, Languages, Shield, FlaskConical, Target, DollarSign, Github, Flag } from 'lucide-react'
+import { Rocket, Code2, Smartphone, Layers, Languages, Shield, ShieldCheck, FlaskConical, Target, DollarSign, Github, Flag, CheckCircle2 } from 'lucide-react'
 import {
   BarChart,
   Bar,
@@ -253,10 +253,10 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[
-            { label: 'Innovation Norway Grant', status: 'Submitted', statusColor: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', icon: Flag },
-            { label: 'NATO DIANA Trondheim', status: 'Pipeline', statusColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Shield },
+            { label: 'Innovation Norway Grant', status: 'Target', statusColor: 'bg-gray-500/20 text-gray-400 border-gray-500/30', icon: Flag },
+            { label: 'NATO DIANA Trondheim', status: 'Target', statusColor: 'bg-gray-500/20 text-gray-400 border-gray-500/30', icon: Shield },
             { label: 'Waitlist', status: 'Growing', statusColor: 'bg-green-500/20 text-green-400 border-green-500/30', icon: Rocket },
-            { label: 'Norwegian Quantum Initiative', status: 'Aligned', statusColor: 'bg-purple-500/20 text-purple-400 border-purple-500/30', icon: Flag },
+            { label: 'Norwegian Quantum Initiative', status: 'Eligible', statusColor: 'bg-gray-500/20 text-gray-400 border-gray-500/30', icon: Flag },
           ].map((item, i) => {
             const Icon = item.icon
             return (
@@ -283,13 +283,35 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
         </div>
       </motion.div>
 
+      {/* Verified Security Credentials */}
+      <motion.div {...fadeUp(0.24)} className="card-quantum mb-6 border-emerald-500/20">
+        <div className="flex items-center gap-2 mb-4">
+          <ShieldCheck className="w-5 h-5 text-emerald-400" />
+          <h3 className="text-sm font-semibold text-white">Verified Security Credentials</h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: 'NIST FIPS 203 KAT', detail: 'ML-KEM-768 validated against official test vectors', icon: CheckCircle2 },
+            { label: 'Dudect Constant-Time', detail: 'Timing side-channel analysis passed', icon: ShieldCheck },
+            { label: '302 Tests + 6 Fuzz Targets', detail: 'Rust core + browser + bridge', icon: FlaskConical },
+            { label: 'MIT Open-Source Core', detail: 'Community-auditable crypto primitives', icon: Github },
+          ].map((cred) => (
+            <div key={cred.label} className="flex flex-col items-center text-center gap-2 p-3 rounded-lg bg-emerald-500/[0.05] border border-emerald-500/15">
+              <cred.icon className="w-5 h-5 text-emerald-400" />
+              <p className="text-xs font-semibold text-white leading-tight">{cred.label}</p>
+              <p className="text-[10px] text-gray-400 leading-snug">{cred.detail}</p>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
       {/* Build Cost & Community */}
       <motion.div {...fadeUp(0.28)} className="mt-4 grid sm:grid-cols-2 gap-4">
         <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-green-500/[0.06] border border-green-500/15">
           <DollarSign className="w-5 h-5 text-green-400 shrink-0" />
           <div>
-            <p className="text-sm text-white font-semibold">$25M equivalent build value</p>
-            <p className="text-xs text-gray-400">40-55% savings from Norwegian base vs Silicon Valley rates</p>
+            <p className="text-sm text-white font-semibold">QDaria Technology Stack</p>
+            <p className="text-xs text-gray-400">100K+ LOC, 302 Rust tests, 6 fuzz targets, 8 integrated pillars, 3 platform builds</p>
           </div>
         </div>
         <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-quantum-500/[0.06] border border-quantum-500/15">

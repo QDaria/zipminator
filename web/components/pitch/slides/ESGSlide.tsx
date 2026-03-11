@@ -63,7 +63,7 @@ const SOCIAL_ITEMS = [
   {
     Icon: TreePine,
     title: 'Open Source Core',
-    detail: 'Cryptographic primitives are Apache 2.0 licensed, enabling community audit and shared security.',
+    detail: 'Cryptographic primitives are MIT licensed, enabling community audit and shared security.',
   },
   {
     Icon: Heart,

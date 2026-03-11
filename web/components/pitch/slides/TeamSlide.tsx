@@ -259,8 +259,8 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
           </span>
         </div>
         <p className="text-xs text-gray-500">
-          Actively recruiting advisors across quantum cryptography, Nordic venture capital, defense/NATO procurement,
-          and enterprise security. Target: 4-6 advisors by Q3 2026.
+          Actively recruiting advisors across quantum cryptography, Nordic venture capital, defense procurement,
+          and enterprise security.
         </p>
       </motion.div>
 

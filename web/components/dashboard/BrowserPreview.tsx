@@ -22,7 +22,7 @@ const FEATURES = [
   },
   {
     icon: Bot,
-    title: 'OpenClaw AI',
+    title: 'Q-AI Assistant',
     desc: 'On-device AI assistant with zero data exfiltration',
     active: true,
   },
@@ -159,7 +159,7 @@ export default function BrowserPreview() {
             <div className="w-72 bg-black/50 border-l border-white/[0.06] p-4 flex flex-col">
               <div className="flex items-center gap-2 mb-4">
                 <Bot className="w-4 h-4 text-quantum-400" />
-                <span className="font-bold text-xs tracking-tight">OpenClaw AI</span>
+                <span className="font-bold text-xs tracking-tight">Q-AI Assistant</span>
                 <span className="ml-auto text-[9px] text-green-400 font-mono bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/10">On-Device</span>
               </div>
               <div className="flex-1 space-y-2.5">
@@ -174,7 +174,7 @@ export default function BrowserPreview() {
                 </div>
               </div>
               <div className="mt-3 flex items-center gap-2 bg-black/30 rounded-xl p-2 border border-white/[0.06]">
-                <div className="flex-1 text-[10px] text-gray-600 px-2">Ask OpenClaw...</div>
+                <div className="flex-1 text-[10px] text-gray-600 px-2">Ask Q-AI...</div>
                 <Bot className="w-3.5 h-3.5 text-quantum-500" />
               </div>
             </div>

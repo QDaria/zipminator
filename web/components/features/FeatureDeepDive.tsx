@@ -90,7 +90,7 @@ const features = [
   },
   {
     icon: Bot,
-    title: 'OpenClaw AI',
+    title: 'Q-AI Assistant',
     tag: 'PQC AI Tunnel',
     metric: 'Zero',
     metricLabel: 'data leaks',

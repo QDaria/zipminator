@@ -74,7 +74,7 @@ const modules = [
   {
     id: 'ai',
     icon: Bot,
-    name: 'OpenClaw AI',
+    name: 'Q-AI Assistant',
     color: 'from-cyan-500 to-blue-500',
     description: 'PQC tunnel mode for AI queries, prompt injection defense, and encrypted model inference.',
   },
