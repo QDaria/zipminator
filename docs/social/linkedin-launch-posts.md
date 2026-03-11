@@ -8,7 +8,7 @@ Nine integrated pillars of encryption infrastructure, built from scratch in Rust
 
 This is not antivirus. This is not endpoint detection. Zipminator is encryption infrastructure for the post-quantum era: encrypted messaging, voice calls, VPN, email, file vault, browser, data anonymization, AI assistant, and WiFi sensing mesh. All under one roof, all protected by ML-KEM-768 (NIST FIPS 203).
 
-The cryptographic core has 302 passing tests. Every key exchange uses quantum-random seeds. Every communication channel is hardened against "harvest now, decrypt later" attacks.
+The cryptographic core has 332 passing tests. Every key exchange uses quantum-random seeds. Every communication channel is hardened against "harvest now, decrypt later" attacks.
 
 Built in Norway by QDaria AS. Now open for early access.
 
@@ -31,7 +31,7 @@ The architecture stack:
 - Flutter super-app targeting macOS, iOS, Android, Windows, Linux, and Web
 - FastAPI backend with PostgreSQL and Redis
 - Tauri 2.x desktop browser with 7 privacy subsystems
-- 302 Rust tests across 4 crates, 23 Flutter tests, 15 web integration tests
+- 332 Rust tests across 5 crates, 23 Flutter tests, 15 web integration tests
 
 We built the crypto right, then built everything else on top of it.
 
@@ -98,7 +98,7 @@ Here is what you get with early access:
 - Q-AI Assistant (local or PQC-tunneled)
 - Quantum VoIP with PQ-SRTP key negotiation
 
-All running on a Rust cryptographic core with 302 passing tests, seeded by IBM Quantum entropy.
+All running on a Rust cryptographic core with 332 passing tests, seeded by IBM Quantum entropy.
 
 We are accepting early access signups now. Join the waitlist, get access to the beta, and help us stress-test the first PQC super-app before general availability.
 

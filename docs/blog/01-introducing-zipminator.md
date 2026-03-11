@@ -45,7 +45,7 @@ Zipminator consolidates nine security functions into a single platform, each pow
 
 ## Built for Verification, Not Trust
 
-The Rust cryptographic core has passed 302 tests across the workspace. The implementation is verified against NIST Known Answer Test (KAT) vectors. Fuzz testing runs continuously on key generation, encapsulation, and decapsulation paths.
+The Rust cryptographic core has passed 332 tests across the workspace. The implementation is verified against NIST Known Answer Test (KAT) vectors. Fuzz testing runs continuously on key generation, encapsulation, and decapsulation paths.
 
 The Flutter super-app compiles from a single codebase to macOS, Windows, Linux, iOS, Android, and web. The Tauri desktop browser ships as a signed DMG for Apple Silicon. The Next.js dashboard serves 24 routes with zero build errors.
 

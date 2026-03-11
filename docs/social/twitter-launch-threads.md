@@ -73,7 +73,7 @@ The first browser where "private browsing" means something.
 Pillar 9: Q-Mesh -- quantum-secured WiFi sensing (coming soon)
 
 **10/**
-Built in Norway by @QDaria. Pure Rust crypto core. 302 tests passing. Implements NIST FIPS 203 (ML-KEM-768). Real IBM Quantum entropy (156 qubits).
+Built in Norway by @QDaria. Pure Rust crypto core. 332 tests passing. Implements NIST FIPS 203 (ML-KEM-768). Real IBM Quantum entropy (156 qubits).
 
 Beta is live now. Sign up for early access:
 https://www.zipminator.zip
@@ -94,7 +94,7 @@ The core is Rust. Pure Rust. No unsafe blocks. Constant-time ops verified via du
 
 Implements ML-KEM-768 (NIST FIPS 203) -- the post-quantum key encapsulation mechanism that NIST standardized.
 
-302 tests across 4 Rust crates.
+332 tests across 5 Rust crates.
 
 **3/**
 Entropy sourcing:
@@ -131,7 +131,7 @@ PQ-WireGuard, not a wrapper around someone else's VPN.
 **7/**
 Everything runs on a Flutter super-app (macOS, iOS, Android, Windows, Linux, Web) with Riverpod state management and Material 3 design.
 
-302 Rust tests. 23 Flutter tests. 15 web tests. 0 clippy warnings.
+332 Rust tests. 23 Flutter tests. 15 web tests. 0 clippy warnings.
 
 The code is the proof.
 

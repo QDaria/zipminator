@@ -112,7 +112,7 @@ The numbers, verified in CI:
 | Rust browser (Tauri) | 103 |
 | Rust bridge (FRB) | 15 |
 | Rust FRB glue | 18 |
-| **Total Rust** | **302** |
+| **Total Rust** | **332** |
 | Flutter | 23 |
 | Web (vitest) | 15 |
 | Mobile (Expo) | 267 |

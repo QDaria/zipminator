@@ -69,7 +69,7 @@ This is not marketing. It is a structural advantage in a market where trust in t
 
 ## QDaria's Position
 
-QDaria AS builds on all of these factors. The company's Zipminator platform implements NIST FIPS 203 (ML-KEM-768), verified against NIST KAT test vectors, with a Rust cryptographic core that has passed 302 tests including fuzz testing and constant-time verification.
+QDaria AS builds on all of these factors. The company's Zipminator platform implements NIST FIPS 203 (ML-KEM-768), verified against NIST KAT test vectors, with a Rust cryptographic core that has passed 332 tests including fuzz testing and constant-time verification.
 
 The choice to build in Norway reflects a conviction that post-quantum security companies need more than strong engineering. They need a regulatory environment that values privacy, a funding ecosystem that supports deep-tech timelines, and a geopolitical position that customers can trust.
 

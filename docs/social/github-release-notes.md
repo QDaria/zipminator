@@ -19,7 +19,7 @@ This is the first public beta release.
 - PyO3 bindings for Python SDK
 - Flutter Rust Bridge (FRB v2.11.1) for mobile/desktop
 - C FFI for Tauri browser integration
-- **302 Rust tests passing across 4 crates**
+- **332 Rust tests passing across 5 crates**
 
 ### 9 Pillars
 
@@ -47,7 +47,7 @@ This is the first public beta release.
 
 | Component | Tests | Status |
 |-----------|-------|--------|
-| Rust core (4 crates) | 302 | Passing |
+| Rust core (5 crates) | 332 | Passing |
 | Flutter | 23 | Passing |
 | Web (vitest) | 15 | Passing |
 | Mobile (Expo/Jest) | 267/274 | Passing (7 skipped) |
@@ -116,7 +116,7 @@ cd browser && cargo tauri dev
 ### Run Tests
 
 ```bash
-cargo test --workspace          # 302 Rust tests
+cargo test --workspace          # 332 Rust tests
 cd app && flutter test          # 23 Flutter tests
 cd web && npm test              # 15 web tests
 cd mobile && npm test           # 267 mobile tests
