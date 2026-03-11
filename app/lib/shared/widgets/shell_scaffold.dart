@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
+import 'package:zipminator/shared/widgets/widgets.dart';
 
-/// Persistent shell with bottom navigation for all 8 pillars.
+/// Persistent shell with navigation for all 8 pillars.
+/// Desktop: NavigationRail with logo + settings.
+/// Mobile: NavigationBar (5 tabs) + "More" overflow bottom sheet.
 class ShellScaffold extends StatelessWidget {
   final Widget child;
 
   const ShellScaffold({super.key, required this.child});
 
   static const _tabs = [
-    _NavTab('/vault', Icons.lock_outline, 'Vault'),
-    _NavTab('/messenger', Icons.chat_bubble_outline, 'Messenger'),
-    _NavTab('/voip', Icons.phone_outlined, 'VoIP'),
-    _NavTab('/vpn', Icons.vpn_key_outlined, 'VPN'),
-    _NavTab('/anonymizer', Icons.visibility_off_outlined, 'Anonymizer'),
-    _NavTab('/ai', Icons.psychology_outlined, 'Q-AI'),
-    _NavTab('/email', Icons.email_outlined, 'Email'),
-    _NavTab('/browser', Icons.language_outlined, 'Browser'),
+    _NavTab('/vault', Icons.lock_outline, Icons.lock, 'Vault'),
+    _NavTab('/messenger', Icons.chat_bubble_outline, Icons.chat_bubble, 'Messenger'),
+    _NavTab('/voip', Icons.phone_outlined, Icons.phone, 'VoIP'),
+    _NavTab('/vpn', Icons.vpn_key_outlined, Icons.vpn_key, 'VPN'),
+    _NavTab('/anonymizer', Icons.visibility_off_outlined, Icons.visibility_off, 'Anonymizer'),
+    _NavTab('/ai', Icons.psychology_outlined, Icons.psychology, 'Q-AI'),
+    _NavTab('/email', Icons.email_outlined, Icons.email, 'Email'),
+    _NavTab('/browser', Icons.language_outlined, Icons.language, 'Browser'),
   ];
+
+  /// Number of primary tabs shown in mobile bottom nav (5th is "More").
+  static const _mobileTabCount = 4;
 
   int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
@@ -25,13 +31,17 @@ class ShellScaffold extends StatelessWidget {
     return idx >= 0 ? idx : 0;
   }
 
+  Widget _animatedChild(Widget page) => AnimatedSwitcher(
+    duration: const Duration(milliseconds: 300),
+    child: page,
+  );
+
   @override
   Widget build(BuildContext context) {
     final index = _currentIndex(context);
     final isWide = MediaQuery.sizeOf(context).width > 800;
 
     if (isWide) {
-      // Desktop: NavigationRail
       return Scaffold(
         body: Row(
           children: [
@@ -41,44 +51,173 @@ class ShellScaffold extends StatelessWidget {
               labelType: NavigationRailLabelType.all,
               backgroundColor: QuantumTheme.surfaceCard,
               indicatorColor: QuantumTheme.quantumCyan.withValues(alpha: 0.15),
-              trailing: Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: IconButton(
-                  icon: const Icon(Icons.settings_outlined),
-                  onPressed: () => context.go('/settings'),
-                  tooltip: 'Settings',
+              leading: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: QuantumTheme.cyanPurpleGradient(),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Z',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
+              trailing: Expanded(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: IconButton(
+                      icon: const Icon(Icons.settings_outlined),
+                      onPressed: () => context.go('/settings'),
+                      tooltip: 'Settings',
+                      style: IconButton.styleFrom(
+                        foregroundColor: QuantumTheme.textSecondary,
+                      ),
+                    ),
+                  ),
                 ),
               ),
               destinations: _tabs
                   .map(
                     (t) => NavigationRailDestination(
                       icon: Icon(t.icon),
+                      selectedIcon: Icon(t.selectedIcon),
                       label: Text(t.label),
                     ),
                   )
                   .toList(),
             ),
             const VerticalDivider(width: 1),
-            Expanded(child: child),
+            Expanded(
+              child: GradientBackground(child: _animatedChild(child)),
+            ),
           ],
         ),
       );
     }
 
-    // Mobile: Bottom navigation (show 5, overflow menu for rest)
+    // Mobile layout: 4 primary tabs + "More" overflow
+    final mobileIndex = index < _mobileTabCount ? index : _mobileTabCount;
+
     return Scaffold(
-      body: child,
+      body: GradientBackground(child: _animatedChild(child)),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: index.clamp(0, 4),
+        selectedIndex: mobileIndex,
         onDestinationSelected: (i) {
-          if (i < _tabs.length) context.go(_tabs[i].path);
+          if (i < _mobileTabCount) {
+            context.go(_tabs[i].path);
+          } else {
+            // "More" tapped — show overflow sheet
+            _showOverflowSheet(context);
+          }
         },
-        destinations: _tabs
-            .take(5)
-            .map(
-              (t) => NavigationDestination(icon: Icon(t.icon), label: t.label),
-            )
-            .toList(),
+        destinations: [
+          ..._tabs.take(_mobileTabCount).map(
+            (t) => NavigationDestination(
+              icon: Icon(t.icon),
+              selectedIcon: Icon(t.selectedIcon),
+              label: t.label,
+            ),
+          ),
+          const NavigationDestination(
+            icon: Icon(Icons.more_horiz),
+            label: 'More',
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showOverflowSheet(BuildContext context) {
+    final overflowTabs = _tabs.sublist(_mobileTabCount);
+
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: QuantumTheme.textSecondary.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              GridView.count(
+                crossAxisCount: 4,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  ...overflowTabs.map(
+                    (t) => _OverflowTile(
+                      icon: t.icon,
+                      label: t.label,
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        context.go(t.path);
+                      },
+                    ),
+                  ),
+                  _OverflowTile(
+                    icon: Icons.settings_outlined,
+                    label: 'Settings',
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      context.go('/settings');
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OverflowTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _OverflowTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 28, color: QuantumTheme.quantumCyan),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -87,7 +226,8 @@ class ShellScaffold extends StatelessWidget {
 class _NavTab {
   final String path;
   final IconData icon;
+  final IconData selectedIcon;
   final String label;
 
-  const _NavTab(this.path, this.icon, this.label);
+  const _NavTab(this.path, this.icon, this.selectedIcon, this.label);
 }

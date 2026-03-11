@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/core/providers/crypto_provider.dart';
 import 'package:zipminator/core/providers/email_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
+import 'package:zipminator/shared/widgets/widgets.dart';
 
 /// Pillar 7: Quantum Mail — PQC-encrypted email with PII scanning.
 class EmailScreen extends ConsumerStatefulWidget {
@@ -41,21 +43,36 @@ class _EmailScreenState extends ConsumerState<EmailScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Key status
-            Card(
-              child: Padding(
+      body: GradientBackground(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              PillarHeader(
+                icon: Icons.email_outlined,
+                title: 'Quantum Mail',
+                subtitle: 'PQC-Encrypted Email',
+                iconColor: QuantumTheme.quantumBlue,
+                badges: [
+                  PqcBadge(
+                    label: 'ML-KEM-768',
+                    color: QuantumTheme.quantumBlue,
+                    isActive: crypto.publicKey != null,
+                  ),
+                ],
+              ),
+
+              // Key status card
+              QuantumCard(
+                glowColor: crypto.publicKey != null
+                    ? QuantumTheme.quantumGreen
+                    : QuantumTheme.textSecondary,
                 padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
                     Icon(
-                      crypto.publicKey != null
-                          ? Icons.key
-                          : Icons.key_off,
+                      crypto.publicKey != null ? Icons.key : Icons.key_off,
                       color: crypto.publicKey != null
                           ? QuantumTheme.quantumGreen
                           : QuantumTheme.textSecondary,
@@ -78,65 +95,84 @@ class _EmailScreenState extends ConsumerState<EmailScreen> {
                       ),
                   ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 12),
+              ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
+              const SizedBox(height: 12),
 
-            // Compose
-            TextField(
-              controller: _toController,
-              decoration: const InputDecoration(
-                labelText: 'To',
-                prefixIcon: Icon(Icons.person_outline),
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _subjectController,
-              decoration: const InputDecoration(
-                labelText: 'Subject',
-                prefixIcon: Icon(Icons.subject),
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _bodyController,
-              maxLines: 8,
-              decoration: const InputDecoration(
-                labelText: 'Message body',
-                alignLabelWithHint: true,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Encrypt button
-            ElevatedButton.icon(
-              onPressed: emailState.isProcessing ? null : _encryptAndSend,
-              icon: emailState.isProcessing
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Icon(Icons.lock_outline),
-              label: Text(emailState.isProcessing
-                  ? 'Encrypting...'
-                  : 'Encrypt with ML-KEM-768'),
-            ),
-
-            // Error
-            if (emailState.error != null) ...[
-              const SizedBox(height: 8),
-              Text(emailState.error!,
-                  style: TextStyle(color: QuantumTheme.quantumRed)),
-            ],
-
-            // Result
-            if (emailState.encryptedEnvelope != null) ...[
+              // Compose fields
+              QuantumCard(
+                glowColor: QuantumTheme.quantumBlue,
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _toController,
+                      decoration: const InputDecoration(
+                        labelText: 'To',
+                        prefixIcon: Icon(Icons.person_outline),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _subjectController,
+                      decoration: const InputDecoration(
+                        labelText: 'Subject',
+                        prefixIcon: Icon(Icons.subject),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Stack(
+                      children: [
+                        TextField(
+                          controller: _bodyController,
+                          maxLines: 8,
+                          decoration: const InputDecoration(
+                            labelText: 'Message body',
+                            alignLabelWithHint: true,
+                          ),
+                        ),
+                        if (emailState.isProcessing)
+                          Positioned.fill(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: ShimmerPlaceholder(
+                                height: double.infinity,
+                                borderRadius: 8,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+                  .animate()
+                  .fadeIn(delay: 200.ms, duration: 400.ms)
+                  .slideY(begin: 0.1),
               const SizedBox(height: 16),
-              Card(
-                color: QuantumTheme.quantumGreen.withValues(alpha: 0.1),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+
+              // Encrypt button
+              ElevatedButton.icon(
+                onPressed: emailState.isProcessing ? null : _encryptAndSend,
+                icon: emailState.isProcessing
+                    ? const ShimmerPlaceholder(
+                        width: 16, height: 16, borderRadius: 8)
+                    : const Icon(Icons.lock_outline),
+                label: Text(emailState.isProcessing
+                    ? 'Encrypting...'
+                    : 'Encrypt with ML-KEM-768'),
+              ),
+
+              // Error
+              if (emailState.error != null) ...[
+                const SizedBox(height: 8),
+                Text(emailState.error!,
+                    style: TextStyle(color: QuantumTheme.quantumRed)),
+              ],
+
+              // Encrypted result
+              if (emailState.encryptedEnvelope != null) ...[
+                const SizedBox(height: 16),
+                QuantumCard(
+                  glowColor: QuantumTheme.quantumGreen,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -161,10 +197,16 @@ class _EmailScreenState extends ConsumerState<EmailScreen> {
                       ),
                     ],
                   ),
-                ),
-              ),
+                )
+                    .animate()
+                    .fadeIn(duration: 400.ms)
+                    .scale(
+                      begin: const Offset(0.95, 0.95),
+                      end: const Offset(1, 1),
+                    ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

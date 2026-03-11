@@ -9,7 +9,7 @@ const KeyGenerator = React.lazy(() => import('../../src/components/KeyGenerator'
 const FileVault = React.lazy(() => import('../../src/components/FileVault'));
 const SecureMessenger = React.lazy(() => import('../../src/components/SecureMessenger'));
 const NetworkShield = React.lazy(() => import('../../src/components/NetworkShield'));
-const OpenClawChat = React.lazy(() => import('../../src/components/OpenClawChat'));
+const QaiChat = React.lazy(() => import('../../src/components/QaiChat'));
 const AnonymizationPanel = React.lazy(() => import('../../src/components/AnonymizationPanel'));
 const JupyterLabConnect = React.lazy(() => import('../../src/components/JupyterLabConnect'));
 
@@ -125,8 +125,8 @@ export default function HomeScreen() {
           <NativeBridgeGuard label="Anonymization">
             <AnonymizationPanel />
           </NativeBridgeGuard>
-          <NativeBridgeGuard label="OpenClaw Chat">
-            <OpenClawChat />
+          <NativeBridgeGuard label="Q-AI Assistant">
+            <QaiChat />
           </NativeBridgeGuard>
         </Suspense>
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
+import 'package:zipminator/shared/widgets/widgets.dart';
 
 /// Pillar 8: ZipBrowser — PQC proxy browser with privacy features.
 class BrowserScreen extends StatefulWidget {
@@ -14,6 +16,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
   bool _proxyActive = false;
   bool _fingerprintProtection = true;
   bool _cookieRotation = true;
+  int _selectedTab = 0;
 
   @override
   void dispose() {
@@ -27,32 +30,11 @@ class _BrowserScreenState extends State<BrowserScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            // PQC indicator
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: _proxyActive
-                    ? QuantumTheme.quantumGreen.withValues(alpha: 0.2)
-                    : QuantumTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _proxyActive ? Icons.lock : Icons.lock_open,
-                    size: 14,
-                    color: _proxyActive
-                        ? QuantumTheme.quantumGreen
-                        : QuantumTheme.textSecondary,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    _proxyActive ? 'PQC' : 'STD',
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                ],
-              ),
+            // PQC badge indicator
+            PqcBadge(
+              label: _proxyActive ? 'PQC' : 'STD',
+              color: _proxyActive ? QuantumTheme.quantumGreen : null,
+              isActive: _proxyActive,
             ),
             const SizedBox(width: 8),
             // URL bar
@@ -85,81 +67,132 @@ class _BrowserScreenState extends State<BrowserScreen> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          // WebView placeholder (requires webview_flutter package)
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.language,
-                      size: 64, color: QuantumTheme.quantumGreen),
-                  const SizedBox(height: 16),
-                  Text('PQC Privacy Browser',
-                      style: Theme.of(context).textTheme.headlineSmall),
-                  const SizedBox(height: 8),
-                  Text(
-                    'WebView routes through local Rust proxy\n'
-                    'for ML-KEM-768 TLS interception',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium,
+      body: GradientBackground(
+        child: Column(
+          children: [
+            // Tab chip row
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _tabChip(0, 'New Tab', Icons.add),
+                    const SizedBox(width: 8),
+                    _tabChip(1, 'Search', Icons.search),
+                    const SizedBox(width: 8),
+                    _tabChip(2, 'Bookmarks', Icons.bookmark_outline),
+                  ],
+                ),
+              ),
+            ).animate().fadeIn(duration: 300.ms).slideY(begin: -0.2),
+
+            // WebView placeholder
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      PillarHeader(
+                        icon: Icons.language,
+                        title: 'PQC Browser',
+                        subtitle: 'ML-KEM-768 TLS Proxy',
+                        iconColor: QuantumTheme.quantumGreen,
+                      ),
+
+                      // PQC padlock with glow animation
+                      Icon(
+                        _proxyActive ? Icons.lock : Icons.lock_open,
+                        size: 48,
+                        color: _proxyActive
+                            ? QuantumTheme.quantumGreen
+                            : QuantumTheme.textSecondary,
+                      )
+                          .animate(
+                            target: _proxyActive ? 1 : 0,
+                          )
+                          .scale(
+                            begin: const Offset(0.9, 0.9),
+                            end: const Offset(1.1, 1.1),
+                          )
+                          .fadeIn(),
+                      const SizedBox(height: 16),
+
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() => _proxyActive = !_proxyActive);
+                        },
+                        icon: Icon(_proxyActive
+                            ? Icons.shield
+                            : Icons.shield_outlined),
+                        label: Text(_proxyActive
+                            ? 'PQC Proxy Active'
+                            : 'Enable PQC Proxy'),
+                      )
+                          .animate()
+                          .fadeIn(delay: 400.ms, duration: 400.ms),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() => _proxyActive = !_proxyActive);
-                    },
-                    icon: Icon(_proxyActive
-                        ? Icons.shield
-                        : Icons.shield_outlined),
-                    label: Text(_proxyActive
-                        ? 'PQC Proxy Active'
-                        : 'Enable PQC Proxy'),
+                ),
+              ),
+            ),
+
+            // Privacy controls
+            QuantumCard(
+              borderRadius: 0,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              glowColor: QuantumTheme.quantumGreen,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _PrivacyToggle(
+                    icon: Icons.fingerprint,
+                    label: 'Fingerprint',
+                    active: _fingerprintProtection,
+                    onTap: () => setState(
+                        () => _fingerprintProtection = !_fingerprintProtection),
+                  ),
+                  _PrivacyToggle(
+                    icon: Icons.cookie_outlined,
+                    label: 'Cookie Rot.',
+                    active: _cookieRotation,
+                    onTap: () =>
+                        setState(() => _cookieRotation = !_cookieRotation),
+                  ),
+                  _PrivacyToggle(
+                    icon: Icons.block,
+                    label: 'Telemetry',
+                    active: true,
+                    onTap: () {},
                   ),
                 ],
               ),
-            ),
-          ),
-
-          // Privacy controls
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: QuantumTheme.surfaceCard,
-              border: Border(
-                top: BorderSide(
-                    color: QuantumTheme.quantumGreen.withValues(alpha: 0.2)),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _PrivacyToggle(
-                  icon: Icons.fingerprint,
-                  label: 'Fingerprint',
-                  active: _fingerprintProtection,
-                  onTap: () => setState(
-                      () => _fingerprintProtection = !_fingerprintProtection),
-                ),
-                _PrivacyToggle(
-                  icon: Icons.cookie_outlined,
-                  label: 'Cookie Rot.',
-                  active: _cookieRotation,
-                  onTap: () =>
-                      setState(() => _cookieRotation = !_cookieRotation),
-                ),
-                _PrivacyToggle(
-                  icon: Icons.block,
-                  label: 'Telemetry',
-                  active: true,
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
-        ],
+            ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _tabChip(int index, String label, IconData icon) {
+    final isSelected = _selectedTab == index;
+    return ChoiceChip(
+      avatar: Icon(icon, size: 16,
+          color: isSelected ? Colors.white : QuantumTheme.quantumGreen),
+      label: Text(label),
+      selected: isSelected,
+      selectedColor: QuantumTheme.quantumGreen.withValues(alpha: 0.3),
+      side: BorderSide(
+        color: isSelected
+            ? QuantumTheme.quantumGreen.withValues(alpha: 0.6)
+            : QuantumTheme.quantumGreen.withValues(alpha: 0.2),
+      ),
+      labelStyle: TextStyle(
+        color: isSelected ? QuantumTheme.quantumGreen : null,
+        fontWeight: isSelected ? FontWeight.w600 : null,
+      ),
+      onSelected: (_) => setState(() => _selectedTab = index),
     );
   }
 }
@@ -181,26 +214,31 @@ class _PrivacyToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: active
-                ? QuantumTheme.quantumGreen
-                : QuantumTheme.textSecondary,
-            size: 20,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: active
-                      ? QuantumTheme.quantumGreen
-                      : QuantumTheme.textSecondary,
-                ),
-          ),
-        ],
+      child: QuantumCard(
+        glowColor: active ? QuantumTheme.quantumGreen : null,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        borderRadius: 12,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: active
+                  ? QuantumTheme.quantumGreen
+                  : QuantumTheme.textSecondary,
+              size: 20,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: active
+                        ? QuantumTheme.quantumGreen
+                        : QuantumTheme.textSecondary,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

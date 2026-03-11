@@ -83,11 +83,42 @@ class QuantumTheme {
     labelSmall: GoogleFonts.jetBrainsMono(fontSize: 11, color: bodyColor),
   );
 
+  // ── Gradient Helpers ──────────────────────────────────────────────────
+  static LinearGradient cyanPurpleGradient({
+    AlignmentGeometry begin = Alignment.topLeft,
+    AlignmentGeometry end = Alignment.bottomRight,
+  }) =>
+      LinearGradient(
+        begin: begin,
+        end: end,
+        colors: const [quantumCyan, quantumPurple],
+      );
+
+  static List<BoxShadow> glowShadow(Color color, {double blur = 20}) => [
+    BoxShadow(
+      color: color.withValues(alpha: 0.3),
+      blurRadius: blur,
+      spreadRadius: -4,
+    ),
+  ];
+
+  // ── Page Transitions ────────────────────────────────────────────────
+  static const _pageTransitions = PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      TargetPlatform.macOS: FadeUpwardsPageTransitionsBuilder(),
+      TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
+      TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
+    },
+  );
+
   // ── Dark Theme ────────────────────────────────────────────────────────
   static ThemeData dark() => ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: surfaceDark,
+    pageTransitionsTheme: _pageTransitions,
     colorScheme: const ColorScheme.dark(
       primary: quantumCyan,
       secondary: quantumPurple,
@@ -144,6 +175,23 @@ class QuantumTheme {
         borderSide: const BorderSide(color: quantumCyan),
       ),
     ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: surfaceCard,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: surfaceCard,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: surfaceElevated,
+      selectedColor: quantumCyan.withValues(alpha: 0.2),
+      labelStyle: GoogleFonts.inter(fontSize: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      side: BorderSide(color: quantumCyan.withValues(alpha: 0.2)),
+    ),
   );
 
   // ── Light Theme ───────────────────────────────────────────────────────
@@ -151,6 +199,7 @@ class QuantumTheme {
     useMaterial3: true,
     brightness: Brightness.light,
     scaffoldBackgroundColor: surfaceLight,
+    pageTransitionsTheme: _pageTransitions,
     colorScheme: const ColorScheme.light(
       primary: quantumBlue,
       secondary: quantumPurple,

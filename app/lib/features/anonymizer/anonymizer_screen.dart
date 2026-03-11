@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/core/providers/pii_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
+import 'package:zipminator/shared/widgets/widgets.dart';
 
 /// Pillar 5: 10-Level Anonymizer — PII scanning and redaction.
 class AnonymizerScreen extends ConsumerStatefulWidget {
@@ -32,18 +34,34 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
           if (pii.matches.isNotEmpty)
             Chip(
               label: Text('${pii.matches.length} found'),
-              backgroundColor: QuantumTheme.quantumOrange.withValues(alpha: 0.2),
+              backgroundColor:
+                  QuantumTheme.quantumOrange.withValues(alpha: 0.2),
             ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+      body: GradientBackground(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              PillarHeader(
+                icon: Icons.visibility_off_outlined,
+                title: 'Anonymizer',
+                subtitle: 'PII Scanner & Redactor',
+                iconColor: QuantumTheme.quantumOrange,
+                badges: [
+                  PqcBadge(
+                    label: '166+ patterns',
+                    color: QuantumTheme.quantumOrange,
+                    isActive: true,
+                  ),
+                ],
+              ),
+
+              // PII Scanner card
+              QuantumCard(
+                glowColor: QuantumTheme.quantumOrange,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -85,19 +103,16 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                     ),
                   ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
+              ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
+              const SizedBox(height: 16),
 
-            // Results
-            if (pii.matches.isNotEmpty) ...[
-              // Summary
-              Card(
-                color: pii.highSensitivityCount > 0
-                    ? QuantumTheme.quantumRed.withValues(alpha: 0.1)
-                    : QuantumTheme.quantumGreen.withValues(alpha: 0.1),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+              // Results
+              if (pii.matches.isNotEmpty) ...[
+                // Summary card
+                QuantumCard(
+                  glowColor: pii.highSensitivityCount > 0
+                      ? QuantumTheme.quantumRed
+                      : QuantumTheme.quantumGreen,
                   child: Row(
                     children: [
                       Icon(
@@ -118,39 +133,69 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                       ),
                     ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Individual matches
-              ...pii.matches.map((m) => Card(
-                    child: ListTile(
-                      leading: _sensitivityBadge(m.sensitivity),
-                      title: Text(m.patternName),
-                      subtitle: Text(
-                        '${m.category} | "${m.matchedText}" | ${m.countryCode.toUpperCase()}',
-                      ),
-                      trailing: Text('L${m.sensitivity}',
-                          style: Theme.of(context).textTheme.labelLarge),
+                )
+                    .animate()
+                    .fadeIn(duration: 300.ms)
+                    .scale(
+                      begin: const Offset(0.95, 0.95),
+                      end: const Offset(1, 1),
                     ),
-                  )),
-            ],
+                const SizedBox(height: 8),
 
-            if (pii.matches.isEmpty && pii.inputText.isNotEmpty)
-              Card(
-                color: QuantumTheme.quantumGreen.withValues(alpha: 0.1),
-                child: const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Row(
+                // Individual matches with staggered animation
+                ...pii.matches.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final m = entry.value;
+                  final glowColor = m.sensitivity >= 4
+                      ? QuantumTheme.quantumRed
+                      : m.sensitivity >= 3
+                          ? QuantumTheme.quantumOrange
+                          : QuantumTheme.quantumGreen;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: QuantumCard(
+                      glowColor: glowColor,
+                      padding: EdgeInsets.zero,
+                      child: ListTile(
+                        leading: _sensitivityBadge(m.sensitivity)
+                            .animate()
+                            .fadeIn(delay: (index * 100).ms),
+                        title: Text(m.patternName),
+                        subtitle: Text(
+                          '${m.category} | "${m.matchedText}" | ${m.countryCode.toUpperCase()}',
+                        ),
+                        trailing: Text('L${m.sensitivity}',
+                            style: Theme.of(context).textTheme.labelLarge),
+                      ),
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(delay: (index * 100).ms, duration: 300.ms)
+                      .slideY(begin: 0.1);
+                }),
+              ],
+
+              if (pii.matches.isEmpty && pii.inputText.isNotEmpty)
+                QuantumCard(
+                  glowColor: QuantumTheme.quantumGreen,
+                  child: const Row(
                     children: [
-                      Icon(Icons.check_circle, color: QuantumTheme.quantumGreen),
+                      Icon(Icons.check_circle,
+                          color: QuantumTheme.quantumGreen),
                       SizedBox(width: 12),
                       Text('No PII detected'),
                     ],
                   ),
-                ),
-              ),
-          ],
+                )
+                    .animate()
+                    .fadeIn(duration: 400.ms)
+                    .scale(
+                      begin: const Offset(0.95, 0.95),
+                      end: const Offset(1, 1),
+                    ),
+            ],
+          ),
         ),
       ),
     );

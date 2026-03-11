@@ -36,13 +36,13 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
     await tester.pumpAndSettle();
 
-    // Should show bottom NavigationBar with 5 destinations
+    // Should show bottom NavigationBar with 4 primary tabs + More overflow
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.text('Vault'), findsOneWidget);
     expect(find.text('Messenger'), findsOneWidget);
     expect(find.text('VoIP'), findsOneWidget);
     expect(find.text('VPN'), findsOneWidget);
-    expect(find.text('Anonymizer'), findsOneWidget);
+    expect(find.text('More'), findsOneWidget);
 
     // Reset view
     tester.view.resetPhysicalSize();

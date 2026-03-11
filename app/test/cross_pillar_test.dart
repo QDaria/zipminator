@@ -27,7 +27,7 @@ void main() {
         ('Anonymizer', 'Anonymizer'),
         ('Q-AI', 'Q-AI Assistant'),
         ('Email', 'Quantum Mail'),
-        ('Browser', 'PQC Privacy Browser'),
+        ('Browser', 'PQC Browser'),
       ];
 
       for (final (tab, expectedTitle) in pillars) {

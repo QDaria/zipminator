@@ -4,7 +4,7 @@ import 'package:zipminator/features/messenger/messenger_screen.dart';
 import 'package:zipminator/features/voip/voip_screen.dart';
 import 'package:zipminator/features/vpn/vpn_screen.dart';
 import 'package:zipminator/features/anonymizer/anonymizer_screen.dart';
-import 'package:zipminator/features/openclaw/openclaw_screen.dart';
+import 'package:zipminator/features/qai/qai_screen.dart';
 import 'package:zipminator/features/email/email_screen.dart';
 import 'package:zipminator/features/browser/browser_screen.dart';
 import 'package:zipminator/features/settings/settings_screen.dart';
@@ -47,7 +47,7 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/ai',
           name: 'ai',
-          builder: (context, state) => const OpenClawScreen(),
+          builder: (context, state) => const QaiScreen(),
         ),
         GoRoute(
           path: '/email',

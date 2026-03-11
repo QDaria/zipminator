@@ -17,7 +17,7 @@ void main() {
     testWidgets('shows key management header', (tester) async {
       await pumpApp(tester);
       expect(find.text('ML-KEM-768 Key Management'), findsOneWidget);
-      expect(find.text('NIST FIPS 203 compliant'), findsOneWidget);
+      expect(find.text('FIPS 203'), findsOneWidget);
     });
 
     testWidgets('has Generate Keypair button', (tester) async {
@@ -37,7 +37,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('PQC Messenger'), findsOneWidget);
-      expect(find.text('PQ Double Ratchet'), findsOneWidget);
+      expect(find.text('Double Ratchet'), findsOneWidget);
       expect(find.text('Start Session'), findsOneWidget);
     });
   });
@@ -50,7 +50,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Quantum VoIP'), findsOneWidget);
-      expect(find.text('PQ-SRTP Voice & Video'), findsOneWidget);
+      expect(find.text('PQ-SRTP Encrypted Calls'), findsOneWidget);
     });
 
     testWidgets('shows protocol info cards when not in call', (tester) async {
@@ -88,7 +88,11 @@ void main() {
   // ── Pillar 5: Anonymizer ──
   group('Anonymizer Screen', () {
     testWidgets('shows PII scanner with scan button', (tester) async {
-      await pumpApp(tester);
+      // Use desktop size since Anonymizer is in mobile overflow menu
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Anonymizer'));
       await tester.pumpAndSettle();
 

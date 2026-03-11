@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useExpertise } from '../context/ExpertiseContext';
 
-export default function OpenClawChat() {
+export default function QaiChat() {
     const { mode } = useExpertise();
     const [messages, setMessages] = useState([
-        { id: 1, text: "Hello! I am OpenClaw, your PQC AI Assistant. How can I help you secure your day?", sender: "ai" }
+        { id: 1, text: "Hello! I am Q-AI Assistant, your PQC AI companion. How can I help you secure your day?", sender: "ai" }
     ]);
     const [inputText, setInputText] = useState("");
 
@@ -63,7 +63,7 @@ export default function OpenClawChat() {
         <View className="w-full bg-black/80 rounded-2xl border border-blue-500/30 overflow-hidden mb-8 h-96">
             <View className="bg-black p-4 border-b border-blue-900/50">
                 <View className="flex-row justify-between mb-1">
-                    <Text className="text-blue-400 font-mono text-sm font-bold">MCP::OPENCLAW_LLM</Text>
+                    <Text className="text-blue-400 font-mono text-sm font-bold">MCP::QAI_LLM</Text>
                     <Text className="text-green-400 font-mono text-xs">ON-DEVICE NPU</Text>
                 </View>
                 <Text className="text-gray-500 font-mono text-[10px]">MODEL: Qwen2.5-Coder-7B-Instruct (4-bit quant)</Text>

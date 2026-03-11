@@ -20,9 +20,8 @@ void main() {
       await tester.tap(find.text('Q-AI'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Q-AI Assistant'), findsOneWidget);
-      expect(find.text('Quantum AI Assistant'), findsOneWidget);
-      expect(find.text('auto'), findsWidgets); // model selector + input suffix
+      expect(find.text('Q-AI Assistant'), findsWidgets);
+      expect(find.text('Auto Route'), findsOneWidget); // ChoiceChip label
     });
   });
 
@@ -33,7 +32,7 @@ void main() {
       await tester.tap(find.text('Email'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Quantum Mail'), findsOneWidget);
+      expect(find.text('Quantum Mail'), findsWidgets);
       expect(find.text('Encrypt with ML-KEM-768'), findsOneWidget);
       // Compose fields
       expect(find.text('To'), findsOneWidget);
@@ -59,7 +58,7 @@ void main() {
       await tester.tap(find.text('Browser'));
       await tester.pumpAndSettle();
 
-      expect(find.text('PQC Privacy Browser'), findsOneWidget);
+      expect(find.text('PQC Browser'), findsOneWidget);
       expect(find.text('Enable PQC Proxy'), findsOneWidget);
       // Privacy toggles
       expect(find.text('Fingerprint'), findsOneWidget);
