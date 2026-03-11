@@ -44,7 +44,7 @@ Zipminator is the world's first **Post-Quantum Cryptography Super-App**, combini
 | 3 | **Quantum VoIP** | Voice/video calls encrypted with PQ-SRTP |
 | 4 | **Q-VPN** | Always-on PQ-WireGuard VPN with kill switch |
 | 5 | **10-Level Anonymizer** | QRNG-powered data anonymization (L1 basic to L10 quantum OTP) |
-| 6 | **OpenClaw AI** | On-device PQC AI assistant (zero data leakage) |
+| 6 | **Q-AI Assistant** | On-device PQC AI assistant (zero data leakage) |
 | 7 | **Quantum Mail** | Self-destructing PQC emails with PII scanning |
 | 8 | **ZipBrowser** | PQC TLS + built-in Q-VPN + AI assistant (Tauri 2.x) |
 
@@ -140,7 +140,7 @@ GitHub Star Supporter Program: star the repo to unlock Developer tier free.
 - **Supabase waitlist** with rate limiting, live and accepting signups
 - **Grant templates** prepared for 10 institutions (Innovation Norway, EIC Accelerator, NATO DIANA, etc.)
 - NIST KAT validation for Kyber-768 correctness
-- IBM Quantum 156-qubit and qBraid integrations operational
+- IBM Quantum 156-qubit and qBraid API integrations implemented (with OS entropy fallback)
 - Docker and Kubernetes deployment infrastructure complete
 - Fuzz testing and benchmark harness established
 - Norwegian-built, GDPR-native, Five Eyes-free positioning
@@ -151,11 +151,11 @@ GitHub Star Supporter Program: star the repo to unlock Developer tier free.
 
 ### Near-Term (0-6 months)
 
-- FIPS 140-3 certification process initiation
+- FIPS 140-3 certification process initiation (requires CMVP validation, budgeted post-funding)
 - NIST KAT full compliance validation
 - Additional quantum provider integrations (Amazon Braket, Azure Quantum)
 - Enterprise pilot deployments in financial services
-- SOC 2 Type II audit preparation
+- SOC 2 readiness assessment
 
 ### Medium-Term (6-18 months)
 

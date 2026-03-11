@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Optimal Quantum Entropy Harvester for IBM Brisbane
+Optimal Quantum Entropy Harvester for IBM Quantum
 
-This script performs optimized quantum entropy harvesting using IBM Brisbane's
-127-qubit quantum computer. It maximizes efficiency by using 120 qubits per shot,
+This script performs optimized quantum entropy harvesting using IBM's
+156-qubit quantum processors (Marrakesh/Fez via qBraid). It maximizes efficiency by using 120 qubits per shot,
 generating 15 bytes per measurement.
 
 Usage:

@@ -160,7 +160,7 @@ def harvest_quantum_bytes(target_bytes: int = 10240, num_qubits: int = 120):
         print(f"Job ID: {job_id}")
         print(f"\n💡 NOTE: For investor demo, mention:")
         print(f"   - This demo uses AerSimulator for reliability")
-        print(f"   - Production uses IBM Brisbane (127 qubits)")
+        print(f"   - Production uses IBM Marrakesh/Fez (156 qubits) via qBraid")
         print(f"   - Real quantum proof: ibm-qrng.ipynb job d1c0qmyv3z50008ah8x0")
 
         return quantum_data, backend_name, job_id

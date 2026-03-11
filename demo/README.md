@@ -6,7 +6,7 @@ Interactive demonstration of Qdaria's quantum security platform, showcasing thre
 
 ### Tab 1: Quantum Entropy Generation
 
-Live entropy sourced from IBM's 127-qubit quantum computer (ibm_brisbane). The dashboard displays real-time pool status, SHA-256 hashes of generated entropy, and NIST-standard quality metrics (entropy rate 7.998/8.0, chi-square PASS, runs test PASS, serial correlation < 0.01). Auto-refresh mode demonstrates continuous high-throughput generation.
+Live entropy sourced from IBM's 156-qubit quantum processors (IBM Marrakesh/Fez via qBraid). The dashboard displays real-time pool status, SHA-256 hashes of generated entropy, and NIST-standard quality metrics (entropy rate 7.998/8.0, chi-square PASS, runs test PASS, serial correlation < 0.01). Auto-refresh mode demonstrates continuous high-throughput generation.
 
 **Investor talking points:**
 - True quantum randomness -- fundamentally unpredictable, unlike classical PRNGs
@@ -86,7 +86,7 @@ A green "Quantum Backend Active" indicator confirms the backend is reachable. If
 
 ### 2. Quantum Entropy Tab
 
-Two cards display IBM Quantum backend specs (127 qubits, pool size) and entropy quality metrics. Clicking "Generate Quantum Entropy (256 bytes)" produces a SHA-256 hash of freshly generated entropy. Toggle "Auto-Refresh" for continuous generation.
+Two cards display IBM Quantum backend specs (156 qubits, pool size) and entropy quality metrics. Clicking "Generate Quantum Entropy (256 bytes)" produces a SHA-256 hash of freshly generated entropy. Toggle "Auto-Refresh" for continuous generation.
 
 ### 3. Zipminator Tab
 

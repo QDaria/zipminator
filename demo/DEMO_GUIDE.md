@@ -4,10 +4,10 @@
 
 ### Introduction (2 minutes)
 **Opening Statement:**
-> "Welcome to Qdaria QRNG - a quantum security platform that combines three cutting-edge technologies: true quantum entropy from IBM's 127-qubit quantum computer, enterprise-grade encryption with GDPR compliance, and post-quantum cryptography that's resistant to future quantum attacks."
+> "Welcome to Qdaria QRNG - a quantum security platform that combines three cutting-edge technologies: true quantum entropy from IBM's 156-qubit quantum computer, enterprise-grade encryption with GDPR compliance, and post-quantum cryptography that's resistant to future quantum attacks."
 
 **Key Points to Emphasize:**
-- ✅ Real quantum hardware (IBM ibm_brisbane, 127 qubits)
+- ✅ Real quantum hardware (IBM IBM Marrakesh/Fez, 156 qubits)
 - ✅ Production-ready implementation
 - ✅ GDPR compliant by design
 - ✅ Future-proof post-quantum security
@@ -19,7 +19,7 @@
 ### Demo Steps:
 1. **Show Backend Status**
    - Point to live status indicator (green = active)
-   - Highlight: "Powered by IBM Quantum (ibm_brisbane, 127 qubits)"
+   - Highlight: "Powered by IBM Quantum (IBM Marrakesh/Fez, 156 qubits)"
 
 2. **Generate Entropy**
    - Click "Generate Quantum Entropy" button
@@ -178,7 +178,7 @@
 ### Technical Questions
 
 **Q: Is this using actual quantum hardware?**
-> A: Yes, IBM's ibm_brisbane (127-qubit quantum computer). For the demo, we're using simulation mode for reliability, but production connects to real hardware.
+> A: Yes, IBM's IBM Marrakesh/Fez (156-qubit quantum computer). For the demo, we're using simulation mode for reliability, but production connects to real hardware.
 
 **Q: What about quantum computer downtime?**
 > A: We cache quantum entropy locally and have fallback to multiple quantum providers (IBM, AWS Braket, IonQ).

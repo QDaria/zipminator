@@ -42,6 +42,15 @@ api_keys.json
 *.backup
 *_backup.*
 
+# Code signing keys and certificates (NEVER COMMIT)
+*.keystore
+*.jks
+*.p12
+*.pem
+*.cer
+key.properties
+ExportOptions.plist
+
 # Token validation reports (may contain sensitive info)
 *_validation_report.json
 token_validation_*.json

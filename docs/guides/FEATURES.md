@@ -23,7 +23,7 @@
 | 3 | **Quantum VoIP** | **80%** | Done | Done | Done | 80% | Media protection limited by WebRTC |
 | 4 | **Q-VPN** | **90%** | Done | Done | Done | 90% | Packet wrapping has shortcuts |
 | 5 | **10-Level Anonymizer** | **100%** | Done | Done | Done | Done | L1-7 production, L8-10 stubbed by design |
-| 6 | **OpenClaw AI** | **85%** | Done | Done | Done | 85% | Local LLM needs model files |
+| 6 | **Q-AI Assistant** | **85%** | Done | Done | Done | 85% | Local LLM needs model files |
 | 7 | **Quantum Mail** | **90%** | Done | Done | Partial | 90% | Crypto library complete, no SMTP/IMAP server |
 | 8 | **ZipBrowser** | **75%** | Done | 103 tests | Done | 75% | Compiles, no real browser engine integration |
 | 9 | **Q-Mesh (RuView)** | **15%** | Planned | Planned | Planned | 15% | QRNG integration planned; RuView ADR-032 mesh security ready |
@@ -140,7 +140,7 @@
 
 ---
 
-## Pillar 6: OpenClaw PQC AI Assistant (85%)
+## Pillar 6: Q-AI PQC AI Assistant (85%)
 
 - **Local LLM mode**: Architecture exists, no data leaves the device
 - **PQC tunnel mode**: Prompts routed through Q-VPN to backend LLMs
@@ -154,7 +154,7 @@
 | **Rust AI** | `browser/src-tauri/src/ai/mod.rs`, `sidebar.rs`, `cloud_llm.rs`, `local_llm.rs`, `config.rs`, `page_context.rs` |
 | **Browser UI** | `browser/src/components/AISidebar.tsx`, `AISettings.tsx`, `ChatPanel.tsx`, `WritingAssist.tsx`, `SummaryPanel.tsx` |
 | **Browser hooks** | `browser/src/hooks/useAI.ts` |
-| **Mobile** | `mobile/src/components/OpenClawChat.tsx` |
+| **Mobile** | `mobile/src/components/QaiChat.tsx` |
 | **Tests** | `browser/tests/ai_sidebar_test.ts`, `browser/tests/local_llm_test.ts` |
 
 ---
@@ -198,7 +198,7 @@
   - PQC-encrypted password vault (Argon2)
   - Audit logging
 - **Tests**: 103 Rust tests passing
-- **Gap**: Uses system WebView, not a custom browser engine; OpenClaw AI sidebar not yet integrated into browser
+- **Gap**: Uses system WebView, not a custom browser engine; Q-AI Assistant sidebar not yet integrated into browser
 
 ### File Paths
 
@@ -371,7 +371,7 @@ app/
 │   │   ├── voip/            # PQ-SRTP calls
 │   │   ├── vpn/             # Connect + kill switch
 │   │   ├── anonymizer/      # PII scanning
-│   │   ├── openclaw/        # Q-AI chat + model selector
+│   │   ├── qai/             # Q-AI chat + model selector
 │   │   ├── email/           # PQC email compose
 │   │   ├── browser/         # PQC proxy browser
 │   │   └── settings/        # Theme toggle + app info

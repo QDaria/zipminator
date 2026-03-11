@@ -30,7 +30,7 @@
 - [x] Implement the `AdvancedAnonymizer` Python module (L1-L10 logic).
 - [x] Port Legacy `Zipndel` (Zip-and-Delete) logic to the PQC Vault.
 - [x] Integrate QRNG (IBM Marrakesh) for Levels 7-10 noise injection.
-- [x] Develop the "OpenClaw" Chatbot UI for in-app AI interactions.
+- [x] Develop the "Q-AI Assistant" Chatbot UI for in-app AI interactions.
 - [x] Connect JupyterLab & `zip-pqc` micromamba environment endpoints for desktop users.
 
 ## Phase 5: Agentic Systems (MCP Server) [TDD & Parallel]
@@ -63,7 +63,7 @@
 - [x] Fork Chromium or build Tauri desktop browser shell.
 - [x] Integrate PQC TLS (ML-KEM-768 for all HTTPS connections).
 - [x] Embed Q-VPN (PQ-WireGuard) as always-on browser tunnel.
-- [x] Integrate OpenClaw AI sidebar (summarize, agentic tasks, writing).
+- [x] Integrate Q-AI Assistant sidebar (summarize, agentic tasks, writing).
 - [x] QRNG-seeded session tokens and fingerprint-resistant cookie rotation.
 - [x] Zero telemetry architecture (no data exits without PQC tunnel).
 - [x] PQC password manager extension and form autofill.

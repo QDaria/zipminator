@@ -2,7 +2,7 @@
 
 ## Vision
 
-Zipminator is no longer just a file vault or key generator. It is the world's first **Post-Quantum Cryptography (PQC) Super-App**. Relying on React Native (Expo) for mobile/tablet and Tauri for desktop, the app harvests true quantum entropy directly from live quantum computers via qBraid (e.g., IBM Marrakesh, Fez 156q) to power an impenetrable suite of communication, network, data analysis, and storage tools.
+Zipminator is no longer just a file vault or key generator. It is the world's first **Post-Quantum Cryptography (PQC) Super-App**. Relying on React Native (Expo) for mobile/tablet and Tauri for desktop, the app harvests true quantum entropy directly from live quantum computers via qBraid (e.g., IBM Marrakesh, Fez 156q) to power a quantum-resistant suite of communication, network, data analysis, and storage tools.
 
 ## 1. The PQC Feature Suite (The Super-App)
 
@@ -18,7 +18,7 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 
 ### 3️⃣ Quantum VoIP & Video Calling
 
-* **Function:** Crystal-clear voice and video calling impervious to ISP interception or telecom SS7 vulnerabilities.
+* **Function:** Crystal-clear voice and video calling designed to resist ISP interception and mitigate telecom SS7 vulnerabilities.
 * **Architecture:** Decentralized WebRTC with SRTP master keys negotiated using Post-Quantum KEMs.
 
 ### 4️⃣ The Q-VPN (Device-Wide Protection)
@@ -36,7 +36,7 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
   * **L7-L9 (Quantum Noise):** Numerical data jitter and Differential Privacy using **QRNG Entropy Pool**.
   * **L10 (Quantum Pseudoanonymization):** Total data replacement using a quantum-random one-time pad mapping.
 
-### 6️⃣ "OpenClaw" PQC AI Assistant
+### 6️⃣ "Q-AI Assistant" PQC AI Assistant
 
 * **Function:** A built-in, highly capable AI chatbot interface (acting as the user's cyber-assistant).
 * **Architecture:** Either runs lightweight Local LLMs (so no data ever leaves the device) or uses Quantum-Secured API tunnels to specialized backend servers, ensuring prompt data cannot be intercepted or harvested.
@@ -50,7 +50,7 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 ### 8️⃣ ZipBrowser — PQC AI Browser
 
 * **Function:** The world's only quantum-safe AI browser. Combines agentic AI capabilities (like ChatGPT Atlas / Perplexity Comet / Dia) with full PQC transport security and built-in Q-VPN.
-* **Architecture:** Chromium-based (or Tauri-based for desktop), with OpenClaw AI sidebar, PQC TLS for all connections (ML-KEM-768 key exchange), built-in Q-VPN tunnel, QRNG-seeded session tokens, and zero telemetry. AI runs locally or through PQC-secured tunnels.
+* **Architecture:** Chromium-based (or Tauri-based for desktop), with Q-AI Assistant sidebar, PQC TLS for all connections (ML-KEM-768 key exchange), built-in Q-VPN tunnel, QRNG-seeded session tokens, and zero telemetry. AI runs locally or through PQC-secured tunnels.
 * **Differentiator:** No AI browser (Atlas, Dia, Comet, Edge Copilot) uses PQC. Every one sends queries over classical TLS. Zipminator would be first to market.
 
 ### 9️⃣ Q-Mesh — Quantum-Secured WiFi Sensing (RuView Integration)
@@ -102,7 +102,7 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 * [x] Implement the `AdvancedAnonymizer` Python module (L1-L10 logic).
 * [x] Port Legacy `Zipndel` (Zip-and-Delete) logic to the PQC Vault.
 * [x] Integrate QRNG (IBM Marrakesh) for Levels 7-10 noise injection.
-* [x] Develop the "OpenClaw" Chatbot UI for in-app AI interactions.
+* [x] Develop the "Q-AI Assistant" Chatbot UI for in-app AI interactions.
 
 ### Phase 5: Agentic Systems (MCP Server) ✅
 
@@ -134,7 +134,7 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 * [x] Build Tauri 2.x desktop browser shell (`browser/src-tauri/`). *(compiles, DMG at target/release/bundle/dmg/)*
 * [x] Integrate PQC TLS (ML-KEM-768 key exchange for all HTTPS connections). *(proxy layer with ML-KEM-768)*
 * [x] Embed Q-VPN (PQ-WireGuard) as always-on tunnel for all browser traffic. *(state machine + kill switch, packet wrapping has shortcuts)*
-* [ ] Integrate OpenClaw AI sidebar (page summarization, agentic tasks, writing assist). *(not yet integrated into browser)*
+* [ ] Integrate Q-AI Assistant sidebar (page summarization, agentic tasks, writing assist). *(not yet integrated into browser)*
 * [x] QRNG-seeded session tokens and cookie rotation for fingerprint resistance.
 * [x] Zero telemetry architecture — no data leaves device unless PQC-tunneled.
 * [x] Build extension system for PQC password manager and form autofill. *(Argon2 vault implemented)*
@@ -155,7 +155,7 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 * [ ] LinkedIn + social launch content. *(Session 4)*
 * [ ] GitHub Release v1.0.0-beta.1 tag. *(Session 5)*
 * [ ] FIPS 140-3 certification process initiation.
-* [ ] SOC 2 Type II audit preparation.
+* [ ] SOC 2 readiness assessment.
 * [ ] Enterprise pilot deployments.
 * [ ] App Store / Play Store submissions for mobile.
 

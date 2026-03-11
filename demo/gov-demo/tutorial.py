@@ -321,7 +321,7 @@ print(f"""  Algorithm          : CRYSTALS-Kyber-768 (ML-KEM)
     - Docker container (self-contained)
 
   Quantum Entropy:
-    - IBM Quantum (127-qubit Eagle processor)
+    - IBM Quantum (156-qubit Marrakesh/Fez processors via qBraid)
     - Rigetti Computing (Ankaa-3 processor)
     - System CSPRNG fallback (/dev/urandom)
 """)

@@ -59,13 +59,13 @@ Use /hive-mind-advanced for supreme coordination.
 
 PREREQUISITE CHECK:
 - Phase 3 Q-VPN (PQ-WireGuard) must be complete (needed for embedded VPN)
-- Phase 4 OpenClaw AI must be complete (needed for AI sidebar) -- already done
+- Phase 4 Q-AI Assistant must be complete (needed for AI sidebar) -- already done
 - Read docs/guides/phase8-zipbrowser-research.md for the Chromium vs Tauri decision
 
 DEPENDENCY GRAPH:
   Phase 2 crypto core --> Phase 8 PQC TLS
   Phase 3 Q-VPN -------> Phase 8 embedded VPN
-  Phase 4 OpenClaw -----> Phase 8 AI sidebar
+  Phase 4 Q-AI Assistant -----> Phase 8 AI sidebar
 
 HIERARCHICAL ORCHESTRATION:
 Create an agent team with 5 domain leads. Each lead should further
@@ -96,7 +96,7 @@ DOMAIN LEAD 3: "embedded-vpn" (Sonnet)
   RALPH loop until: all browser traffic routes through PQ-WireGuard
 
 DOMAIN LEAD 4: "ai-sidebar" (Sonnet)
-  Owns: OpenClaw AI integration in browser
+  Owns: Q-AI Assistant integration in browser
   Subagents:
   - Sidebar UI (page summarization, agentic tasks, writing assist)
   - Local LLM mode (no data leaves device)

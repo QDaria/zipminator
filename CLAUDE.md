@@ -376,7 +376,19 @@ This exports:
 - [x] Research open source PQC strategy (Apache-2.0 for crypto, proprietary for apps)
 - [x] Update CLAUDE.md: ruflo v3.5 always-on, micromamba+uv pip, RALPH, zero-hallucination
 
-### Completed (2026-03-09)
+### Completed (2026-03-09, Sprint 2)
+- [x] Wave 4 UI Polish Sprint: glass-morphic QuantumCard, PillarHeader animations, GradientBackground, PqcBadge, ShimmerPlaceholder
+- [x] OpenClaw -> Q-AI Assistant rename across 17+ files (0 references remaining)
+- [x] 66 PNGs moved from root to _screenshots/
+- [x] 15+ CLAUDE.md stubs deleted
+- [x] FIPS language violations fixed in web/docs/
+- [x] Shell scaffold upgraded: 4+More mobile nav, desktop NavigationRail with logo, AnimatedSwitcher transitions
+- [x] Theme upgraded: pageTransitions, bottomSheetTheme, dialogTheme, chipTheme, gradient helpers
+- [x] All 8 pillar screens polished with QuantumCard, PillarHeader, entry animations
+- [x] flutter analyze: 0 issues, flutter test: 23/23 pass, cargo test: 302 pass, web build: 0 errors
+- [x] MEMORY.md + FEATURES.md + implementation_plan.md updated for Q-AI rename
+
+### Completed (2026-03-09, Sprint 1)
 - [x] FEATURES.md consolidated: single source of truth at docs/guides/FEATURES.md (code-verified percentages)
 - [x] Root FEATURES.md archived to _archive/FEATURES-v0.2-2026-03-02.md
 - [x] CLAUDE.md: added mandatory session-start reads, product identity, progress tracking protocol

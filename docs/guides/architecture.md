@@ -410,7 +410,7 @@ A Tauri 2.x PQC-enabled desktop browser with:
 
 - PQC TLS proxy (ML-KEM-768 key exchange detection)
 - Built-in Q-VPN (PQ-WireGuard tunnel with kill switch)
-- OpenClaw AI sidebar (summarization, writing assist, chat)
+- Q-AI Assistant sidebar (summarization, writing assist, chat)
 - PQC password vault (Argon2 master key, ML-KEM encrypted entries)
 - Cookie rotation and fingerprint resistance
 - Zero telemetry architecture

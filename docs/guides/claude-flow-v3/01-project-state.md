@@ -20,7 +20,7 @@
 | **Gov Demo** | Done | `demo/gov-demo/` with install script and tutorial |
 | **CI/CD Workflows** | Done | `.github/workflows/` with CI, security, release, benchmarks |
 | **10-Level Anonymizer** | Done | L1-L10 processing, QRNG Levels 7-10, AdvancedAnonymizer module |
-| **OpenClaw AI** | Done | Chat UI, PQC tunnel mode, prompt injection defense |
+| **Q-AI Assistant** | Done | Chat UI, PQC tunnel mode, prompt injection defense |
 | **MCP Server** | Done | Kyber/Dilithium tools, QRNG harvesting, PII scanning |
 | **Agentic Skills** | Done | `/anonymize-vault`, `/pqc-shield`, `/quantum-status` commands |
 
@@ -38,7 +38,7 @@
 | Component | % | Remaining Work |
 |-----------|---|---------------|
 | **Production Deploy** | 80% | Live at zipminator.zip, OAuth, waitlist, pitch deck done |
-| **Certifications** | 0% | FIPS 140-3 initiation, SOC 2 Type II audit |
+| **Certifications** | 0% | FIPS 140-3 initiation, SOC 2 readiness assessment |
 | **Enterprise Pilots** | 0% | Needs sales outreach, pilot agreements |
 | **App Store Submissions** | 0% | iOS App Store, Google Play Store |
 
@@ -61,7 +61,7 @@ Phase 9 (Production/GTM)🟡 80%
     ├── Supabase waitlist ✅
     ├── Grant templates (10 institutions) ✅
     ├── FIPS 140-3 certification 📋
-    ├── SOC 2 Type II audit 📋
+    ├── SOC 2 readiness assessment 📋
     ├── Enterprise pilots 📋
     └── App Store submissions 📋
 ```
@@ -90,7 +90,7 @@ See [15-entropy-pool.md](15-entropy-pool.md) for full details.
 | Task | Priority | Agent Type | Status |
 |------|----------|-----------|--------|
 | FIPS 140-3 certification process initiation | Critical | manual | Not started |
-| SOC 2 Type II audit preparation | Critical | manual | Not started |
+| SOC 2 readiness assessment preparation | Critical | manual | Not started |
 | Enterprise pilot deployments (finance, gov) | High | manual | Not started |
 | iOS App Store submission | High | `coder` + manual | Not started |
 | Google Play Store submission | High | `coder` + manual | Not started |
