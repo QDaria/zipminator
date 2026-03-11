@@ -7059,6 +7059,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "zipminator-mesh"
+version = "1.0.0"
+dependencies = [
+ "hex",
+ "hkdf",
+ "log",
+ "sha2",
+ "subtle",
+ "tempfile",
+ "thiserror 1.0.69",
+ "zeroize",
+]
+
+[[package]]
 name = "zipminator-nist"
 version = "1.0.0"
 dependencies = [
