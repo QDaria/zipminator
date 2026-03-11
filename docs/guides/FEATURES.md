@@ -2,7 +2,9 @@
 
 > **Single Source of Truth** for all pillar statuses. Updated after every code change session.
 >
-> Last verified: 2026-03-09 | Verifier: Claude Code audit
+> Last verified: 2026-03-11 | Verifier: Claude Code audit
+>
+> Percentages code-verified Mar 11 2026. Previous inflated estimates corrected.
 >
 > **Major update**: Flutter Super-App (Wave 1-3 complete). Single codebase for all platforms.
 
@@ -19,14 +21,14 @@
 | # | Pillar | Overall | Crypto | Tests | UI | Integration | Notes |
 |---|--------|:-------:|:------:|:-----:|:--:|:-----------:|-------|
 | 1 | **Quantum Vault** | **95%** | Done | Done | Done | 95% | Self-destruct UI wiring incomplete |
-| 2 | **PQC Messenger** | **85%** | Done | Done | Done | 85% | No message persistence/storage |
-| 3 | **Quantum VoIP** | **80%** | Done | Done | Done | 80% | Media protection limited by WebRTC |
+| 2 | **PQC Messenger** | **75%** | Done | Done | Done | 75% | No message persistence layer; messages exist only in-session |
+| 3 | **Quantum VoIP** | **60%** | Partial | Done | Done | 60% | SRTP key derivation works; no actual media stream protection |
 | 4 | **Q-VPN** | **90%** | Done | Done | Done | 90% | Packet wrapping has shortcuts |
-| 5 | **10-Level Anonymizer** | **100%** | Done | Done | Done | Done | L1-7 production, L8-10 stubbed by design |
-| 6 | **Q-AI Assistant** | **85%** | Done | Done | Done | 85% | Local LLM needs model files |
-| 7 | **Quantum Mail** | **90%** | Done | Done | Partial | 90% | Crypto library complete, no SMTP/IMAP server |
+| 5 | **10-Level Anonymizer** | **70%** | Partial | Done | Done | 70% | Binary PII detection only; 10-level granularity not implemented |
+| 6 | **Q-AI Assistant** | **30%** | Partial | Partial | Done | 30% | Stub LLM; no real backend, no prompt injection defense wired |
+| 7 | **Quantum Mail** | **60%** | Done | Done | Partial | 60% | Envelope crypto works; no SMTP/IMAP transport deployed |
 | 8 | **ZipBrowser** | **75%** | Done | 103 tests | Done | 75% | Compiles, no real browser engine integration |
-| 9 | **Q-Mesh (RuView)** | **15%** | Planned | Planned | Planned | 15% | QRNG integration planned; RuView ADR-032 mesh security ready |
+| 9 | **Q-Mesh (RuView)** | **10%** | Planned | Planned | Planned | 10% | Entropy bridge skeleton only; no RuView integration |
 
 **Legend**: Done = code exists, tested, reviewed | Partial = code exists but incomplete | Planned = no code yet
 
@@ -58,11 +60,12 @@
 
 ---
 
-## Pillar 2: PQC Messenger (85%)
+## Pillar 2: PQC Messenger (75%)
 
 - **Protocol**: Post-Quantum Double Ratchet — ML-KEM-768 for ratchet key exchange, AES-256-GCM for payloads, HKDF-SHA-256 chain keys with forward secrecy
 - **Transport**: WebSocket signaling (FastAPI) + WebRTC data channels
-- **Gap**: No message persistence layer (messages exist only in-session)
+- **What works**: Ratchet key exchange, message encrypt/decrypt roundtrip, session state management
+- **What's missing**: No message persistence layer (messages exist only in-session); no offline message queue; no group chat support
 
 ### File Paths
 
@@ -77,12 +80,13 @@
 
 ---
 
-## Pillar 3: Quantum VoIP & Video (80%)
+## Pillar 3: Quantum VoIP & Video (60%)
 
 - **Media**: WebRTC peer connections with native camera/microphone
 - **Security**: PQ-SRTP — SRTP master keys derived from ML-KEM-768 shared secrets
 - **Signaling**: Shared WebSocket signaling server with Messenger
-- **Gap**: Media protection constrained by WebRTC's SRTP implementation; can't replace DTLS-SRTP key exchange at browser level
+- **What works**: SRTP key derivation from ML-KEM-768 shared secret; call state machine; signaling WebSocket
+- **What's missing**: No actual media stream encryption (only key derivation exists); WebRTC DTLS-SRTP key exchange not replaced at browser level; no TURN/STUN server; no call recording or voicemail
 
 ### File Paths
 
@@ -116,14 +120,12 @@
 
 ---
 
-## Pillar 5: 10-Level Anonymization Suite (100%)
+## Pillar 5: 10-Level Anonymization Suite (70%)
 
 - **Origins**: Production code from NAV (Norwegian Labour and Welfare Administration), upgraded with PQC + QRNG
-- **L1-L3**: Regex masking, partial redaction, static masking — production
-- **L4-L6**: PQC pseudonymization (SHA-3 + Kyber seed), generalization, suppression — production
-- **L7**: Quantum Jitter (QRNG Gaussian noise 5% sigma) — production
-- **L8-L10**: Differential Privacy (Laplace epsilon=0.1), Enhanced K-Anonymity, Total Quantum Pseudoanonymization — stubbed by design (requires Enterprise QRNG allocation)
-- **Integration**: JupyterLab + `zip-pqc` micromamba env, Pandas DataFrames, CLI, MCP tools
+- **What works**: Binary PII detection (present/absent) with 20+ pattern types; regex masking for detected fields; Pandas DataFrame integration; JupyterLab + `zip-pqc` micromamba env; CLI; MCP tools
+- **What's missing**: The "10 levels" of graduated anonymization are not implemented as discrete, selectable levels in code; only binary detection and masking exist. L4-L10 (PQC pseudonymization, generalization, suppression, quantum jitter, differential privacy, k-anonymity) are described but not wired as selectable tiers in the anonymizer engine
+- **Integration**: JupyterLab, Pandas DataFrames, CLI, MCP tools
 
 ### File Paths
 
@@ -140,12 +142,10 @@
 
 ---
 
-## Pillar 6: Q-AI PQC AI Assistant (85%)
+## Pillar 6: Q-AI PQC AI Assistant (30%)
 
-- **Local LLM mode**: Architecture exists, no data leaves the device
-- **PQC tunnel mode**: Prompts routed through Q-VPN to backend LLMs
-- **AIDefence**: Prompt injection and PII scanning before send
-- **Gap**: Local LLM requires user to provide model files; no bundled model
+- **What works**: UI shell (Flutter screen with model selector, chat interface); Tauri AI sidebar with config structs; Rust module stubs for cloud_llm and local_llm
+- **What's missing**: No real LLM backend (stub only, returns placeholder responses); no prompt injection defense wired; no PII scanning before send; no local model loading; no PQC tunnel mode for remote LLM calls; AIDefence is config only, not functional
 
 ### File Paths
 
@@ -159,14 +159,11 @@
 
 ---
 
-## Pillar 7: Quantum-Secure Email (90%)
+## Pillar 7: Quantum-Secure Email (60%)
 
 - **Domain**: `@zipminator.zip` (`.zip` = real Google TLD, brand-perfect)
-- **Crypto library**: ML-KEM-768 key exchange, AES-256-GCM at rest, QRNG-seeded per-message keys — complete
-- **PII protection**: Auto-scans outgoing emails for 20+ PII types
-- **Self-destruct**: Timer-based + read-receipt triggered message deletion
-- **Attachment anonymization**: L1-L10 for outgoing files
-- **Gap**: No SMTP/IMAP server deployed; crypto library ready but not connected to mail transport
+- **What works**: Envelope crypto (ML-KEM-768 key exchange, AES-256-GCM at rest, QRNG-seeded per-message keys); Rust `email_crypto.rs` encrypt/decrypt roundtrip; config files for Postfix/Dovecot exist
+- **What's missing**: No SMTP/IMAP transport deployed or tested end-to-end; self-destruct timer is UI-only (no server-side enforcement); attachment anonymization references L1-L10 but anonymizer only does binary detection (see Pillar 5); PII scanning not wired into email pipeline
 
 ### File Paths
 
@@ -217,7 +214,7 @@
 
 ---
 
-## Pillar 9: Q-Mesh — Quantum-Secured WiFi Sensing (15%)
+## Pillar 9: Q-Mesh — Quantum-Secured WiFi Sensing (10%)
 
 - **Integration**: [RuView](https://github.com/MoHoushmand/RuView) WiFi DensePose system with Zipminator QRNG entropy
 - **What RuView does**: ESP32-S3 mesh network that senses human pose, breathing, heartbeat, and presence through WiFi CSI signals. No cameras, no wearables, no internet required
@@ -225,7 +222,8 @@
 - **Zipminator integration**: Replace the classical random entropy source for mesh key generation and rotation with Zipminator's QRNG (IBM Quantum 156q). The QRNG harvester produces 50KB/cycle; a mesh key is 16 bytes. This creates quantum-secured WiFi sensing mesh
 - **QUIC transport (ADR-032a)**: Aggregator-class nodes use `midstreamer-quic` with TLS 1.3 AEAD. ESP32-S3 nodes retain manual HMAC/SipHash over UDP
 - **Use cases**: Healthcare (vital sign monitoring, fall detection), defense (through-wall personnel tracking), elder care, smart buildings
-- **Gap**: No code integration yet; RuView and Zipminator are separate repos. Integration requires: (1) QRNG-seeded key provisioning in `scripts/provision.py`, (2) entropy bridge crate linking `zipminator-core` QRNG to RuView mesh key derivation, (3) shared NVS key management
+- **What works**: Entropy bridge skeleton exists in `crates/zipminator-mesh/`; RuView ADR-032 mesh security spec is documented
+- **What's missing**: No actual RuView integration; entropy bridge crate has no functional code; no QRNG-seeded key provisioning in `scripts/provision.py`; no shared NVS key management; RuView and Zipminator remain entirely separate repos with no code linking them
 
 ### Architecture
 
@@ -459,7 +457,7 @@ Settings screen: theme toggle (dark/light), Rust bridge version, crypto engine i
 
 ---
 
-## Test Summary (verified 2026-03-09)
+## Test Summary (verified 2026-03-11)
 
 | Suite | Count | Command |
 |-------|:-----:|---------|
@@ -469,9 +467,10 @@ Settings screen: theme toggle (dark/light), Rust bridge version, crypto engine i
 | Rust FRB bridge | 17 | `cargo test -p rust_lib_zipminator` |
 | Rust NIST | 5 | `cargo test -p nist-kat` |
 | Rust bench | 17 | `cargo test -p zipminator-bench` |
-| **Rust total** | **302** | `cargo test --workspace` |
+| Rust mesh | 15 | `cargo test -p zipminator-mesh` |
+| **Rust total** | **332** | `cargo test --workspace` |
 | Flutter widget | 23 | `cd app && flutter test` |
-| Web vitest | 15 | `cd web && npm test` |
+| Web vitest | 30 | `cd web && npm test` |
 | Mobile Expo | 267/274 | `cd mobile && npm test` |
 | Python | 116 | `micromamba activate zip-pqc && pytest tests/` |
 
@@ -531,4 +530,4 @@ Matrix: ubuntu-latest + macos-latest for Flutter; ubuntu-latest for Rust bridge.
 
 ---
 
-*Last verified: 2026-03-09 | QDaria AS*
+*Last verified: 2026-03-11 | QDaria AS*

@@ -13,8 +13,10 @@ use thiserror::Error;
 
 /// Health status of a QRNG device
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Default)]
 pub enum HealthStatus {
     /// Device is healthy and operating normally
+    #[default]
     Healthy,
     /// Device is degraded but still functional
     Degraded,
@@ -22,11 +24,6 @@ pub enum HealthStatus {
     Failed,
 }
 
-impl Default for HealthStatus {
-    fn default() -> Self {
-        HealthStatus::Healthy
-    }
-}
 
 /// Errors that can occur during QRNG operations
 #[derive(Error, Debug)]

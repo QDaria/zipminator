@@ -95,7 +95,7 @@ pub struct ErrorContext {
     pub column: u32,
     pub operation: Option<String>,
     pub details: Option<String>,
-    #[cfg_attr(feature = "config", serde(skip))]
+    #[cfg_attr(feature = "config", serde(skip, default = "std::time::SystemTime::now"))]
     pub timestamp: std::time::SystemTime,
 }
 

@@ -13,7 +13,7 @@ mod tabs;
 use state::AppState;
 #[cfg(feature = "vpn")]
 use state::VpnState;
-use tauri::{Listener, Manager};
+use tauri::Manager;
 
 fn main() {
     // Initialize structured logging (tracing for domain modules, env_logger for shell).

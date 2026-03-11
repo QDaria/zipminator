@@ -97,7 +97,7 @@ fn aes256_key_wrap(kek: &[u8; 32], plaintext: &[u8]) -> Result<Vec<u8>, EmailCry
     use aes::Aes256;
 
     let n = plaintext.len() / 8;
-    if plaintext.len() % 8 != 0 || n < 2 {
+    if !plaintext.len().is_multiple_of(8) || n < 2 {
         return Err(EmailCryptoError::KeyWrapError(
             "plaintext must be >= 16 bytes and a multiple of 8",
         ));
@@ -117,11 +117,11 @@ fn aes256_key_wrap(kek: &[u8; 32], plaintext: &[u8]) -> Result<Vec<u8>, EmailCry
     let mut a = KW_IV.to_be_bytes();
 
     for j in 0..6u64 {
-        for i in 0..n {
+        for (i, r_block) in r.iter_mut().enumerate().take(n) {
             // B = AES(A || R[i])
             let mut block = [0u8; 16];
             block[..8].copy_from_slice(&a);
-            block[8..].copy_from_slice(&r[i]);
+            block[8..].copy_from_slice(r_block);
 
             let b = aes::Block::from_mut_slice(&mut block);
             cipher.encrypt_block(b);
@@ -132,7 +132,7 @@ fn aes256_key_wrap(kek: &[u8; 32], plaintext: &[u8]) -> Result<Vec<u8>, EmailCry
             a_val ^= t;
             a = a_val.to_be_bytes();
 
-            r[i].copy_from_slice(&block[8..]);
+            r_block.copy_from_slice(&block[8..]);
         }
     }
 
@@ -153,7 +153,7 @@ fn aes256_key_unwrap(kek: &[u8; 32], wrapped: &[u8]) -> Result<Vec<u8>, EmailCry
     use aes::cipher::{BlockDecrypt, KeyInit as AesKeyInit};
     use aes::Aes256;
 
-    if wrapped.len() < 24 || wrapped.len() % 8 != 0 {
+    if wrapped.len() < 24 || !wrapped.len().is_multiple_of(8) {
         return Err(EmailCryptoError::KeyWrapError(
             "wrapped key must be >= 24 bytes and a multiple of 8",
         ));

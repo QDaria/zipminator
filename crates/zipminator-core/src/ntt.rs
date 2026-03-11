@@ -93,8 +93,8 @@ pub fn invntt(poly: &mut [i16; KYBER_N]) {
 
     // Multiply by f = mont^2/128 and normalize
     const F: i16 = 1441;
-    for i in 0..KYBER_N {
-        poly[i] = montgomery_reduce(F as i32 * poly[i] as i32);
+    for coeff in poly.iter_mut().take(KYBER_N) {
+        *coeff = montgomery_reduce(F as i32 * *coeff as i32);
     }
 }
 

@@ -330,7 +330,7 @@ impl PasswordVault {
             let byte = self.entropy.read_bytes(1)[0] as usize;
             // Rejection sampling to avoid modulo bias.
             let limit = 256 - (256 % charset_len);
-            if (byte as usize) < limit {
+            if byte < limit {
                 out.push(CHARSET[byte % charset_len]);
             }
             attempts += 1;

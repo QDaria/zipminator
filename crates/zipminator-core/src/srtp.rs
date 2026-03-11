@@ -125,7 +125,7 @@ pub unsafe extern "C" fn zipminator_derive_srtp_keys(
     out_key: *mut u8,         // 16 bytes
     out_salt: *mut u8,        // 14 bytes
 ) -> c_int {
-    match catch_unwind(AssertUnwindSafe(|| {
+    catch_unwind(AssertUnwindSafe(|| {
         if shared_secret.is_null() || out_key.is_null() || out_salt.is_null() {
             return -1;
         }
@@ -139,10 +139,7 @@ pub unsafe extern "C" fn zipminator_derive_srtp_keys(
         std::ptr::copy_nonoverlapping(material.master_salt.as_ptr(), out_salt, 14);
 
         0
-    })) {
-        Ok(result) => result,
-        Err(_) => -2,
-    }
+    })).unwrap_or(-2)
 }
 
 // ── Tests ──────────────────────────────────────────────────────────────────

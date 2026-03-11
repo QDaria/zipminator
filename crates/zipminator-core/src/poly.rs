@@ -12,6 +12,12 @@ pub struct Poly {
     pub coeffs: [i16; KYBER_N],
 }
 
+impl Default for Poly {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Poly {
     pub fn new() -> Self {
         Self {
@@ -198,6 +204,12 @@ impl Poly {
 #[derive(Clone)]
 pub struct PolyVec {
     pub polys: [Poly; KYBER_K],
+}
+
+impl Default for PolyVec {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PolyVec {

@@ -16,8 +16,10 @@
 
 pub mod entropy_bridge;
 pub mod mesh_key;
+pub mod provisioner;
 pub mod siphash_key;
 
 pub use entropy_bridge::{EntropyBridge, EntropyBridgeError, PoolEntropySource};
 pub use mesh_key::MeshKey;
+pub use provisioner::MeshProvisioner;
 pub use siphash_key::SipHashKey;

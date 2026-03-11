@@ -16,13 +16,9 @@ pub const MAX_SKIP: u32 = 1000;
 
 /// A 32-byte secret that zeroes itself when dropped.
 #[derive(Clone, Zeroize, ZeroizeOnDrop)]
+#[derive(Default)]
 pub struct SecretKey32(pub [u8; 32]);
 
-impl Default for SecretKey32 {
-    fn default() -> Self {
-        Self([0u8; 32])
-    }
-}
 
 /// Holds the raw bytes of a Kyber768 keypair so we can zeroize them.
 #[derive(Zeroize, ZeroizeOnDrop)]

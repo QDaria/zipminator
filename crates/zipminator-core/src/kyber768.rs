@@ -59,6 +59,11 @@ impl SecretKey {
     pub fn len(&self) -> usize {
         self.data.len()
     }
+
+    /// Returns true if the secret key data is empty
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
 }
 
 impl Drop for SecretKey {
@@ -119,6 +124,7 @@ impl Kyber768 {
     }
 
     /// Generate a keypair from a seed (deterministic)
+    #[allow(clippy::needless_range_loop)]
     pub fn keypair_from_seed(seed: &[u8; KYBER_SYMBYTES]) -> (PublicKey, SecretKey) {
         // Hash the seed
         let hash = sha3_512(seed);
@@ -189,6 +195,7 @@ impl Kyber768 {
     }
 
     /// Encapsulate with provided randomness (for testing)
+    #[allow(clippy::needless_range_loop)]
     pub fn encapsulate_with_coins(
         pk: &PublicKey,
         coins: &[u8; KYBER_SYMBYTES],
@@ -387,6 +394,7 @@ impl Kyber768 {
     }
 
     /// Generate matrix A (or A^T)
+    #[allow(clippy::needless_range_loop)]
     fn gen_matrix(seed: &[u8; KYBER_SYMBYTES], transposed: bool) -> Vec<PolyVec> {
         let mut matrix = vec![PolyVec::new(); KYBER_K];
 

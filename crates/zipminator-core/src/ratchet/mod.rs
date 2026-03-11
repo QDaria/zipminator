@@ -52,6 +52,12 @@ pub struct PqcRatchet {
     pub root_key: [u8; 32],
 }
 
+impl Default for PqcRatchet {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PqcRatchet {
     pub fn new() -> Self {
         let (pk, sk) = kyber768::keypair();
@@ -591,6 +597,51 @@ impl PqRatchetSession {
     /// Return true if the handshake is complete.
     pub fn is_ready(&self) -> bool {
         self.handshake_complete
+    }
+
+    // ── Store-integrated convenience methods ─────────────────────────────
+
+    /// Encrypt a plaintext message and persist it to the given store.
+    ///
+    /// Returns the message id assigned by the store.
+    pub fn encrypt_and_store(
+        &mut self,
+        store: &mut dyn crate::message_store::MessageStore,
+        conversation_id: &str,
+        sender: &str,
+        plaintext: &[u8],
+        sequence: u32,
+    ) -> Result<String, RatchetError> {
+        let (header, ciphertext) = self.encrypt(plaintext)?;
+
+        let id = format!("{}-{}-{}", conversation_id, sender, sequence);
+        let msg = crate::message_store::EncryptedMessage {
+            id: id.clone(),
+            conversation_id: conversation_id.to_string(),
+            sender: sender.to_string(),
+            ciphertext,
+            nonce: header, // header doubles as authenticated envelope
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs(),
+            sequence,
+        };
+        store.store_message(msg)?;
+        Ok(id)
+    }
+
+    /// Retrieve a stored message and decrypt it.
+    pub fn retrieve_and_decrypt(
+        &mut self,
+        store: &dyn crate::message_store::MessageStore,
+        message_id: &str,
+    ) -> Result<Vec<u8>, RatchetError> {
+        let msg = store
+            .get_message(message_id)?
+            .ok_or(RatchetError::Other("message not found in store"))?;
+        // nonce field holds the ratchet header bytes
+        self.decrypt(&msg.nonce, &msg.ciphertext)
     }
 }
 

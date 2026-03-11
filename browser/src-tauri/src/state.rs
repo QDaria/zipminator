@@ -34,6 +34,7 @@ impl Default for ProxyConfig {
 
 /// VPN connection status (mirrored in AppState for synchronous read by the status bar).
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Default)]
 pub struct VpnState {
     pub connected: bool,
     pub server_location: Option<String>,
@@ -44,33 +45,19 @@ pub struct VpnState {
     pub always_on: bool,
 }
 
-impl Default for VpnState {
-    fn default() -> Self {
-        Self {
-            connected: false,
-            server_location: None,
-            protocol: None,
-            uptime_secs: 0,
-            always_on: false,
-        }
-    }
-}
 
 /// QRNG entropy pool status.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[derive(Default)]
 pub enum EntropyStatus {
     Available,
     Harvesting,
     Depleted,
+    #[default]
     Unknown,
 }
 
-impl Default for EntropyStatus {
-    fn default() -> Self {
-        Self::Unknown
-    }
-}
 
 /// Bookmark entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]

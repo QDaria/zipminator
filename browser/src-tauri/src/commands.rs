@@ -7,8 +7,7 @@ use crate::navigation;
 use crate::state::{AppState, Bookmark, EntropyStatus, SecurityLevel, VpnState};
 use crate::tabs::Tab;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-use tauri::{AppHandle, State};
+use tauri::State;
 
 // ---------------------------------------------------------------------------
 // Tab commands

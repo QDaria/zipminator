@@ -19,18 +19,15 @@ pub const CONNECTION_TIMEOUT_SECS: u64 = 30;
 
 /// Proxy operating mode.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Default)]
 pub enum ProxyMode {
     /// Allow both PQC and classical TLS (prefer PQC).
+    #[default]
     Hybrid,
     /// Refuse connections that cannot negotiate PQC key exchange.
     PqcOnly,
 }
 
-impl Default for ProxyMode {
-    fn default() -> Self {
-        Self::Hybrid
-    }
-}
 
 /// Full proxy configuration.
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -1,15 +1,15 @@
-/// IBM Quantum QRNG Device
-///
-/// Provides quantum entropy from IBM Quantum systems via:
-/// 1. Pre-generated entropy pool file (primary, offline)
-/// 2. IBM Quantum API (optional, requires authentication)
-/// 3. System /dev/urandom (fallback)
-///
-/// Features:
-/// - File-based entropy pool for offline operation
-/// - Automatic fallback when pool exhausted
-/// - Health monitoring and logging
-/// - Thread-safe concurrent access
+//! IBM Quantum QRNG Device
+//!
+//! Provides quantum entropy from IBM Quantum systems via:
+//! 1. Pre-generated entropy pool file (primary, offline)
+//! 2. IBM Quantum API (optional, requires authentication)
+//! 3. System /dev/urandom (fallback)
+//!
+//! Features:
+//! - File-based entropy pool for offline operation
+//! - Automatic fallback when pool exhausted
+//! - Health monitoring and logging
+//! - Thread-safe concurrent access
 
 use super::{HealthStatus, QrngDevice, QrngError};
 use log::{info, warn};

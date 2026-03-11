@@ -1,7 +1,7 @@
-/// Entropy Pool for QRNG Buffering
-///
-/// Provides thread-safe buffering of quantum random data with automatic refilling,
-/// health monitoring, and minimum entropy guarantees.
+//! Entropy Pool for QRNG Buffering
+//!
+//! Provides thread-safe buffering of quantum random data with automatic refilling,
+//! health monitoring, and minimum entropy guarantees.
 
 use super::{HealthStatus, QrngDevice, QrngError};
 use crossbeam::channel::{bounded, Receiver, Sender};

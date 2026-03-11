@@ -11,12 +11,15 @@
 
 pub mod constants;
 pub mod email_crypto;
+pub mod email_transport;
 pub mod entropy_source;
 pub mod errors;
 pub mod ffi;
 pub mod kyber768;
+pub mod message_store;
 pub mod ntt;
 pub mod openpgp_keys;
+pub mod anonymize;
 pub mod pii;
 pub mod poly;
 pub mod qrng;
@@ -24,6 +27,7 @@ pub mod quantum_entropy_pool;
 pub mod ratchet;
 pub mod srtp;
 pub mod utils;
+pub mod voip_session;
 
 // Python bindings module - this is the entry point for Python
 #[cfg(feature = "pyo3")]

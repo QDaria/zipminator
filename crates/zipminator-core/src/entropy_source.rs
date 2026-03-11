@@ -1,7 +1,7 @@
-/// Entropy Source Abstraction
-///
-/// Provides a unified interface for accessing entropy from multiple sources with
-/// automatic fallback handling.
+//! Entropy Source Abstraction
+//!
+//! Provides a unified interface for accessing entropy from multiple sources with
+//! automatic fallback handling.
 
 use crate::qrng::{ibm_quantum::IBMQuantumQRNG, QrngDevice, QrngError};
 use log::{info, warn};
@@ -56,8 +56,10 @@ pub struct IBMQuantumEntropySource {
 impl IBMQuantumEntropySource {
     /// Create a new IBM Quantum entropy source
     pub fn new(pool_path: &str) -> Result<Self, Error> {
-        let mut config = crate::qrng::ibm_quantum::IBMQuantumConfig::default();
-        config.pool_file_path = pool_path.into();
+        let config = crate::qrng::ibm_quantum::IBMQuantumConfig {
+            pool_file_path: pool_path.into(),
+            ..Default::default()
+        };
 
         let mut device = IBMQuantumQRNG::with_config(config);
         device.initialize()?;

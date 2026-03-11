@@ -28,7 +28,7 @@ pub struct KATVector {
 /// Convert hex string to bytes
 fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, String> {
     let hex = hex.trim();
-    if hex.len() % 2 != 0 {
+    if !hex.len().is_multiple_of(2) {
         return Err("Hex string must have even length".to_string());
     }
 
@@ -63,7 +63,7 @@ fn compare_bytes(name: &str, actual: &[u8], expected: &[u8]) -> bool {
                       name, i, e, a);
 
             // Show context around error
-            let start = if i > 8 { i - 8 } else { 0 };
+            let start = i.saturating_sub(8);
             let end = std::cmp::min(i + 8, actual.len());
 
             eprintln!("Context (bytes {} to {}):", start, end);
@@ -221,8 +221,8 @@ pub fn generate_sample_vectors() -> Vec<KATVector> {
 
     // Create a simple test vector with known seed
     let mut seed = vec![0u8; 48];
-    for i in 0..48 {
-        seed[i] = i as u8;
+    for (i, byte) in seed.iter_mut().enumerate().take(48) {
+        *byte = i as u8;
     }
 
     // Generate expected values using our implementation

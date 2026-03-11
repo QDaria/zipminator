@@ -124,7 +124,7 @@ impl ExtensionRegistry {
     pub fn register(&mut self, manifest: ExtensionManifest, install_path: &str) -> String {
         let id = format!(
             "ext_{}",
-            uuid::Uuid::new_v4().to_string().replace('-', "")[..12].to_string()
+            &uuid::Uuid::new_v4().to_string().replace('-', "")[..12]
         );
         let info = ExtensionInfo {
             id: id.clone(),

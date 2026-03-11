@@ -1,7 +1,7 @@
-/// Mock QRNG Device for Testing
-///
-/// Provides a deterministic mock implementation of QrngDevice for use in tests
-/// and CI environments where real quantum hardware is not available.
+//! Mock QRNG Device for Testing
+//!
+//! Provides a deterministic mock implementation of QrngDevice for use in tests
+//! and CI environments where real quantum hardware is not available.
 
 use super::{HealthStatus, QrngDevice, QrngError};
 use std::sync::Mutex;

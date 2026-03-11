@@ -282,7 +282,7 @@ pub fn luhn_validate(number: &str) -> bool {
         double = !double;
     }
 
-    sum % 10 == 0
+    sum.is_multiple_of(10)
 }
 
 /// Basic US SSN format validator.
@@ -329,7 +329,7 @@ fn apply_validator(validator_type: &Option<String>, matched: &str) -> bool {
 ///
 /// * `text` - The text to scan for PII
 /// * `countries` - Country codes to filter by (e.g. `["us", "uk"]`).
-///                 An empty slice means scan all registered countries.
+///   An empty slice means scan all registered countries.
 ///
 /// # Returns
 ///

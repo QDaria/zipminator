@@ -315,7 +315,7 @@ impl CloudLlmClient {
         loop {
             let resp = self
                 .http
-                .post(&self.completions_url())
+                .post(self.completions_url())
                 .bearer_auth(&self.config.api_key)
                 .header("Content-Type", "application/json")
                 .json(&body)
@@ -379,7 +379,7 @@ impl CloudLlmClient {
         loop {
             let resp = self
                 .http
-                .post(&self.completions_url())
+                .post(self.completions_url())
                 .bearer_auth(&self.config.api_key)
                 .header("Content-Type", "application/json")
                 .json(&body)

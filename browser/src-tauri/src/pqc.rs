@@ -60,8 +60,8 @@ pub fn pqc_keygen() -> Result<PqcKeypair, String> {
     Ok(PqcKeypair {
         pk_size: pk_bytes.len(),
         sk_size: sk_bytes.len(),
-        public_key: B64.encode(&pk_bytes),
-        secret_key: B64.encode(&sk_bytes),
+        public_key: B64.encode(pk_bytes),
+        secret_key: B64.encode(sk_bytes),
     })
 }
 
@@ -75,7 +75,7 @@ pub fn pqc_encapsulate(public_key_b64: String) -> Result<PqcEncapsulation, Strin
     let ct_bytes = &ct.data;
     Ok(PqcEncapsulation {
         ct_size: ct_bytes.len(),
-        ciphertext: B64.encode(&ct_bytes),
+        ciphertext: B64.encode(ct_bytes),
         shared_secret: B64.encode(ss.as_bytes()),
     })
 }
