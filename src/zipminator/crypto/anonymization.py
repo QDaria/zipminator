@@ -6,14 +6,34 @@ Provides progressive data anonymization from basic masking to homomorphic encryp
 import hashlib
 import random
 import string
-import numpy as np
-import pandas as pd
 from typing import List, Dict, Any, Optional
-from faker import Faker
+
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    np = None  # type: ignore
+    NUMPY_AVAILABLE = False
+
+try:
+    import pandas as pd
+    PANDAS_AVAILABLE = True
+except ImportError:
+    pd = None  # type: ignore
+    PANDAS_AVAILABLE = False
+
+try:
+    from faker import Faker
+    FAKER_AVAILABLE = True
+except ImportError:
+    Faker = None  # type: ignore
+    FAKER_AVAILABLE = False
+
 try:
     from phe import paillier
     PHE_AVAILABLE = True
 except ImportError:
+    paillier = None  # type: ignore
     PHE_AVAILABLE = False
 
 
@@ -28,7 +48,7 @@ class AnonymizationEngine:
 
     def __init__(self):
         self._token_maps = {}
-        self.faker = Faker()
+        self.faker = Faker() if FAKER_AVAILABLE else None
         self.public_key = None
         self.private_key = None
         self.qrand = QuantumRandom()  # Initialize Quantum Random Generator
@@ -97,10 +117,16 @@ class AnonymizationEngine:
                     df[col] = df[col].apply(
                         lambda x: x + np.random.laplace(0, scale))
                 else:
+                    # For text columns, always replace to prevent PII leakage.
+                    # A truthful-response probability > 0 would leak original
+                    # values, which violates the anonymization contract.
                     df[col] = df[col].apply(
-                        lambda x: self._randomized_response(x))
+                        lambda x: self._randomized_response(x, p=0.0))
 
             elif level == 10:
+                if not PHE_AVAILABLE:
+                    # Degrade to L9 (differential privacy) if phe not installed
+                    return self.apply_anonymization(df, [col], level=9)
                 # Real Homomorphic Encryption using Paillier
                 if not self.public_key:
                     self.public_key, self.private_key = paillier.generate_paillier_keypair()
@@ -148,6 +174,11 @@ class AnonymizationEngine:
 
     def _generate_synthetic(self, column_name: str) -> str:
         """Generate synthetic data based on column name hints."""
+        if not self.faker:
+            # Fallback without faker: generate random string
+            chars = string.ascii_letters + string.digits
+            return ''.join([self.qrand.choice(chars) for _ in range(12)])
+
         col_lower = column_name.lower()
 
         if 'name' in col_lower:
@@ -168,13 +199,22 @@ class AnonymizationEngine:
             return self.faker.word()
 
     def _apply_k_anonymity(self, df: pd.DataFrame, quasi_identifiers: List[str], k: int = 5) -> pd.DataFrame:
-        """Apply k-anonymity by generalizing quasi-identifiers."""
+        """Apply k-anonymity by generalizing quasi-identifiers.
+
+        Numeric columns are bucketed into ranges. Text columns are
+        generalized to category prefixes so that the original PII value
+        is never preserved verbatim.
+        """
         df_copy = df.copy()
 
         for col in quasi_identifiers:
             if pd.api.types.is_numeric_dtype(df_copy[col]):
                 df_copy[col] = df_copy[col].apply(
                     lambda x: self._generalize_numeric(x, bucket_size=10))
+            else:
+                # Generalize text to category prefix (same as L4 text path)
+                df_copy[col] = df_copy[col].apply(
+                    lambda x: self._generalize_text(x))
 
         return df_copy
 
