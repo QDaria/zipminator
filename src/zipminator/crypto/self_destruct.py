@@ -3,10 +3,11 @@
 This module provides secure data destruction capabilities for sensitive information.
 """
 
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Dict
 from pathlib import Path
 import os
 import shutil
+import time as _time
 from datetime import datetime, timedelta
 import logging
 
@@ -242,3 +243,112 @@ class SelfDestruct:
         except Exception as e:
             logger.error(f"Error saving operations log: {e}")
             raise RuntimeError(f"Failed to save operations log: {e}") from e
+
+
+# ---------------------------------------------------------------------------
+# Convenience function: top-level secure_delete
+# ---------------------------------------------------------------------------
+
+def secure_delete(path: Union[str, Path], passes: int = 3) -> None:
+    """Securely delete a file using DoD 5220.22-M multi-pass overwrite.
+
+    This is a convenience wrapper around ``SelfDestruct.secure_delete_file``.
+
+    Args:
+        path: Path to the file to destroy.
+        passes: Number of overwrite passes (default 3: zeros, ones, random).
+
+    Raises:
+        FileNotFoundError: If *path* does not exist.
+        ValueError: If *passes* < 1.
+    """
+    sd = SelfDestruct(log_operations=True)
+    sd.secure_delete_file(path, overwrite_passes=passes)
+
+
+# ---------------------------------------------------------------------------
+# SelfDestructScheduler — timer-based auto-destruct
+# ---------------------------------------------------------------------------
+
+class SelfDestructScheduler:
+    """Schedule files for automatic secure deletion after a delay.
+
+    Each entry records the file path, the monotonic deadline, and the wipe
+    method.  Call :meth:`check_expired` periodically (or after sleeping) to
+    destroy any files whose deadline has passed.
+    """
+
+    _METHODS = {"overwrite_3pass", "overwrite_1pass", "unlink"}
+
+    def __init__(self) -> None:
+        self._entries: List[Dict] = []
+
+    # ------------------------------------------------------------------
+    def schedule(
+        self,
+        path: Union[str, Path],
+        delay_seconds: float,
+        method: str = "overwrite_3pass",
+    ) -> None:
+        """Register *path* for destruction after *delay_seconds*.
+
+        Args:
+            path: File to destroy.
+            delay_seconds: Seconds from now until destruction.
+            method: One of ``overwrite_3pass``, ``overwrite_1pass``, ``unlink``.
+
+        Raises:
+            FileNotFoundError: If *path* does not exist at schedule time.
+            ValueError: If *method* is unknown or *delay_seconds* < 0.
+        """
+        path = Path(path)
+        if not path.exists():
+            raise FileNotFoundError(f"Cannot schedule non-existent path: {path}")
+        if delay_seconds < 0:
+            raise ValueError("delay_seconds must be non-negative")
+        if method not in self._METHODS:
+            raise ValueError(
+                f"Unknown method {method!r}; choose from {sorted(self._METHODS)}"
+            )
+
+        deadline = _time.monotonic() + delay_seconds
+        self._entries.append(
+            {"path": str(path), "deadline": deadline, "method": method}
+        )
+        logger.info("Scheduled destruction of %s in %.1fs (%s)", path, delay_seconds, method)
+
+    # ------------------------------------------------------------------
+    def check_expired(self) -> int:
+        """Destroy all files whose deadline has passed.
+
+        Returns:
+            Number of files destroyed in this call.
+        """
+        now = _time.monotonic()
+        remaining: List[Dict] = []
+        destroyed = 0
+
+        for entry in self._entries:
+            if now >= entry["deadline"]:
+                path = Path(entry["path"])
+                if path.exists():
+                    passes = 3 if entry["method"] == "overwrite_3pass" else 1
+                    if entry["method"] == "unlink":
+                        path.unlink()
+                    else:
+                        secure_delete(path, passes=passes)
+                    destroyed += 1
+                    logger.info("Auto-destroyed %s via %s", path, entry["method"])
+                else:
+                    logger.debug("Skipping already-removed %s", path)
+            else:
+                remaining.append(entry)
+
+        self._entries = remaining
+        return destroyed
+
+    # ------------------------------------------------------------------
+    @property
+    def pending(self) -> int:
+        """Number of files still awaiting destruction."""
+        return len(self._entries)
