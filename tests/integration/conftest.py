@@ -7,9 +7,13 @@ COMPOSE_FILE = os.path.join(
     os.path.dirname(__file__), "..", "..", "docker-compose.integration.yml"
 )
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def docker_services():
-    """Start docker-compose services for the test session."""
+    """Start docker-compose services on demand (not autouse).
+
+    Tests that need docker should request this fixture explicitly.
+    Tests that don't need docker (e.g., self-destruct) run without it.
+    """
     if os.environ.get("CI_SKIP_DOCKER"):
         pytest.skip("Docker services not available in this CI environment")
     result = subprocess.run(
@@ -19,7 +23,7 @@ def docker_services():
     if "greenmail" not in result.stdout:
         subprocess.run(
             ["docker", "compose", "-f", COMPOSE_FILE, "up", "-d", "--wait"],
-            check=True, timeout=120
+            check=True, timeout=180
         )
     yield
 
