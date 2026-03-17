@@ -142,6 +142,99 @@ pub unsafe extern "C" fn zipminator_derive_srtp_keys(
     })).unwrap_or(-2)
 }
 
+// ── Frame encryption ─────────────────────────────────────────────────────
+
+/// Errors from SRTP frame protection/unprotection.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SrtpError {
+    /// HKDF key derivation failed.
+    KeyDerivation,
+    /// AES-GCM encryption failed.
+    EncryptionFailed,
+    /// AES-GCM decryption failed (bad key, corrupted ciphertext, or wrong sequence).
+    DecryptionFailed,
+}
+
+impl std::fmt::Display for SrtpError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SrtpError::KeyDerivation => write!(f, "SRTP key derivation failed"),
+            SrtpError::EncryptionFailed => write!(f, "SRTP frame encryption failed"),
+            SrtpError::DecryptionFailed => write!(f, "SRTP frame decryption failed"),
+        }
+    }
+}
+
+impl std::error::Error for SrtpError {}
+
+/// SRTP context for encrypting/decrypting media frames using AES-256-GCM.
+///
+/// Derives a 256-bit encryption key and 96-bit base nonce from the Kyber-768
+/// shared secret via HKDF-SHA-256 with domain-separated info strings.
+pub struct SrtpContext {
+    key: [u8; 32],
+    salt: [u8; 12],
+}
+
+impl SrtpContext {
+    /// Create an SRTP context from a 32-byte ML-KEM-768 shared secret.
+    ///
+    /// Uses HKDF-SHA-256 to derive:
+    /// - 256-bit AES-GCM key (info: `"srtp-frame-key"`)
+    /// - 96-bit base nonce/salt (info: `"srtp-frame-salt"`)
+    pub fn from_shared_secret(secret: &[u8]) -> Result<Self, SrtpError> {
+        let hk = Hkdf::<Sha256>::new(None, secret);
+        let mut key = [0u8; 32];
+        let mut salt = [0u8; 12];
+        hk.expand(b"srtp-frame-key", &mut key)
+            .map_err(|_| SrtpError::KeyDerivation)?;
+        hk.expand(b"srtp-frame-salt", &mut salt)
+            .map_err(|_| SrtpError::KeyDerivation)?;
+        Ok(Self { key, salt })
+    }
+
+    /// Encrypt an RTP payload for the given sequence number.
+    ///
+    /// The nonce is constructed by XORing the base salt with the sequence number,
+    /// ensuring each frame gets a unique nonce. Returns the AES-256-GCM ciphertext
+    /// (payload + 16-byte authentication tag).
+    pub fn protect(&self, payload: &[u8], seq: u64) -> Result<Vec<u8>, SrtpError> {
+        use aes_gcm::{aead::Aead, Aes256Gcm, KeyInit, Nonce};
+        let cipher =
+            Aes256Gcm::new_from_slice(&self.key).map_err(|_| SrtpError::EncryptionFailed)?;
+        let nonce = self.build_nonce(seq);
+        let nonce_ref = Nonce::from_slice(&nonce);
+        cipher
+            .encrypt(nonce_ref, payload)
+            .map_err(|_| SrtpError::EncryptionFailed)
+    }
+
+    /// Decrypt an SRTP ciphertext for the given sequence number.
+    ///
+    /// The same nonce derivation as `protect` is used. Returns the original
+    /// plaintext payload, or `SrtpError::DecryptionFailed` if authentication fails.
+    pub fn unprotect(&self, ciphertext: &[u8], seq: u64) -> Result<Vec<u8>, SrtpError> {
+        use aes_gcm::{aead::Aead, Aes256Gcm, KeyInit, Nonce};
+        let cipher =
+            Aes256Gcm::new_from_slice(&self.key).map_err(|_| SrtpError::DecryptionFailed)?;
+        let nonce = self.build_nonce(seq);
+        let nonce_ref = Nonce::from_slice(&nonce);
+        cipher
+            .decrypt(nonce_ref, ciphertext)
+            .map_err(|_| SrtpError::DecryptionFailed)
+    }
+
+    /// Build a 12-byte nonce by XORing the sequence number into the base salt.
+    fn build_nonce(&self, seq: u64) -> [u8; 12] {
+        let mut nonce = self.salt;
+        let seq_bytes = seq.to_be_bytes();
+        for i in 0..8 {
+            nonce[4 + i] ^= seq_bytes[i];
+        }
+        nonce
+    }
+}
+
 // ── Tests ──────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -348,5 +441,85 @@ mod tests {
             zipminator_derive_srtp_keys(TEST_SS.as_ptr(), key.as_mut_ptr(), std::ptr::null_mut())
         };
         assert_eq!(rc, -1);
+    }
+
+    // ── SrtpContext frame encryption tests ───────────────────────────────
+
+    #[test]
+    fn srtp_frame_encrypt_decrypt() {
+        let shared_secret = [42u8; 32];
+        let ctx = SrtpContext::from_shared_secret(&shared_secret).unwrap();
+        let rtp_payload = b"audio frame data here";
+        let encrypted = ctx.protect(rtp_payload, 0).unwrap();
+        assert_ne!(&encrypted[..], &rtp_payload[..]);
+        let decrypted = ctx.unprotect(&encrypted, 0).unwrap();
+        assert_eq!(&decrypted[..], &rtp_payload[..]);
+    }
+
+    #[test]
+    fn srtp_different_sequences_produce_different_ciphertexts() {
+        let ctx = SrtpContext::from_shared_secret(&[1u8; 32]).unwrap();
+        let payload = b"same payload";
+        let ct1 = ctx.protect(payload, 1).unwrap();
+        let ct2 = ctx.protect(payload, 2).unwrap();
+        assert_ne!(ct1, ct2);
+    }
+
+    #[test]
+    fn srtp_wrong_sequence_fails_decrypt() {
+        let ctx = SrtpContext::from_shared_secret(&[7u8; 32]).unwrap();
+        let payload = b"secret audio";
+        let ct = ctx.protect(payload, 100).unwrap();
+        // Wrong sequence number should fail authentication
+        let result = ctx.unprotect(&ct, 101);
+        assert_eq!(result, Err(SrtpError::DecryptionFailed));
+    }
+
+    #[test]
+    fn srtp_wrong_key_fails_decrypt() {
+        let ctx1 = SrtpContext::from_shared_secret(&[1u8; 32]).unwrap();
+        let ctx2 = SrtpContext::from_shared_secret(&[2u8; 32]).unwrap();
+        let payload = b"private call";
+        let ct = ctx1.protect(payload, 0).unwrap();
+        let result = ctx2.unprotect(&ct, 0);
+        assert_eq!(result, Err(SrtpError::DecryptionFailed));
+    }
+
+    #[test]
+    fn srtp_empty_payload() {
+        let ctx = SrtpContext::from_shared_secret(&[3u8; 32]).unwrap();
+        let ct = ctx.protect(b"", 0).unwrap();
+        // Ciphertext should be non-empty (GCM tag is 16 bytes)
+        assert!(!ct.is_empty());
+        let pt = ctx.unprotect(&ct, 0).unwrap();
+        assert!(pt.is_empty());
+    }
+
+    #[test]
+    fn srtp_large_payload() {
+        let ctx = SrtpContext::from_shared_secret(&[4u8; 32]).unwrap();
+        // Simulate a 20ms Opus frame at 48kHz mono (~960 samples, ~120 bytes)
+        let payload = vec![0xABu8; 960];
+        let ct = ctx.protect(&payload, 12345).unwrap();
+        let pt = ctx.unprotect(&ct, 12345).unwrap();
+        assert_eq!(pt, payload);
+    }
+
+    #[test]
+    fn srtp_max_sequence_number() {
+        let ctx = SrtpContext::from_shared_secret(&[5u8; 32]).unwrap();
+        let payload = b"last frame";
+        let ct = ctx.protect(payload, u64::MAX).unwrap();
+        let pt = ctx.unprotect(&ct, u64::MAX).unwrap();
+        assert_eq!(&pt[..], &payload[..]);
+    }
+
+    #[test]
+    fn srtp_ciphertext_is_16_bytes_longer_than_plaintext() {
+        let ctx = SrtpContext::from_shared_secret(&[6u8; 32]).unwrap();
+        let payload = b"exactly this length";
+        let ct = ctx.protect(payload, 0).unwrap();
+        // AES-GCM adds a 16-byte tag
+        assert_eq!(ct.len(), payload.len() + 16);
     }
 }
