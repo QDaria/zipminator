@@ -31,7 +31,7 @@ services:
       - "3993:3993"
       - "8080:8080"
     environment:
-      GREENMAIL_OPTS: "-Dgreenmail.setup.test.all -Dgreenmail.users=test:test@zipminator.zip"
+      GREENMAIL_OPTS: "-Dgreenmail.setup.test.all -Dgreenmail.users=test:test@zipminator.zip -Dgreenmail.hostname=0.0.0.0"
 
   coturn:
     image: coturn/coturn:4.6

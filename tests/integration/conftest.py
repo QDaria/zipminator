@@ -21,10 +21,13 @@ def docker_services():
         capture_output=True, text=True
     )
     if "greenmail" not in result.stdout:
-        subprocess.run(
-            ["docker", "compose", "-f", COMPOSE_FILE, "up", "-d", "--wait"],
-            check=True, timeout=180
-        )
+        try:
+            subprocess.run(
+                ["docker", "compose", "-f", COMPOSE_FILE, "up", "-d", "--wait"],
+                check=True, timeout=180
+            )
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
+            pytest.skip("Docker services failed to start")
     yield
 
 @pytest.fixture
