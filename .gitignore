@@ -1,0 +1,61 @@
+# Rust
+target/
+**/*.rs.bk
+*.pdb
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+
+# Environment & secrets
+.env
+.env.*
+!.env.template
+!.env.example
+*.key
+*.pem
+*.keystore
+
+# Quantum entropy (generated data)
+quantum_entropy/*.bin
+quantum_entropy/*.qep
+quantum_entropy/quotas/
+quantum_entropy/harvest_log.jsonl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Node (not used in public repo, but just in case)
+node_modules/
+
+# Claude Code / AI coordination
+.claude/
+.mcp.json
+.agents/
+.swarm/
+memory/

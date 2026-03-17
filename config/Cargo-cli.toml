@@ -1,0 +1,77 @@
+[package]
+name = "zipminator"
+version = "1.0.0"
+edition = "2021"
+authors = ["QDaria <hello@qdaria.com>"]
+license = "MIT"
+description = "CLI for quantum-safe cryptography with NIST Kyber768 and IBM QRNG"
+repository = "https://github.com/qdaria/zipminator"
+homepage = "https://qdaria.com/technology/products/zipminator"
+documentation = "https://docs.qdaria.com/zipminator"
+readme = "README.md"
+keywords = ["quantum", "cryptography", "cli", "kyber", "qrng", "pqc"]
+categories = ["cryptography", "command-line-utilities"]
+
+[dependencies]
+# CLI framework
+clap = { version = "4.4", features = ["derive", "cargo", "env"] }
+colored = "2.1"
+indicatif = "0.17"
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Cryptography
+sha3 = "0.10"
+subtle = "2.5"
+rand_core = "0.6"
+getrandom = { version = "0.2", features = ["std"] }
+
+# IBM QRNG Integration
+reqwest = { version = "0.11", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.40", features = ["full"] }
+
+# Logging and error handling
+log = "0.4"
+env_logger = "0.11"
+chrono = "0.4"
+
+# File operations
+walkdir = "2"
+tempfile = "3"
+
+# Config management
+config = "0.13"
+toml = "0.8"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+tempfile = "3"
+
+[features]
+default = ["vendored"]
+vendored = []
+async = []
+
+[[bin]]
+name = "zipminator"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+debug = false
+panic = "abort"
+
+[profile.bench]
+inherits = "release"
+
+[profile.dev]
+opt-level = 0
+
+[lib]
+path = "src/lib.rs"

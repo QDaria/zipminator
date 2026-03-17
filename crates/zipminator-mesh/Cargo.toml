@@ -1,0 +1,39 @@
+[package]
+name = "zipminator-mesh"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Q-Mesh entropy bridge: QRNG-derived keys for RuView mesh security (HMAC-SHA256 + SipHash-2-4)"
+
+[dependencies]
+# Key derivation
+hkdf = "0.12"
+sha2 = "0.10"
+
+# Constant-time operations
+subtle = "2.5"
+zeroize = { version = "1", features = ["derive"] }
+
+# Error handling
+thiserror = "1.0"
+
+# Serialization (for ESP32 provisioning JSON)
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Hex encoding for JSON provisioning output
+hex = "0.4"
+
+# Logging
+log = "0.4"
+
+[dev-dependencies]
+tempfile = "3"
+hex = "0.4"
+serde_json = "1"
+
+[lib]
+name = "zipminator_mesh"
+path = "src/lib.rs"

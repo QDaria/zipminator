@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  zipminator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+        VCS_REF: ${VCS_REF:-unknown}
+        VERSION: ${VERSION:-0.1.0}
+    image: qdaria/zipminator:${VERSION:-latest}
+    container_name: zipminator
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+    # Volumes for input/output
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config:ro
+
+    # Environment variables
+    environment:
+      - RUST_LOG=info
+      - RUST_BACKTRACE=1
+
+    # Network
+    networks:
+      - zipminator-net
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service=zipminator"
+
+    # Restart policy
+    restart: unless-stopped
+
+networks:
+  zipminator-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

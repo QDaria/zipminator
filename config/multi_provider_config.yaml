@@ -1,0 +1,185 @@
+# Multi-Provider Quantum QRNG Configuration
+
+# Provider credentials (override with environment variables)
+credentials:
+  ibm_token: ${IBM_QUANTUM_TOKEN}
+  qbraid_api_key: ${QBRAID_API_KEY}
+  aws_access_key: ${AWS_ACCESS_KEY_ID}
+  aws_secret_key: ${AWS_SECRET_ACCESS_KEY}
+  ionq_api_key: ${IONQ_API_KEY}
+  rigetti_api_key: ${RIGETTI_API_KEY}
+  oqc_api_key: ${OQC_API_KEY}
+
+# Provider priority (fallback order)
+provider_priority:
+  - ibm_direct          # IBM Quantum direct API (highest priority)
+  - qbraid_ibm          # IBM via qBraid
+  - ionq                # IonQ Harmony
+  - rigetti             # Rigetti Aspen
+  - aws_braket          # AWS Braket
+  - oqc                 # Oxford Quantum Circuits
+  - simulator           # Fallback simulator
+
+# Hardware limits
+hardware:
+  max_qubits_per_shot: 120      # Conservative limit for stability
+  max_shots_per_job: 8192        # IBM limit
+  min_qubits: 8                  # Minimum for 1 byte per shot
+
+# Cost optimization
+optimization:
+  default_goal: "balanced"       # balanced, cost, time, jobs, quality
+  max_cost_per_kilobyte: 1.00   # $1.00 per KB
+  max_wait_time_seconds: 600    # 10 minutes
+  prefer_fewer_jobs: true        # Minimize job submissions
+
+# Provider-specific settings
+providers:
+  ibm_direct:
+    enabled: true
+    backend_preference:
+      - "ibm_brisbane"    # 127 qubits (preferred)
+      - "ibm_kyoto"       # 127 qubits
+      - "ibm_osaka"       # 127 qubits
+      - "ibm_sherbrooke"  # 127 qubits
+    max_concurrent_jobs: 3
+    retry_attempts: 3
+    retry_delay_seconds: 5
+
+  qbraid:
+    enabled: true
+    auto_select_least_busy: true
+    prefer_hardware_over_simulator: true
+
+  ionq:
+    enabled: true
+    backend_preference:
+      - "harmony"         # 11 qubits trapped ion
+      - "aria-1"          # 25 qubits (if available)
+
+  rigetti:
+    enabled: true
+    backend_preference:
+      - "Aspen-M-3"       # 79 qubits
+      - "Aspen-M-2"       # 79 qubits
+
+  aws_braket:
+    enabled: true
+    region: "us-east-1"
+    s3_bucket: ${AWS_S3_BUCKET}
+    backend_preference:
+      - "IonQ Device"
+      - "Rigetti Device"
+      - "SV1"            # Simulator fallback
+
+  oqc:
+    enabled: true
+    backend_preference:
+      - "Lucy"           # 8 qubits
+
+# Quality assurance
+quality:
+  enable_nist_tests: true
+  min_entropy_per_byte: 7.9     # bits (out of 8)
+  dieharder_tests: true
+  save_test_results: true
+  test_results_dir: "tests/quantum_results"
+
+# Caching and persistence
+cache:
+  enable_result_caching: true
+  cache_dir: "cache/quantum_results"
+  max_cache_size_mb: 100
+  cache_ttl_seconds: 3600       # 1 hour
+
+# Monitoring and logging
+monitoring:
+  log_level: "INFO"
+  log_file: "logs/quantum_harvester.log"
+  enable_metrics: true
+  metrics_file: "logs/quantum_metrics.json"
+  track_credit_usage: true
+  alert_on_high_cost: true
+  cost_alert_threshold: 10.00   # $10.00
+
+# Harvest strategies
+strategies:
+  # Strategy 1: Maximum efficiency (use all available qubits)
+  max_efficiency:
+    description: "Use maximum qubits to minimize shots"
+    qubit_preference: "max"
+    optimize_for: "jobs"
+
+  # Strategy 2: Balanced (good qubit count, reasonable shots)
+  balanced:
+    description: "Balance between qubits and shots"
+    qubit_preference: 64
+    optimize_for: "balanced"
+
+  # Strategy 3: Minimum qubits (8 qubits = 1 byte per shot)
+  min_qubits:
+    description: "Use minimum qubits for maximum parallelism"
+    qubit_preference: 8
+    optimize_for: "time"
+
+  # Strategy 4: Cost optimized
+  cost_optimized:
+    description: "Minimize credit usage"
+    optimize_for: "cost"
+    prefer_free_tier: true
+
+# Example configurations for common use cases
+use_cases:
+  # Generate 1KB of quantum random data
+  small_batch:
+    target_bytes: 1024
+    strategy: "balanced"
+    max_cost: 0.10
+    max_time: 300
+
+  # Generate 1MB of quantum random data
+  large_batch:
+    target_bytes: 1048576
+    strategy: "max_efficiency"
+    max_cost: 50.00
+    max_time: 3600
+
+  # Real-time generation (low latency)
+  realtime:
+    target_bytes: 256
+    strategy: "min_qubits"
+    max_cost: 0.05
+    max_time: 30
+
+  # Research/testing (use simulator)
+  testing:
+    target_bytes: 1024
+    strategy: "balanced"
+    force_simulator: true
+    max_cost: 0.00
+
+# Fallback behavior
+fallback:
+  on_provider_failure:
+    - try_next_provider
+    - retry_with_fewer_qubits
+    - use_simulator
+
+  on_quota_exceeded:
+    - switch_provider
+    - wait_and_retry
+    - use_simulator
+
+  on_backend_offline:
+    - select_alternative_backend
+    - switch_provider
+    - use_simulator
+
+# Advanced features
+advanced:
+  enable_load_balancing: true    # Distribute across multiple backends
+  enable_circuit_caching: true   # Cache transpiled circuits
+  enable_result_validation: true # Validate quantum results
+  enable_entropy_pooling: false  # Mix multiple sources
+  parallel_harvesting: true      # Run multiple jobs in parallel
+  max_parallel_jobs: 5

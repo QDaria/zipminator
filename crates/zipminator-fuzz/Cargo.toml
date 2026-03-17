@@ -1,0 +1,37 @@
+[package]
+name = "zipminator-fuzz"
+version = "0.0.0"
+authors.workspace = true
+publish = false
+edition.workspace = true
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+zipminator-core = { path = "../zipminator-core" }
+
+[[bin]]
+name = "fuzz_keygen"
+path = "fuzz_targets/fuzz_keygen.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_encapsulate"
+path = "fuzz_targets/fuzz_encapsulate.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_decapsulate"
+path = "fuzz_targets/fuzz_decapsulate.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_round_trip"
+path = "fuzz_targets/fuzz_round_trip.rs"
+test = false
+doc = false

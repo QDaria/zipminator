@@ -1,0 +1,47 @@
+# Entropy Sources Configuration
+# Defines priority-ordered entropy sources for Kyber-768 cryptographic operations
+
+entropy_sources:
+  # Primary source: IBM Quantum QRNG (pre-generated pool)
+  primary:
+    type: quantum
+    provider: ibm
+    enabled: true
+    pool_path: /var/lib/zipminator/quantum_entropy.pool
+    min_bytes: 10240  # 10KB - trigger refill notification
+    refill_threshold: 32768  # 32KB - recommended refill point
+    warn_on_exhaustion: true
+
+  # Fallback source: System /dev/urandom
+  fallback:
+    type: system
+    device: /dev/urandom
+    enabled: true
+
+# Entropy pool buffering configuration
+entropy_pool:
+  enabled: true
+  size: 131072  # 128KB buffer
+  refill_threshold: 32768  # Refill when below 32KB
+  min_guarantee: 4096  # Always maintain 4KB minimum
+
+# Monitoring and logging
+monitoring:
+  log_source: true  # Log which entropy source is active
+  alert_on_fallback: true  # Alert when falling back to non-quantum
+  health_check_interval: 60000  # Health check every 60 seconds (ms)
+  enable_metrics: true  # Collect performance metrics
+
+# Performance tuning
+performance:
+  max_latency_overhead_percent: 2  # Maximum acceptable latency increase
+  thread_safe: true  # Enable thread-safe concurrent access
+  batch_reads: true  # Batch entropy reads for efficiency
+
+# Integration settings
+integration:
+  kyber768:
+    use_quantum_for_keygen: true  # Use quantum entropy for keypair generation
+    use_quantum_for_encaps: true  # Use quantum entropy for encapsulation
+    fallback_mode: graceful  # graceful|strict (strict fails if no quantum)
+    log_operations: false  # Log each Kyber operation (verbose)

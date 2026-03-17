@@ -1,0 +1,17 @@
+[package]
+name = "zipminator-bench"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Criterion benchmarks for Zipminator Kyber-768 implementation"
+
+[dependencies]
+zipminator-core = { path = "../zipminator-core" }
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "kyber_bench"
+harness = false
+path = "benches/kyber_bench.rs"

@@ -1,0 +1,162 @@
+# IBM Quantum Free Tier Limits Configuration
+# https://quantum.ibm.com/composer/docs/iqx/manage/plans
+
+free_tier:
+  # Maximum quantum minutes per month
+  max_minutes_per_month: 10
+
+  # Alert thresholds (percentage of max_minutes_per_month)
+  alert_thresholds:
+    warning: 80    # 8 minutes
+    critical: 90   # 9 minutes
+    emergency: 95  # 9.5 minutes
+
+  # Rate limiting
+  rate_limits:
+    # Minimum seconds between job submissions
+    min_job_interval_seconds: 5
+
+    # Maximum concurrent jobs in queue
+    max_concurrent_jobs: 3
+
+    # Maximum shots per job (balance queue time vs entropy)
+    max_shots_per_job: 8192
+    recommended_shots_per_job: 4096
+
+    # Exponential backoff parameters
+    backoff:
+      initial_delay_seconds: 10
+      max_delay_seconds: 300
+      multiplier: 2.0
+      max_retries: 5
+
+  # Job estimation parameters
+  estimation:
+    # Average seconds per shot on different backends
+    backend_speeds:
+      ibm_brisbane: 0.0012  # ~1.2ms per shot
+      ibm_kyoto: 0.0015
+      ibm_osaka: 0.0013
+      ibmq_qasm_simulator: 0.0001
+
+    # Queue wait time estimation (seconds)
+    typical_queue_wait: 300
+
+    # Overhead per job (seconds)
+    job_overhead: 30
+
+# Scheduling preferences
+scheduling:
+  # Preferred time windows (UTC)
+  preferred_windows:
+    - start: "02:00"  # Off-peak hours
+      end: "06:00"
+    - start: "14:00"  # Secondary window
+      end: "16:00"
+
+  # Days to avoid (0=Monday, 6=Sunday)
+  avoid_days: []
+
+  # Batching strategy
+  batching:
+    enabled: true
+    min_requests_to_batch: 2
+    max_batch_wait_seconds: 300
+    combine_similar_circuits: true
+
+# Emergency procedures
+emergency:
+  # Fallback to classical RNG when credits exhausted
+  auto_fallback: true
+
+  # Require manual approval for jobs above this threshold
+  manual_approval_threshold_minutes: 0.5
+
+  # Budget allocation for paid tier
+  paid_tier:
+    enabled: false
+    max_monthly_budget_usd: 0
+    auto_upgrade: false
+
+# Monitoring and metrics
+monitoring:
+  # Export Prometheus metrics
+  prometheus:
+    enabled: false
+    port: 9090
+    endpoint: "/metrics"
+
+  # Dashboard update frequency
+  dashboard_update_interval_seconds: 60
+
+  # Log retention
+  log_retention_days: 90
+
+  # Notification channels
+  notifications:
+    console: true
+    file: true
+    log_path: "logs/ibm_credit_alerts.log"
+    email: false
+    slack: false
+
+# Historical tracking
+tracking:
+  # Database for usage history
+  database:
+    type: "sqlite"
+    path: "data/ibm_usage.db"
+
+  # Metrics to track
+  metrics:
+    - total_jobs_submitted
+    - total_shots_executed
+    - total_minutes_consumed
+    - average_queue_time
+    - success_rate
+    - entropy_bytes_generated
+    - cost_per_entropy_byte
+
+# Backend selection strategy
+backend_selection:
+  # Prefer less busy backends
+  prefer_low_queue: true
+
+  # Minimum backend requirements
+  min_qubits: 5
+  max_error_rate: 0.05
+
+  # Backend priority list (highest to lowest)
+  priority:
+    - ibm_brisbane
+    - ibm_kyoto
+    - ibm_osaka
+    - ibmq_qasm_simulator  # Last resort
+
+# Pool management
+entropy_pool:
+  # Minimum bytes before triggering harvest
+  min_level_bytes: 256
+
+  # Target pool size
+  target_size_bytes: 4096
+
+  # Maximum pool size
+  max_size_bytes: 16384
+
+  # Pre-emptive harvest threshold
+  preemptive_threshold_bytes: 512
+
+  # Minimum bytes to harvest per job
+  min_harvest_bytes: 1024
+
+# Development and testing
+development:
+  # Use simulator only
+  simulator_only: false
+
+  # Dry run mode (no actual job submission)
+  dry_run: false
+
+  # Mock responses
+  mock_enabled: false
