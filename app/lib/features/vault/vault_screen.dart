@@ -214,7 +214,7 @@ class _KeyCardState extends State<_KeyCard> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                widget.isSecret && !_revealed
+                !_revealed
                     ? '** hidden **'
                     : _hexPreview(),
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
