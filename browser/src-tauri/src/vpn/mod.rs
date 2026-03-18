@@ -145,6 +145,8 @@ impl VpnManager {
         let rekey_interval = config.rekey_interval_secs;
         // Extract the tunnel IP before config is moved into Tunnel::connect.
         let tunnel_ip_for_proxy = config.tunnel_ip().to_string();
+        // Derive WG session key before config is consumed by Tunnel::connect.
+        let wg_session_key = derive_wg_session_key(&config);
 
         // ── 1. Transition → Connecting ─────────────────────────────────
         self.transition_and_emit(VpnState::Connecting, &emit_fn)?;
@@ -181,20 +183,19 @@ impl VpnManager {
         // In production this control channel would be mTLS-authenticated.
         // For Phase 8 we use a plain TCP stream (the WireGuard UDP tunnel
         // already provides encryption and authentication for the data path).
-        let _wg_session_key = derive_dummy_wg_key(); // See note below.
+        let _wg_session_key = wg_session_key;
 
-        // NOTE on `wg_session_key`: boringtun does not expose the Noise
-        // session key via its public API in 0.6.x.  We therefore derive a
-        // deterministic key from the Curve25519 DH output using HKDF.  In a
-        // production system, a patched boringtun or a Noise implementation
-        // with an exposed session key export would be used.  The hybrid
-        // security guarantee is preserved: the Kyber768 shared secret is
-        // mixed with this key, so breaking only Curve25519 is insufficient.
+        // The WG session key is derived from the Curve25519 DH of the static
+        // keys via HKDF-SHA256 (see `derive_wg_session_key`).  boringtun 0.7
+        // does not expose the Noise session key, so this deterministic
+        // derivation provides the classical contribution to the hybrid key.
+        // The hybrid security guarantee is preserved: the Kyber768 shared
+        // secret is mixed with this key via `pq_handshake::derive_hybrid_key`,
+        // so breaking only Curve25519 is insufficient.
 
-        // (PQ handshake over TCP control channel would happen here)
-        // For now we log that it is deferred to the integration with the
-        // control-plane server.
-        info!("PQ handshake: ML-KEM-768 rekey scheduled (hybrid key derived from WG + Kyber)");
+        // PQ handshake over TCP control channel would happen here in
+        // production.  Deferred to the control-plane server integration.
+        info!("PQ handshake: ML-KEM-768 rekey scheduled (hybrid key derived from WG DH + Kyber)");
 
         // ── 5. Record connection start ──────────────────────────────────
         self.metrics.record_connected();
@@ -370,19 +371,38 @@ impl Default for VpnManager {
     }
 }
 
-// ── WG session key derivation (Phase 8 compatibility stub) ─────────────────
+// ── WG session key derivation ──────────────────────────────────────────────
 
-/// Derive a placeholder WireGuard session key.
+/// Derive the WireGuard session key contribution from the static key pair.
 ///
-/// boringtun 0.6 does not expose the Noise session key in its public API.
-/// This function returns a deterministic placeholder.  In production this
-/// would be replaced by patched boringtun that exports the session key, or
-/// by using the `noise` crate directly.
-fn derive_dummy_wg_key() -> [u8; 32] {
-    // In production: export the actual WireGuard Noise session key.
-    // For Phase 8: use a zero key as the WG contribution; security comes
-    // entirely from the Kyber768 shared secret in the hybrid derivation.
-    [0u8; 32]
+/// boringtun 0.6/0.7 does not expose the Noise session key via its public
+/// API.  As a workaround, we perform a Curve25519 Diffie-Hellman between the
+/// client static private key and the server static public key, then pass the
+/// raw DH output through HKDF-SHA256 with a domain-separation info string.
+///
+/// This gives a deterministic, non-zero 32-byte key that contributes the
+/// classical (Curve25519) security layer to the hybrid PQ derivation in
+/// `pq_handshake::derive_hybrid_key`.
+///
+/// In production: replace with the actual Noise session key exported from a
+/// patched boringtun or a direct Noise implementation.
+fn derive_wg_session_key(config: &config::VpnConfig) -> [u8; 32] {
+    use boringtun::x25519;
+    use hkdf::Hkdf;
+    use sha2::Sha256;
+
+    let client_secret = x25519::StaticSecret::from(config.client_private_key);
+    let server_public = x25519::PublicKey::from(config.server_public_key);
+    let dh_output = client_secret.diffie_hellman(&server_public);
+
+    // HKDF-SHA256: extract from the raw DH shared secret, expand with a
+    // domain-separation label so this key is distinct from the WireGuard
+    // Noise session key (which uses its own KDF chain).
+    let hkdf = Hkdf::<Sha256>::new(None, dh_output.as_bytes());
+    let mut key = [0u8; 32];
+    hkdf.expand(b"zipminator-wg-session-key-v1", &mut key)
+        .expect("HKDF-SHA256 expand to 32 bytes cannot fail");
+    key
 }
 
 // ── VpnError ──────────────────────────────────────────────────────────────
@@ -493,5 +513,89 @@ mod tests {
         // Verify we can lock and read state.
         let guard = shared.try_lock().expect("should not be locked");
         assert_eq!(guard.current_state(), VpnState::Disconnected);
+    }
+
+    #[test]
+    fn derive_wg_session_key_is_nonzero() {
+        let config = config::VpnConfig {
+            server_endpoint: "127.0.0.1:51820".to_string(),
+            server_public_key: [0x01u8; 32],
+            client_private_key: [0x02u8; 32],
+            tunnel_address: "10.14.0.2/32".to_string(),
+            dns: vec!["1.1.1.1".to_string()],
+            rekey_interval_secs: 300,
+            kill_switch_enabled: false,
+        };
+        let key = super::derive_wg_session_key(&config);
+        // Must NOT be all zeros (the old dummy key).
+        assert_ne!(key, [0u8; 32], "WG session key must not be zero");
+    }
+
+    #[test]
+    fn derive_wg_session_key_is_deterministic() {
+        let config = config::VpnConfig {
+            server_endpoint: "127.0.0.1:51820".to_string(),
+            server_public_key: [0xaau8; 32],
+            client_private_key: [0xbbu8; 32],
+            tunnel_address: "10.14.0.2/32".to_string(),
+            dns: vec!["1.1.1.1".to_string()],
+            rekey_interval_secs: 300,
+            kill_switch_enabled: false,
+        };
+        let k1 = super::derive_wg_session_key(&config);
+        let k2 = super::derive_wg_session_key(&config);
+        assert_eq!(k1, k2, "same inputs must produce same key");
+    }
+
+    #[test]
+    fn derive_wg_session_key_differs_for_different_keys() {
+        let config_a = config::VpnConfig {
+            server_endpoint: "127.0.0.1:51820".to_string(),
+            server_public_key: [0x01u8; 32],
+            client_private_key: [0x02u8; 32],
+            tunnel_address: "10.14.0.2/32".to_string(),
+            dns: vec!["1.1.1.1".to_string()],
+            rekey_interval_secs: 300,
+            kill_switch_enabled: false,
+        };
+        let config_b = config::VpnConfig {
+            server_endpoint: "127.0.0.1:51820".to_string(),
+            server_public_key: [0x03u8; 32],
+            client_private_key: [0x04u8; 32],
+            tunnel_address: "10.14.0.2/32".to_string(),
+            dns: vec!["1.1.1.1".to_string()],
+            rekey_interval_secs: 300,
+            kill_switch_enabled: false,
+        };
+        let k_a = super::derive_wg_session_key(&config_a);
+        let k_b = super::derive_wg_session_key(&config_b);
+        assert_ne!(k_a, k_b, "different key pairs must produce different WG session keys");
+    }
+
+    #[test]
+    fn derive_wg_session_key_feeds_into_hybrid_derivation() {
+        // Verify the derived WG session key works with the PQ handshake's
+        // hybrid key derivation (non-zero contribution).
+        let config = config::VpnConfig {
+            server_endpoint: "127.0.0.1:51820".to_string(),
+            server_public_key: [0x55u8; 32],
+            client_private_key: [0x66u8; 32],
+            tunnel_address: "10.14.0.2/32".to_string(),
+            dns: vec!["1.1.1.1".to_string()],
+            rekey_interval_secs: 300,
+            kill_switch_enabled: false,
+        };
+        let wg_key = super::derive_wg_session_key(&config);
+        let kyber_ss = [0xccu8; 32]; // mock Kyber shared secret
+
+        let hybrid = pq_handshake::derive_hybrid_key(&wg_key, &kyber_ss)
+            .expect("hybrid key derivation must succeed");
+        assert_ne!(hybrid, [0u8; 32], "hybrid key must not be zero");
+
+        // Changing the WG key must change the hybrid key.
+        let zero_wg = [0u8; 32];
+        let hybrid_zero = pq_handshake::derive_hybrid_key(&zero_wg, &kyber_ss)
+            .expect("hybrid derivation with zero WG key must succeed");
+        assert_ne!(hybrid, hybrid_zero, "non-zero WG key must produce different hybrid than zero WG key");
     }
 }

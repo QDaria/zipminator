@@ -43,8 +43,8 @@ const Footer = () => {
     { name: 'Careers', href: 'mailto:careers@qdaria.com' },
     { name: 'Blog', href: 'https://github.com/qdaria/zipminator-pqc/releases' },
     { name: 'Contact', href: 'mailto:contact@qdaria.com' },
-    { name: 'Privacy Policy', href: '#' },
-    { name: 'Terms of Service', href: '#' },
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Terms of Service', href: '/terms' },
   ]
 
   const socialLinks = [
@@ -235,15 +235,15 @@ const Footer = () => {
 
             {/* Legal links */}
             <div className="flex items-center space-x-4 text-sm text-gray-400">
-              <Link href="#" className="hover:text-quantum-400 transition-colors">
+              <Link href="/privacy" className="hover:text-quantum-400 transition-colors">
                 Privacy
               </Link>
               <span>|</span>
-              <Link href="#" className="hover:text-quantum-400 transition-colors">
+              <Link href="/terms" className="hover:text-quantum-400 transition-colors">
                 Terms
               </Link>
               <span>|</span>
-              <Link href="#" className="hover:text-quantum-400 transition-colors">
+              <Link href="/privacy#cookies" className="hover:text-quantum-400 transition-colors">
                 Cookies
               </Link>
             </div>

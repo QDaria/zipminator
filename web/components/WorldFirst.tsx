@@ -23,7 +23,7 @@ const firsts = [
     icon: Cpu,
     claim: 'First app combining real quantum hardware entropy with PQC',
     detail:
-      'True randomness from IBM 156-qubit processors seeds every key generation and nonce',
+      'True randomness from 156-qubit quantum processors seeds every key generation and nonce',
   },
   {
     icon: Wifi,
@@ -45,9 +45,9 @@ const firsts = [
   },
   {
     icon: Mail,
-    claim: 'First email client with PQC encryption and zero-knowledge headers',
+    claim: 'First all-in-one app with PQC email, messaging, VoIP, VPN, and browser',
     detail:
-      'Quantum-secure email with automatic key discovery via WKD, protecting both content and metadata',
+      'No other product combines quantum-secure email, messaging, voice, VPN, and browsing in a single install',
   },
 ]
 

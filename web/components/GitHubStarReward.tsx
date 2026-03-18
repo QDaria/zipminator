@@ -97,7 +97,7 @@ export default function GitHubStarReward({
 
           <div className="flex gap-3">
             <a
-              href="https://github.com/MoHoushmand/zipminator-pqc"
+              href="https://github.com/QDaria/zipminator"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 transition-colors text-sm font-medium"

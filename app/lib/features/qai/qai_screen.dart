@@ -1,81 +1,226 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zipminator/core/providers/pii_provider.dart';
+import 'package:zipminator/core/providers/qai_provider.dart';
+import 'package:zipminator/core/services/llm_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
 
-/// Pillar 6: Q-AI Assistant — AI chat with model routing.
-class QaiScreen extends StatefulWidget {
+/// Pillar 6: Q-AI Assistant — AI chat with multi-provider model routing and PII guard.
+class QaiScreen extends ConsumerStatefulWidget {
   const QaiScreen({super.key});
 
   @override
-  State<QaiScreen> createState() => _QaiScreenState();
+  ConsumerState<QaiScreen> createState() => _QaiScreenState();
 }
 
-class _QaiScreenState extends State<QaiScreen> {
+class _QaiScreenState extends ConsumerState<QaiScreen> {
   final _controller = TextEditingController();
-  String _selectedModel = 'auto';
-  final List<_AiMessage> _messages = [];
+  final _scrollController = ScrollController();
 
-  static const _modelColors = {
-    'opus': QuantumTheme.quantumPurple,
-    'sonnet': QuantumTheme.quantumBlue,
-    'haiku': QuantumTheme.quantumCyan,
-    'local': QuantumTheme.quantumGreen,
+  static const _providerColors = {
+    LLMProvider.claude: QuantumTheme.quantumPurple,
+    LLMProvider.gemini: QuantumTheme.quantumBlue,
+    LLMProvider.openRouter: QuantumTheme.quantumOrange,
   };
 
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  Future<void> _sendMessage() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+
+    // PII guard: scan message before sending
+    ref.read(piiProvider.notifier).scan(text);
+    final piiAfter = ref.read(piiProvider);
+    if (piiAfter.highSensitivityCount > 0) {
+      if (!mounted) return;
+      final proceed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('PII Detected'),
+          content: Text(
+            '${piiAfter.highSensitivityCount} high-sensitivity PII items found. '
+            'Send anyway?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Send Anyway'),
+            ),
+          ],
+        ),
+      );
+      if (proceed != true) return;
+    }
+
+    _controller.clear();
+    await ref.read(qaiProvider.notifier).sendMessage(text);
+    _scrollToBottom();
   }
 
   @override
   Widget build(BuildContext context) {
+    final qai = ref.watch(qaiProvider);
+    final providerColor =
+        _providerColors[qai.selectedProvider] ?? QuantumTheme.quantumPurple;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Q-AI Assistant'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 20),
+            onPressed: qai.messages.isEmpty
+                ? null
+                : () => ref.read(qaiProvider.notifier).clearConversation(),
+            tooltip: 'Clear conversation',
+          ),
+        ],
       ),
       body: GradientBackground(
         child: Column(
           children: [
-            // Model selector chip row
+            // API key banner
+            if (!qai.hasApiKey)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                color: QuantumTheme.quantumOrange.withValues(alpha: 0.1),
+                child: Row(
+                  children: [
+                    Icon(Icons.key_off,
+                        size: 18, color: QuantumTheme.quantumOrange),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Set your ${qai.selectedProvider.displayName} API key in Settings to chat',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            // Provider selector chip row
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: [
-                    _modelChip('auto', 'Auto Route', Icons.auto_awesome),
-                    const SizedBox(width: 8),
-                    _modelChip('opus', 'Opus', Icons.diamond_outlined),
-                    const SizedBox(width: 8),
-                    _modelChip('sonnet', 'Sonnet', Icons.speed),
-                    const SizedBox(width: 8),
-                    _modelChip('haiku', 'Haiku', Icons.bolt),
-                    const SizedBox(width: 8),
-                    _modelChip('local', 'Local', Icons.computer),
-                  ],
+                  children: LLMProvider.values.map((provider) {
+                    final isSelected = qai.selectedProvider == provider;
+                    final color = _providerColors[provider] ??
+                        Theme.of(context).colorScheme.primary;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        avatar: Icon(
+                          _providerIcon(provider),
+                          size: 16,
+                          color: isSelected ? Colors.white : color,
+                        ),
+                        label: Text(provider.displayName),
+                        selected: isSelected,
+                        selectedColor: color.withValues(alpha: 0.3),
+                        side: BorderSide(
+                          color: isSelected
+                              ? color.withValues(alpha: 0.6)
+                              : color.withValues(alpha: 0.2),
+                        ),
+                        labelStyle: TextStyle(
+                          color: isSelected ? color : null,
+                          fontWeight: isSelected ? FontWeight.w600 : null,
+                        ),
+                        onSelected: (_) => ref
+                            .read(qaiProvider.notifier)
+                            .selectProvider(provider),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
             ).animate().fadeIn(duration: 300.ms).slideY(begin: -0.2),
 
+            // Model selector chip row (dynamic based on provider)
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: qai.availableModels.map((model) {
+                    final isSelected = qai.selectedModel == model.id;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(model.displayName),
+                        selected: isSelected,
+                        selectedColor: providerColor.withValues(alpha: 0.3),
+                        side: BorderSide(
+                          color: isSelected
+                              ? providerColor.withValues(alpha: 0.6)
+                              : providerColor.withValues(alpha: 0.15),
+                        ),
+                        labelStyle: TextStyle(
+                          color: isSelected ? providerColor : null,
+                          fontWeight: isSelected ? FontWeight.w600 : null,
+                          fontSize: 12,
+                        ),
+                        onSelected: (_) => ref
+                            .read(qaiProvider.notifier)
+                            .selectModel(model.id),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+
             // Messages
             Expanded(
-              child: _messages.isEmpty
+              child: qai.messages.isEmpty
                   ? Center(
                       child: SingleChildScrollView(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            const PillarStatusBanner(
+                              description:
+                                  'AI assistant with PQC-encrypted queries',
+                              status: PillarStatus.demo,
+                            ),
                             PillarHeader(
                               icon: Icons.psychology_outlined,
                               title: 'Q-AI Assistant',
                               subtitle:
-                                  'Multi-model Routing by Task Complexity',
-                              iconColor: QuantumTheme.quantumPurple,
+                                  'Multi-Provider Model Routing',
+                              iconColor: providerColor,
                             ),
                             Text(
-                              'Opus for crypto, Sonnet for features, Haiku for config',
+                              'Claude / Gemini / OpenRouter — select provider above',
                               style: Theme.of(context).textTheme.bodySmall,
                             )
                                 .animate()
@@ -85,37 +230,81 @@ class _QaiScreenState extends State<QaiScreen> {
                       ),
                     )
                   : ListView.builder(
+                      controller: _scrollController,
                       padding: const EdgeInsets.all(12),
-                      itemCount: _messages.length,
+                      itemCount: qai.messages.length,
                       itemBuilder: (context, i) {
-                        final msg = _messages[i];
-                        return _AiMessageBubble(message: msg, index: i);
+                        final msg = qai.messages[i];
+                        return _QaiMessageBubble(message: msg, index: i);
                       },
                     ),
             ),
+
+            // Loading indicator
+            if (qai.isLoading)
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: providerColor,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text('Thinking...',
+                        style: Theme.of(context).textTheme.bodySmall),
+                  ],
+                ),
+              ),
+
+            // Error
+            if (qai.error != null)
+              Container(
+                padding: const EdgeInsets.all(8),
+                color: QuantumTheme.quantumRed.withValues(alpha: 0.1),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline,
+                        size: 16, color: QuantumTheme.quantumRed),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(qai.error!,
+                          style: TextStyle(color: QuantumTheme.quantumRed)),
+                    ),
+                  ],
+                ),
+              ),
 
             // Input
             QuantumCard(
               borderRadius: 0,
               padding: const EdgeInsets.all(8),
-              glowColor: QuantumTheme.quantumPurple,
+              glowColor: providerColor,
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: _controller,
                       decoration: InputDecoration(
-                        hintText: 'Ask anything...',
+                        hintText: qai.hasApiKey
+                            ? 'Ask anything...'
+                            : 'Set API key in Settings first',
                         border: InputBorder.none,
-                        suffixText: _selectedModel,
+                        suffixText: qai.selectedModel.split('/').last,
                       ),
+                      enabled: qai.hasApiKey && !qai.isLoading,
                       onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
                   IconButton(
-                    icon:
-                        Icon(Icons.send, color: QuantumTheme.quantumPurple),
-                    onPressed: _sendMessage,
+                    icon: Icon(Icons.send, color: providerColor),
+                    onPressed:
+                        qai.hasApiKey && !qai.isLoading ? _sendMessage : null,
                   ),
                 ],
               ),
@@ -126,73 +315,29 @@ class _QaiScreenState extends State<QaiScreen> {
     );
   }
 
-  Widget _modelChip(String value, String label, IconData icon) {
-    final isSelected = _selectedModel == value;
-    final chipColor = _modelColors[value] ??
-        Theme.of(context).colorScheme.primary;
-
-    return ChoiceChip(
-      avatar: Icon(icon, size: 16,
-          color: isSelected ? Colors.white : chipColor),
-      label: Text(label),
-      selected: isSelected,
-      selectedColor: chipColor.withValues(alpha: 0.3),
-      side: BorderSide(
-        color: isSelected
-            ? chipColor.withValues(alpha: 0.6)
-            : chipColor.withValues(alpha: 0.2),
-      ),
-      labelStyle: TextStyle(
-        color: isSelected ? chipColor : null,
-        fontWeight: isSelected ? FontWeight.w600 : null,
-      ),
-      onSelected: (_) => setState(() => _selectedModel = value),
-    );
-  }
-
-  void _sendMessage() {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-    setState(() {
-      _messages.add(_AiMessage(text: text, isUser: true, model: _selectedModel));
-      _messages.add(_AiMessage(
-        text: 'Q-AI response will be generated here. '
-            'Model: $_selectedModel. '
-            'This pillar connects to cloud/local LLM via Rust bridge.',
-        isUser: false,
-        model: _selectedModel,
-      ));
-    });
-    _controller.clear();
-  }
+  IconData _providerIcon(LLMProvider provider) => switch (provider) {
+        LLMProvider.claude => Icons.diamond_outlined,
+        LLMProvider.gemini => Icons.auto_awesome,
+        LLMProvider.openRouter => Icons.router_outlined,
+      };
 }
 
-class _AiMessage {
-  final String text;
-  final bool isUser;
-  final String model;
-
-  _AiMessage({required this.text, required this.isUser, required this.model});
-}
-
-class _AiMessageBubble extends StatelessWidget {
-  final _AiMessage message;
+class _QaiMessageBubble extends StatelessWidget {
+  final QaiMessage message;
   final int index;
 
-  static const _modelColors = {
-    'opus': QuantumTheme.quantumPurple,
-    'sonnet': QuantumTheme.quantumBlue,
-    'haiku': QuantumTheme.quantumCyan,
-    'local': QuantumTheme.quantumGreen,
-  };
-
-  const _AiMessageBubble({required this.message, required this.index});
+  const _QaiMessageBubble({required this.message, required this.index});
 
   @override
   Widget build(BuildContext context) {
+    // Resolve display name from model ID
+    final modelInfo =
+        kAvailableModels.where((m) => m.id == message.model).firstOrNull;
+    final modelLabel = modelInfo?.displayName ?? message.model;
+
     final glowColor = message.isUser
         ? QuantumTheme.quantumPurple
-        : (_modelColors[message.model] ?? QuantumTheme.quantumCyan);
+        : QuantumTheme.quantumCyan;
 
     return Align(
       alignment:
@@ -208,10 +353,10 @@ class _AiMessageBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(message.text),
+              SelectableText(message.text),
               if (!message.isUser) ...[
                 const SizedBox(height: 4),
-                Text('via ${message.model}',
+                Text('via $modelLabel',
                     style: Theme.of(context).textTheme.labelSmall),
               ],
             ],

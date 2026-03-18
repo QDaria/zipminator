@@ -23,6 +23,12 @@ class VaultScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Status banner
+              const PillarStatusBanner(
+                description: 'Generate & test quantum-safe encryption keys',
+                status: PillarStatus.ready,
+              ),
+
               // Header
               PillarHeader(
                 icon: Icons.lock_outline,
@@ -144,7 +150,7 @@ class _KeyCard extends StatefulWidget {
 }
 
 class _KeyCardState extends State<_KeyCard> {
-  bool _revealed = false;
+  late bool _revealed = !widget.isSecret;
 
   String _hexPreview() {
     final preview = widget.bytes
@@ -172,8 +178,7 @@ class _KeyCardState extends State<_KeyCard> {
                       .titleMedium
                       ?.copyWith(color: widget.color)),
               const Spacer(),
-              if (widget.isSecret)
-                IconButton(
+              IconButton(
                   icon: Icon(
                     _revealed ? Icons.visibility_off : Icons.visibility,
                     size: 18,

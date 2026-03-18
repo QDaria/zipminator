@@ -34,10 +34,10 @@ const TrustSignals = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Trusted by <span className="gradient-text">Quantum Innovators</span>
+            Verified <span className="gradient-text">Security Standards</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Leading enterprises securing quantum-safe data with Zipminator-PQC
+            Every claim backed by NIST standards, open-source audits, and passing test suites
           </p>
         </motion.div>
 
@@ -88,7 +88,7 @@ const TrustSignals = () => {
         >
           <div className="inline-block bg-quantum-900/30 border border-quantum-500/30 rounded-full px-6 py-3">
             <p className="text-lg text-quantum-300">
-              <span className="font-bold">287</span> tests passing • <span className="font-bold">Memory-safe</span> Rust core • <span className="font-bold">Constant-time</span> crypto
+              <span className="font-bold">408+</span> tests passing • <span className="font-bold">Memory-safe</span> Rust core • <span className="font-bold">Constant-time</span> crypto
             </p>
           </div>
         </motion.div>

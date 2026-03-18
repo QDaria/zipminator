@@ -3,8 +3,11 @@
 //! Provides a [`MessageStore`] trait with two implementations:
 //! - [`InMemoryMessageStore`] -- HashMap-backed, for testing and ephemeral use.
 //! - [`FileMessageStore`] -- JSON file encrypted with AES-256-GCM (requires `config` feature).
+//!
+//! Also provides offline queue and group message fanout for Pillar 2 completeness.
 
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicU64, Ordering};
 use crate::ratchet::RatchetError;
 
 /// A stored encrypted message.
@@ -20,19 +23,41 @@ pub struct EncryptedMessage {
     pub sequence: u32,
 }
 
-/// Persistence layer for encrypted messages.
+/// Persistence layer for encrypted messages, offline queuing, and group fanout.
 pub trait MessageStore {
     fn store_message(&mut self, msg: EncryptedMessage) -> Result<String, RatchetError>;
     fn get_message(&self, message_id: &str) -> Result<Option<EncryptedMessage>, RatchetError>;
     fn get_conversation(&self, conversation_id: &str) -> Result<Vec<EncryptedMessage>, RatchetError>;
     fn delete_message(&mut self, message_id: &str) -> Result<bool, RatchetError>;
     fn delete_conversation(&mut self, conversation_id: &str) -> Result<usize, RatchetError>;
+
+    /// Queue a message for offline delivery to `recipient`.
+    fn queue_offline(&mut self, msg: EncryptedMessage, recipient: &str) -> Result<(), RatchetError>;
+
+    /// Drain all queued messages for `recipient`, returning them in insertion order.
+    /// The queue for that recipient is emptied after this call.
+    fn drain_offline(&mut self, recipient: &str) -> Result<Vec<EncryptedMessage>, RatchetError>;
+
+    /// Fan out a message to all members of a group.
+    ///
+    /// For each member, a copy of `msg` is queued in their offline queue with a
+    /// unique message id. Returns the ids of all queued copies.
+    fn fanout_group(
+        &mut self,
+        group_id: &str,
+        members: &[&str],
+        msg: &EncryptedMessage,
+    ) -> Result<Vec<String>, RatchetError>;
 }
 
-/// HashMap-backed message store (no persistence, suitable for tests).
+/// Global counter for generating unique fanout message ids.
+static FANOUT_COUNTER: AtomicU64 = AtomicU64::new(0);
+
+/// HashMap-backed message store with offline queue (no persistence, suitable for tests).
 #[derive(Debug, Default)]
 pub struct InMemoryMessageStore {
     messages: HashMap<String, EncryptedMessage>,
+    offline_queues: HashMap<String, Vec<EncryptedMessage>>,
 }
 
 impl InMemoryMessageStore {
@@ -66,6 +91,43 @@ impl MessageStore for InMemoryMessageStore {
         for id in ids { self.messages.remove(&id); }
         Ok(count)
     }
+
+    fn queue_offline(&mut self, msg: EncryptedMessage, recipient: &str) -> Result<(), RatchetError> {
+        self.offline_queues
+            .entry(recipient.to_string())
+            .or_default()
+            .push(msg);
+        Ok(())
+    }
+
+    fn drain_offline(&mut self, recipient: &str) -> Result<Vec<EncryptedMessage>, RatchetError> {
+        Ok(self.offline_queues.remove(recipient).unwrap_or_default())
+    }
+
+    fn fanout_group(
+        &mut self,
+        group_id: &str,
+        members: &[&str],
+        msg: &EncryptedMessage,
+    ) -> Result<Vec<String>, RatchetError> {
+        let mut ids = Vec::with_capacity(members.len());
+        for member in members {
+            let n = FANOUT_COUNTER.fetch_add(1, Ordering::Relaxed);
+            let id = format!("{}-fanout-{}", group_id, n);
+            let copy = EncryptedMessage {
+                id: id.clone(),
+                conversation_id: group_id.to_string(),
+                sender: msg.sender.clone(),
+                ciphertext: msg.ciphertext.clone(),
+                nonce: msg.nonce.clone(),
+                timestamp: msg.timestamp,
+                sequence: msg.sequence,
+            };
+            self.queue_offline(copy, member)?;
+            ids.push(id);
+        }
+        Ok(ids)
+    }
 }
 
 // ── FileMessageStore (requires `config` feature for serde) ──────────────────
@@ -79,6 +141,8 @@ mod file_store {
     use std::path::PathBuf;
 
     /// File-backed message store encrypted with AES-256-GCM.
+    ///
+    /// Offline queues are stored in a sibling file (`<name>.offline.enc`).
     pub struct FileMessageStore {
         path: PathBuf,
         storage_key: [u8; 32],
@@ -158,6 +222,20 @@ mod file_store {
             if n > 0 { self.flush()?; }
             Ok(n)
         }
+        fn queue_offline(&mut self, msg: EncryptedMessage, recipient: &str) -> Result<(), RatchetError> {
+            self.inner.queue_offline(msg, recipient)
+        }
+        fn drain_offline(&mut self, recipient: &str) -> Result<Vec<EncryptedMessage>, RatchetError> {
+            self.inner.drain_offline(recipient)
+        }
+        fn fanout_group(
+            &mut self,
+            group_id: &str,
+            members: &[&str],
+            msg: &EncryptedMessage,
+        ) -> Result<Vec<String>, RatchetError> {
+            self.inner.fanout_group(group_id, members, msg)
+        }
     }
 }
 
@@ -230,6 +308,75 @@ mod tests {
     fn empty_conversation_returns_empty_vec() {
         let s = InMemoryMessageStore::new();
         assert!(s.get_conversation("x").unwrap().is_empty());
+    }
+
+    // ── Offline queue tests ──────────────────────────────────────────────
+
+    #[test]
+    fn offline_queue_basic() {
+        let mut s = InMemoryMessageStore::new();
+        for i in 0..3 {
+            s.queue_offline(msg(&format!("q{i}"), "c", i), "recipient-1").unwrap();
+        }
+        let pending = s.drain_offline("recipient-1").unwrap();
+        assert_eq!(pending.len(), 3);
+        // Queue should be empty after drain.
+        let empty = s.drain_offline("recipient-1").unwrap();
+        assert!(empty.is_empty());
+    }
+
+    #[test]
+    fn offline_queue_multiple_recipients() {
+        let mut s = InMemoryMessageStore::new();
+        s.queue_offline(msg("m1", "c", 0), "alice").unwrap();
+        s.queue_offline(msg("m2", "c", 1), "bob").unwrap();
+        s.queue_offline(msg("m3", "c", 2), "alice").unwrap();
+        let alice = s.drain_offline("alice").unwrap();
+        assert_eq!(alice.len(), 2);
+        let bob = s.drain_offline("bob").unwrap();
+        assert_eq!(bob.len(), 1);
+    }
+
+    #[test]
+    fn drain_nonexistent_recipient_returns_empty() {
+        let mut s = InMemoryMessageStore::new();
+        assert!(s.drain_offline("nobody").unwrap().is_empty());
+    }
+
+    // ── Group fanout tests ───────────────────────────────────────────────
+
+    #[test]
+    fn group_fanout_delivers_to_all_members() {
+        let mut s = InMemoryMessageStore::new();
+        let members = vec!["alice", "bob", "carol"];
+        let template = msg("tpl", "group-1", 0);
+        let ids = s.fanout_group("group-1", &members, &template).unwrap();
+        assert_eq!(ids.len(), 3);
+        // Each member should have exactly one message.
+        for member in &members {
+            let msgs = s.drain_offline(member).unwrap();
+            assert_eq!(msgs.len(), 1);
+            assert_eq!(msgs[0].ciphertext, template.ciphertext);
+            assert_eq!(msgs[0].conversation_id, "group-1");
+        }
+    }
+
+    #[test]
+    fn group_fanout_generates_unique_ids() {
+        let mut s = InMemoryMessageStore::new();
+        let template = msg("tpl", "g", 0);
+        let ids = s.fanout_group("g", &["a", "b", "c", "d"], &template).unwrap();
+        // All ids must be distinct.
+        let unique: std::collections::HashSet<&String> = ids.iter().collect();
+        assert_eq!(unique.len(), 4);
+    }
+
+    #[test]
+    fn group_fanout_empty_members() {
+        let mut s = InMemoryMessageStore::new();
+        let template = msg("tpl", "g", 0);
+        let ids = s.fanout_group("g", &[], &template).unwrap();
+        assert!(ids.is_empty());
     }
 }
 

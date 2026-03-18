@@ -16,7 +16,7 @@ version = "1.0.0"
 edition = "2021"
 authors = ["Qdaria Inc. <team@qdaria.com>"]
 license = "MIT"
-repository = "https://github.com/MoHoushmand/zipminator-pqc"
+repository = "https://github.com/QDaria/zipminator"
 
 [profile.release]
 opt-level = 3

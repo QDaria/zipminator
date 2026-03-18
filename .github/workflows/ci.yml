@@ -66,12 +66,19 @@ jobs:
   # Python: pytest
   # ---------------------------------------------------------------------------
   python-test:
-    name: Python Tests (${{ matrix.os }})
+    name: Python Tests (${{ matrix.os }}, py${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        exclude:
+          # Reduce matrix size: only test min/max on macOS
+          - os: macos-latest
+            python-version: "3.10"
+          - os: macos-latest
+            python-version: "3.11"
 
     steps:
       - uses: actions/checkout@v4
@@ -79,7 +86,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
 
       - name: Setup Rust (for maturin)
         uses: dtolnay/rust-toolchain@stable
@@ -88,15 +95,15 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+          key: ${{ runner.os }}-py${{ matrix.python-version }}-pip-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-py${{ matrix.python-version }}-pip-
 
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install maturin[patchelf] pytest pytest-cov
-          pip install -e ".[dev]"
+          pip install -e ".[all,dev]"
 
       - name: Build Rust extension via maturin
         run: maturin develop --release
@@ -108,9 +115,50 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: python-test-results-${{ matrix.os }}
+          name: python-test-results-${{ matrix.os }}-py${{ matrix.python-version }}
           path: test-results/
           retention-days: 5
+
+  # ---------------------------------------------------------------------------
+  # Docs: build Jupyter Book
+  # ---------------------------------------------------------------------------
+  docs-build:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Jupyter Book
+        run: pip install jupyter-book sphinx-book-theme
+
+      - name: Build Jupyter Book
+        run: jupyter-book build docs/book/ --all
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jupyter-book-html
+          path: docs/book/_build/html/
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # Installer: smoke test
+  # ---------------------------------------------------------------------------
+  installer-smoke:
+    name: Installer Smoke Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Smoke test installer (dry run)
+        run: bash scripts/install-zipminator.sh --dry-run
 
   # ---------------------------------------------------------------------------
   # Lint: cargo clippy + cargo fmt + ruff

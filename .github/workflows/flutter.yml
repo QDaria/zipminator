@@ -103,3 +103,111 @@ jobs:
 
       - name: Test FRB bridge crate
         run: cargo test -p rust_lib_zipminator --verbose
+
+  # ---------------------------------------------------------------------------
+  # Android release APK + AAB (unsigned, for CI verification)
+  # ---------------------------------------------------------------------------
+  android-release:
+    name: Android Release Build
+    runs-on: ubuntu-latest
+    needs: [flutter-test, rust-bridge]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-android-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-android-
+
+      - name: Install Flutter dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Build APK (debug-signed for CI)
+        working-directory: app
+        run: flutter build apk --release
+
+      - name: Build App Bundle (debug-signed for CI)
+        working-directory: app
+        run: flutter build appbundle --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: app/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: app/build/app/outputs/bundle/release/app-release.aab
+
+  # ---------------------------------------------------------------------------
+  # iOS release build (no-codesign, for CI verification)
+  # ---------------------------------------------------------------------------
+  ios-release:
+    name: iOS Release Build
+    runs-on: macos-latest
+    needs: [flutter-test, rust-bridge]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-ios-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-ios-
+
+      - name: Install Flutter dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Install CocoaPods dependencies
+        working-directory: app/ios
+        run: pod install
+
+      - name: Build iOS (no codesign)
+        working-directory: app
+        run: flutter build ios --release --no-codesign

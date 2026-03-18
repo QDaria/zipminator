@@ -45,6 +45,11 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const PillarStatusBanner(
+                description: 'Find & redact personal data in text',
+                status: PillarStatus.ready,
+              ),
+
               PillarHeader(
                 icon: Icons.visibility_off_outlined,
                 title: 'Anonymizer',
@@ -58,6 +63,81 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                   ),
                 ],
               ),
+
+              // 10-Level Anonymization Selector
+              QuantumCard(
+                glowColor: QuantumTheme.quantumOrange,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Anonymization Level',
+                        style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Level ${pii.selectedLevel}: ${_levelDescription(pii.selectedLevel)}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 8),
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: _levelColor(pii.selectedLevel),
+                        thumbColor: _levelColor(pii.selectedLevel),
+                        inactiveTrackColor:
+                            _levelColor(pii.selectedLevel).withValues(alpha: 0.2),
+                        overlayColor:
+                            _levelColor(pii.selectedLevel).withValues(alpha: 0.1),
+                      ),
+                      child: Slider(
+                        value: pii.selectedLevel.toDouble(),
+                        min: 1,
+                        max: 10,
+                        divisions: 9,
+                        label: 'L${pii.selectedLevel}',
+                        onChanged: (v) => notifier.setLevel(v.round()),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('L1 Basic',
+                            style: Theme.of(context).textTheme.labelSmall),
+                        Text('L10 Maximum',
+                            style: Theme.of(context).textTheme.labelSmall),
+                      ],
+                    ),
+                  ],
+                ),
+              ).animate().fadeIn(delay: 200.ms, duration: 300.ms),
+              const SizedBox(height: 12),
+
+              // Redact button + output
+              if (pii.redactedText != null) ...[
+                QuantumCard(
+                  glowColor: QuantumTheme.quantumGreen,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.check_circle,
+                              color: QuantumTheme.quantumGreen, size: 20),
+                          const SizedBox(width: 8),
+                          Text('Redacted Output (L${pii.selectedLevel})',
+                              style: Theme.of(context).textTheme.titleSmall),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      SelectableText(
+                        pii.redactedText!,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontFamily: 'JetBrains Mono',
+                            ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(duration: 300.ms),
+                const SizedBox(height: 12),
+              ],
 
               // PII Scanner card
               QuantumCard(
@@ -79,7 +159,21 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                             'Paste text to scan for PII...\ne.g. "My SSN is 123-45-6789, email me at test@example.com"',
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: ActionChip(
+                        avatar: const Icon(Icons.science_outlined, size: 16),
+                        label: const Text('Try Example'),
+                        onPressed: () {
+                          _controller.text =
+                              'John Smith, SSN 123-45-6789, john@acme.com, '
+                              '555-0123, CC 4111-1111-1111-1111';
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         Expanded(
@@ -89,6 +183,19 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                             },
                             icon: const Icon(Icons.search),
                             label: const Text('Scan'),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _controller.text.isNotEmpty
+                                ? () => notifier.redact(_controller.text)
+                                : null,
+                            icon: const Icon(Icons.shield),
+                            label: const Text('Redact'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: QuantumTheme.quantumOrange,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -199,6 +306,26 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
         ),
       ),
     );
+  }
+
+  String _levelDescription(int level) => switch (level) {
+        1 => 'Names only',
+        2 => 'Names + emails',
+        3 => 'Names + emails + phones',
+        4 => 'All contact info + addresses',
+        5 => 'All PII including SSN/ID numbers',
+        6 => 'All PII + financial data',
+        7 => 'All PII + IP addresses + devices',
+        8 => 'All PII + biometrics + medical',
+        9 => 'All PII + behavioral patterns',
+        10 => 'Maximum: all detectable PII',
+        _ => 'Unknown',
+      };
+
+  Color _levelColor(int level) {
+    if (level <= 3) return QuantumTheme.quantumGreen;
+    if (level <= 6) return QuantumTheme.quantumOrange;
+    return QuantumTheme.quantumRed;
   }
 
   Widget _sensitivityBadge(int level) {

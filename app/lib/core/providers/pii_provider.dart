@@ -41,22 +41,30 @@ class PiiScanState {
   final String inputText;
   final List<PiiMatch> matches;
   final bool isScanning;
+  final int selectedLevel;
+  final String? redactedText;
 
   const PiiScanState({
     this.inputText = '',
     this.matches = const [],
     this.isScanning = false,
+    this.selectedLevel = 5,
+    this.redactedText,
   });
 
   PiiScanState copyWith({
     String? inputText,
     List<PiiMatch>? matches,
     bool? isScanning,
+    int? selectedLevel,
+    String? redactedText,
   }) =>
       PiiScanState(
         inputText: inputText ?? this.inputText,
         matches: matches ?? this.matches,
         isScanning: isScanning ?? this.isScanning,
+        selectedLevel: selectedLevel ?? this.selectedLevel,
+        redactedText: redactedText,
       );
 
   int get highSensitivityCount =>
@@ -74,6 +82,31 @@ class PiiNotifier extends Notifier<PiiScanState> {
     final List<dynamic> parsed = jsonDecode(jsonStr);
     final matches = parsed.map((m) => PiiMatch.fromJson(m)).toList();
     state = state.copyWith(matches: matches, isScanning: false);
+  }
+
+  void setLevel(int level) {
+    state = state.copyWith(selectedLevel: level);
+  }
+
+  /// Redact PII at or below the selected sensitivity level.
+  void redact(String text) {
+    scan(text);
+    final filtered = state.matches
+        .where((m) => m.sensitivity <= state.selectedLevel)
+        .toList()
+      ..sort((a, b) => b.start.compareTo(a.start));
+
+    var result = text;
+    for (final m in filtered) {
+      final replacement = '[${m.category.toUpperCase()}]';
+      result = result.replaceRange(m.start, m.end, replacement);
+    }
+    state = PiiScanState(
+      inputText: state.inputText,
+      matches: state.matches,
+      selectedLevel: state.selectedLevel,
+      redactedText: result,
+    );
   }
 
   void clear() {

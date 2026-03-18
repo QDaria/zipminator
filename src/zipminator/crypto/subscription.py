@@ -14,6 +14,7 @@ Hybrid Naming (Public / Internal Character):
 License: MIT + Commercial (see LICENSE file)
 """
 
+import os
 import re
 from typing import Dict, List, Optional
 from dataclasses import dataclass
@@ -523,6 +524,126 @@ class SubscriptionManager:
                 "certifications": features.certifications,
             })
         return result
+
+
+class APIKeyValidator:
+    """
+    Validates API keys for L4+ access.
+
+    Auth flow:
+    1. L1-3: always available (no key needed)
+    2. L4+: check ZIPMINATOR_API_KEY env var -> validate against API -> fallback to activation code
+    3. ZIPMINATOR_OFFLINE=1: skip API validation, use activation codes only
+
+    The API endpoint (api.zipminator.zip/v1/validate) is not yet deployed;
+    this class provides the client-side gating logic with local caching.
+    """
+
+    _cache: Dict[str, tuple] = {}  # key -> (tier, expiry_timestamp)
+    CACHE_TTL_SECONDS = 3600  # 1 hour
+
+    @classmethod
+    def is_offline_mode(cls) -> bool:
+        """Check if offline mode is forced via env var."""
+        return os.getenv("ZIPMINATOR_OFFLINE", "").strip() in ("1", "true", "yes")
+
+    @classmethod
+    def get_api_key(cls) -> Optional[str]:
+        """Read API key from environment."""
+        return os.getenv("ZIPMINATOR_API_KEY", "").strip() or None
+
+    @classmethod
+    def validate_key(cls, api_key: str) -> Optional[SubscriptionTier]:
+        """
+        Validate an API key against the remote service.
+
+        Returns the tier if valid, None if invalid or unreachable.
+        Currently returns None (API not deployed); activation codes are the
+        fallback auth path until api.zipminator.zip is live.
+        """
+        import time
+
+        # Check cache first
+        if api_key in cls._cache:
+            tier, expiry = cls._cache[api_key]
+            if time.time() < expiry:
+                return tier
+
+        # Try remote validation (requires httpx)
+        try:
+            import httpx
+            resp = httpx.post(
+                "https://api.zipminator.zip/v1/validate",
+                json={"api_key": api_key},
+                timeout=5.0,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                tier_str = data.get("tier", "").lower()
+                tier_map = {t.value: t for t in SubscriptionTier}
+                tier = tier_map.get(tier_str)
+                if tier:
+                    cls._cache[api_key] = (tier, time.time() + cls.CACHE_TTL_SECONDS)
+                    return tier
+        except Exception:
+            pass  # Network error, httpx not installed, etc.
+
+        return None
+
+    @classmethod
+    def authorize_level(cls, level: int, activation_code: Optional[str] = None) -> tuple:
+        """
+        Authorize access to a given anonymization level.
+
+        Returns (allowed: bool, message: str, auth_method: str).
+
+        Auth priority:
+        1. L1-3 always allowed
+        2. API key (if set and not offline)
+        3. Activation code
+        4. Deny
+        """
+        # L1-3 are always free
+        if level <= 3:
+            return True, None, "free_tier"
+
+        # Check offline mode
+        offline = cls.is_offline_mode()
+
+        # Try API key first (unless offline)
+        if not offline:
+            api_key = cls.get_api_key()
+            if api_key:
+                tier = cls.validate_key(api_key)
+                if tier:
+                    features = TIER_FEATURES[tier]
+                    if level <= features.max_level:
+                        return True, None, "api_key"
+                    else:
+                        return False, (
+                            f"API key tier ({features.character_name}) "
+                            f"supports up to level {features.max_level}."
+                        ), "api_key_insufficient"
+
+        # Try activation code
+        if activation_code:
+            allowed, msg = SubscriptionManager.can_use_level(activation_code, level)
+            if allowed:
+                return True, None, "activation_code"
+            return False, msg, "activation_code_insufficient"
+
+        # No auth method succeeded
+        required = SubscriptionManager._infer_tier_from_level(level)
+        features = TIER_FEATURES[required]
+        return False, (
+            f"Level {level} requires {features.public_name} tier or higher. "
+            "Set ZIPMINATOR_API_KEY or provide an activation code."
+        ), "denied"
+
+    @classmethod
+    def clear_cache(cls):
+        """Clear the API key validation cache."""
+        cls._cache.clear()
 
 
 # Convenience functions

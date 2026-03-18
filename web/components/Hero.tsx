@@ -86,7 +86,7 @@ const Hero = () => {
             className="text-lg md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
           >
             Real quantum entropy from{' '}
-            <span className="text-quantum-400 font-bold">156-qubit IBM hardware</span>
+            <span className="text-quantum-400 font-bold">156-qubit quantum hardware</span>
             {' '}combined with{' '}
             <span className="text-quantum-400 font-bold">NIST FIPS 203 Kyber768</span>
             {' '}cryptography for quantum-resistant security
@@ -166,7 +166,7 @@ const Hero = () => {
                 <div className="text-3xl font-bold bg-gradient-to-br from-quantum-400 to-purple-400 bg-clip-text text-transparent mb-2">
                   156 Qubits
                 </div>
-                <div className="text-gray-400 font-medium">IBM Quantum Hardware</div>
+                <div className="text-gray-400 font-medium">Quantum Hardware Entropy</div>
               </div>
             </motion.div>
 

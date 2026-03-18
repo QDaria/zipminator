@@ -1,5 +1,5 @@
 name: zipminator
-description: "A new Flutter project."
+description: "Zipminator — the world's first PQC super-app. Military-grade post-quantum encryption for communications, files, and data at rest."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -41,8 +41,15 @@ dependencies:
   google_fonts: ^8.0.2
   flutter_animate: ^4.5.2
   shimmer: ^3.0.0
+  http: ^1.2.0
+  shared_preferences: ^2.3.0
+  webview_flutter: ^4.10.0
   rust_lib_zipminator:
     path: rust_builder
+
+dependency_overrides:
+  # Pin to avoid objective_c native asset crash on iOS 26.3
+  path_provider_foundation: 2.4.0
 
 dev_dependencies:
   flutter_test:

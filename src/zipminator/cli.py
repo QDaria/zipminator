@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-from shared.providers import get_provider
-from shared.core.pqc import PQC
-import typer
-from rich.console import Console
-from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich import print as rprint
-from typing import Optional
+"""Zipminator CLI — Post-Quantum Cryptography tools."""
+
 import sys
 import os
+from typing import Optional
 
-# Ensure root is in path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    import typer
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.progress import Progress, SpinnerColumn, TextColumn
+    from rich import print as rprint
+except ImportError:
+    print("CLI requires 'typer' and 'rich'. Install with: pip install zipminator[cli]")
+    sys.exit(1)
+
+from zipminator.crypto.pqc import PQC
+from zipminator.crypto.quantum_random import QuantumRandom
 
 
 app = typer.Typer(
@@ -119,16 +124,16 @@ def entropy(
             transient=True,
         ) as progress:
             task = progress.add_task(
-                description="Connecting to Quantum Provider...", total=None)
-            provider = get_provider(provider_name)
+                description="Generating quantum entropy...", total=None)
+            qrand = QuantumRandom()
+            entropy_bytes = qrand.randbytes(bits // 8)
             progress.update(
-                task, description=f"Connected to {provider.name()}")
+                task, description="Entropy generated")
 
-            entropy_bytes = provider.get_entropy(bits)
-
+        source = "Quantum Pool" if qrand._has_quantum_access else "System Random"
         rprint(
-            f"[green]✅ Success![/green] Connected to: [bold blue]{provider.name()}[/bold blue]")
-        console.print(Panel(f"{entropy_bytes}",
+            f"[green]✅ Success![/green] Source: [bold blue]{source}[/bold blue]")
+        console.print(Panel(f"{entropy_bytes.hex()}",
                       title="Quantum Entropy", border_style="green"))
 
     except Exception as e:

@@ -1,47 +1,74 @@
-# Zipminator
+# Zipminator PQC Documentation
 
-**Post-Quantum Cryptography Platform for Data Protection**
+**Post-quantum cryptography toolkit with real quantum entropy.**
 
-Zipminator is a comprehensive PQC security platform built on NIST FIPS 203 (ML-KEM-768 / Kyber768). It combines quantum-resistant encryption with quantum random number generation from a 156-qubit IBM quantum processor, a 10-level anonymization system, PII scanning, and self-destruct capabilities.
+[![Tests](https://img.shields.io/badge/tests-575_passing-00d4aa?style=flat-square)](https://github.com/QDaria/zipminator)
+[![FIPS 203](https://img.shields.io/badge/NIST_FIPS_203-verified-00d4aa?style=flat-square)](https://github.com/QDaria/zipminator)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square)](https://github.com/QDaria/zipminator/blob/main/LICENSE)
 
-## Core Capabilities
+Zipminator is an open-source post-quantum cryptography toolkit built on a from-scratch CRYSTALS-Kyber-768 (ML-KEM) implementation in Rust, exposed as a Python SDK via PyO3. It provides 10-level data anonymization, PII scanning across 15+ country jurisdictions, and quantum-seeded key generation from IBM Quantum hardware (156-qubit Eagle r3 processors).
 
-- **PQC Encryption**: ML-KEM-768 (Kyber768) key encapsulation mechanism, verified against NIST KAT test vectors
-- **Quantum Random Number Generation**: Entropy harvested from 156-qubit IBM quantum hardware via qBraid
-- **10-Level Anonymization**: From basic regex masking (L1) to total quantum pseudoanonymization (L10)
-- **PII Scanning**: Automatic detection and classification of personally identifiable information
-- **Self-Destruct**: DoD 5220.22-M 3-pass secure overwrite for sensitive data
-- **Compliance Ready**: GDPR, HIPAA, and CCPA alignment with full audit trail
+## Feature Highlights
 
-## Platform Components
+- **Rust Kyber768 core** -- Constant-time arithmetic, NIST KAT validation, fuzz testing, 413 Rust tests
+- **10-level anonymization** -- From SHA-256 hashing (L1) to Paillier homomorphic encryption (L10)
+- **PII scanning** -- Automatic detection of 18+ PII types across Norwegian, US, and European jurisdictions
+- **Quantum entropy** -- Continuous harvesting from IBM Quantum via qBraid, with quota management
+- **Subscription gating** -- Freemium L1-3, API-key-gated L4-10 with four subscription tiers
+- **CLI and Jupyter** -- Command-line tools and JupyterLab magics for interactive use
 
-| Component | Technology | Description |
-|-----------|-----------|-------------|
-| Crypto Engine | Rust + PyO3 | Kyber768 KEM with constant-time operations |
-| Python SDK | Python 3.11 | Anonymizer, scanner, QRNG, CLI |
-| Web Dashboard | Next.js 16 | 9-tab monitoring dashboard |
-| Desktop Browser | Tauri 2.x | PQC-native browser with built-in VPN |
-| Mobile App | Expo React Native | Cross-platform mobile client |
-| API | FastAPI | REST backend with PostgreSQL + Redis |
-| JupyterLab | Python | Interactive magics and widgets |
+## Quick Example
 
-## Subscription Tiers
+```python
+from zipminator import keypair, encapsulate, decapsulate
 
-| Feature | Free | Developer | Pro | Enterprise |
-|---------|------|-----------|-----|------------|
-| Anonymization Levels | L1-L3 | L1-L5 | L1-L7 | L1-L10 |
-| PQC Encryption | Basic | Full | Full | Full |
-| QRNG Entropy | Simulated | Shared pool | Dedicated pool | Dedicated hardware |
-| PII Scanning | 100 rows/day | 10K rows/day | Unlimited | Unlimited |
-| Self-Destruct | -- | Single file | Batch | Enterprise policies |
-| Audit Trail | -- | -- | 90 days | Unlimited |
-| Support | Community | Email | Priority | Dedicated |
+# Generate a Kyber768 keypair (NIST FIPS 203, Security Level 3)
+pk, sk = keypair()
 
-## FIPS 203 Compliance
+# Encapsulate: sender creates shared secret + ciphertext
+ct, shared_secret = encapsulate(pk)
 
-Zipminator implements the NIST FIPS 203 (ML-KEM) algorithm specification. The Rust crypto engine has been verified against official NIST Known Answer Test (KAT) vectors. This is algorithm-level compliance, not FIPS 140-3 module validation (which requires a separate CMVP certification process).
+# Decapsulate: receiver recovers the same shared secret
+recovered = decapsulate(ct, sk)
 
-## Getting Started
-
-```{tableofcontents}
+assert shared_secret == recovered  # 32-byte shared secret
+print(f"Shared secret: {shared_secret.hex()[:32]}...")
 ```
+
+## Architecture
+
+```
+                +-----------------+
+                |   Python SDK    |  zipminator v0.5.0b1
+                |  CLI / Jupyter  |
+                +--------+--------+
+                         |  PyO3
+                +--------+--------+
+                |   Rust Core     |  crates/zipminator-core
+                |  Kyber768 KEM   |
+                |  NTT / Poly     |
+                |  Entropy Pool   |
+                +--------+--------+
+                         |
+          +--------------+--------------+
+          |              |              |
+    +-----+----+  +-----+----+  +------+-----+
+    | IBM Fez   |  | IBM      |  | OS Entropy |
+    | (qBraid)  |  | Marrakesh|  | (fallback) |
+    +-----------+  +----------+  +------------+
+```
+
+## Where to Start
+
+If you are new to Zipminator, begin with the {doc}`content/getting_started` guide. For installation options (PyPI, source, Docker), see {doc}`content/installation`.
+
+## Links
+
+- **Platform**: [zipminator.zip](https://www.zipminator.zip)
+- **Repository**: [github.com/QDaria/zipminator](https://github.com/QDaria/zipminator)
+- **Issues**: [github.com/QDaria/zipminator/issues](https://github.com/QDaria/zipminator/issues)
+- **Contact**: [mo@qdaria.com](mailto:mo@qdaria.com)
+
+---
+
+Built by [QDaria](https://qdaria.com) in Oslo, Norway.

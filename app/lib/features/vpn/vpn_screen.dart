@@ -5,7 +5,7 @@ import 'package:zipminator/core/providers/vpn_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
 
-/// Pillar 4: Q-VPN — PQC VPN with ML-KEM handshake.
+/// Pillar 4: Q-VPN — PQC VPN with ML-KEM handshake and location selector.
 class VpnScreen extends ConsumerWidget {
   const VpnScreen({super.key});
 
@@ -23,6 +23,12 @@ class VpnScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Status banner
+                const PillarStatusBanner(
+                  description: 'One-tap quantum-safe VPN tunnel',
+                  status: PillarStatus.ready,
+                ),
+
                 // Header
                 PillarHeader(
                   icon: Icons.vpn_key_outlined,
@@ -37,6 +43,96 @@ class VpnScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
+
+                // Location selector
+                QuantumCard(
+                  glowColor: QuantumTheme.quantumBlue,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Server Location',
+                          style: Theme.of(context).textTheme.titleSmall),
+                      const SizedBox(height: 8),
+
+                      // Region selector chips
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: VpnRegion.values.map((region) {
+                            final isSelected =
+                                vpn.selectedRegion == region;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: ChoiceChip(
+                                label: Text(region.label),
+                                selected: isSelected,
+                                selectedColor: QuantumTheme.quantumBlue
+                                    .withValues(alpha: 0.3),
+                                side: BorderSide(
+                                  color: isSelected
+                                      ? QuantumTheme.quantumBlue
+                                          .withValues(alpha: 0.6)
+                                      : QuantumTheme.quantumBlue
+                                          .withValues(alpha: 0.15),
+                                ),
+                                labelStyle: TextStyle(
+                                  color: isSelected
+                                      ? QuantumTheme.quantumBlue
+                                      : null,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : null,
+                                  fontSize: 12,
+                                ),
+                                onSelected: vpn.isActive
+                                    ? null
+                                    : (_) =>
+                                        notifier.selectRegion(region),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Country dropdown
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 2),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: QuantumTheme.quantumBlue
+                                .withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: DropdownButton<VpnLocation>(
+                          value: vpn.selectedLocation,
+                          isExpanded: true,
+                          underline: const SizedBox.shrink(),
+                          items: vpn.regionLocations.map((loc) {
+                            return DropdownMenuItem(
+                              value: loc,
+                              child: Text(loc.displayName,
+                                  style: const TextStyle(fontSize: 14)),
+                            );
+                          }).toList(),
+                          onChanged: vpn.isActive
+                              ? null
+                              : (loc) {
+                                  if (loc != null) {
+                                    notifier.selectLocation(loc);
+                                  }
+                                },
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                    .animate()
+                    .fadeIn(delay: 200.ms, duration: 300.ms)
+                    .slideY(begin: 0.05),
+                const SizedBox(height: 16),
 
                 // Connection indicator
                 _VpnStatusIndicator(status: vpn.status)
@@ -80,8 +176,7 @@ class VpnScreen extends ConsumerWidget {
                             ),
                           ),
                         )
-                            .animate(
-                                onPlay: (c) => c.repeat())
+                            .animate(onPlay: (c) => c.repeat())
                             .scale(
                               begin: const Offset(0.8, 0.8),
                               end: const Offset(1.3, 1.3),
@@ -102,8 +197,7 @@ class VpnScreen extends ConsumerWidget {
                             ),
                           ),
                         )
-                            .animate(
-                                onPlay: (c) => c.repeat())
+                            .animate(onPlay: (c) => c.repeat())
                             .scale(
                               begin: const Offset(0.8, 0.8),
                               end: const Offset(1.3, 1.3),
@@ -116,16 +210,17 @@ class VpnScreen extends ConsumerWidget {
                         width: 160,
                         height: 160,
                         child: ElevatedButton(
-                          onPressed: vpn.status == VpnStatus.connecting ||
-                                  vpn.status == VpnStatus.disconnecting
-                              ? null
-                              : () {
-                                  if (vpn.isActive) {
-                                    notifier.disconnect();
-                                  } else {
-                                    notifier.connect();
-                                  }
-                                },
+                          onPressed:
+                              vpn.status == VpnStatus.connecting ||
+                                      vpn.status == VpnStatus.disconnecting
+                                  ? null
+                                  : () {
+                                      if (vpn.isActive) {
+                                        notifier.disconnect();
+                                      } else {
+                                        notifier.connect();
+                                      }
+                                    },
                           style: ElevatedButton.styleFrom(
                             shape: const CircleBorder(),
                             backgroundColor: vpn.isActive
@@ -162,7 +257,10 @@ class VpnScreen extends ConsumerWidget {
                     activeTrackColor: QuantumTheme.quantumCyan,
                     secondary: const Icon(Icons.shield_outlined),
                   ),
-                ).animate().fadeIn(delay: 500.ms, duration: 300.ms).slideY(begin: 0.05),
+                )
+                    .animate()
+                    .fadeIn(delay: 500.ms, duration: 300.ms)
+                    .slideY(begin: 0.05),
                 const SizedBox(height: 8),
 
                 // Protocol info
@@ -175,7 +273,10 @@ class VpnScreen extends ConsumerWidget {
                     title: const Text('ML-KEM-768 Handshake'),
                     subtitle: const Text('PQ-WireGuard tunnel'),
                   ),
-                ).animate().fadeIn(delay: 600.ms, duration: 300.ms).slideY(begin: 0.05),
+                )
+                    .animate()
+                    .fadeIn(delay: 600.ms, duration: 300.ms)
+                    .slideY(begin: 0.05),
               ],
             ),
           ),
@@ -215,7 +316,8 @@ class _VpnStatusIndicator extends StatelessWidget {
               height: 24,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: color.withValues(alpha: 0.5), width: 2),
+                border: Border.all(
+                    color: color.withValues(alpha: 0.5), width: 2),
               ),
             )
                 .animate(onPlay: (c) => c.repeat())

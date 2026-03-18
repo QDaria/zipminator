@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,21 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
   final _scrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    // Auto-start demo session on load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ratchet = ref.read(ratchetProvider);
+      if (!ratchet.isConnected) {
+        ref
+            .read(ratchetProvider.notifier)
+            .initAlice()
+            .catchError((_) => Uint8List(0));
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     _scrollController.dispose();
@@ -29,7 +45,9 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
     final ratchet = ref.watch(ratchetProvider);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
+        title: const Text('Quantum Alice'),
         actions: [
           PqcBadge(
             label: 'PQ-Ratchet',
@@ -48,6 +66,11 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
+                    const PillarStatusBanner(
+                      description:
+                          'Send encrypted messages with forward secrecy',
+                      status: PillarStatus.ready,
+                    ),
                     PillarHeader(
                       icon: Icons.chat_bubble_outline,
                       title: 'PQC Messenger',
@@ -65,21 +88,12 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
                         ),
                       ],
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        final notifier = ref.read(ratchetProvider.notifier);
-                        final messenger = ScaffoldMessenger.of(context);
-                        final alicePk = await notifier.initAlice();
-                        messenger.showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Session initialized (${alicePk.length} byte PK)'),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.handshake),
-                      label: const Text('Start Session'),
-                    ).animate().fadeIn(delay: 500.ms, duration: 300.ms),
+                    const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(),
+                    ),
+                    Text('Initializing PQ-Double Ratchet session...',
+                        style: Theme.of(context).textTheme.bodySmall),
                   ],
                 ),
               ),
@@ -88,11 +102,22 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
             Expanded(
               child: ratchet.messages.isEmpty
                   ? Center(
-                      child: Text(
-                        ratchet.isConnected
-                            ? 'Send your first quantum-safe message'
-                            : 'Initialize a session to begin',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.lock,
+                              size: 32,
+                              color: QuantumTheme.quantumGreen
+                                  .withValues(alpha: 0.5)),
+                          const SizedBox(height: 8),
+                          Text(
+                            ratchet.isConnected
+                                ? 'Session initialized with PQ-Double Ratchet.\nSend your first quantum-safe message!'
+                                : 'Connecting...',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
                       ),
                     )
                   : ListView.builder(

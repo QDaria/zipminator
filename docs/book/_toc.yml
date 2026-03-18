@@ -1,40 +1,30 @@
 format: jb-book
 root: index
-
 parts:
-  - caption: Introduction
-    chapters:
-      - file: content/intro
-
   - caption: Getting Started
     chapters:
       - file: content/getting_started
-
-  - caption: Anonymization
+      - file: content/installation
+  - caption: Core Features
     chapters:
-      - file: content/anonymization_levels
-
-  - caption: API Reference
+      - file: content/core_crypto
+      - file: content/anonymization
+      - file: content/pii_scanning
+      - file: content/entropy
+      - file: content/subscription
+  - caption: Tools
     chapters:
-      - file: content/api_reference
-
-  - caption: CLI Reference
+      - file: content/cli
+      - file: content/jupyter
+  - caption: Use Cases
     chapters:
-      - file: content/cli_reference
-
-  - caption: Compliance
-    chapters:
-      - file: content/compliance
-
-  - caption: Tutorials
-    chapters:
-      - file: notebooks/01_quickstart
-      - file: notebooks/02_anonymization
-      - file: notebooks/03_qrng_entropy
-      - file: notebooks/04_compliance
-      - file: notebooks/05_shor_demo
-      - file: notebooks/06_quantum_capabilities
-
+      - file: content/use_cases/government
+      - file: content/use_cases/healthcare
+      - file: content/use_cases/finance
+      - file: content/use_cases/ecommerce
+      - file: content/use_cases/defense
   - caption: Appendix
     chapters:
-      - file: content/appendix
+      - file: content/appendix/anonymization_techniques
+      - file: content/appendix/fips_203
+      - file: content/appendix/glossary

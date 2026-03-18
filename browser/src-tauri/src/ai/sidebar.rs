@@ -22,6 +22,7 @@ use crate::ai::local_llm::{
     CHAT_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, WRITING_SYSTEM_PROMPT,
 };
 use crate::ai::page_context::{PageContext, RawPageData};
+use crate::ai::prompt_guard;
 
 // ---------------------------------------------------------------------------
 // Event names emitted to the frontend
@@ -236,6 +237,18 @@ pub async fn ai_chat(
         (mode, engine_opt, cloud_opt, history_snapshot, config)
     };
 
+    // --- Prompt guard: scan the user message before sending to any LLM ---
+    let safety = prompt_guard::scan(&request.message);
+    if !safety.is_safe {
+        return Err(AiError::new(
+            "prompt_injection_blocked",
+            format!(
+                "Your message was blocked by the prompt safety scanner. Detected issues: {}",
+                safety.threats.join("; ")
+            ),
+        ));
+    }
+
     let _ = app.emit(EVENT_AI_START, ());
 
     let result_text = match mode {
@@ -285,9 +298,22 @@ pub async fn ai_summarize(
         )
     };
 
+    // --- Prompt guard: scan page content for injection attempts ---
+    let page_text = request.page_context.to_prompt_context();
+    let safety = prompt_guard::scan(&page_text);
+    if !safety.is_safe {
+        return Err(AiError::new(
+            "prompt_injection_blocked",
+            format!(
+                "Page content was blocked by the prompt safety scanner. Detected issues: {}",
+                safety.threats.join("; ")
+            ),
+        ));
+    }
+
     let _ = app.emit(EVENT_AI_START, ());
 
-    let prompt_content = request.page_context.to_prompt_context();
+    let prompt_content = page_text;
 
     let history = vec![ChatMessage {
         role: Role::User,
@@ -367,6 +393,18 @@ pub async fn ai_rewrite(
         WritingTone::Academic => " Use an academic, scholarly tone with precise language.",
         WritingTone::Creative => " Use a creative, expressive tone.",
     }).unwrap_or("");
+
+    // --- Prompt guard: scan the user-supplied text for injection ---
+    let safety = prompt_guard::scan(&request.text);
+    if !safety.is_safe {
+        return Err(AiError::new(
+            "prompt_injection_blocked",
+            format!(
+                "Your text was blocked by the prompt safety scanner. Detected issues: {}",
+                safety.threats.join("; ")
+            ),
+        ));
+    }
 
     let user_message = format!(
         "{action_instruction}{tone_instruction}\n\nText:\n{text}",

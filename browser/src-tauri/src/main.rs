@@ -15,6 +15,9 @@ use state::AppState;
 use state::VpnState;
 use tauri::Manager;
 
+// AI sidebar commands (Domain 4)
+use zipbrowser::ai;
+
 fn main() {
     // Initialize structured logging (tracing for domain modules, env_logger for shell).
     tracing_subscriber::fmt()
@@ -37,6 +40,7 @@ fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .manage(AppState::new())
+        .manage(ai::initial_state(None)) // AI sidebar state (proxy port set in setup)
         .setup(|app| {
             let app_handle = app.handle().clone();
 
@@ -157,6 +161,16 @@ fn main() {
             pqc::pqc_self_test,
             // ── PQC Scanning ─────────────────────────────────────────────
             commands::scan_pqc_endpoint,
+            // ── AI Sidebar (Domain 4) ───────────────────────────────────────
+            ai::sidebar::ai_chat,
+            ai::sidebar::ai_summarize,
+            ai::sidebar::ai_rewrite,
+            ai::sidebar::ai_get_config,
+            ai::sidebar::ai_set_config,
+            ai::sidebar::ai_extract_page_context,
+            ai::sidebar::ai_clear_history,
+            ai::sidebar::ai_download_model,
+            ai::sidebar::ai_load_model,
         ])
         .run(tauri::generate_context!())
         .expect("error running Zipminator");

@@ -9,6 +9,8 @@ class VoipState {
   final Uint8List? srtpMasterKey;
   final Uint8List? srtpMasterSalt;
   final Duration callDuration;
+  final bool isMuted;
+  final bool isSpeaker;
   final String? error;
 
   const VoipState({
@@ -17,6 +19,8 @@ class VoipState {
     this.srtpMasterKey,
     this.srtpMasterSalt,
     this.callDuration = Duration.zero,
+    this.isMuted = false,
+    this.isSpeaker = false,
     this.error,
   });
 
@@ -26,6 +30,8 @@ class VoipState {
     Uint8List? srtpMasterKey,
     Uint8List? srtpMasterSalt,
     Duration? callDuration,
+    bool? isMuted,
+    bool? isSpeaker,
     String? error,
   }) =>
       VoipState(
@@ -34,6 +40,8 @@ class VoipState {
         srtpMasterKey: srtpMasterKey ?? this.srtpMasterKey,
         srtpMasterSalt: srtpMasterSalt ?? this.srtpMasterSalt,
         callDuration: callDuration ?? this.callDuration,
+        isMuted: isMuted ?? this.isMuted,
+        isSpeaker: isSpeaker ?? this.isSpeaker,
         error: error,
       );
 }
@@ -60,6 +68,18 @@ class VoipNotifier extends Notifier<VoipState> {
 
   void endCall() {
     state = const VoipState();
+  }
+
+  void toggleMute() {
+    state = state.copyWith(isMuted: !state.isMuted);
+  }
+
+  void toggleSpeaker() {
+    state = state.copyWith(isSpeaker: !state.isSpeaker);
+  }
+
+  void updateCallDuration(Duration duration) {
+    state = state.copyWith(callDuration: duration);
   }
 }
 

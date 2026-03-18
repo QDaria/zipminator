@@ -6,46 +6,46 @@ import { Shield, Award, Lock, GitBranch, Cpu, Globe } from 'lucide-react'
 const ProviderShowcase = () => {
   const providers = [
     {
-      name: 'IBM Quantum',
-      description: '156-qubit hardware partner',
-      icon: Cpu,
-      color: 'from-blue-500 to-cyan-500',
-      verified: true
-    },
-    {
       name: 'NIST',
-      description: 'FIPS 203 Standards',
+      description: 'FIPS 203 / 204 Standards',
       icon: Award,
       color: 'from-purple-500 to-pink-500',
       verified: true
     },
     {
-      name: 'GitHub',
-      description: 'Open Source',
-      icon: GitBranch,
-      color: 'from-gray-500 to-gray-400',
-      verified: true
-    },
-    {
-      name: 'Kyber',
-      description: 'ML-KEM Algorithm',
+      name: 'ML-KEM-768',
+      description: 'Kyber Lattice KEM',
       icon: Shield,
       color: 'from-quantum-500 to-purple-500',
       verified: true
     },
     {
-      name: 'OpenSSL',
-      description: 'Cryptographic Engine',
+      name: 'RustCrypto',
+      description: 'Audited Crate Ecosystem',
       icon: Lock,
-      color: 'from-red-500 to-orange-500',
-      verified: false
+      color: 'from-orange-500 to-red-500',
+      verified: true
     },
     {
-      name: 'IETF',
-      description: 'Standards Compliance',
+      name: 'Rigetti',
+      description: 'Quantum Hardware Access',
+      icon: Cpu,
+      color: 'from-blue-500 to-cyan-500',
+      verified: true
+    },
+    {
+      name: 'GitHub',
+      description: 'MIT Open Source',
+      icon: GitBranch,
+      color: 'from-gray-500 to-gray-400',
+      verified: true
+    },
+    {
+      name: 'WireGuard',
+      description: 'VPN Protocol Base',
       icon: Globe,
       color: 'from-green-500 to-emerald-500',
-      verified: false
+      verified: true
     }
   ]
 
@@ -95,22 +95,22 @@ const ProviderShowcase = () => {
           <div className="inline-flex items-center space-x-2 bg-quantum-900/30 border border-quantum-500/30 rounded-full px-4 py-2 mb-6">
             <Shield className="w-4 h-4 text-quantum-400" />
             <span className="text-sm font-medium text-quantum-300">
-              Industry Leaders
+              Verified Technologies
             </span>
           </div>
 
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="gradient-text">
-              Trusted by Leading
+              Built on Proven
             </span>
             <br />
             <span className="text-white">
-              Quantum & Security Organizations
+              Standards & Open Source
             </span>
           </h2>
 
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Powered by real quantum hardware and NIST-standardized cryptographic algorithms
+            Every cryptographic component backed by NIST standards, audited open-source libraries, and real quantum hardware
           </p>
         </motion.div>
 
@@ -175,8 +175,8 @@ const ProviderShowcase = () => {
           className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto"
         >
           <div className="card-quantum text-center">
-            <div className="text-3xl font-bold text-quantum-400 mb-2">156</div>
-            <div className="text-gray-400">Qubit Quantum Hardware</div>
+            <div className="text-3xl font-bold text-quantum-400 mb-2">408+</div>
+            <div className="text-gray-400">Tests Passing</div>
           </div>
 
           <div className="card-quantum text-center">

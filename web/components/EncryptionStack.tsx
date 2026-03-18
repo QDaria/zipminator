@@ -53,9 +53,9 @@ const stackLayers = [
   },
   {
     icon: Cpu,
-    name: 'IBM 156-Qubit QRNG',
+    name: '156-Qubit QRNG',
     standard: 'Hardware Entropy',
-    description: 'True quantum randomness from IBM 156-qubit quantum processors',
+    description: 'True quantum randomness from 156-qubit quantum processors via cloud API',
     color: 'from-cyan-500 to-blue-500',
   },
   {
@@ -175,7 +175,7 @@ const EncryptionStack = () => {
           <div className="inline-flex items-center space-x-2 bg-quantum-900/30 border border-quantum-500/30 rounded-full px-5 py-2.5 mb-8">
             <Lock className="w-4 h-4 text-quantum-400" />
             <span className="text-sm font-semibold text-quantum-300">
-              26 Security Technologies
+              16 Security Technologies
             </span>
           </div>
 

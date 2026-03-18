@@ -15,9 +15,26 @@ class EmailScreen extends ConsumerStatefulWidget {
 }
 
 class _EmailScreenState extends ConsumerState<EmailScreen> {
-  final _toController = TextEditingController();
-  final _subjectController = TextEditingController();
-  final _bodyController = TextEditingController();
+  final _toController = TextEditingController(text: 'quantum@example.com');
+  final _subjectController =
+      TextEditingController(text: 'Test PQC Encryption');
+  final _bodyController = TextEditingController(
+      text: 'This message is encrypted with ML-KEM-768.');
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-generate keypair if none exists
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final crypto = ref.read(cryptoProvider);
+      if (crypto.publicKey == null && !crypto.isGenerating) {
+        ref
+            .read(cryptoProvider.notifier)
+            .generateKeypair()
+            .catchError((_) {});
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -33,6 +50,7 @@ class _EmailScreenState extends ConsumerState<EmailScreen> {
     final crypto = ref.watch(cryptoProvider);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Quantum Mail'),
         actions: [
@@ -49,6 +67,11 @@ class _EmailScreenState extends ConsumerState<EmailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const PillarStatusBanner(
+                description: 'Encrypt email with quantum-safe keys',
+                status: PillarStatus.ready,
+              ),
+
               PillarHeader(
                 icon: Icons.email_outlined,
                 title: 'Quantum Mail',

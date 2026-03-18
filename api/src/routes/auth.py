@@ -90,19 +90,10 @@ async def login(user_data: UserLogin, db: Session = Depends(get_db)):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
+from src.middleware.auth import get_current_user  # noqa: E402
+
+
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
-    """
-    Get current user information
-
-    Args:
-        current_user: Current authenticated user
-
-    Returns:
-        User information
-    """
+    """Get current user information."""
     return current_user
-
-
-# Import the dependency here to avoid circular imports
-from src.middleware.auth import get_current_user

@@ -14,14 +14,20 @@ Future<void> pumpDesktop(WidgetTester tester) async {
 void main() {
   // ── Pillar 6: Q-AI Assistant ──
   group('Q-AI Screen', () {
-    testWidgets('shows model selector and chat interface', (tester) async {
+    testWidgets('shows provider and model selectors', (tester) async {
       await pumpDesktop(tester);
       // Navigate via rail
       await tester.tap(find.text('Q-AI'));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Q-AI Assistant'), findsWidgets);
-      expect(find.text('Auto Route'), findsOneWidget); // ChoiceChip label
+      // Provider chips
+      expect(find.text('Claude'), findsOneWidget);
+      expect(find.text('Gemini'), findsOneWidget);
+      expect(find.text('OpenRouter'), findsOneWidget);
+      // Default model chips for Claude
+      expect(find.text('Claude Sonnet 4.6'), findsOneWidget);
     });
   });
 
@@ -40,14 +46,15 @@ void main() {
       expect(find.text('Message body'), findsOneWidget);
     });
 
-    testWidgets('shows key status when no key loaded', (tester) async {
+    testWidgets('auto-generates key when none loaded', (tester) async {
       await pumpDesktop(tester);
       await tester.tap(find.text('Email'));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 100));
 
-      expect(
-          find.textContaining('No key'), findsOneWidget);
-      expect(find.text('Generate'), findsOneWidget);
+      // Email now auto-generates keypair and pre-fills fields
+      expect(find.text('Quantum Mail'), findsWidgets);
+      expect(find.text('Test PQC Encryption'), findsOneWidget);
     });
   });
 
@@ -58,11 +65,10 @@ void main() {
       await tester.tap(find.text('Browser'));
       await tester.pumpAndSettle();
 
-      expect(find.text('PQC Browser'), findsOneWidget);
-      expect(find.text('Enable PQC Proxy'), findsOneWidget);
-      // Privacy toggles
-      expect(find.text('Fingerprint'), findsOneWidget);
-      expect(find.text('Cookie Rot.'), findsOneWidget);
+      // Browser shows floating privacy chips on macOS (WebView path)
+      expect(find.text('PQC'), findsOneWidget);
+      expect(find.text('FP'), findsOneWidget);
+      expect(find.text('Cookie'), findsOneWidget);
       expect(find.text('Telemetry'), findsOneWidget);
     });
   });

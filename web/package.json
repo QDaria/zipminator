@@ -9,7 +9,8 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "npx playwright test"
   },
   "dependencies": {
     "@auth/core": "^0.41.0",
@@ -24,6 +25,8 @@
     "dotenv": "^17.2.3",
     "framer-motion": "^11.18.2",
     "gemini-flow": "^2.1.0-alpha.1",
+    "html-to-image": "^1.11.13",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.363.0",
     "next": "^15.0.0",
     "next-auth": "^5.0.0-beta.30",

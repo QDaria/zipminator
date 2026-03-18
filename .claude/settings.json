@@ -1,6 +1,6 @@
 {
   "env": {
-    "CLAUDE_FLOW_AUTO_COMMIT": "false",
+    "CLAUDE_FLOW_AUTO_COMMIT": "true",
     "CLAUDE_FLOW_AUTO_PUSH": "false",
     "CLAUDE_FLOW_HOOKS_ENABLED": "true",
     "CLAUDE_FLOW_TELEMETRY_ENABLED": "true",
@@ -10,6 +10,7 @@
     "RUFLO_AGENT_BOOSTER": "true",
     "RUFLO_MODEL_ROUTING": "auto"
   },
+  "includeCoAuthoredBy": true,
   "permissions": {
     "allow": [
       "Bash(npx claude-flow:*)",
@@ -50,6 +51,12 @@
       "Bash(rm -rf /)"
     ]
   },
+  "enabledMcpjsonServers": [
+    "claude-flow",
+    "ruv-swarm",
+    "context7",
+    "playwright"
+  ],
   "hooks": {
     "PreToolUse": [
       {
@@ -116,16 +123,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/helpers/feedback-loop.sh --report 2>/dev/null; npx claude-flow@alpha hooks session-end --generate-summary true --persist-state true --export-metrics true"
+            "command": "bash .claude/helpers/auto-commit.sh 2>/dev/null; bash .claude/helpers/feedback-loop.sh --report 2>/dev/null; npx claude-flow@alpha hooks session-end --generate-summary true --persist-state true --export-metrics true"
           }
         ]
       }
     ]
   },
-  "includeCoAuthoredBy": true,
-  "enabledMcpjsonServers": ["claude-flow", "ruv-swarm", "context7", "playwright"],
   "statusLine": {
     "type": "command",
     "command": ".claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "autofix-bot@claude-plugins-official": true,
+    "terraform@claude-plugins-official": true
   }
 }

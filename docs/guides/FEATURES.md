@@ -472,7 +472,7 @@ Settings screen: theme toggle (dark/light), Rust bridge version, crypto engine i
 | Flutter widget | 23 | `cd app && flutter test` |
 | Web vitest | 30 | `cd web && npm test` |
 | Mobile Expo | 267/274 | `cd mobile && npm test` |
-| Python + integration | 497 | `micromamba activate zip-pqc && pytest tests/` |
+| Python + integration | 429 | `micromamba activate zip-pqc && pytest tests/` |
 
 ---
 

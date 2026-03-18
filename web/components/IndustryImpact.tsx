@@ -29,13 +29,13 @@ const comparisons = [
     competitor: 'Signal',
     category: 'Messaging',
     icon: MessageCircle,
-    lacks: 'No PQC, no VPN, no email, no browser',
+    lacks: 'PQC messaging only — no VPN, no email, no browser, no VoIP encryption',
   },
   {
     competitor: 'ProtonMail',
     category: 'Email',
     icon: Mail,
-    lacks: 'No PQC messaging, no VPN, no VoIP',
+    lacks: 'PQC email only — no VPN, no messaging, no VoIP',
   },
   {
     competitor: 'NordVPN',
@@ -93,7 +93,7 @@ const IndustryImpact = () => {
 
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
             Governments worldwide are mandating post-quantum cryptography.
-            Zipminator is already compliant.
+            Zipminator already implements NIST FIPS 203 and 204.
           </p>
         </motion.div>
 

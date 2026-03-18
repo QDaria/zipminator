@@ -19,7 +19,7 @@ import {
 const stats = [
   { icon: Code2, value: 300000, suffix: '+', label: 'Total Project Lines', format: true },
   { icon: FileCode, value: 1902, suffix: '+', label: 'Project Files', format: true },
-  { icon: Lock, value: 26, suffix: '', label: 'Security Technologies', format: false },
+  { icon: Lock, value: 16, suffix: '', label: 'Security Technologies', format: false },
   { icon: Layers, value: 10, suffix: '', label: 'Anonymization Levels', format: false },
   { icon: Cpu, value: 156, suffix: '-qubit', label: 'Quantum Hardware', format: false },
   { icon: Monitor, value: 6, suffix: '', label: 'Platforms', format: false },

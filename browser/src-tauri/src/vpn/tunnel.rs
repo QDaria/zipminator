@@ -368,18 +368,16 @@ fn build_boringtun_peer(config: &VpnConfig) -> Result<Box<Tunn>, TunnelError> {
     let static_private = x25519::StaticSecret::from(config.client_private_key);
     let peer_static_public = x25519::PublicKey::from(config.server_public_key);
 
-    // boringtun 0.6: Tunn::new returns Result<Self, &'static str>.
-    match Tunn::new(
+    // boringtun 0.7: Tunn::new returns Tunn directly.
+    let t = Tunn::new(
         static_private,
         peer_static_public,
         None,     // no pre-shared key at WireGuard layer (PQ added on top)
         Some(25), // 25-second keepalive
         0,        // peer index
         None,     // no rate limiter
-    ) {
-        Ok(t) => Ok(Box::new(t)),
-        Err(e) => Err(TunnelError::Boringtun(format!("Tunn::new failed: {}", e))),
-    }
+    );
+    Ok(Box::new(t))
 }
 
 // ── Interface configuration ────────────────────────────────────────────────
@@ -692,5 +690,95 @@ mod tests {
             let result = run_cmd("false", &[]);
             assert!(result.is_err());
         }
+    }
+
+    /// Verify that boringtun `encapsulate()` produces WireGuard Type 4
+    /// transport data packets with the correct header format:
+    ///
+    /// ```text
+    /// ┌──────────┬──────────────┬──────────────┬────────────────────┐
+    /// │ Type (1) │ Reserved (3) │ Counter (8)  │ Encrypted (N+16)   │
+    /// │  0x04    │  0x00 0x00   │ LE u64       │ AEAD payload       │
+    /// │          │  0x00        │              │                    │
+    /// └──────────┴──────────────┴──────────────┴────────────────────┘
+    /// ```
+    ///
+    /// This test constructs a boringtun peer, completes a local handshake,
+    /// then encapsulates a sample IP packet and inspects the output bytes.
+    #[test]
+    fn wireguard_type4_transport_packet_format() {
+        use boringtun::noise::{Tunn, TunnResult};
+        use boringtun::x25519;
+
+        // Use fixed keys for deterministic testing (any 32-byte values work).
+        let client_secret = x25519::StaticSecret::from([0x01u8; 32]);
+        let client_public = x25519::PublicKey::from(&client_secret);
+        let server_secret = x25519::StaticSecret::from([0x02u8; 32]);
+        let server_public = x25519::PublicKey::from(&server_secret);
+
+        let mut client = Tunn::new(
+            client_secret, server_public, None, None, 0, None,
+        );
+
+        let mut server = Tunn::new(
+            server_secret, client_public, None, None, 1, None,
+        );
+
+        // Complete the WireGuard handshake between client and server.
+        let mut buf1 = vec![0u8; 2048];
+        let mut buf2 = vec![0u8; 2048];
+
+        // Client -> Server: handshake initiation (Type 1, 0x01).
+        let init_pkt = match client.format_handshake_initiation(&mut buf1, false) {
+            TunnResult::WriteToNetwork(pkt) => pkt.to_vec(),
+            other => panic!("expected WriteToNetwork for initiation, got {:?}", std::mem::discriminant(&other)),
+        };
+        assert_eq!(init_pkt[0], 0x01, "handshake initiation must be Type 1");
+
+        // Server processes initiation -> responds with Type 2.
+        let response_pkt = match server.decapsulate(None, &init_pkt, &mut buf2) {
+            TunnResult::WriteToNetwork(pkt) => pkt.to_vec(),
+            other => panic!("expected WriteToNetwork for response, got {:?}", std::mem::discriminant(&other)),
+        };
+        assert_eq!(response_pkt[0], 0x02, "handshake response must be Type 2");
+
+        // Client processes response -> handshake complete.
+        match client.decapsulate(None, &response_pkt, &mut buf1) {
+            TunnResult::Done => {}
+            TunnResult::WriteToNetwork(_) => {} // keepalive is fine
+            other => panic!("expected Done after handshake response, got {:?}", std::mem::discriminant(&other)),
+        }
+
+        // Now encapsulate a sample IP packet.
+        // Minimal IPv4 header (20 bytes) + 4 bytes payload = 24 bytes.
+        let mut sample_ip_packet = vec![0u8; 24];
+        sample_ip_packet[0] = 0x45; // IPv4, IHL=5
+
+        let mut transport_buf = vec![0u8; 2048];
+        let transport_pkt = match client.encapsulate(&sample_ip_packet, &mut transport_buf) {
+            TunnResult::WriteToNetwork(pkt) => pkt.to_vec(),
+            other => panic!("expected WriteToNetwork for transport, got {:?}", std::mem::discriminant(&other)),
+        };
+
+        // Verify WireGuard Type 4 transport format.
+        assert!(transport_pkt.len() >= 12, "transport packet must be at least 12 bytes (header)");
+        assert_eq!(transport_pkt[0], 0x04, "transport packet type must be 0x04");
+        // Reserved bytes must be zero.
+        assert_eq!(transport_pkt[1], 0x00, "reserved byte 1 must be 0x00");
+        assert_eq!(transport_pkt[2], 0x00, "reserved byte 2 must be 0x00");
+        assert_eq!(transport_pkt[3], 0x00, "reserved byte 3 must be 0x00");
+        // Bytes 4..8 are the receiver index (u32 LE).
+        // Bytes 8..16 are the counter (u64 LE).
+        // boringtun starts the transport counter at 1 (counter 0 is not used
+        // for transport data in some implementations).
+        let counter = u64::from_le_bytes(transport_pkt[8..16].try_into().unwrap());
+        assert!(counter <= 1, "first transport packet counter should be 0 or 1, got {}", counter);
+        // Encrypted payload follows at offset 16: plaintext (24) + Poly1305 tag (16) = 40.
+        let encrypted_payload_len = transport_pkt.len() - 16;
+        assert_eq!(
+            encrypted_payload_len,
+            sample_ip_packet.len() + 16,
+            "encrypted payload should be plaintext + 16 bytes Poly1305 tag"
+        );
     }
 }

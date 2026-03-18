@@ -1,39 +1,36 @@
 <p align="center">
-  <strong>Zipminator</strong><br>
-  Post-quantum cryptography with quantum entropy.
+  <img src="https://img.shields.io/badge/zipminator-PQC-00d4aa?style=for-the-badge&labelColor=0a0a1a" alt="Zipminator">
+</p>
+
+<h1 align="center">Zipminator</h1>
+
+<p align="center">
+  <strong>Post-quantum cryptography toolkit with real quantum entropy</strong><br>
+  CRYSTALS-Kyber-768 (ML-KEM) in Rust, exposed as a Python SDK with 10-level data anonymization,<br>
+  PII scanning, and quantum-seeded key generation from IBM Quantum hardware.
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/zipminator/"><img src="https://img.shields.io/pypi/v/zipminator?color=blue&label=PyPI" alt="PyPI"></a>
-  <a href="https://crates.io/crates/kyber768-rust"><img src="https://img.shields.io/crates/v/kyber768-rust?color=orange&label=crates.io" alt="crates.io"></a>
-  <a href="https://github.com/qdaria/zipminator/actions"><img src="https://img.shields.io/github/actions/workflow/status/qdaria/zipminator/ci.yml?label=CI" alt="CI"></a>
-  <a href="#security-and-compliance"><img src="https://img.shields.io/badge/FIPS-203%20Compliant-brightgreen" alt="FIPS 203"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT%20%2F%20Commercial-blue" alt="License"></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.8%2B-blue" alt="Python 3.8+"></a>
-  <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/rust-2021%20edition-orange" alt="Rust"></a>
+  <a href="https://github.com/QDaria/zipminator/actions"><img src="https://img.shields.io/github/actions/workflow/status/QDaria/zipminator/ci.yml?style=flat-square&label=CI&logo=github" alt="CI"></a>
+  <a href="#security"><img src="https://img.shields.io/badge/NIST_FIPS_203-verified-00d4aa?style=flat-square" alt="FIPS 203"></a>
+  <a href="#test-coverage"><img src="https://img.shields.io/badge/tests-842_passing-00d4aa?style=flat-square" alt="Tests"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square" alt="License"></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.9%2B-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python"></a>
+  <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/rust-2021_edition-dea584?style=flat-square&logo=rust&logoColor=white" alt="Rust"></a>
 </p>
 
 ---
 
-# Zipminator
+## What This Is
 
-Zipminator is a post-quantum cryptography platform that implements CRYSTALS-Kyber-768 (ML-KEM) in Rust with constant-time operations, validated against NIST FIPS 203 Known Answer Tests. It seeds key generation from real quantum entropy sourced from Rigetti Computing and IBM Quantum hardware, and exposes the entire stack through a Python SDK, a REST API, and a web dashboard.
+Zipminator is the open-source cryptographic core of the [Zipminator PQC Platform](https://www.zipminator.zip). It provides:
 
-Built by [Qdaria Inc.](https://qdaria.com)
+- **Rust Kyber768 engine** with constant-time arithmetic, NIST KAT validation, and fuzz testing
+- **Python SDK** (v0.5.0b1) with PyO3 bindings, 10-level anonymization, PII scanning, and CLI
+- **Quantum entropy harvester** that continuously collects real entropy from IBM Quantum (Fez, Marrakesh) via qBraid
+- **Subscription-gated access** with freemium L1-3 and API-key-gated L4-10
 
-## Table of Contents
-
-- [Quick Start](#quick-start)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [CLI Usage](#cli-usage)
-- [API Reference](#api-reference)
-- [Security and Compliance](#security-and-compliance)
-- [Benchmarks](#benchmarks)
-- [Quantum Entropy Providers](#quantum-entropy-providers)
-- [Contributing](#contributing)
-- [License](#license)
+The commercial platform (Flutter super-app, Tauri browser, web dashboard) is built on top of this core but is not included in this repository.
 
 ## Quick Start
 
@@ -42,14 +39,18 @@ pip install zipminator
 ```
 
 ```python
-from zipminator.crypto.pqc import PQC
+from zipminator import keypair, encapsulate, decapsulate
 
-pqc = PQC(level=768)                       # NIST Security Level 3
-pk, sk = pqc.generate_keypair()             # Kyber768 keypair
-ciphertext, shared_secret = pqc.encapsulate(pk)
-recovered_secret = pqc.decapsulate(sk, ciphertext)
+# Generate a Kyber768 keypair (NIST FIPS 203, Security Level 3)
+pk, sk = keypair()
 
-assert shared_secret == recovered_secret    # 32-byte shared secret
+# Encapsulate: sender creates shared secret + ciphertext
+ct, shared_secret = encapsulate(pk)
+
+# Decapsulate: receiver recovers the same shared secret
+recovered = decapsulate(ct, sk)
+
+assert shared_secret == recovered  # 32-byte shared secret
 ```
 
 With quantum entropy seeding:
@@ -57,453 +58,387 @@ With quantum entropy seeding:
 ```python
 from zipminator.crypto.pqc import PQC
 
-seed = open("quantum_entropy/entropy_pool.bin", "rb").read(32)
+seed = open("quantum_entropy/quantum_entropy_pool.bin", "rb").read(32)
 pqc = PQC(level=768)
-pk, sk = pqc.generate_keypair(seed=seed)    # Seeded from quantum hardware
+pk, sk = pqc.generate_keypair(seed=seed)  # Seeded from IBM Quantum hardware
 ```
 
-## Key Features
+## Features
 
 ### Rust Kyber768 Core
 
-The cryptographic engine is a from-scratch CRYSTALS-Kyber-768 implementation in Rust. All arithmetic uses constant-time operations via the `subtle` crate, with Montgomery and Barrett reductions in the NTT layer. The Rust core compiles to both a native library and a Python extension module via PyO3.
+From-scratch CRYSTALS-Kyber-768 in Rust. All secret-dependent operations use constant-time arithmetic via the `subtle` crate. Montgomery and Barrett reductions in the NTT layer. Compiles to both a native library and a Python extension module via PyO3/maturin.
 
-```rust
-use kyber768_core::Kyber768;
+**Key sizes**: PK = 1,184 bytes, SK = 2,400 bytes, CT = 1,088 bytes, SS = 32 bytes.
 
-let (pk, sk) = Kyber768::keypair();
-let (ct, ss_enc) = Kyber768::encaps(&pk);
-let ss_dec = Kyber768::decaps(&sk, &ct);
-assert_eq!(ss_enc.as_bytes(), ss_dec.as_bytes());
-```
+### 10-Level Data Anonymization
 
-### PII Scanning and Anonymization
+Progressive anonymization from basic masking to homomorphic encryption:
 
-Automatic detection of personally identifiable information across 18 PII types including Norwegian FNR, US SSN, IBAN, credit cards, API keys, and email addresses. Each match is classified by risk level (low, medium, high, critical) with configurable confidence thresholds.
+| Level | Technique | Tier |
+|-------|-----------|------|
+| L1 | SHA-256 hashing | Free |
+| L2 | Quantum-random replacement | Free |
+| L3 | Deterministic tokenization | Free |
+| L4 | Generalization (numeric ranges, categories) | Developer |
+| L5 | Suppression (NULL replacement) | Developer |
+| L6 | Quantum noise injection | Pro |
+| L7 | Synthetic data generation (Faker) | Pro |
+| L8 | k-Anonymity grouping | Enterprise |
+| L9 | Differential privacy (Laplace noise) | Enterprise |
+| L10 | Paillier homomorphic encryption | Enterprise |
+
+### PII Scanner
+
+Automatic detection of 50+ PII types across 15 countries (US, UK, UAE, Norway, Sweden, Denmark, Finland, EU, Germany, France, India, Brazil, Japan, Canada, Australia). Each match gets a confidence score and risk level (low / medium / high / critical).
 
 ```python
 from zipminator.crypto.pii_scanner import PIIScanner
 import pandas as pd
 
 scanner = PIIScanner()
-df = pd.read_csv("customer_data.csv")
-report = scanner.scan(df)                   # Detect PII before encryption
+results = scanner.scan_dataframe(pd.read_csv("data.csv"))
+print(results["summary"])
+# PII Scan Results:
+#   - 3 column(s) contain PII
+#   - Risk Level: HIGH
+#   - Recommended Anonymization Level: 7/10
 ```
 
-### DoD 5220.22-M Self-Destruct
+Detected types include: Norwegian FNR, Swedish personnummer, Danish CPR, Finnish henkilotunnus, German Steuer-ID, French NIR, Indian Aadhaar/PAN, Brazilian CPF/CNPJ, Japanese My Number, Canadian SIN, Australian TFN, US SSN, UK NI number, UAE Emirates ID, IBAN, credit cards, email, phone, and more.
 
-Three-pass overwrite (zeros, ones, random) followed by file deletion for forensic-proof destruction. Configurable timer-based auto-destruct with audit logging.
+### Quantum Entropy Harvester
 
-```python
-from zipminator.crypto.self_destruct import SelfDestruct
+Continuously collects real quantum entropy from IBM Quantum hardware (156-qubit Eagle r3 processors) via qBraid. The pool file grows without limit; consumers read from it dynamically.
 
-sd = SelfDestruct()
-sd.secure_delete_file("decrypted_output.csv", overwrite_passes=3, verify=True)
+```bash
+# Daemon mode (runs forever, harvests every hour)
+python -m zipminator.entropy.scheduler --daemon --interval 3600
+
+# One-shot (for cron jobs)
+python -m zipminator.entropy.scheduler --once
+
+# Check pool status
+python -m zipminator.entropy.scheduler --stats
 ```
 
-### Quantum Entropy Integration
+Entropy quotas are managed per subscription tier:
 
-Aggregate entropy from multiple quantum hardware providers with automatic fallback to OS-level randomness. The Rust-level `EntropyPool` supports concurrent access from multiple threads.
+| Tier | Monthly Entropy | Overage |
+|------|----------------|---------|
+| Free | 1 MB | $0.01/KB |
+| Developer | 10 MB | $0.01/KB |
+| Pro | 100 MB | $0.01/KB |
+| Enterprise | Unlimited | - |
 
-### Encrypt-Zip-Destroy Pipeline
+### Quantum Random Module
 
-The `Zipndel` class chains PII scanning, column-level anonymization, AES-encrypted ZIP compression, and timed self-destruct into a single operation.
+Drop-in replacement for Python's `random` module, backed by quantum entropy when available:
 
 ```python
-from zipminator.crypto.zipit import Zipndel
+from zipminator.crypto.quantum_random import QuantumRandom
 
-zipper = Zipndel(
-    file_name="sensitive_data",
-    self_destruct_enabled=True,
-    self_destruct_time=(24, 0, 0),          # 24 hours
-    compliance_check=True,
-    audit_trail=True,
-)
-zipper.zip_it()
+qr = QuantumRandom()
+qr.random()              # float in [0.0, 1.0)
+qr.randint(1, 100)       # inclusive range
+qr.randbytes(32)         # cryptographic bytes
+qr.choice(["a", "b"])    # random selection
+qr.shuffle(my_list)      # Fisher-Yates shuffle
+```
+
+### Self-Destruct
+
+DoD 5220.22-M 3-pass overwrite (zeros, ones, random) with timer-based auto-destruct and audit logging.
+
+### CLI
+
+```bash
+pip install zipminator[cli]
+
+zipminator keygen --output-dir ./keys
+zipminator keygen --entropy-file quantum_entropy/quantum_entropy_pool.bin
+zipminator entropy --bits 256
 ```
 
 ## Architecture
 
-```mermaid
-graph TB
-    subgraph "Client Layer"
-        CLI[CLI - Typer/Rich]
-        SDK[Python SDK]
-        WEB[Next.js Dashboard]
-    end
-
-    subgraph "API Layer"
-        API[FastAPI Server]
-        AUTH[Auth Middleware]
-        RATE[Rate Limiter]
-    end
-
-    subgraph "Crypto Engine - Rust"
-        KYBER[Kyber768 Core]
-        NTT[NTT - Montgomery/Barrett]
-        ENTROPY[Entropy Pool]
-        QRNG[QRNG Device Trait]
-    end
-
-    subgraph "Python Modules"
-        PQC[PQC Wrapper - PyO3]
-        PII[PII Scanner]
-        ANON[Anonymization]
-        SD[Self-Destruct]
-        ZIP[Zipndel Pipeline]
-    end
-
-    subgraph "Quantum Providers"
-        RIG[Rigetti QCS]
-        IBM[IBM Quantum]
-        QBR[QBraid]
-        OS[OS Entropy Fallback]
-    end
-
-    subgraph "Validation"
-        NIST[NIST-KAT Runner]
-        FUZZ[Fuzz Targets]
-        BENCH[Criterion Benchmarks]
-    end
-
-    CLI --> PQC
-    SDK --> PQC
-    WEB --> API
-    API --> AUTH --> PQC
-    API --> RATE
-
-    PQC --> KYBER
-    KYBER --> NTT
-    KYBER --> ENTROPY
-    ENTROPY --> QRNG
-    QRNG --> RIG
-    QRNG --> IBM
-    QRNG --> QBR
-    QRNG --> OS
-
-    SDK --> PII
-    SDK --> ANON
-    SDK --> SD
-    SDK --> ZIP
-    ZIP --> PQC
-    ZIP --> PII
-    ZIP --> ANON
-    ZIP --> SD
-
-    KYBER --> NIST
-    KYBER --> FUZZ
-    KYBER --> BENCH
+```
+                    +-----------------+
+                    |   Python SDK    |  zipminator v0.5.0b1
+                    |  CLI / Jupyter  |
+                    +--------+--------+
+                             |  PyO3
+                    +--------+--------+
+                    |   Rust Core     |  crates/zipminator-core
+                    |  Kyber768 KEM   |
+                    |  NTT / Poly     |
+                    |  Entropy Pool   |
+                    +--------+--------+
+                             |
+              +--------------+--------------+
+              |              |              |
+        +-----+----+  +-----+----+  +------+-----+
+        | IBM Fez   |  | IBM      |  | OS Entropy |
+        | (qBraid)  |  | Marrakesh|  | (fallback) |
+        +-----------+  +----------+  +------------+
 ```
 
 ### Repository Structure
 
 ```
 zipminator/
-├── crates/
-│   ├── zipminator-core/        # Kyber768, NTT, poly, QRNG trait, entropy pool
-│   ├── zipminator-fuzz/        # cargo-fuzz targets (keygen, encaps, decaps, round-trip)
-│   └── zipminator-nist/        # FIPS 203 Known Answer Test runner
-├── src/zipminator/             # Python package
-│   ├── crypto/                 # PQC wrapper, PII scanner, self-destruct, Zipndel
-│   └── entropy/                # Provider adapters (Rigetti, IBM, QBraid)
-├── api/                        # FastAPI backend (auth, keys, crypto routes)
-│   └── docker-compose.yml      # Postgres + Redis + API stack
-├── web/                        # Next.js dashboard (React, Three.js, Tailwind)
-├── cli/                        # CLI with Rust and Python entry points
-├── compliance/                 # FIPS validation, CNSA 2.0, constant-time audit
-├── benchmarks/                 # Criterion (Rust), C++ baseline, Mojo experiments
-├── tests/                      # Python + Rust + integration test suites
-└── config/                     # YAML provider configs, environment templates
++-- crates/
+|   +-- zipminator-core/          Kyber768 KEM, NTT, poly, entropy pool, PyO3 bindings
+|   +-- zipminator-fuzz/          cargo-fuzz targets (keygen, encaps, decaps, round-trip)
+|   +-- zipminator-nist/          NIST FIPS 203 Known Answer Test runner
+|   +-- zipminator-mesh/          Q-Mesh security (HMAC-SHA256 beacon auth)
+|   +-- zipminator-app/           Flutter Rust Bridge (FRB) safe wrappers
++-- src/zipminator/               Python SDK
+|   +-- crypto/                   PQC wrapper, PII scanner, anonymization, self-destruct
+|   +-- entropy/                  Provider adapters, scheduler daemon, quota manager
+|   +-- jupyter/                  JupyterLab magics and widgets
++-- tests/
+|   +-- python/                   429+ tests (core, PQC, PII x15 countries, entropy, installer)
++-- scripts/
+|   +-- install-zipminator.sh     Universal installer (macOS + Linux)
+|   +-- install-zipminator.ps1    Universal installer (Windows)
+|   +-- qrng_harvester.py         Standalone entropy harvester
++-- docs/book/                     Jupyter Book documentation (20+ pages)
++-- quantum_entropy/              Entropy pool (gitignored .bin files)
++-- config/                       Provider YAML configs
 ```
 
 ## Installation
 
-### From PyPI (recommended)
+### From PyPI
 
 ```bash
-pip install zipminator
+pip install zipminator                          # Core (894KB wheel, Rust crypto included)
+pip install zipminator[cli]                     # + CLI (typer, rich)
+pip install zipminator[data]                    # + numpy, pandas, pyzipper
+pip install zipminator[anonymization]           # + faker, numpy, pandas
+pip install zipminator[jupyter]                 # + JupyterLab, ipywidgets, plotly
+pip install zipminator[all]                     # Everything
 ```
 
-This installs the Python SDK with pre-built Rust bindings (manylinux2014 / macOS universal2 wheels).
+### From Source
 
-### From Source (full development setup)
-
-Requirements: Rust 1.70+, Python 3.8+, Node.js 18+ (for dashboard).
+Requirements: Rust 1.70+, Python 3.9+.
 
 ```bash
-git clone https://github.com/qdaria/zipminator.git
+git clone https://github.com/QDaria/zipminator.git
 cd zipminator
 
 # Build Rust core + Python bindings
 pip install maturin
-maturin develop --release
+maturin develop --release --strip
 
-# Install Python dependencies
-pip install -e ".[dev,quantum]"
+# Install with dev dependencies
+pip install -e ".[dev,data,anonymization,cli]"
 
-# Run Rust tests
-cargo test --workspace
-
-# Run Python tests
-pytest tests/
-
-# Run NIST-KAT validation
-cd compliance/nist-kat && cargo run --release
+# Run tests
+cargo test --workspace                          # 413 Rust tests
+pytest tests/python/ -v                         # 162 Python tests
 ```
 
-### Docker (API stack)
+## Security
+
+### NIST FIPS 203 (ML-KEM)
+
+The Kyber768 implementation follows the NIST FIPS 203 specification. Validation is performed against the official Known Answer Test vectors via a deterministic DRBG.
 
 ```bash
-cd api
-docker-compose up
+cd crates/zipminator-nist
+cargo test
 ```
 
-This starts Postgres 15, Redis 7, and the FastAPI server on port 8000.
-
-### Web Dashboard
-
-```bash
-cd web
-npm install
-npm run dev                                 # http://localhost:3000
-```
-
-## CLI Usage
-
-The CLI uses [Typer](https://typer.tiangolo.com/) with Rich formatting.
-
-```bash
-# Generate a Kyber768 keypair
-zipminator keygen --output-dir ./keys
-
-# Generate keypair with quantum entropy seed
-zipminator keygen --entropy-file quantum_entropy/entropy_pool.bin
-
-# Generate quantum entropy from a provider
-zipminator entropy --bits 256 --provider rigetti
-
-# Show available providers
-zipminator entropy --bits 64 --provider ibm
-```
-
-## API Reference
-
-The REST API runs on FastAPI with OpenAPI documentation at `/docs`.
-
-### Authentication
-
-```bash
-# Register and obtain an API key
-curl -X POST https://api.zipminator.io/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "..."}'
-
-# Create an API key
-curl -X POST https://api.zipminator.io/v1/keys \
-  -H "Authorization: Bearer <token>" \
-  -d '{"name": "production", "rate_limit": 1000}'
-```
-
-### Key Generation
-
-```bash
-# Generate a Kyber768 keypair (quantum entropy seeded)
-curl -X POST https://api.zipminator.io/v1/keygen \
-  -H "X-API-Key: zip_..." \
-  -d '{"use_quantum": true}'
-```
-
-Response:
-
-```json
-{
-  "public_key": "base64...",
-  "secret_key": "base64...",
-  "algorithm": "kyber768",
-  "entropy_source": "rigetti",
-  "duration_ms": 12
-}
-```
-
-### Encapsulation / Decapsulation
-
-```bash
-# Encapsulate a shared secret
-curl -X POST https://api.zipminator.io/v1/encrypt \
-  -H "X-API-Key: zip_..." \
-  -d '{"public_key": "base64..."}'
-
-# Decapsulate
-curl -X POST https://api.zipminator.io/v1/decrypt \
-  -H "X-API-Key: zip_..." \
-  -d '{"secret_key": "base64...", "ciphertext": "base64..."}'
-```
-
-### Health
-
-```bash
-curl https://api.zipminator.io/health
-```
-
-Interactive API docs are available at `https://api.zipminator.io/docs` (Swagger) and `https://api.zipminator.io/redoc` (ReDoc).
-
-## Security and Compliance
-
-### FIPS 203 (ML-KEM)
-
-The Kyber768 implementation follows the NIST FIPS 203 specification for ML-KEM. Validation is performed by running the official NIST Known Answer Tests (KAT) via a deterministic DRBG seeded with the standard test vectors.
-
-```bash
-cd compliance/nist-kat
-cargo run --release
-# Validates keygen, encapsulation, and decapsulation against reference vectors
-```
+**Note**: This library implements FIPS 203 (the algorithm specification). It has **not** undergone FIPS 140-3 module validation (which requires CMVP certification). Do not represent this as "FIPS certified" or "FIPS validated."
 
 ### Constant-Time Operations
 
-All secret-dependent operations use the `subtle` crate for constant-time comparisons and conditional selection. The NTT layer uses Montgomery reduction (`montgomery_reduce`) and Barrett reduction (`barrett_reduce`) implemented as `#[inline(always)]` functions to prevent timing side-channels.
-
-Key constant-time primitives:
+All secret-dependent operations use:
 - `subtle::ConstantTimeEq` for key comparison
 - `subtle::ConditionallySelectable` for branch-free secret selection
-- `csubq()` with arithmetic masking instead of conditional branches
+- `csubq()` with arithmetic masking (no conditional branches)
+- Montgomery and Barrett reductions as `#[inline(always)]`
 
 ### Fuzz Testing
 
 Four `cargo-fuzz` targets cover the attack surface:
 
-| Target | Description |
-|---|---|
-| `fuzz_keygen` | Arbitrary seed inputs to key generation |
-| `fuzz_encapsulate` | Malformed public keys to encapsulation |
-| `fuzz_decapsulate` | Malformed ciphertext/key pairs to decapsulation |
-| `fuzz_round_trip` | End-to-end keygen-encaps-decaps correctness |
+| Target | Input |
+|--------|-------|
+| `fuzz_keygen` | Arbitrary seed bytes |
+| `fuzz_encapsulate` | Malformed public keys |
+| `fuzz_decapsulate` | Malformed ciphertext/key pairs |
+| `fuzz_round_trip` | End-to-end correctness |
 
 ```bash
 cd crates/zipminator-fuzz
 cargo fuzz run fuzz_keygen -- -max_total_time=300
 ```
 
-### DoD 5220.22-M Deletion
+## Test Coverage
 
-The `SelfDestruct` module implements the DoD 5220.22-M standard for media sanitization:
-1. Overwrite with zeros
-2. Overwrite with ones
-3. Overwrite with random data
-4. Verify and delete
-
-### PII Detection
-
-The scanner identifies 18 PII types across Norwegian, US, and European jurisdictions:
-
-| Category | Types |
-|---|---|
-| Norwegian | FNR (fodselsnummer), bank account, org number |
-| Identity | SSN, email, phone, name, date of birth, address |
-| Financial | Credit card, IBAN, SWIFT/BIC, tax ID |
-| Secrets | Passwords, auth tokens, API keys, crypto keys |
-
-Each detection includes a confidence score and risk level classification (low / medium / high / critical).
-
-### CI/CD Security Pipeline
-
-The GitHub Actions pipeline includes:
-- `ci.yml` -- Build and test on every push
-- `security.yml` -- Dependency audit and vulnerability scanning
-- `quality-gate.yml` -- Clippy, ruff, mypy, coverage thresholds
-- `wheels.yml` -- Build manylinux2014 / macOS / Windows wheels
-- `release.yml` -- Signed releases with provenance
+| Layer | Tests | Status |
+|-------|------:|--------|
+| Rust core (Kyber768, anonymize, ratchet, SRTP, email) | 200 | Passing |
+| Rust browser (Tauri, prompt guard) | 125 | Passing |
+| Rust NIST KAT | 35 | Passing |
+| Rust mesh (HMAC-SHA256 beacon auth) | 28 | Passing |
+| Rust bridge (FRB) | 25 | Passing |
+| **Total Rust** | **413** | **Passing** |
+| Python core (Kyber bindings, PQC wrapper) | 73 | Passing |
+| Python PII scanner (15 countries) | 224 | Passing |
+| Python subscription (tiers, API key gating) | 35 | Passing |
+| Python entropy (pool provider, quota, scheduler) | 54 | Passing |
+| Python quantum random | 18 | Passing |
+| Python installer utilities | 19 | Passing |
+| Python multi-provider | 16 | Skipped (needs external deps) |
+| **Total Python** | **429** | **Passing** |
+| **Grand Total** | **842** | |
 
 ## Benchmarks
 
-The Rust implementation is benchmarked with [Criterion](https://bheisler.github.io/criterion.rs/book/) under `profile.release` settings (LTO=fat, codegen-units=1, opt-level=3).
+Measured via the Python SDK (PyO3 bindings) on Apple M1 Max, release build. Native Rust performance is higher; these numbers include Python-Rust bridge overhead.
 
-| Operation | Rust (this project) | C (reference) | Go (Cloudflare CIRCL) |
-|---|---|---|---|
-| KeyGen | ~29,000 ops/sec | ~35,000 ops/sec | ~18,000 ops/sec |
-| Encaps | ~27,000 ops/sec | ~32,000 ops/sec | ~16,000 ops/sec |
-| Decaps | ~25,000 ops/sec | ~30,000 ops/sec | ~15,000 ops/sec |
-| Full Round Trip | ~0.11 ms | ~0.09 ms | ~0.19 ms |
-
-*Measured on Apple M2 Pro. Rust numbers include SHA3 hashing but exclude entropy sourcing. C reference is pqcrystals/kyber with AVX2. Go reference is Cloudflare CIRCL v1.3.*
+| Operation | ops/sec | Latency |
+|-----------|--------:|--------:|
+| KeyGen | 3,115 | 321 us |
+| Encapsulate | 1,649 | 607 us |
+| Decapsulate | 1,612 | 620 us |
+| Full Round Trip | 900 | 1.1 ms |
 
 Run benchmarks locally:
 
 ```bash
-cd crates/zipminator-core
-cargo bench
+# Rust-native benchmarks (Criterion)
+cd crates/zipminator-core && cargo bench
+
+# Python SDK benchmarks
+python -c "
+from zipminator._core import keypair, encapsulate, decapsulate
+import time
+pk, sk = keypair()
+start = time.perf_counter()
+for _ in range(1000):
+    ct, ss = encapsulate(pk)
+    decapsulate(ct, sk)
+print(f'{1000/(time.perf_counter()-start):.0f} round-trips/sec')
+"
 ```
 
 ## Quantum Entropy Providers
 
-Zipminator aggregates entropy from multiple quantum hardware backends. The `QrngDevice` trait (Rust) and `QuantumProvider` ABC (Python) define the provider interface.
-
-| Provider | Backend | Status | Use Case |
-|---|---|---|---|
-| Rigetti Computing | QCS (Quil/pyQuil) | Production | Primary entropy source |
-| IBM Quantum | Qiskit Runtime | Testing/Demo | Validation and demos |
-| QBraid | Multi-platform | Experimental | Cross-platform access |
-| OS Fallback | `getrandom` / `os.urandom` | Always available | Fallback when no hardware |
-
-### Provider Configuration
-
-Providers are configured via environment variables or YAML:
+| Provider | Backend | Status |
+|----------|---------|--------|
+| qBraid | IBM Fez / Marrakesh (156-qubit Eagle r3) | Production |
+| IBM Quantum | Qiskit Runtime | Available |
+| Rigetti | QCS (pyQuil) | Available |
+| OS Fallback | `getrandom` / `os.urandom` | Always available |
 
 ```bash
 # .env
-RIGETTI_API_KEY=your_key
-IBM_QUANTUM_TOKEN=your_token
 QBRAID_API_KEY=your_key
+IBM_QUANTUM_TOKEN=your_token
+RIGETTI_API_KEY=your_key
 ```
+
+The harvester daemon continuously pulls entropy into an ever-growing pool:
 
 ```bash
-# CLI: force a specific provider
-zipminator entropy --bits 256 --provider rigetti
+# Crontab: harvest every 6 hours
+0 */6 * * * /path/to/python -m zipminator.entropy.scheduler --once
 ```
 
-The Rust-level `EntropyPool` manages provider health, failover, and concurrent access:
+## Subscription Tiers
 
-```rust
-use kyber768_core::{EntropyPool, EntropyPoolConfig};
+The open-source SDK includes all 10 anonymization levels. Levels 1-3 are always available. Levels 4-10 require an API key or activation code.
 
-let config = EntropyPoolConfig::default();
-let pool = EntropyPool::new(config);
-let mut seed = [0u8; 32];
-pool.fill_bytes(&mut seed)?;
+| Tier | Price | Levels | Entropy | QRNG |
+|------|------:|:------:|--------:|:----:|
+| Free | $0 | 1-3 | 1 MB/mo | No |
+| Developer | $9/mo | 1-5 | 10 MB/mo | No |
+| Pro | $29/mo | 1-7 | 100 MB/mo | No |
+| Enterprise | Custom | 1-10 | Unlimited | Yes |
+
+```python
+from zipminator.crypto.subscription import APIKeyValidator
+
+# L1-3: always works
+allowed, msg, method = APIKeyValidator.authorize_level(3)
+assert allowed  # True, free_tier
+
+# L4+: needs API key or activation code
+import os
+os.environ["ZIPMINATOR_API_KEY"] = "your-key"
+allowed, msg, method = APIKeyValidator.authorize_level(7)
 ```
+
+## Open Source vs Enterprise
+
+| Component | This Repo | Enterprise |
+|-----------|:---------:|:----------:|
+| Rust Kyber768 core | Yes | Yes |
+| Python SDK + CLI | Yes | Yes |
+| 10-level anonymization | Yes | Yes |
+| PII scanner | Yes | Yes |
+| Quantum entropy harvester | Yes | Yes |
+| Entropy quotas + billing | Yes | Yes |
+| NIST KAT + fuzz testing | Yes | Yes |
+| Flutter super-app (iOS/Android/macOS/Windows/Linux) | - | Yes |
+| Tauri PQC browser (ZipBrowser) | - | Yes |
+| Web dashboard + pitch deck | - | Yes |
+| PQC Messenger + VoIP | - | Yes |
+| Q-VPN (PQ-WireGuard) | - | Yes |
+| Quantum Mail (@zipminator.zip) | - | Yes |
+| HSM integration | - | Yes |
+| FIPS 140-3 validated module | - | Yes |
+| SSO / RBAC | - | Yes |
+| 24/7 support + SLA | - | Yes |
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide. The short version:
-
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feat/your-feature`)
-3. Run the test suites:
+3. Run the quality gates:
    ```bash
    cargo test --workspace
    cargo clippy --all-targets -- -D warnings
-   pytest tests/
-   ruff check .
+   pytest tests/python/
+   ruff check src/
    ```
 4. Submit a pull request
 
-All contributions must pass the CI quality gate: clippy clean, ruff clean, mypy clean, and test coverage above the configured threshold.
+All PRs must pass CI: clippy clean, ruff clean, tests green.
 
 ## License
 
-Zipminator is dual-licensed:
+```
+Copyright 2025-2026 QDaria AS
 
-- **MIT License** -- Free for open-source and commercial use. See [LICENSE](LICENSE).
-- **Enterprise License** -- Includes HSM integration, SSO/RBAC, multi-provider optimization, FIPS 140-3 validated modules, and 24/7 support. Contact [enterprise@zipminator.io](mailto:enterprise@zipminator.io).
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+
+Enterprise features (Flutter apps, browser, VPN, mail, HSM, SSO) require a separate commercial license. Contact [mo@qdaria.com](mailto:mo@qdaria.com).
 
 ## Links
 
-- **Repository**: [github.com/qdaria/zipminator](https://github.com/qdaria/zipminator)
-- **Documentation**: [zipminator.readthedocs.io](https://zipminator.readthedocs.io)
-- **PyPI**: [pypi.org/project/zipminator](https://pypi.org/project/zipminator)
-- **Issue Tracker**: [github.com/qdaria/zipminator/issues](https://github.com/qdaria/zipminator/issues)
-- **Qdaria**: [qdaria.com](https://qdaria.com)
+- **Platform**: [zipminator.zip](https://www.zipminator.zip)
+- **QDaria**: [qdaria.com](https://qdaria.com)
+- **Repository**: [github.com/QDaria/zipminator](https://github.com/QDaria/zipminator)
+- **Issues**: [github.com/QDaria/zipminator/issues](https://github.com/QDaria/zipminator/issues)
 
 ---
 
-Copyright 2025 Qdaria Inc.
+Built by [QDaria](https://qdaria.com) in Oslo, Norway.

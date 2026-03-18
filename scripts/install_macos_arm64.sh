@@ -7,7 +7,7 @@
 # Date: November 2025
 #
 # Usage: ./scripts/install_macos_arm64.sh
-# Or: curl -sSL https://raw.githubusercontent.com/MoHoushmand/zipminator-pqc/main/scripts/install_macos_arm64.sh | bash
+# Or: curl -sSL https://raw.githubusercontent.com/QDaria/zipminator/main/scripts/install_macos_arm64.sh | bash
 #
 
 set -e  # Exit on error
@@ -308,7 +308,7 @@ echo -e "  - API Docs: ${BLUE}docs/API_REFERENCE.md${NC}"
 echo ""
 echo -e "${CYAN}Support:${NC}"
 echo -e "  - Email: ${BLUE}mo@qdaria.com${NC}"
-echo -e "  - Issues: ${CYAN}https://github.com/MoHoushmand/zipminator-pqc/issues${NC}"
+echo -e "  - Issues: ${CYAN}https://github.com/QDaria/zipminator/issues${NC}"
 echo ""
 
 # Save activation helper

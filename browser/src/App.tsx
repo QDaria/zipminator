@@ -5,6 +5,7 @@ import { NavigationControls } from "./components/NavigationControls";
 import { WebContent } from "./components/WebContent";
 import { StatusBar } from "./components/StatusBar";
 import { SidebarSlot } from "./components/SidebarSlot";
+import { AISidebar } from "./components/AISidebar";
 import { useTabs } from "./hooks/useTabs";
 import { useNavigation } from "./hooks/useNavigation";
 import type { SecurityLevel } from "./types";
@@ -228,7 +229,9 @@ export default function App() {
           isOpen={sidebarOpen}
           width={360}
           onClose={() => setSidebarOpen(false)}
-        />
+        >
+          <AISidebar tabId={activeTabId ?? "default"} defaultOpen />
+        </SidebarSlot>
       </div>
 
       <StatusBar

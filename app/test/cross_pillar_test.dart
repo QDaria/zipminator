@@ -27,19 +27,22 @@ void main() {
         ('Anonymizer', 'Anonymizer'),
         ('Q-AI', 'Q-AI Assistant'),
         ('Email', 'Quantum Mail'),
-        ('Browser', 'PQC Browser'),
+        ('Browser', 'PQC'), // Full-page browser shows compact privacy chips
       ];
 
       for (final (tab, expectedTitle) in pillars) {
         await tester.tap(find.text(tab));
-        await tester.pumpAndSettle();
+        // Use pump instead of pumpAndSettle — some screens have looping animations
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pump(const Duration(milliseconds: 100));
         expect(find.text(expectedTitle), findsWidgets,
             reason: '$tab screen should show "$expectedTitle"');
       }
 
       // Navigate back to Vault
       await tester.tap(find.text('Vault'));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 500));
       expect(find.text('Quantum Vault'), findsOneWidget);
 
       tester.view.resetPhysicalSize();
@@ -86,10 +89,12 @@ void main() {
 
       // Tap settings icon
       await tester.tap(find.byIcon(Icons.settings_outlined));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Settings'), findsWidgets);
       expect(find.text('Theme'), findsOneWidget);
+      expect(find.text('AI Provider API Keys'), findsOneWidget);
       expect(find.text('Crypto Engine'), findsOneWidget);
       expect(find.text('ML-KEM-768 (NIST FIPS 203)'), findsOneWidget);
 
@@ -107,14 +112,16 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
       await tester.pumpAndSettle();
 
-      // Go to Email - should show "No key"
+      // Go to Email - auto-generates key, shows pre-filled subject
       await tester.tap(find.text('Email'));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('No key'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(find.text('Test PQC Encryption'), findsOneWidget);
 
       // Go to Vault - generate button should be available
       await tester.tap(find.text('Vault'));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 100));
       expect(find.text('Generate Keypair'), findsOneWidget);
 
       tester.view.resetPhysicalSize();

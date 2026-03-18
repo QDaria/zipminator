@@ -112,7 +112,7 @@ const CTA = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
           >
-            Join leading organizations protecting their data with post-quantum cryptography.
+            Protect your data with NIST-approved post-quantum cryptography.
             Join the beta. Ships free to early adopters.
           </motion.p>
 
@@ -160,7 +160,7 @@ const CTA = () => {
             <div className="hidden md:block w-px h-6 bg-gray-700" />
             <div className="flex items-center space-x-2">
               <Clock className="w-4 h-4 text-quantum-400" />
-              <span className="font-semibold text-white">287/287</span>
+              <span className="font-semibold text-white">408+</span>
               <span>Tests Passing</span>
             </div>
             <div className="hidden md:block w-px h-6 bg-gray-700" />

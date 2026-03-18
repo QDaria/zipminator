@@ -1,164 +1,97 @@
 # Getting Started
 
-## Installation
+Three minutes to your first post-quantum key exchange.
 
-### One-Click Install (Recommended)
-
-The simplest way to set up the complete environment:
+## Install
 
 ```bash
-bash scripts/install-jupyter-env.sh
+pip install zipminator
 ```
 
-This script creates the `zip-pqc` micromamba environment with Python 3.11, all scientific dependencies, and the Rust toolchain.
+The wheel is ~894KB and includes the pre-compiled Rust Kyber768 engine. No Rust toolchain needed for installation from PyPI.
 
-### Manual Installation
-
-#### 1. Create the environment
-
-```bash
-micromamba create -n zip-pqc python=3.11 -c conda-forge -y
-micromamba activate zip-pqc
-```
-
-#### 2. Install Python dependencies
-
-```bash
-uv pip install numpy pandas matplotlib cryptography
-uv pip install jupyter jupyterlab jupyter-book
-```
-
-#### 3. Build Rust bindings
-
-```bash
-uv pip install maturin
-maturin develop
-```
-
-This compiles the Rust Kyber768 engine and installs the `zipminator._core` native extension.
-
-#### 4. Verify installation
+## Generate a Keypair and Exchange a Secret
 
 ```python
-from zipminator._core import keypair, encapsulate, decapsulate
+from zipminator import keypair, encapsulate, decapsulate
 
+# Step 1: Generate a Kyber768 keypair
 pk, sk = keypair()
-print(f"Public key size:  {len(pk.to_bytes())} bytes")   # 1184
-print(f"Secret key size:  {len(sk.to_bytes())} bytes")    # 2400
+print(f"Public key:  {len(pk.to_bytes())} bytes")   # 1184 bytes
+print(f"Secret key:  {len(sk.to_bytes())} bytes")   # 2400 bytes
+
+# Step 2: Sender encapsulates a shared secret using the public key
+ct, shared_secret = encapsulate(pk)
+print(f"Ciphertext:  {len(ct.to_bytes())} bytes")   # 1088 bytes
+print(f"Shared secret: {shared_secret.hex()[:32]}...")  # 32 bytes
+
+# Step 3: Receiver decapsulates using their secret key
+recovered = decapsulate(ct, sk)
+
+# Both parties now share the same 32-byte secret
+assert shared_secret == recovered
+print("Key exchange successful.")
 ```
 
-## Package Structure
-
-```
-src/zipminator/
-    __init__.py
-    cli.py                  # Command-line interface
-    anonymizer.py           # AdvancedAnonymizer (10 levels)
-    scanner.py              # QuantumReadinessScanner (PII detection)
-    hndl_risk.py            # HNDL risk calculator
-    crypto/
-        __init__.py
-        quantum_random.py   # QuantumRandom (QRNG interface)
-        subscription.py     # SubscriptionManager (tier enforcement)
-        key_management.py   # Key generation and storage
-    entropy/
-        __init__.py
-        pool.py             # Entropy pool reader
-        harvester.py        # QRNG harvester (IBM/Rigetti/Fez)
-    jupyter/
-        __init__.py
-        magics.py           # IPython magics (%zipminate, %qrng)
-        widgets.py          # Interactive Jupyter widgets
-        display.py          # Rich output formatters
-        bridge.py           # Notebook-to-API bridge
-```
-
-## Quick Start
-
-### Key Generation and Encryption
+## Scan Data for PII
 
 ```python
-from zipminator._core import keypair, encapsulate, decapsulate
-
-# Generate a Kyber768 keypair
-pk, sk = keypair()
-
-# Encapsulate: sender creates ciphertext + shared secret
-ct, shared_secret_sender = encapsulate(pk)
-
-# Decapsulate: receiver recovers the same shared secret
-shared_secret_receiver = decapsulate(ct, sk)
-
-assert shared_secret_sender == shared_secret_receiver
-print(f"Shared secret: {shared_secret_sender.hex()[:32]}...")
-```
-
-### Encrypting a Message
-
-```python
-from hashlib import sha3_256
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-import os
-
-# Derive a 256-bit AES key from the shared secret
-aes_key = sha3_256(shared_secret_sender).digest()
-
-# Encrypt with AES-256-GCM
-aesgcm = AESGCM(aes_key)
-nonce = os.urandom(12)
-message = b"Quantum-safe message"
-ciphertext = aesgcm.encrypt(nonce, message, None)
-
-# Decrypt
-plaintext = aesgcm.decrypt(nonce, ciphertext, None)
-assert plaintext == message
-print(f"Decrypted: {plaintext.decode()}")
-```
-
-### DataFrame Anonymization
-
-```python
+from zipminator.crypto.pii_scanner import PIIScanner
 import pandas as pd
-from zipminator.anonymizer import AdvancedAnonymizer
 
-anonymizer = AdvancedAnonymizer()
-
+scanner = PIIScanner()
 df = pd.DataFrame({
-    "name": ["Alice Johnson", "Bob Smith"],
-    "email": ["alice@example.com", "bob@example.com"],
-    "salary": [85000, 92000],
+    "name": ["Ola Nordmann", "Jane Smith"],
+    "email": ["ola@example.no", "jane@example.com"],
+    "ssn": ["12345678901", "123-45-6789"],
 })
 
-# Apply Level 1 anonymization (minimal masking)
-result = anonymizer.anonymize(df, level=1)
-print(result)
+results = scanner.scan_dataframe(df)
+print(results["summary"])
+# PII Scan Results:
+#   - 3 column(s) contain PII
+#   - Risk Level: HIGH
+#   - Recommended Anonymization Level: 7/10
 ```
 
-### PII Scanning
+## Anonymize Sensitive Data
 
 ```python
-from zipminator.scanner import QuantumReadinessScanner
+from zipminator.crypto.anonymization import AnonymizationEngine
+import pandas as pd
 
-scanner = QuantumReadinessScanner()
+engine = AnonymizationEngine()
+df = pd.DataFrame({
+    "name": ["Alice", "Bob", "Charlie"],
+    "salary": [50000, 60000, 70000],
+})
 
-data = {
-    "notes": "Contact alice@example.com or call 555-0123",
-    "ssn": "123-45-6789",
-}
+# Level 1: SHA-256 hashing (free tier)
+hashed = engine.apply_anonymization(df, columns=["name"], level=1)
+print(hashed["name"][0])  # e.g., "2bd806c9..."
 
-findings = scanner.scan(data)
-for finding in findings:
-    print(f"  {finding.field}: {finding.pii_type} (confidence: {finding.confidence:.0%})")
+# Level 4: Generalization (requires Developer tier)
+generalized = engine.apply_anonymization(df, columns=["salary"], level=4)
+print(generalized["salary"][0])  # e.g., "50000-60000"
 ```
 
-## Building the Documentation
+## Quantum-Seeded Key Generation
 
-To build this Jupyter Book locally:
+If you have a quantum entropy pool file (harvested from IBM Quantum hardware), you can seed key generation with true quantum randomness:
 
-```bash
-micromamba activate zip-pqc
-uv pip install jupyter-book sphinx-book-theme myst-nb sphinx-design
-jupyter-book build docs/book/
+```python
+from zipminator.crypto.pqc import PQC
+
+seed = open("quantum_entropy/quantum_entropy_pool.bin", "rb").read(32)
+pqc = PQC(level=768)
+pk, sk = pqc.generate_keypair(seed=seed)
 ```
 
-The built HTML will be in `docs/book/_build/html/`.
+See {doc}`entropy` for details on harvesting and managing quantum entropy.
+
+## Next Steps
+
+- {doc}`installation` -- All installation methods (PyPI, source, Docker, conda)
+- {doc}`core_crypto` -- Deep dive into the Kyber768 implementation
+- {doc}`anonymization` -- Full 10-level anonymization reference
+- {doc}`cli` -- Command-line interface

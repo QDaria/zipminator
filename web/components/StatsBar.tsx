@@ -24,7 +24,7 @@ const stats = [
   },
   {
     icon: CheckCircle,
-    value: '287+',
+    value: '408+',
     label: 'Tests Passing',
     description: 'Comprehensive quality assurance',
   },
