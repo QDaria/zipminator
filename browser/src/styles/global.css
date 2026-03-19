@@ -385,6 +385,50 @@ html, body, #root {
 }
 
 /* ===================================================================
+   AI Sidebar Toggle Button (in toolbar)
+   =================================================================== */
+.ai-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 7px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.ai-toggle-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+.ai-toggle-btn--active {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.ai-toggle-btn--active:hover {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.6);
+}
+
+.ai-toggle-label {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ===================================================================
    Web Content Area
    =================================================================== */
 .web-content {

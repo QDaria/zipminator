@@ -39,8 +39,15 @@ interface AISidebarProps {
   tabId?: string;
   /** Tauri app-data directory (passed from App.tsx). */
   appDataDir?: string;
-  /** If true, the sidebar starts open. Default: false. */
+  /** If true, the sidebar starts open (uncontrolled mode). Default: false. */
   defaultOpen?: boolean;
+  /**
+   * Controlled open state. When provided the sidebar switches to controlled
+   * mode and `defaultOpen` is ignored.
+   */
+  isOpen?: boolean;
+  /** Called when the sidebar wants to toggle itself (controlled mode). */
+  onToggle?: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -124,8 +131,25 @@ export function AISidebar({
   tabId = "default",
   appDataDir = "",
   defaultOpen = false,
+  isOpen: controlledOpen,
+  onToggle,
 }: AISidebarProps) {
-  const [open, setOpen] = useState(defaultOpen);
+  const isControlled = controlledOpen !== undefined;
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const open = isControlled ? controlledOpen : internalOpen;
+
+  const setOpen = useCallback(
+    (value: boolean | ((prev: boolean) => boolean)) => {
+      if (isControlled) {
+        // In controlled mode, call onToggle whenever the value would change.
+        const next = typeof value === "function" ? value(open) : value;
+        if (next !== open) onToggle?.();
+      } else {
+        setInternalOpen(value);
+      }
+    },
+    [isControlled, open, onToggle]
+  );
   const [activeTab, setActiveTab] = useState<Tab>("chat");
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [isResizing, setIsResizing] = useState(false);

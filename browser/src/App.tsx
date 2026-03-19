@@ -4,7 +4,6 @@ import { AddressBar } from "./components/AddressBar";
 import { NavigationControls } from "./components/NavigationControls";
 import { WebContent } from "./components/WebContent";
 import { StatusBar } from "./components/StatusBar";
-import { SidebarSlot } from "./components/SidebarSlot";
 import { AISidebar } from "./components/AISidebar";
 import { useTabs } from "./hooks/useTabs";
 import { useNavigation } from "./hooks/useNavigation";
@@ -106,6 +105,13 @@ export default function App() {
 
       // Cmd+Shift+B: Toggle sidebar
       if (meta && e.shiftKey && e.key === "B") {
+        e.preventDefault();
+        setSidebarOpen((prev) => !prev);
+        return;
+      }
+
+      // Cmd+Shift+A: Toggle AI sidebar
+      if (meta && e.shiftKey && (e.key === "a" || e.key === "A")) {
         e.preventDefault();
         setSidebarOpen((prev) => !prev);
         return;
@@ -212,6 +218,28 @@ export default function App() {
           isLoading={isLoading}
           onNavigate={handleNavigate}
         />
+        {/* AI sidebar toggle button */}
+        <button
+          className={`ai-toggle-btn${sidebarOpen ? " ai-toggle-btn--active" : ""}`}
+          onClick={() => setSidebarOpen((prev) => !prev)}
+          aria-label={sidebarOpen ? "Close AI sidebar" : "Open AI sidebar (Cmd+Shift+A)"}
+          title="AI Sidebar (Cmd+Shift+A)"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12a10 10 0 0 1 10-10z" />
+            <path d="M8 12h.01M12 12h.01M16 12h.01" />
+          </svg>
+          <span className="ai-toggle-label">AI</span>
+        </button>
       </div>
 
       <div className="content-area">
@@ -225,14 +253,14 @@ export default function App() {
           onLoadError={handleLoadError}
           onNavigate={(tabId, url) => navigate(tabId, url)}
         />
-        <SidebarSlot
-          isOpen={sidebarOpen}
-          width={360}
-          onClose={() => setSidebarOpen(false)}
-        >
-          <AISidebar tabId={activeTabId ?? "default"} defaultOpen />
-        </SidebarSlot>
       </div>
+
+      {/* AI sidebar — rendered outside content-area so it overlays correctly */}
+      <AISidebar
+        tabId={activeTabId ?? "default"}
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen((prev) => !prev)}
+      />
 
       <StatusBar
         security={activeTab?.security ?? "none"}

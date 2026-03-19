@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.config import settings
 from src.routes import health, auth, keys, crypto, anonymize, signaling, messages, voip, email, ai
+from api.src.routes import messenger
 from src.middleware.logging import LoggingMiddleware
 import logging
 
@@ -44,6 +45,7 @@ app.include_router(messages.router, prefix="/v1/messages", tags=["messages"])
 app.include_router(voip.router, prefix="/v1/voip", tags=["voip"])
 app.include_router(email.router, prefix="/v1/email", tags=["email"])
 app.include_router(ai.router, tags=["ai"])
+app.include_router(messenger.router, prefix="/api/messenger", tags=["messenger"])
 
 
 @app.on_event("startup")
