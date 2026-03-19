@@ -141,6 +141,60 @@ def entropy(
         sys.exit(1)
 
 
+@app.command()
+def anonymize(
+    input_file: str = typer.Argument(..., help="Path to input CSV file"),
+    output_file: str = typer.Argument(..., help="Path to output CSV file"),
+    level: int = typer.Option(3, "--level", "-l", min=1, max=10,
+                              help="Anonymization level (1-10, default 3)"),
+):
+    """
+    Anonymize a CSV file using the 10-level PQC anonymization system.
+
+    Applies the specified level to ALL columns in the input CSV.
+    """
+    import pandas as pd
+    from zipminator.anonymizer import AdvancedAnonymizer
+
+    if not os.path.isfile(input_file):
+        rprint(f"[bold red]Error:[/bold red] File not found: {input_file}")
+        raise typer.Exit(code=1)
+
+    console.print(Panel.fit(
+        f"Anonymizing [bold]{input_file}[/bold] at level {level}/10",
+        style="bold cyan",
+    ))
+
+    try:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            transient=True,
+        ) as progress:
+            progress.add_task(description="Reading CSV...", total=None)
+            df = pd.read_csv(input_file)
+
+            level_map = {col: level for col in df.columns}
+
+            progress.add_task(description="Applying anonymization...", total=None)
+            anon = AdvancedAnonymizer()
+            result = anon.process(df, level_map)
+
+            progress.add_task(description="Writing output...", total=None)
+            result.to_csv(output_file, index=False)
+
+        rprint(f"[green]Done.[/green] {len(df)} rows anonymized -> [bold]{output_file}[/bold]")
+        rprint(f"   Columns: {', '.join(df.columns)}")
+        rprint(f"   Level: {level}/10")
+
+    except pd.errors.EmptyDataError:
+        rprint("[bold red]Error:[/bold red] Input CSV is empty.")
+        raise typer.Exit(code=1)
+    except Exception as e:
+        rprint(f"[bold red]Error:[/bold red] {e}")
+        raise typer.Exit(code=1)
+
+
 def main():
     app()
 

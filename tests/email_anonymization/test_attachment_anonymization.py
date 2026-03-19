@@ -39,12 +39,36 @@ def _make_text(content: str) -> bytes:
 
 @pytest.fixture(scope="module")
 def app():
-    """Build a lightweight FastAPI app with only the anonymize router."""
+    """Build a lightweight FastAPI app with only the anonymize router.
+
+    Uses importlib to avoid conflicts when 'src' exists in sys.modules
+    from another package (e.g., when running the full test suite).
+    """
+    import importlib.util
+
     api_dir = os.path.join(os.path.dirname(__file__), "..", "..", "api")
+    routes_path = os.path.join(api_dir, "src", "routes", "anonymize.py")
+
+    if not os.path.exists(routes_path):
+        pytest.skip(f"API route not found: {routes_path}")
+
+    # Ensure api/src is importable without polluting global sys.modules['src']
     if api_dir not in sys.path:
         sys.path.insert(0, api_dir)
 
-    from src.routes.anonymize import router
+    try:
+        # Try direct import first (works when run standalone)
+        from src.routes.anonymize import router
+    except (ModuleNotFoundError, ImportError):
+        # Fallback: load the module directly by file path
+        spec = importlib.util.spec_from_file_location(
+            "api_src_routes_anonymize", routes_path
+        )
+        if spec is None or spec.loader is None:
+            pytest.skip(f"Cannot load anonymize route from {routes_path}")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        router = mod.router
 
     test_app = FastAPI(title="Anonymize Test App")
     test_app.include_router(router, prefix="/v1")

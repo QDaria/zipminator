@@ -2,11 +2,12 @@
 
 > **Single Source of Truth** for all pillar statuses. Updated after every code change session.
 >
-> Last verified: 2026-03-19 | Verifier: Claude Code Beta Launch Sprint (parallel recipes S+T)
+> Last verified: 2026-03-19 | Verifier: Claude Code 100% Completion Sprint
 >
-> Percentages code-verified Mar 19 2026. Pillars 5 and 6 upgraded with production implementations.
+> Percentages reconciled Mar 19 2026 — summary table now matches detail sections.
+> Summary table reflects actual production-readiness, not just code-structure completeness.
 >
-> **Mar 19 update**: Pillar 5 now has real 10-level anonymizer (L1-L10 selectable, 64 new tests). Pillar 6 now has real Ollama LLM backend + 18-pattern prompt guard (40 new tests).
+> **Mar 19 update**: Reconciled all pillar percentages. VoIP upgraded to 85% (frame encryption exists). Mesh upgraded to 80% (entropy bridge functional). Browser upgraded to 85% (AI sidebar integrated).
 
 ---
 
@@ -20,15 +21,15 @@
 
 | # | Pillar | Overall | Crypto | Tests | UI | Integration | Notes |
 |---|--------|:-------:|:------:|:-----:|:--:|:-----------:|-------|
-| 1 | **Quantum Vault** | **100%** | Done | Done | Done | Done | SelfDestructScheduler + secure_delete wired (4 integration tests) |
-| 2 | **PQC Messenger** | **100%** | Done | Done | Done | Done | MessageStore with offline queue + group fanout (6 new tests) |
-| 3 | **Quantum VoIP** | **100%** | Done | Done | Done | Done | PQ-SRTP frame encryption (AES-256-GCM) + encrypted voicemail (29 tests) |
-| 4 | **Q-VPN** | **100%** | Done | Done | Done | Done | Real Curve25519 DH + HKDF; WireGuard Type 4 format verified (5 new tests) |
-| 5 | **10-Level Anonymizer** | **100%** | Done | Done | Done | Done | All L1-L10 verified; 2 PII-leakage bugs fixed (45 integration tests) |
-| 6 | **Q-AI Assistant** | **100%** | Done | Done | Done | Done | Prompt guard wired, Ollama client, 18 injection patterns (63 AI tests) |
-| 7 | **Quantum Mail** | **100%** | Done | Done | Done | Done | SMTP/IMAP transport + self-destruct + PQC envelope roundtrip (12 tests) |
-| 8 | **ZipBrowser** | **100%** | Done | Done | Done | Done | AI sidebar registered + rendered, WebView ADR documented (157 tests) |
-| 9 | **Q-Mesh (RuView)** | **100%** | Done | Done | Planned | Done | HKDF entropy bridge, beacon auth, SipHash, provisioner (44 tests) |
+| 1 | **Quantum Vault** | **95%** | Done | Done | Done | Partial | Self-destruct Tauri UI wiring incomplete |
+| 2 | **PQC Messenger** | **85%** | Done | Done | Done | Partial | MessageStore + offline queue done; e2e needs running API |
+| 3 | **Quantum VoIP** | **85%** | Done | Done | Done | Partial | PQ-SRTP frame encryption (AES-256-GCM) done; WebRTC DTLS replacement pending |
+| 4 | **Q-VPN** | **90%** | Done | Done | Done | Partial | Packet wrapping has shortcuts; no mobile VPN service |
+| 5 | **10-Level Anonymizer** | **92%** | Done | Done | Done | Partial | All L1-L10 verified; CLI `--level N` not wired |
+| 6 | **Q-AI Assistant** | **65%** | Partial | Done | Done | Partial | Prompt guard + Ollama done; PII scan before send + PQC tunnel missing |
+| 7 | **Quantum Mail** | **60%** | Done | Done | Done | Planned | PQC envelope roundtrip done; SMTP/IMAP transport not deployed |
+| 8 | **ZipBrowser** | **85%** | Done | Done | Done | Done | AI sidebar integrated (Recipe W); WebView limitation (ADR documented) |
+| 9 | **Q-Mesh (RuView)** | **80%** | Done | Done | Planned | Partial | HKDF entropy bridge + provisioner done; RuView repo integration pending |
 
 **Legend**: Done = code exists, tested, reviewed | Partial = code exists but incomplete | Planned = no code yet
 
@@ -60,12 +61,12 @@
 
 ---
 
-## Pillar 2: PQC Messenger (75%)
+## Pillar 2: PQC Messenger (85%)
 
 - **Protocol**: Post-Quantum Double Ratchet — ML-KEM-768 for ratchet key exchange, AES-256-GCM for payloads, HKDF-SHA-256 chain keys with forward secrecy
 - **Transport**: WebSocket signaling (FastAPI) + WebRTC data channels
-- **What works**: Ratchet key exchange, message encrypt/decrypt roundtrip, session state management
-- **What's missing**: No message persistence layer (messages exist only in-session); no offline message queue; no group chat support
+- **What works**: Ratchet key exchange, message encrypt/decrypt roundtrip, session state management, MessageStore with offline queue + group fanout (Recipe V), 6 persistence tests
+- **What's missing**: E2E tests need running API server; WebSocket signaling not yet tested in integration
 
 ### File Paths
 
@@ -80,13 +81,13 @@
 
 ---
 
-## Pillar 3: Quantum VoIP & Video (60%)
+## Pillar 3: Quantum VoIP & Video (85%)
 
 - **Media**: WebRTC peer connections with native camera/microphone
-- **Security**: PQ-SRTP — SRTP master keys derived from ML-KEM-768 shared secrets
+- **Security**: PQ-SRTP — SRTP master keys derived from ML-KEM-768 shared secrets, AES-256-GCM frame encryption via `SrtpContext`
 - **Signaling**: Shared WebSocket signaling server with Messenger
-- **What works**: SRTP key derivation from ML-KEM-768 shared secret; call state machine; signaling WebSocket
-- **What's missing**: No actual media stream encryption (only key derivation exists); WebRTC DTLS-SRTP key exchange not replaced at browser level; no TURN/STUN server; no call recording or voicemail
+- **What works**: SRTP key derivation from ML-KEM-768 shared secret; AES-256-GCM frame encrypt/decrypt (`SrtpContext::protect`/`unprotect`); VoIP session with offer/answer/hangup lifecycle; call state machine; signaling WebSocket; 29 SRTP tests
+- **What's missing**: WebRTC DTLS-SRTP key exchange not replaced at browser level; no TURN/STUN server; no encrypted voicemail storage
 
 ### File Paths
 
@@ -120,7 +121,7 @@
 
 ---
 
-## Pillar 5: 10-Level Anonymization Suite (90%)
+## Pillar 5: 10-Level Anonymization Suite (92%)
 
 - **Origins**: Production code from NAV (Norwegian Labour and Welfare Administration), upgraded with PQC + QRNG
 - **What works**: All 10 levels implemented as selectable tiers via `LevelAnonymizer.apply(df, level=N)`:
@@ -152,7 +153,7 @@
 
 ---
 
-## Pillar 6: Q-AI PQC AI Assistant (60%)
+## Pillar 6: Q-AI PQC AI Assistant (65%)
 
 - **What works**:
   - OllamaClient for local-first LLM (localhost:11434, models: llama3.2, mistral, phi-3)
@@ -200,7 +201,7 @@
 
 ---
 
-## Pillar 8: ZipBrowser — PQC AI Browser (75%)
+## Pillar 8: ZipBrowser — PQC AI Browser (85%)
 
 - **Shell**: Tauri 2.x desktop browser (`browser/src-tauri/`)
 - **DMG**: `target/release/bundle/dmg/Zipminator_0.2.0_aarch64.dmg` (5.7MB, all Apple Silicon M1-M5)
@@ -212,8 +213,9 @@
   - Domain-level telemetry/tracker blocking
   - PQC-encrypted password vault (Argon2)
   - Audit logging
-- **Tests**: 103 Rust tests passing
-- **Gap**: Uses system WebView, not a custom browser engine; Q-AI Assistant sidebar not yet integrated into browser
+- **AI sidebar**: Integrated via Recipe W (registered Tauri command + React component rendered in SidebarSlot)
+- **Tests**: 157 Rust tests passing
+- **Gap**: Uses system WebView (not custom browser engine; limitation documented in ADR)
 
 ### File Paths
 
@@ -232,7 +234,7 @@
 
 ---
 
-## Pillar 9: Q-Mesh — Quantum-Secured WiFi Sensing (10%)
+## Pillar 9: Q-Mesh — Quantum-Secured WiFi Sensing (80%)
 
 - **Integration**: [RuView](https://github.com/MoHoushmand/RuView) WiFi DensePose system with Zipminator QRNG entropy
 - **What RuView does**: ESP32-S3 mesh network that senses human pose, breathing, heartbeat, and presence through WiFi CSI signals. No cameras, no wearables, no internet required
@@ -240,8 +242,8 @@
 - **Zipminator integration**: Replace the classical random entropy source for mesh key generation and rotation with Zipminator's QRNG (IBM Quantum 156q). The QRNG harvester produces 50KB/cycle; a mesh key is 16 bytes. This creates quantum-secured WiFi sensing mesh
 - **QUIC transport (ADR-032a)**: Aggregator-class nodes use `midstreamer-quic` with TLS 1.3 AEAD. ESP32-S3 nodes retain manual HMAC/SipHash over UDP
 - **Use cases**: Healthcare (vital sign monitoring, fall detection), defense (through-wall personnel tracking), elder care, smart buildings
-- **What works**: Entropy bridge skeleton exists in `crates/zipminator-mesh/`; RuView ADR-032 mesh security spec is documented
-- **What's missing**: No actual RuView integration; entropy bridge crate has no functional code; no QRNG-seeded key provisioning in `scripts/provision.py`; no shared NVS key management; RuView and Zipminator remain entirely separate repos with no code linking them
+- **What works**: Entropy bridge crate (`crates/zipminator-mesh/`) with HKDF-SHA256 key derivation from quantum pool; MeshKey (16-byte PSK) and SipHashKey types with zeroize-on-drop; FilePoolSource and MemoryEntropySource; MeshProvisioner for key generation; 44 Rust tests passing
+- **What's missing**: CLI provisioner for writing mesh keys to NVS binary format for ESP32-S3; cross-repo integration script linking Zipminator QRNG output to RuView's `scripts/provision.py`; shared NVS key management
 
 ### Architecture
 
@@ -548,4 +550,4 @@ Matrix: ubuntu-latest + macos-latest for Flutter; ubuntu-latest for Rust bridge.
 
 ---
 
-*Last verified: 2026-03-17 | QDaria AS | 9-Pillar Sprint Complete*
+*Last verified: 2026-03-19 | QDaria AS | 100% Completion Sprint — Percentages reconciled*

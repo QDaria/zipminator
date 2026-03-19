@@ -12,7 +12,7 @@ use base64::{engine::general_purpose::STANDARD as B64, Engine};
 use sha2::{Digest, Sha256};
 
 use crate::kyber768::{Kyber768, PublicKey, SecretKey};
-use crate::srtp::{derive_srtp_keys_labeled, SrtpKeyMaterial};
+use crate::srtp::{derive_srtp_keys_labeled, SrtpContext, SrtpError, SrtpKeyMaterial};
 
 /// Session lifecycle states.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
