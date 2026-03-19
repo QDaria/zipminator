@@ -405,3 +405,4 @@ web/test-results/
 _screenshots/
 docs/book/_build/
 .playwright-mcp/
+web/screenshots/

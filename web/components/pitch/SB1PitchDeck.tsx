@@ -8,22 +8,20 @@ import { SlideThreat } from './sb1-slides/SlideThreat';
 import { SlideDORA } from './sb1-slides/SlideDORA';
 import { SlideGlobalBanks } from './sb1-slides/SlideGlobalBanks';
 import { SlideZipminator } from './sb1-slides/SlideZipminator';
-import {
-  SlidePortfolio,
-  SlideRiskModeling,
-  SlideFraudDetection,
-  SlideQRNG,
-} from './sb1-slides/SlideBusinessCases';
-import {
-  SlideMarketSize,
-  SlideQDaria,
-  SlideNextSteps,
-} from './sb1-slides/SlideMarketAndStrategy';
+import { SlidePortfolio } from './sb1-slides/SlidePortfolio';
+import { SlideRiskModeling } from './sb1-slides/SlideRiskModeling';
+import { SlideFraudDetection } from './sb1-slides/SlideFraudDetection';
+import { SlideQRNG } from './sb1-slides/SlideQRNG';
+import { SlideMarketSize } from './sb1-slides/SlideMarketAndStrategy';
+import { SlideQDaria } from './sb1-slides/SlideQDaria';
+import { SlideNextSteps } from './sb1-slides/SlideNextSteps';
+import type { Scenario } from '@/lib/sb1-chart-data';
 
 interface SlideConfig {
   id: number;
   title: string;
-  component: React.ComponentType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: React.ComponentType<any>;
 }
 
 const SLIDES: SlideConfig[] = [
@@ -44,6 +42,7 @@ const SLIDES: SlideConfig[] = [
 export const SB1PitchDeck: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [scenario, setScenario] = useState<Scenario>('base');
 
   const goTo = useCallback((index: number) => {
     if (index === current || isTransitioning) return;
@@ -62,7 +61,6 @@ export const SB1PitchDeck: React.FC = () => {
     if (current > 0) goTo(current - 1);
   }, [current, goTo]);
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
@@ -89,19 +87,17 @@ export const SB1PitchDeck: React.FC = () => {
         fontFamily: "'DM Sans', sans-serif",
       }}
     >
-      {/* Slide area */}
       <div className="flex-1 overflow-hidden relative">
         <div
           className="absolute inset-0 transition-opacity duration-150"
           style={{ opacity: isTransitioning ? 0 : 1 }}
         >
           <SlideWrapper>
-            <CurrentSlide />
+            <CurrentSlide scenario={scenario} onScenarioChange={setScenario} />
           </SlideWrapper>
         </div>
       </div>
 
-      {/* Navigation bar */}
       <Navigation
         current={current}
         total={SLIDES.length}
