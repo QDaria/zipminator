@@ -7,18 +7,24 @@ set -euo pipefail
 ROOT="${ZIPMINATOR_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}"
 cd "$ROOT"
 
-# ─── Guard: skip if no modified tracked files ────────────────────────
+# ─── Guard: skip if no changes at all ────────────────────────────────
 CHANGED=$(git diff --name-only 2>/dev/null || true)
 STAGED=$(git diff --cached --name-only 2>/dev/null || true)
+UNTRACKED=$(git ls-files --others --exclude-standard 2>/dev/null || true)
 
-if [ -z "$CHANGED" ] && [ -z "$STAGED" ]; then
+if [ -z "$CHANGED" ] && [ -z "$STAGED" ] && [ -z "$UNTRACKED" ]; then
   echo "auto-commit: no changes to commit"
   exit 0
 fi
 
-# ─── Stage modified tracked files, then unstage junk ─────────────────
-# Step 1: stage all tracked modifications
+# ─── Stage tracked modifications ─────────────────────────────────────
 git add -u -- . 2>/dev/null || true
+
+# ─── Stage new untracked source files (code + docs only) ─────────────
+echo "$UNTRACKED" | grep -E '\.(rs|py|dart|ts|tsx|js|jsx|toml|yaml|yml|json|sh|sql|html|css|scss|md|txt|cfg|ini)$' \
+  | while IFS= read -r f; do
+    [ -n "$f" ] && git add "$f" 2>/dev/null || true
+  done
 
 # Step 2: unstage files matching exclude patterns (binaries, caches, secrets, generated)
 # Using git reset on pathspecs is more reliable than git add exclude globs
@@ -31,8 +37,8 @@ UNSTAGE_PATTERNS=(
   '*/node_modules/*'       '*/build/*'              'target/*'
   '*/.playwright-mcp/*'    '_archive/*'             '_screenshots/*'
   '*/*.xcuserdatad/*'      '*/Pods/*'               '*/ephemeral/*'
-  '*/e2e/screenshots/*'    'web/landing-page/*'
-  'Cargo.lock'             '*/Podfile.lock'         '*/pubspec.lock'
+  '*/e2e/screenshots/*'    'web/landing-page/*'    'web/test-results/*'
+  '*/Podfile.lock'         '*/pubspec.lock'        '.playwright-mcp/*'
 )
 for pat in "${UNSTAGE_PATTERNS[@]}"; do
   git reset HEAD -- "$pat" 2>/dev/null || true
