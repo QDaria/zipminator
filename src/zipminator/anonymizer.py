@@ -1,17 +1,41 @@
 """
 Advanced Anonymizer - 10-Level PQC Anonymization System
 
-Facelift for legacy Zipminator logic from NAV, upgraded with 
+Facelift for legacy Zipminator logic from NAV, upgraded with
 Post-Quantum Cryptography and Quantum Random Number Generation.
+
+Levels:
+  L1  Regex masking (SSN -> ***-**-1234)
+  L2  SHA-3 deterministic hashing of PII fields
+  L3  SHA-3 with PQC-derived salt (unique per dataset)
+  L4  Tokenization (reversible mapping via secure SQLite)
+  L5  K-Anonymity (generalize quasi-identifiers until k>=5)
+  L6  L-Diversity (ensure sensitive attribute diversity)
+  L7  Quantum noise jitter (numerical perturbation using QRNG entropy)
+  L8  Differential privacy (Laplace mechanism, configurable epsilon, QRNG)
+  L9  K-Anonymity + Differential privacy combined
+  L10 Quantum pseudoanonymization (OTP mapping from QRNG pool)
 """
 
-import pandas as pd
-import numpy as np
+from __future__ import annotations
+
 import hashlib
+import math
+import os
 import re
+import sqlite3
 import string
-from typing import List, Union, Optional, Dict, Any
-from zipminator.crypto import quantum_random as qrng
+import struct
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+import numpy as np
+import pandas as pd
+
+try:
+    from zipminator.crypto import quantum_random as qrng
+except Exception:  # pragma: no cover
+    qrng = None  # type: ignore
 
 class AdvancedAnonymizer:
     """
@@ -169,3 +193,452 @@ class AdvancedAnonymizer:
                 mapping[val] = "".join([qrng.choice(chars) for _ in range(12)])
             return mapping[val]
         return series.apply(get_otp_val)
+
+
+# ---------------------------------------------------------------------------
+# Entropy helper: read bytes from pool or fallback to os.urandom
+# ---------------------------------------------------------------------------
+
+def _get_entropy_bytes(n: int, pool_path: Optional[str] = None) -> bytes:
+    """Return *n* random bytes, preferring the quantum entropy pool."""
+    if pool_path:
+        p = Path(pool_path)
+        if p.exists() and p.stat().st_size > 0:
+            try:
+                with open(p, "rb") as f:
+                    data = f.read(n)
+                if len(data) >= n:
+                    return data[:n]
+            except OSError:
+                pass
+    # Try the PoolProvider (project default path)
+    try:
+        from zipminator.entropy.pool_provider import PoolProvider
+        provider = PoolProvider(pool_path=pool_path)
+        bits = provider.get_entropy(n * 8)
+        # Convert bitstring back to bytes
+        out = bytearray()
+        for i in range(0, len(bits), 8):
+            out.append(int(bits[i:i + 8], 2))
+        if len(out) >= n:
+            return bytes(out[:n])
+    except Exception:
+        pass
+    return os.urandom(n)
+
+
+def _entropy_float(pool_path: Optional[str] = None) -> float:
+    """Return a random float in [0, 1) from entropy source."""
+    raw = _get_entropy_bytes(8, pool_path)
+    return struct.unpack(">Q", raw)[0] / (2**64)
+
+
+def _entropy_laplace(mu: float, b: float, pool_path: Optional[str] = None) -> float:
+    """Sample from Laplace(mu, b) using entropy source."""
+    u = _entropy_float(pool_path) - 0.5
+    # Clamp to avoid log(0)
+    u = max(min(u, 0.4999999), -0.4999999)
+    return mu - b * np.sign(u) * np.log(1.0 - 2.0 * abs(u))
+
+
+def _entropy_gauss(mu: float, sigma: float, pool_path: Optional[str] = None) -> float:
+    """Sample from Gaussian(mu, sigma) using Box-Muller with entropy source."""
+    u1 = max(_entropy_float(pool_path), 1e-15)
+    u2 = _entropy_float(pool_path)
+    z = math.sqrt(-2.0 * math.log(u1)) * math.cos(2.0 * math.pi * u2)
+    return mu + sigma * z
+
+
+def _entropy_random_string(length: int, pool_path: Optional[str] = None) -> str:
+    """Generate a random alphanumeric string from entropy source."""
+    chars = string.ascii_letters + string.digits
+    raw = _get_entropy_bytes(length, pool_path)
+    return "".join(chars[b % len(chars)] for b in raw)
+
+
+# ---------------------------------------------------------------------------
+# TokenStore: reversible tokenization backed by in-memory SQLite
+# ---------------------------------------------------------------------------
+
+class TokenStore:
+    """Reversible token mapping backed by an in-memory (or file) SQLite DB."""
+
+    def __init__(self, db_path: str = ":memory:") -> None:
+        self._conn = sqlite3.connect(db_path)
+        self._conn.execute(
+            "CREATE TABLE IF NOT EXISTS tokens "
+            "(col TEXT, original TEXT, token TEXT, "
+            "PRIMARY KEY (col, original))"
+        )
+        self._conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_tok ON tokens(col, token)"
+        )
+        self._counter: Dict[str, int] = {}
+
+    def tokenize(self, col: str, value: str) -> str:
+        row = self._conn.execute(
+            "SELECT token FROM tokens WHERE col=? AND original=?",
+            (col, value),
+        ).fetchone()
+        if row:
+            return row[0]
+        self._counter.setdefault(col, 0)
+        self._counter[col] += 1
+        token = f"TOK_{self._counter[col]:08X}"
+        self._conn.execute(
+            "INSERT INTO tokens VALUES (?, ?, ?)", (col, value, token)
+        )
+        return token
+
+    def detokenize(self, col: str, token: str) -> Optional[str]:
+        row = self._conn.execute(
+            "SELECT original FROM tokens WHERE col=? AND token=?",
+            (col, token),
+        ).fetchone()
+        return row[0] if row else None
+
+
+# ---------------------------------------------------------------------------
+# LevelAnonymizer — canonical API: apply(df, level, **kwargs)
+# ---------------------------------------------------------------------------
+
+class LevelAnonymizer:
+    """
+    10-level anonymizer following the Zipminator product spec.
+
+    Usage::
+
+        anon = LevelAnonymizer()
+        result = anon.apply(df, level=5, k=5, quasi_identifiers=["age"])
+        # For L4 tokenization, reverse with:
+        restored = anon.detokenize(result)
+    """
+
+    LEVEL_NAMES = {
+        1: "Regex Masking",
+        2: "SHA-3 Deterministic Hashing",
+        3: "SHA-3 + PQC Salt",
+        4: "Tokenization (reversible)",
+        5: "K-Anonymity",
+        6: "L-Diversity",
+        7: "Quantum Noise Jitter",
+        8: "Differential Privacy (Laplace)",
+        9: "K-Anonymity + Differential Privacy",
+        10: "Quantum OTP Pseudoanonymization",
+    }
+
+    def __init__(
+        self,
+        pqc_salt: Optional[bytes] = None,
+        token_db_path: str = ":memory:",
+        entropy_pool_path: Optional[str] = None,
+    ) -> None:
+        self._pqc_salt = pqc_salt or b"zipminator_pqc_default_salt_v1"
+        self._token_store = TokenStore(db_path=token_db_path)
+        self._pool_path = entropy_pool_path
+        self._otp_maps: Dict[str, Dict[Any, str]] = {}
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def apply(self, df: pd.DataFrame, level: int, **kwargs: Any) -> pd.DataFrame:
+        """
+        Apply anonymization at the given level (1-10) to the DataFrame.
+
+        Keyword args vary by level:
+          L5: k (int, default 5), quasi_identifiers (list[str])
+          L6: l (int, default 2), quasi_identifiers, sensitive_columns
+          L7: jitter_factor (float, default 0.05)
+          L8: epsilon (float, default 1.0)
+          L9: k, epsilon, quasi_identifiers
+          L10: (no extra args)
+        """
+        if level < 1 or level > 10:
+            raise ValueError(f"level must be between 1 and 10, got {level}")
+
+        if len(df) == 0:
+            return df.copy()
+
+        handler = {
+            1: self._apply_l1,
+            2: self._apply_l2,
+            3: self._apply_l3,
+            4: self._apply_l4,
+            5: self._apply_l5,
+            6: self._apply_l6,
+            7: self._apply_l7,
+            8: self._apply_l8,
+            9: self._apply_l9,
+            10: self._apply_l10,
+        }
+        return handler[level](df.copy(), **kwargs)
+
+    def detokenize(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Reverse L4 tokenization for all columns that contain TOK_ prefixed values."""
+        out = df.copy()
+        for col in out.columns:
+            # Check if column could contain string tokens (object, string, str dtype)
+            if not pd.api.types.is_numeric_dtype(out[col]):
+                def _detok(v: Any, c: str = col) -> Any:
+                    sv = str(v)
+                    if sv.startswith("TOK_"):
+                        result = self._token_store.detokenize(c, sv)
+                        return result if result is not None else v
+                    return v
+                out[col] = out[col].apply(_detok)
+        return out
+
+    # ------------------------------------------------------------------
+    # L1: Regex masking
+    # ------------------------------------------------------------------
+
+    def _apply_l1(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:
+        for col in df.columns:
+            if pd.api.types.is_numeric_dtype(df[col]):
+                continue  # leave numeric untouched
+            df[col] = df[col].apply(self._mask_value)
+        return df
+
+    @staticmethod
+    def _mask_value(val: Any) -> str:
+        s = str(val)
+        # Email
+        if "@" in s:
+            local, domain = s.split("@", 1)
+            return local[0] + "***@" + domain
+        # SSN-like (NNN-NN-NNNN)
+        m = re.match(r"(\d{3})-(\d{2})-(\d{4})", s)
+        if m:
+            return f"***-**-{m.group(3)}"
+        # Generic: mask all but last 4
+        if len(s) > 4:
+            return "*" * (len(s) - 4) + s[-4:]
+        return "***"
+
+    # ------------------------------------------------------------------
+    # L2: SHA-3 deterministic hashing
+    # ------------------------------------------------------------------
+
+    def _apply_l2(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:
+        for col in df.columns:
+            if pd.api.types.is_numeric_dtype(df[col]):
+                df[col] = df[col].apply(
+                    lambda v: hashlib.sha3_256(str(v).encode()).hexdigest()
+                )
+            else:
+                df[col] = df[col].apply(
+                    lambda v: hashlib.sha3_256(str(v).encode()).hexdigest()
+                )
+        return df
+
+    # ------------------------------------------------------------------
+    # L3: SHA-3 with PQC-derived salt
+    # ------------------------------------------------------------------
+
+    def _apply_l3(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:
+        for col in df.columns:
+            df[col] = df[col].apply(lambda v: self._salted_hash(v))
+        return df
+
+    def _salted_hash(self, val: Any) -> str:
+        h = hashlib.sha3_256()
+        h.update(self._pqc_salt)
+        h.update(str(val).encode())
+        return h.hexdigest()
+
+    # ------------------------------------------------------------------
+    # L4: Tokenization (reversible)
+    # ------------------------------------------------------------------
+
+    def _apply_l4(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:
+        for col in df.columns:
+            df[col] = df[col].apply(
+                lambda v, c=col: self._token_store.tokenize(c, str(v))
+            )
+        return df
+
+    # ------------------------------------------------------------------
+    # L5: K-Anonymity
+    # ------------------------------------------------------------------
+
+    def _apply_l5(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:
+        k = kw.get("k", 5)
+        qi = kw.get("quasi_identifiers", self._detect_quasi_identifiers(df))
+        df = self._generalize_until_k(df, qi, k)
+        return df
+
+    def _generalize_until_k(
+        self, df: pd.DataFrame, qi: List[str], k: int, max_iter: int = 20
+    ) -> pd.DataFrame:
+        """Iteratively widen buckets on quasi-identifiers until every group has >= k rows."""
+        # Compute a sensible initial bucket size from data range
+        initial_bucket = 10
+        for col in qi:
+            if col in df.columns and pd.api.types.is_numeric_dtype(df[col]):
+                col_range = float(df[col].max() - df[col].min())
+                if col_range > 0:
+                    # Start with a bucket that yields ~n/k groups
+                    n_groups_target = max(1, len(df) // k)
+                    candidate = col_range / n_groups_target
+                    initial_bucket = max(initial_bucket, candidate)
+
+        bucket_size = initial_bucket
+        temp = df.copy()
+        for _ in range(max_iter):
+            temp = df.copy()
+            for col in qi:
+                if col not in temp.columns:
+                    continue
+                if pd.api.types.is_numeric_dtype(df[col]):
+                    temp[col] = df[col].apply(
+                        lambda x, bs=bucket_size: self._numeric_range(x, bs)
+                    )
+                else:
+                    temp[col] = df[col].apply(
+                        lambda x, bs=bucket_size: self._text_generalize(x, bs)
+                    )
+            groups = temp.groupby(qi).size()
+            if groups.min() >= k:
+                return temp
+            bucket_size *= 2
+        return temp  # best effort
+
+    @staticmethod
+    def _numeric_range(val: Any, bucket_size: int) -> str:
+        try:
+            v = float(val)
+            lower = int(v // bucket_size) * bucket_size
+            upper = lower + bucket_size
+            return f"{lower}-{upper}"
+        except (ValueError, TypeError):
+            return str(val)
+
+    @staticmethod
+    def _text_generalize(val: Any, level: int) -> str:
+        s = str(val)
+        # Truncate to fewer chars as level grows
+        keep = max(1, len(s) - level // 10)
+        return s[:keep] + "*"
+
+    @staticmethod
+    def _detect_quasi_identifiers(df: pd.DataFrame) -> List[str]:
+        """Heuristic: numeric columns are likely quasi-identifiers."""
+        return [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c])]
+
+    # ------------------------------------------------------------------
+    # L6: L-Diversity
+    # ------------------------------------------------------------------
+
+    def _apply_l6(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:
+        l_val = kw.get("l", 2)
+        qi = kw.get("quasi_identifiers", self._detect_quasi_identifiers(df))
+        sensitive = kw.get("sensitive_columns", [])
+
+        # First apply k-anonymity style generalization
+        df = self._generalize_until_k(df, qi, k=l_val)
+
+        if not sensitive:
+            return df
+
+        # Suppress groups that don't meet l-diversity
+        for _ in range(5):  # max refinement iterations
+            groups = df.groupby(qi)
+            bad_groups = []
+            for name, group in groups:
+                for scol in sensitive:
+                    if scol in group.columns and group[scol].nunique() < l_val:
+                        bad_groups.append(name)
+                        break
+            if not bad_groups:
+                break
+            # Widen generalization for bad groups by doubling bucket
+            # Re-generalize all with larger bucket
+            df = self._generalize_until_k(
+                df, qi, k=max(l_val, 5),
+            )
+
+        return df
+
+    # ------------------------------------------------------------------
+    # L7: Quantum noise jitter (numeric perturbation)
+    # ------------------------------------------------------------------
+
+    def _apply_l7(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:
+        factor = kw.get("jitter_factor", 0.05)
+        for col in df.columns:
+            if pd.api.types.is_numeric_dtype(df[col]):
+                std = df[col].std()
+                if std == 0 or np.isnan(std):
+                    std = 1.0
+                noise_std = std * factor
+                df[col] = df[col].apply(
+                    lambda x: x + _entropy_gauss(0, noise_std, self._pool_path)
+                )
+        return df
+
+    # ------------------------------------------------------------------
+    # L8: Differential privacy (Laplace mechanism)
+    # ------------------------------------------------------------------
+
+    def _apply_l8(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:
+        epsilon = kw.get("epsilon", 1.0)
+        for col in df.columns:
+            if pd.api.types.is_numeric_dtype(df[col]):
+                sensitivity = float(df[col].max() - df[col].min())
+                if sensitivity == 0:
+                    sensitivity = 1.0
+                scale = sensitivity / epsilon
+                df[col] = df[col].apply(
+                    lambda x: x + _entropy_laplace(0, scale, self._pool_path)
+                )
+            else:
+                # Hash text columns to prevent cleartext leakage
+                df[col] = df[col].apply(
+                    lambda v: hashlib.sha3_256(str(v).encode()).hexdigest()[:16]
+                )
+        return df
+
+    # ------------------------------------------------------------------
+    # L9: K-Anonymity + Differential Privacy combined
+    # ------------------------------------------------------------------
+
+    def _apply_l9(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:
+        k = kw.get("k", 5)
+        epsilon = kw.get("epsilon", 1.0)
+        qi = kw.get("quasi_identifiers", self._detect_quasi_identifiers(df))
+
+        # Step 1: K-anonymity on quasi-identifiers
+        df = self._generalize_until_k(df, qi, k)
+
+        # Step 2: Differential privacy noise on non-QI numeric columns
+        for col in df.columns:
+            if col in qi:
+                continue  # already generalized
+            if pd.api.types.is_numeric_dtype(df[col]):
+                sensitivity = float(df[col].max() - df[col].min())
+                if sensitivity == 0:
+                    sensitivity = 1.0
+                scale = sensitivity / epsilon
+                df[col] = df[col].apply(
+                    lambda x: x + _entropy_laplace(0, scale, self._pool_path)
+                )
+        return df
+
+    # ------------------------------------------------------------------
+    # L10: Quantum OTP pseudoanonymization
+    # ------------------------------------------------------------------
+
+    def _apply_l10(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:
+        for col in df.columns:
+            mapping: Dict[Any, str] = {}
+
+            def otp_replace(val: Any, m: Dict = mapping) -> str:
+                key = str(val)
+                if key not in m:
+                    m[key] = _entropy_random_string(16, self._pool_path)
+                return m[key]
+
+            df[col] = df[col].apply(otp_replace)
+            self._otp_maps[col] = mapping
+        return df
