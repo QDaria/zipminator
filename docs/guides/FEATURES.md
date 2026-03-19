@@ -2,11 +2,11 @@
 
 > **Single Source of Truth** for all pillar statuses. Updated after every code change session.
 >
-> Last verified: 2026-03-17 | Verifier: Claude Code 9-Pillar Sprint (hive-mind orchestration)
+> Last verified: 2026-03-19 | Verifier: Claude Code Beta Launch Sprint (parallel recipes S+T)
 >
-> Percentages code-verified Mar 17 2026 after 9-pillar sprint. All pillars at 100%.
+> Percentages code-verified Mar 19 2026. Pillars 5 and 6 upgraded with production implementations.
 >
-> **Major update**: All 9 pillars closed to 100% code-complete with integration tests.
+> **Mar 19 update**: Pillar 5 now has real 10-level anonymizer (L1-L10 selectable, 64 new tests). Pillar 6 now has real Ollama LLM backend + 18-pattern prompt guard (40 new tests).
 
 ---
 
@@ -120,11 +120,21 @@
 
 ---
 
-## Pillar 5: 10-Level Anonymization Suite (70%)
+## Pillar 5: 10-Level Anonymization Suite (90%)
 
 - **Origins**: Production code from NAV (Norwegian Labour and Welfare Administration), upgraded with PQC + QRNG
-- **What works**: Binary PII detection (present/absent) with 20+ pattern types; regex masking for detected fields; Pandas DataFrame integration; JupyterLab + `zip-pqc` micromamba env; CLI; MCP tools
-- **What's missing**: The "10 levels" of graduated anonymization are not implemented as discrete, selectable levels in code; only binary detection and masking exist. L4-L10 (PQC pseudonymization, generalization, suppression, quantum jitter, differential privacy, k-anonymity) are described but not wired as selectable tiers in the anonymizer engine
+- **What works**: All 10 levels implemented as selectable tiers via `LevelAnonymizer.apply(df, level=N)`:
+  - L1-L3: Regex masking, SHA-3 deterministic hashing, PQC-salted hashing
+  - L4: Reversible tokenization (SQLite-backed TokenStore with detokenize())
+  - L5: K-Anonymity (generalization of quasi-identifiers, verified k>=5)
+  - L6: L-Diversity (sensitive attribute diversity within equivalence classes)
+  - L7: Quantum noise jitter (numerical perturbation using QRNG entropy)
+  - L8: Differential privacy (Laplace mechanism with configurable epsilon, QRNG noise)
+  - L9: Combined K-Anonymity + Differential privacy
+  - L10: Quantum OTP pseudoanonymization from entropy pool
+- **Entropy**: All L7-L10 use PoolProvider with OS fallback (never crash)
+- **Tests**: 64 new level tests + 45 existing integration tests (109 total)
+- **Gap**: CLI `--level N` flag not yet wired; Flutter UI level selector not connected to backend
 - **Integration**: JupyterLab, Pandas DataFrames, CLI, MCP tools
 
 ### File Paths
@@ -142,10 +152,18 @@
 
 ---
 
-## Pillar 6: Q-AI PQC AI Assistant (30%)
+## Pillar 6: Q-AI PQC AI Assistant (60%)
 
-- **What works**: UI shell (Flutter screen with model selector, chat interface); Tauri AI sidebar with config structs; Rust module stubs for cloud_llm and local_llm
-- **What's missing**: No real LLM backend (stub only, returns placeholder responses); no prompt injection defense wired; no PII scanning before send; no local model loading; no PQC tunnel mode for remote LLM calls; AIDefence is config only, not functional
+- **What works**:
+  - OllamaClient for local-first LLM (localhost:11434, models: llama3.2, mistral, phi-3)
+  - PromptGuard with 18 injection patterns across 6 categories (system override, role hijack, delimiter injection, data extraction, encoding bypass, recursive injection)
+  - FastAPI routes: POST /api/ai/chat (streaming), POST /api/ai/summarize, GET /api/ai/models
+  - Graceful fallback when Ollama is offline (helpful error, no crash)
+  - All routes run PromptGuard before forwarding to LLM; injection returns HTTP 400
+  - Flutter UI shell with model selector and chat interface
+  - Tauri AI sidebar with config structs
+- **Tests**: 40 tests (30 prompt guard + 10 LLM service)
+- **What's missing**: PII scanning before send not wired; PQC tunnel mode for remote LLM calls not implemented; local model auto-download; Tauri sidebar not integrated with Ollama backend
 
 ### File Paths
 
