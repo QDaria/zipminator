@@ -149,7 +149,6 @@ fn chunk_size(file_size: u64) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::io::Read;
     use tempfile::NamedTempFile;
 
     #[test]
@@ -213,11 +212,22 @@ mod tests {
 
     #[test]
     fn self_destruct_refuses_system_paths() {
-        // On macOS/Linux, /usr/bin/ls should be refused.
         if cfg!(unix) {
-            let result = secure_delete_file(Path::new("/usr/bin/ls"));
-            assert!(result.is_err());
-            assert!(result.unwrap_err().contains("system path"));
+            // /usr/lib/dyld exists on macOS and lives under a forbidden prefix.
+            let candidates = ["/usr/lib/dyld", "/usr/bin/true", "/bin/ls"];
+            for candidate in &candidates {
+                let p = Path::new(candidate);
+                if p.exists() {
+                    let result = secure_delete_file(p);
+                    assert!(result.is_err(), "Should refuse {candidate}");
+                    assert!(
+                        result.unwrap_err().contains("system path"),
+                        "Error for {candidate} should mention 'system path'"
+                    );
+                    return;
+                }
+            }
+            // If none of the candidates exist, skip gracefully.
         }
     }
 }

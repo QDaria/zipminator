@@ -174,7 +174,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                     <div key={`leg-${node.location}`} className="flex items-center gap-1">
                       <div className="w-1.5 h-1.5 rounded-full" style={{ background: node.color }} />
                       <span
-                        className="text-[7px]"
+                        className="text-[8px]"
                         style={{ color: '#64748B', fontFamily: "'JetBrains Mono', monospace" }}
                       >
                         {node.location.split(',')[0]}
@@ -190,7 +190,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
           <div className="col-span-3 flex flex-col gap-3">
             <div>
               <p
-                className="text-[10px] font-mono tracking-widest uppercase mb-2 opacity-70"
+                className="text-xs font-mono tracking-widest uppercase mb-2 opacity-90"
                 style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
               >
                 QDaria produktportefølje
@@ -205,7 +205,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                   <div
                     key={p.product}
                     className="rounded p-3 flex flex-col gap-1"
-                    style={{ background: `${p.color}06`, border: `1px solid ${p.color}20` }}
+                    style={{ background: `${p.color}06`, border: `1px solid ${p.color}20`, boxShadow: `0 0 16px ${p.color}10` }}
                   >
                     <div className="flex items-center gap-2">
                       <span
@@ -215,14 +215,14 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                         {p.product}
                       </span>
                       <span
-                        className="text-[9px] font-mono px-1.5 py-0.5 rounded"
+                        className="text-[10px] font-mono px-1.5 py-0.5 rounded"
                         style={{ color: p.color, background: `${p.color}15`, fontFamily: "'JetBrains Mono', monospace" }}
                       >
                         {p.tag}
                       </span>
                     </div>
                     <p
-                      className="text-slate-500 text-xs leading-snug"
+                      className="text-slate-400 text-xs leading-snug"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
                       {p.desc}
@@ -234,23 +234,23 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
 
             <div className="flex-1">
               <p
-                className="text-[10px] font-mono tracking-widest uppercase mb-2 opacity-70"
+                className="text-xs font-mono tracking-widest uppercase mb-2 opacity-90"
                 style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Konkurransefortrinn vs. globale aktører
               </p>
               <div
                 className="rounded-lg overflow-hidden"
-                style={{ border: '1px solid rgba(34,211,238,0.12)' }}
+                style={{ border: '1px solid rgba(34,211,238,0.12)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
               >
                 {/* Header */}
                 <div
                   className="grid grid-cols-3 px-3 py-1.5"
                   style={{ background: 'rgba(34,211,238,0.06)', borderBottom: '1px solid rgba(34,211,238,0.1)' }}
                 >
-                  <span className="text-[9px] font-mono text-slate-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Dimensjon</span>
-                  <span className="text-[9px] font-mono text-cyan-400 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>QDaria</span>
-                  <span className="text-[9px] font-mono text-slate-500 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Globale</span>
+                  <span className="text-[10px] font-mono text-slate-400" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Dimensjon</span>
+                  <span className="text-[10px] font-mono text-cyan-400 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>QDaria</span>
+                  <span className="text-[10px] font-mono text-slate-400 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Globale</span>
                 </div>
                 {[
                   { dim: 'Norsk regulatorisk ekspertise', qdaria: '✓✓✓', global: '✗' },
@@ -278,7 +278,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                       {row.qdaria}
                     </span>
                     <span
-                      className="text-slate-500 text-xs font-mono text-center"
+                      className="text-slate-400 text-xs font-mono text-center"
                       style={{ fontFamily: "'JetBrains Mono', monospace" }}
                     >
                       {row.global}

@@ -15,7 +15,7 @@ const TOTAL_MONTHS = 24;
 export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
   return (
     <SlideWrapper>
-      <div className="flex flex-col h-full px-10 py-6">
+      <div className="flex flex-col h-full px-12 py-10">
         <SlideTitle
           eyebrow="Veien videre · Call to Action"
           title="Tre steg til Norges første kvantebank."
@@ -26,10 +26,10 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
         {/* Gantt timeline */}
         <div
           className="rounded-lg p-4 mb-4"
-          style={{ background: 'rgba(34,211,238,0.02)', border: '1px solid rgba(34,211,238,0.1)' }}
+          style={{ background: 'rgba(34,211,238,0.02)', border: '1px solid rgba(34,211,238,0.15)', boxShadow: '0 0 20px rgba(34,211,238,0.06)' }}
         >
           <p
-            className="text-[10px] font-mono tracking-widest uppercase mb-3 opacity-70"
+            className="text-xs font-mono tracking-widest uppercase mb-3 opacity-90"
             style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
           >
             Fremdriftsplan — måneder fra oppstart
@@ -40,7 +40,7 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
               {[0, 3, 6, 9, 12, 15, 18, 21, 24].map((m) => (
                 <div
                   key={m}
-                  className="absolute text-[9px]"
+                  className="absolute text-[10px]"
                   style={{
                     left: `calc(100px + ${(m / TOTAL_MONTHS) * 100}%)`,
                     color: '#475569',
@@ -69,7 +69,7 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
                     style={{ width: 100 }}
                   >
                     <span
-                      className="text-[10px] font-mono"
+                      className="text-xs font-mono"
                       style={{ color: phase.color, fontFamily: "'JetBrains Mono', monospace" }}
                     >
                       Fase {phase.phase}
@@ -88,7 +88,7 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
                       }}
                     >
                       <span
-                        className="text-[9px] font-semibold truncate"
+                        className="text-[10px] font-semibold truncate"
                         style={{ color: phase.color, fontFamily: "'DM Sans', sans-serif" }}
                       >
                         {phase.title}
@@ -108,7 +108,7 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
                   </div>
                   {/* Duration badge */}
                   <span
-                    className="ml-2 text-[9px] font-mono shrink-0"
+                    className="ml-2 text-[10px] font-mono shrink-0"
                     style={{ color: '#475569', fontFamily: "'JetBrains Mono', monospace" }}
                   >
                     {phase.duration}
@@ -125,7 +125,7 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
             <div
               key={phase.phase}
               className="rounded-lg p-4 flex flex-col gap-2"
-              style={{ background: `${phase.color}06`, border: `1px solid ${phase.color}25` }}
+              style={{ background: `${phase.color}08`, border: `1px solid ${phase.color}35`, boxShadow: `0 0 16px ${phase.color}10` }}
             >
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -136,7 +136,7 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
                     {String(phase.phase).padStart(2, '0')}
                   </span>
                   <span
-                    className="text-[10px] font-mono px-2 py-0.5 rounded"
+                    className="text-xs font-mono px-2 py-0.5 rounded"
                     style={{ color: phase.color, background: `${phase.color}15`, fontFamily: "'JetBrains Mono', monospace" }}
                   >
                     {phase.duration}
@@ -175,10 +175,10 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
         <div className="grid grid-cols-2 gap-3">
           <div
             className="rounded-lg p-4"
-            style={{ background: 'rgba(251,113,133,0.05)', border: '1px solid rgba(251,113,133,0.2)' }}
+            style={{ background: 'rgba(251,113,133,0.06)', border: '1px solid rgba(251,113,133,0.3)', boxShadow: '0 0 16px rgba(251,113,133,0.08)' }}
           >
             <p
-              className="text-[10px] font-mono tracking-widest uppercase mb-2 opacity-80"
+              className="text-xs font-mono tracking-widest uppercase mb-2 opacity-90"
               style={{ color: '#FB7185', fontFamily: "'JetBrains Mono', monospace" }}
             >
               Hva SpareBank 1 får
@@ -211,10 +211,10 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
 
           <div
             className="rounded-lg p-4 flex flex-col justify-between"
-            style={{ background: 'rgba(34,211,238,0.05)', border: '1px solid rgba(34,211,238,0.25)' }}
+            style={{ background: 'rgba(34,211,238,0.06)', border: '1px solid rgba(34,211,238,0.35)', boxShadow: '0 0 16px rgba(34,211,238,0.08)' }}
           >
             <p
-              className="text-[10px] font-mono tracking-widest uppercase mb-2 opacity-80"
+              className="text-xs font-mono tracking-widest uppercase mb-2 opacity-90"
               style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
             >
               Kontakt
@@ -239,7 +239,7 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
                 mo@qdaria.com
               </p>
               <p
-                className="text-slate-500 text-xs font-mono"
+                className="text-slate-400 text-xs font-mono"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 qdaria.com · Oslo, Norge

@@ -112,7 +112,7 @@ const EntropyHexStream: React.FC = () => {
       {stream.map((byte, i) => (
         <span
           key={i}
-          className="text-[9px] font-mono px-1 py-0.5 rounded"
+          className="text-xs font-mono px-1 py-0.5 rounded"
           style={{
             fontFamily: "'JetBrains Mono', monospace",
             color: 'rgba(34,211,238,0.7)',
@@ -251,14 +251,14 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
               {/* Commercial params */}
               <div
                 className="rounded-lg overflow-hidden"
-                style={{ border: '1px solid rgba(34,211,238,0.15)' }}
+                style={{ border: '1px solid rgba(34,211,238,0.15)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
               >
                 <div
                   className="px-4 py-2 border-b"
                   style={{ background: 'rgba(34,211,238,0.07)', borderColor: 'rgba(34,211,238,0.15)' }}
                 >
                   <span
-                    className="text-cyan-400 text-[10px] font-mono tracking-wider uppercase"
+                    className="text-cyan-400 text-xs font-mono tracking-wider uppercase"
                     style={{ fontFamily: "'JetBrains Mono', monospace" }}
                   >
                     Kommersielle parametre
@@ -277,10 +277,10 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
               {/* Global precedents */}
               <div
                 className="rounded-lg p-3"
-                style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}
+                style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
               >
                 <p
-                  className="text-amber-400 text-[10px] font-mono mb-2 uppercase tracking-wider"
+                  className="text-amber-400 text-xs font-mono mb-2 uppercase tracking-wider"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   Globale presedenser
@@ -293,7 +293,7 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
                   ].map((p, i) => (
                     <p
                       key={i}
-                      className="text-slate-500 text-xs leading-snug"
+                      className="text-slate-400 text-sm leading-snug"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
                       ↗ {p}
