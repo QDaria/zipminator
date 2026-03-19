@@ -47,7 +47,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
 
   return (
     <SlideWrapper>
-      <div className="flex flex-col h-full px-10 py-6">
+      <div className="flex flex-col h-full px-12 py-10">
         <div className="flex items-start justify-between mb-1">
           <SlideTitle
             eyebrow="Markedsstørrelse · Investmentcase"
@@ -61,19 +61,19 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
         </div>
 
         {/* Charts row */}
-        <div className="grid grid-cols-3 gap-4 mb-4" style={{ height: 200 }}>
+        <div className="grid grid-cols-3 gap-4 mb-4" style={{ height: 240 }}>
           {/* Stacked area chart */}
           <div
             className="col-span-2 rounded-lg p-3 flex flex-col"
-            style={{ background: 'rgba(34,211,238,0.03)', border: '1px solid rgba(34,211,238,0.12)' }}
+            style={{ background: 'rgba(34,211,238,0.03)', border: '1px solid rgba(34,211,238,0.12)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
           >
             <p
-              className="text-[10px] font-mono tracking-widest uppercase mb-2 opacity-70"
+              className="text-xs font-mono tracking-widest uppercase mb-2 opacity-90"
               style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
             >
               PQC + QCaaS markedsstørrelse — {scenario} ($B)
             </p>
-            <ResponsiveContainer width="100%" height={155}>
+            <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={projData} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gradPqc" x1="0" y1="0" x2="0" y2="1">
@@ -127,15 +127,15 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
           {/* Donut chart */}
           <div
             className="rounded-lg p-3 flex flex-col"
-            style={{ background: 'rgba(251,113,133,0.03)', border: '1px solid rgba(251,113,133,0.15)' }}
+            style={{ background: 'rgba(251,113,133,0.03)', border: '1px solid rgba(251,113,133,0.15)', boxShadow: '0 0 20px rgba(251,113,133,0.08)' }}
           >
             <p
-              className="text-[10px] font-mono tracking-widest uppercase mb-1 opacity-70"
+              className="text-xs font-mono tracking-widest uppercase mb-1 opacity-90"
               style={{ color: '#FB7185', fontFamily: "'JetBrains Mono', monospace" }}
             >
               Defensiv vs. offensiv 2032 (MNOK)
             </p>
-            <ResponsiveContainer width="100%" height={165}>
+            <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie
                   data={defensiveVsOffensive}
@@ -173,15 +173,15 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
           {/* CAGR comparison */}
           <div
             className="rounded-lg p-3 flex flex-col"
-            style={{ background: 'rgba(245,158,11,0.03)', border: '1px solid rgba(245,158,11,0.12)' }}
+            style={{ background: 'rgba(245,158,11,0.03)', border: '1px solid rgba(245,158,11,0.12)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
           >
             <p
-              className="text-[10px] font-mono tracking-widest uppercase mb-2 opacity-70"
+              className="text-xs font-mono tracking-widest uppercase mb-2 opacity-90"
               style={{ color: '#F59E0B', fontFamily: "'JetBrains Mono', monospace" }}
             >
               CAGR-sammenligning etter segment
             </p>
-            <ResponsiveContainer width="100%" height={130}>
+            <ResponsiveContainer width="100%" height={160}>
               <BarChart
                 layout="vertical"
                 data={cagrComparison}
@@ -220,10 +220,10 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
           {/* Nordic first-mover table */}
           <div
             className="rounded-lg p-4 flex flex-col"
-            style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.2)' }}
+            style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.2)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
           >
             <p
-              className="text-[10px] font-mono tracking-widest uppercase mb-3 opacity-80"
+              className="text-xs font-mono tracking-widest uppercase mb-3 opacity-90"
               style={{ color: '#F59E0B', fontFamily: "'JetBrains Mono', monospace" }}
             >
               Nordisk first-mover landscape

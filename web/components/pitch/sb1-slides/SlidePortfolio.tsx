@@ -50,7 +50,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
 
   return (
     <SlideWrapper>
-      <div className="flex flex-col h-full px-10 py-8">
+      <div className="flex flex-col h-full px-12 py-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-1">
           <span
@@ -88,7 +88,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                 }}
               >
                 <span
-                  className="text-amber-400 text-[10px] font-mono tracking-wider uppercase"
+                  className="text-amber-400 text-xs font-mono tracking-wider uppercase"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   Porteføljeytelse 2025–2030 · indeks 100 = baseline · scenario: {scenario}
@@ -187,7 +187,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                 }}
               >
                 <span
-                  className="text-cyan-400 text-[10px] font-mono tracking-wider uppercase"
+                  className="text-cyan-400 text-xs font-mono tracking-wider uppercase"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   Dokumentert speedup (x kvantum vs. klassisk) · globale banker
@@ -252,7 +252,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
               }}
             >
               <p
-                className="text-amber-400 text-[10px] font-mono tracking-wider uppercase mb-3"
+                className="text-amber-400 text-xs font-mono tracking-wider uppercase mb-3"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 SB1 Markets / ODIN Use Case
@@ -267,7 +267,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                       ▸
                     </span>
                     <p
-                      className="text-slate-400 text-xs leading-snug"
+                      className="text-slate-400 text-sm leading-snug"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
                       {u}
@@ -289,7 +289,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                 }}
               >
                 <span
-                  className="text-amber-400 text-[10px] font-mono tracking-wider uppercase"
+                  className="text-amber-400 text-xs font-mono tracking-wider uppercase"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   Kommersielle parametre

@@ -4,6 +4,8 @@ import React from 'react';
 import type { Scenario } from '@/lib/sb1-chart-data';
 import { AnimatedCounter } from '../pitch-ui/AnimatedCounter';
 import { SpeakerNotes } from '../pitch-ui/SpeakerNotes';
+import { SlideWrapper } from '../pitch-ui/SB1SlideWrapper';
+import QuantumParticleField from '../QuantumParticleField';
 import { SPEAKER_NOTES } from '@/lib/sb1-speaker-notes';
 
 interface SlideTitleProps {
@@ -12,70 +14,9 @@ interface SlideTitleProps {
 
 export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) => {
   return (
-    <div className="flex flex-col h-full justify-between" style={{ position: 'relative', overflow: 'hidden' }}>
-      {/* Particle/grid background */}
-      <style>{`
-        @keyframes float-dot-1 {
-          0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.25; }
-          50% { transform: translateY(-18px) translateX(8px); opacity: 0.5; }
-        }
-        @keyframes float-dot-2 {
-          0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.15; }
-          33% { transform: translateY(12px) translateX(-10px); opacity: 0.35; }
-          66% { transform: translateY(-8px) translateX(6px); opacity: 0.2; }
-        }
-        @keyframes float-dot-3 {
-          0%, 100% { transform: translateY(0px); opacity: 0.2; }
-          50% { transform: translateY(-24px); opacity: 0.45; }
-        }
-        @keyframes pulse-line {
-          0%, 100% { opacity: 0.04; }
-          50% { opacity: 0.09; }
-        }
-        .particle-dot-1 { animation: float-dot-1 6s ease-in-out infinite; }
-        .particle-dot-2 { animation: float-dot-2 9s ease-in-out infinite; }
-        .particle-dot-3 { animation: float-dot-3 7s ease-in-out infinite; }
-        .particle-dot-4 { animation: float-dot-1 11s ease-in-out infinite 2s; }
-        .particle-dot-5 { animation: float-dot-2 8s ease-in-out infinite 1s; }
-        .particle-dot-6 { animation: float-dot-3 10s ease-in-out infinite 3s; }
-        .bg-grid-pulse { animation: pulse-line 4s ease-in-out infinite; }
-      `}</style>
-
-      {/* Animated grid */}
-      <div
-        className="absolute inset-0 pointer-events-none bg-grid-pulse"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(34,211,238,0.8) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(34,211,238,0.8) 1px, transparent 1px)
-          `,
-          backgroundSize: '80px 80px',
-          opacity: 0.04,
-        }}
-      />
-
-      {/* Floating particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Row 1 */}
-        <div className="particle-dot-1 absolute w-1.5 h-1.5 rounded-full" style={{ background: '#22D3EE', top: '12%', left: '8%' }} />
-        <div className="particle-dot-2 absolute w-1 h-1 rounded-full" style={{ background: '#F59E0B', top: '18%', left: '25%' }} />
-        <div className="particle-dot-3 absolute w-2 h-2 rounded-full" style={{ background: '#22D3EE', top: '8%', left: '55%' }} />
-        <div className="particle-dot-4 absolute w-1 h-1 rounded-full" style={{ background: '#A78BFA', top: '15%', left: '75%' }} />
-        <div className="particle-dot-5 absolute w-1.5 h-1.5 rounded-full" style={{ background: '#FB7185', top: '10%', left: '90%' }} />
-        {/* Row 2 */}
-        <div className="particle-dot-6 absolute w-1 h-1 rounded-full" style={{ background: '#34D399', top: '35%', left: '15%' }} />
-        <div className="particle-dot-1 absolute w-2 h-2 rounded-full" style={{ background: '#22D3EE', top: '40%', left: '45%' }} />
-        <div className="particle-dot-2 absolute w-1 h-1 rounded-full" style={{ background: '#F59E0B', top: '38%', left: '82%' }} />
-        {/* Row 3 */}
-        <div className="particle-dot-3 absolute w-1.5 h-1.5 rounded-full" style={{ background: '#22D3EE', top: '65%', left: '5%' }} />
-        <div className="particle-dot-4 absolute w-1 h-1 rounded-full" style={{ background: '#A78BFA', top: '70%', left: '35%' }} />
-        <div className="particle-dot-5 absolute w-2 h-2 rounded-full" style={{ background: '#34D399', top: '62%', left: '65%' }} />
-        <div className="particle-dot-6 absolute w-1 h-1 rounded-full" style={{ background: '#FB7185', top: '68%', left: '92%' }} />
-        {/* Row 4 */}
-        <div className="particle-dot-1 absolute w-1 h-1 rounded-full" style={{ background: '#22D3EE', top: '85%', left: '18%' }} />
-        <div className="particle-dot-2 absolute w-1.5 h-1.5 rounded-full" style={{ background: '#F59E0B', top: '88%', left: '50%' }} />
-        <div className="particle-dot-3 absolute w-1 h-1 rounded-full" style={{ background: '#22D3EE', top: '82%', left: '78%' }} />
-      </div>
+    <SlideWrapper>
+      {/* Three.js particle background */}
+      <QuantumParticleField />
 
       {/* Radial glows */}
       <div
@@ -88,7 +29,7 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
       />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col h-full px-10 py-10 justify-between">
+      <div className="relative z-10 flex flex-col h-full px-12 py-10 justify-between">
         {/* Top bar */}
         <div className="flex justify-between items-start">
           <div
@@ -100,7 +41,7 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
           >
             <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
             <span
-              className="text-rose-400 text-xs font-mono tracking-wider"
+              className="text-rose-400 text-sm font-mono tracking-wider"
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
               KONFIDENSIELT · TMT INVESTMENT BANKING
@@ -108,13 +49,13 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
           </div>
           <div className="text-right">
             <p
-              className="text-slate-500 text-xs font-mono"
+              className="text-slate-400 text-sm font-mono"
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
               Mars 2026
             </p>
             <p
-              className="text-slate-600 text-xs font-mono"
+              className="text-slate-400 text-sm font-mono"
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
               SpareBank 1 Markets
@@ -128,7 +69,7 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px w-12" style={{ background: '#22D3EE' }} />
             <span
-              className="text-xs font-mono tracking-widest uppercase"
+              className="text-sm font-mono tracking-widest uppercase"
               style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
             >
               Kvanteteknologi for finanssektoren
@@ -161,7 +102,8 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
               className="flex items-center gap-2 px-4 py-2 rounded"
               style={{
                 background: 'rgba(34,211,238,0.08)',
-                border: '1px solid rgba(34,211,238,0.25)',
+                border: '1px solid rgba(34,211,238,0.4)',
+                boxShadow: '0 0 16px rgba(34,211,238,0.1)',
               }}
             >
               <div
@@ -182,7 +124,7 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
               </span>
             </div>
             <div
-              className="text-slate-600 text-lg"
+              className="text-slate-400 text-lg"
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
               ×
@@ -191,7 +133,8 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
               className="flex items-center gap-2 px-4 py-2 rounded"
               style={{
                 background: 'rgba(225,29,72,0.08)',
-                border: '1px solid rgba(225,29,72,0.25)',
+                border: '1px solid rgba(225,29,72,0.4)',
+                boxShadow: '0 0 16px rgba(225,29,72,0.1)',
               }}
             >
               <div
@@ -216,8 +159,13 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
 
         {/* Bottom stats */}
         <div
-          className="grid grid-cols-3 gap-4 pt-6 border-t"
-          style={{ borderColor: 'rgba(34,211,238,0.12)' }}
+          className="grid grid-cols-3 gap-4 pt-6 border-t rounded-lg px-4 py-4"
+          style={{
+            borderColor: 'rgba(34,211,238,0.12)',
+            background: 'rgba(34,211,238,0.03)',
+            boxShadow: '0 0 16px rgba(34,211,238,0.1)',
+            border: '1px solid rgba(34,211,238,0.4)',
+          }}
         >
           <div className="flex flex-col">
             <AnimatedCounter
@@ -227,13 +175,13 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
               style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
             />
             <span
-              className="text-slate-300 text-xs font-medium"
+              className="text-slate-300 text-sm font-medium"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               Business cases
             </span>
             <span
-              className="text-slate-600 text-[10px]"
+              className="text-slate-400 text-xs"
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
               spesialtilpasset SB1
@@ -251,13 +199,13 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
                 {s.value}
               </span>
               <span
-                className="text-slate-300 text-xs font-medium"
+                className="text-slate-300 text-sm font-medium"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
                 {s.label}
               </span>
               <span
-                className="text-slate-600 text-[10px]"
+                className="text-slate-400 text-xs"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 {s.sub}
@@ -271,6 +219,6 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
       <div className="relative z-10">
         <SpeakerNotes notes={SPEAKER_NOTES[0]} />
       </div>
-    </div>
+    </SlideWrapper>
   );
 };

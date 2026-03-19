@@ -61,7 +61,7 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
 
   return (
     <SlideWrapper>
-      <div className="flex flex-col h-full px-10 py-8">
+      <div className="flex flex-col h-full px-12 py-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-1">
           <span
@@ -99,6 +99,7 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
                 style={{
                   background: `rgba(251,113,133,${0.04 + i * 0.02})`,
                   border: '1px solid rgba(251,113,133,0.15)',
+                  boxShadow: '0 0 16px rgba(251,113,133,0.1)',
                 }}
               >
                 <div
@@ -116,14 +117,14 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
                       {p.phase}
                     </span>
                     <span
-                      className="text-slate-500 text-xs font-mono"
+                      className="text-slate-400 text-xs font-mono"
                       style={{ fontFamily: "'JetBrains Mono', monospace" }}
                     >
                       {p.duration}
                     </span>
                   </div>
                   <p
-                    className="text-slate-300 text-xs leading-snug"
+                    className="text-slate-300 text-sm leading-snug"
                     style={{ fontFamily: "'DM Sans', sans-serif" }}
                   >
                     {p.label}
@@ -138,10 +139,11 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
               style={{
                 background: 'rgba(34,211,238,0.04)',
                 border: '1px solid rgba(34,211,238,0.15)',
+                boxShadow: '0 0 16px rgba(34,211,238,0.1)',
               }}
             >
               <p
-                className="text-cyan-400 text-[10px] font-mono tracking-wider uppercase mb-2"
+                className="text-cyan-400 text-xs font-mono tracking-wider uppercase mb-2"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 NIST-standardisert aug. 2024
@@ -154,13 +156,13 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
                 ].map((s) => (
                   <div key={s.std} className="flex justify-between items-center">
                     <span
-                      className="text-cyan-400 text-[10px] font-mono"
+                      className="text-cyan-400 text-xs font-mono"
                       style={{ fontFamily: "'JetBrains Mono', monospace" }}
                     >
                       {s.std}
                     </span>
                     <span
-                      className="text-slate-500 text-[10px]"
+                      className="text-slate-400 text-xs"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
                       {s.desc}
@@ -193,7 +195,7 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
             {/* Horizontal bar chart: kostnad vs besparelse per kategori */}
             <div
               className="rounded-lg overflow-hidden flex-1 flex flex-col"
-              style={{ border: '1px solid rgba(251,113,133,0.2)' }}
+              style={{ border: '1px solid rgba(251,113,133,0.2)', boxShadow: '0 0 16px rgba(251,113,133,0.1)' }}
             >
               <div
                 className="px-4 py-2.5 border-b shrink-0"
@@ -203,14 +205,14 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
                 }}
               >
                 <span
-                  className="text-rose-400 text-[10px] font-mono tracking-wider uppercase"
+                  className="text-rose-400 text-xs font-mono tracking-wider uppercase"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   Business Case · ROI-estimat (MNOK) · Scenario: {scenario}
                 </span>
               </div>
               <div className="flex-1 p-3 min-h-0">
-                <ResponsiveContainer width="100%" height={160}>
+                <ResponsiveContainer width="100%" height={220}>
                   <BarChart
                     data={roiData}
                     layout="vertical"
@@ -279,13 +281,13 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
                   {roiData.map((row) => (
                     <div key={row.label} className="flex justify-between items-center py-1 px-2">
                       <span
-                        className="text-slate-500 text-[10px]"
+                        className="text-slate-400 text-xs"
                         style={{ fontFamily: "'DM Sans', sans-serif" }}
                       >
                         {row.label}
                       </span>
                       <span
-                        className="text-emerald-400 text-[10px] font-mono"
+                        className="text-emerald-400 text-xs font-mono"
                         style={{ fontFamily: "'JetBrains Mono', monospace" }}
                       >
                         ROI: {row.roi.toLocaleString('nb-NO')}%
@@ -302,10 +304,11 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
               style={{
                 background: 'rgba(245,158,11,0.05)',
                 border: '1px solid rgba(245,158,11,0.2)',
+                boxShadow: '0 0 16px rgba(245,158,11,0.1)',
               }}
             >
               <p
-                className="text-amber-400 text-[10px] font-mono mb-1 uppercase tracking-wider"
+                className="text-amber-400 text-xs font-mono mb-1 uppercase tracking-wider"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Rigetti-fordel

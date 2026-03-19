@@ -57,9 +57,8 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
   const [scenario, setScenario] = useState<Scenario>(initialScenario);
 
   return (
-    <div className="flex flex-col h-full">
       <SlideWrapper>
-        <div className="flex flex-col h-full px-10 py-8">
+        <div className="flex flex-col h-full px-12 py-10">
           {/* Header row */}
           <div className="flex items-center justify-between mb-1">
             <span
@@ -276,6 +275,5 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
 
         <SpeakerNotes notes={SPEAKER_NOTES[7]} />
       </SlideWrapper>
-    </div>
   );
 };

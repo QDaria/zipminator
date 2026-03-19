@@ -21,38 +21,17 @@ export const Navigation: React.FC<NavigationProps> = ({
 }) => {
   return (
     <div
-      className="flex items-center justify-between px-8 py-4 border-t select-none"
+      className="flex items-center justify-between px-6 py-3 border-t select-none shrink-0"
       style={{
         borderColor: 'rgba(34,211,238,0.12)',
-        background: 'rgba(2,8,23,0.9)',
+        background: 'rgba(2,8,23,0.95)',
         backdropFilter: 'blur(12px)',
       }}
     >
-      {/* Left: branding */}
-      <div className="flex items-center gap-3">
-        <div
-          className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold"
-          style={{
-            background: 'rgba(34,211,238,0.15)',
-            border: '1px solid rgba(34,211,238,0.4)',
-            color: '#22D3EE',
-            fontFamily: "'JetBrains Mono', monospace",
-          }}
-        >
-          Q
-        </div>
-        <span
-          className="text-slate-500 text-xs font-mono hidden sm:block"
-          style={{ fontFamily: "'JetBrains Mono', monospace" }}
-        >
-          QDaria × SpareBank 1 · Konfidensielt
-        </span>
-      </div>
-
       {/* Center: slide dots + title */}
-      <div className="flex flex-col items-center gap-1.5">
+      <div className="flex items-center gap-4 flex-1 justify-center">
         <span
-          className="text-slate-500 text-[10px] font-mono text-center hidden md:block"
+          className="text-slate-400 text-xs font-mono hidden md:block"
           style={{ fontFamily: "'JetBrains Mono', monospace" }}
         >
           {slideTitle}
@@ -64,14 +43,15 @@ export const Navigation: React.FC<NavigationProps> = ({
               onClick={() => onGoTo(i)}
               className="rounded-full transition-all duration-300 hover:opacity-100"
               style={{
-                width: i === current ? '20px' : '6px',
-                height: '6px',
+                width: i === current ? '24px' : '8px',
+                height: '8px',
                 background: i === current
                   ? '#22D3EE'
                   : i < current
                   ? 'rgba(34,211,238,0.4)'
-                  : 'rgba(148,163,184,0.2)',
+                  : 'rgba(148,163,184,0.25)',
                 opacity: i === current ? 1 : 0.7,
+                boxShadow: i === current ? '0 0 8px rgba(34,211,238,0.5)' : 'none',
               }}
             />
           ))}
@@ -81,19 +61,19 @@ export const Navigation: React.FC<NavigationProps> = ({
       {/* Right: controls */}
       <div className="flex items-center gap-3">
         <span
-          className="text-slate-600 text-xs font-mono"
+          className="text-slate-400 text-sm font-mono"
           style={{ fontFamily: "'JetBrains Mono', monospace" }}
         >
           {String(current + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
         </span>
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           <button
             onClick={onPrev}
             disabled={current === 0}
-            className="w-8 h-8 rounded flex items-center justify-center transition-all duration-200 disabled:opacity-20"
+            className="w-9 h-9 rounded flex items-center justify-center transition-all duration-200 disabled:opacity-20 text-sm"
             style={{
               background: 'rgba(34,211,238,0.1)',
-              border: '1px solid rgba(34,211,238,0.2)',
+              border: '1px solid rgba(34,211,238,0.3)',
               color: '#22D3EE',
             }}
           >
@@ -102,10 +82,10 @@ export const Navigation: React.FC<NavigationProps> = ({
           <button
             onClick={onNext}
             disabled={current === total - 1}
-            className="w-8 h-8 rounded flex items-center justify-center transition-all duration-200 disabled:opacity-20"
+            className="w-9 h-9 rounded flex items-center justify-center transition-all duration-200 disabled:opacity-20 text-sm"
             style={{
               background: 'rgba(34,211,238,0.1)',
-              border: '1px solid rgba(34,211,238,0.2)',
+              border: '1px solid rgba(34,211,238,0.3)',
               color: '#22D3EE',
             }}
           >

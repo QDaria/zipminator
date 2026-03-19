@@ -44,9 +44,8 @@ interface SlideRiskModelingProps {
 
 export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: _scenario }) => {
   return (
-    <div className="flex flex-col h-full">
       <SlideWrapper>
-        <div className="flex flex-col h-full px-10 py-8">
+        <div className="flex flex-col h-full px-12 py-10">
           {/* Header row */}
           <div className="flex items-center justify-between mb-1">
             <span
@@ -87,15 +86,15 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
             {/* VaR Convergence: ComposedChart with log X-axis */}
             <div
               className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(52,211,153,0.04)', border: '1px solid rgba(52,211,153,0.18)' }}
+              style={{ background: 'rgba(52,211,153,0.04)', border: '1px solid rgba(52,211,153,0.18)', boxShadow: '0 0 20px rgba(52,211,153,0.08)' }}
             >
               <p
-                className="text-emerald-400 text-[10px] font-mono tracking-wider uppercase mb-3"
+                className="text-emerald-400 text-xs font-mono tracking-wider uppercase mb-3"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 VaR Konvergensrate (feil %)
               </p>
-              <ResponsiveContainer width="100%" height={150}>
+              <ResponsiveContainer width="100%" height={220}>
                 <ComposedChart data={varConvergence} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis
@@ -146,15 +145,15 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
             {/* SB1 Entity Exposure: horizontal bar chart */}
             <div
               className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.15)' }}
+              style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.15)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
             >
               <p
-                className="text-cyan-400 text-[10px] font-mono tracking-wider uppercase mb-3"
+                className="text-cyan-400 text-xs font-mono tracking-wider uppercase mb-3"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 SB1 Utlånsvolum (mrd. NOK)
               </p>
-              <ResponsiveContainer width="100%" height={150}>
+              <ResponsiveContainer width="100%" height={220}>
                 <BarChart
                   data={sb1EntityExposure}
                   layout="vertical"
@@ -188,15 +187,15 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
             {/* Capital Allocation: donut PieChart */}
             <div
               className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(167,139,250,0.04)', border: '1px solid rgba(167,139,250,0.15)' }}
+              style={{ background: 'rgba(167,139,250,0.04)', border: '1px solid rgba(167,139,250,0.15)', boxShadow: '0 0 20px rgba(167,139,250,0.08)' }}
             >
               <p
-                className="text-violet-400 text-[10px] font-mono tracking-wider uppercase mb-3"
+                className="text-violet-400 text-xs font-mono tracking-wider uppercase mb-3"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Kapitalallokering (%)
               </p>
-              <ResponsiveContainer width="100%" height={150}>
+              <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
                   <Pie
                     data={capitalAllocation}
@@ -228,10 +227,10 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div
               className="rounded-lg p-4"
-              style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.18)' }}
+              style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.18)', boxShadow: '0 0 20px rgba(52,211,153,0.08)' }}
             >
               <p
-                className="text-emerald-400 text-[10px] font-mono tracking-wider uppercase mb-2"
+                className="text-emerald-400 text-xs font-mono tracking-wider uppercase mb-2"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Teknisk use case
@@ -245,13 +244,13 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
                 ].map((u) => (
                   <div key={u.label} className="flex flex-col">
                     <span
-                      className="text-emerald-400 text-[10px] font-mono"
+                      className="text-emerald-400 text-xs font-mono"
                       style={{ fontFamily: "'JetBrains Mono', monospace" }}
                     >
                       {u.label}
                     </span>
                     <p
-                      className="text-slate-400 text-xs leading-snug"
+                      className="text-slate-400 text-sm leading-snug"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
                       {u.desc}
@@ -263,14 +262,14 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
 
             <div
               className="rounded-lg overflow-hidden"
-              style={{ border: '1px solid rgba(245,158,11,0.15)' }}
+              style={{ border: '1px solid rgba(245,158,11,0.15)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
             >
               <div
                 className="px-4 py-2.5 border-b"
                 style={{ background: 'rgba(245,158,11,0.06)', borderColor: 'rgba(245,158,11,0.15)' }}
               >
                 <span
-                  className="text-amber-400 text-[10px] font-mono tracking-wider uppercase"
+                  className="text-amber-400 text-xs font-mono tracking-wider uppercase"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   SB1 eksponeringer + regulatorisk driver
@@ -284,7 +283,7 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
               </div>
               <div className="px-4 py-2">
                 <p
-                  className="text-slate-400 text-xs leading-relaxed"
+                  className="text-slate-400 text-sm leading-relaxed"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
                   Basel IV (CRR3) krever mer granulære risikomodeller fra 2025. Quantum MC gir SpareBank 1 en strukturell presisjonsmarginal over konkurrentene.
@@ -296,6 +295,5 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
 
         <SpeakerNotes notes={SPEAKER_NOTES[6]} />
       </SlideWrapper>
-    </div>
   );
 };

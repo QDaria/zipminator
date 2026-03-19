@@ -30,6 +30,7 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #1327 | 11:51 PM | ✅ | Q-Mesh pillar status updated to 85% with NVS binary provisioner | ~272 |
 | #1314 | 11:49 PM | ✅ | Test summary documentation updated to current counts | ~295 |
 | #1313 | " | ✅ | Updated Python test count to 776 in documentation | ~241 |
 | #1312 | " | ✅ | Updated Q-Mesh documentation with NVS binary provisioner details | ~327 |

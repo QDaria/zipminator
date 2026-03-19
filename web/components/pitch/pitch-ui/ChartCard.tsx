@@ -21,26 +21,27 @@ export const ChartCard: React.FC<ChartCardProps> = ({
     <div
       className={`rounded-lg overflow-hidden ${className}`}
       style={{
-        background: `${accentColor}06`,
-        border: `1px solid ${accentColor}25`,
+        background: `${accentColor}0A`,
+        border: `1px solid ${accentColor}40`,
+        boxShadow: `0 0 16px ${accentColor}10`,
       }}
     >
       <div
-        className="px-4 py-2.5 flex items-center justify-between border-b"
+        className="px-4 py-3 flex items-center justify-between border-b"
         style={{
-          borderColor: `${accentColor}20`,
-          background: `${accentColor}08`,
+          borderColor: `${accentColor}30`,
+          background: `${accentColor}0C`,
         }}
       >
         <span
-          className="text-xs font-mono tracking-wider uppercase"
+          className="text-sm font-mono tracking-wider uppercase"
           style={{ color: accentColor, fontFamily: "'JetBrains Mono', monospace" }}
         >
           {title}
         </span>
         {source && (
           <span
-            className="text-slate-600 text-[10px] font-mono"
+            className="text-slate-500 text-xs font-mono"
             style={{ fontFamily: "'JetBrains Mono', monospace" }}
           >
             src: {source}

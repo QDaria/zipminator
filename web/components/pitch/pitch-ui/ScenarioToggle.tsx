@@ -20,7 +20,8 @@ export const ScenarioToggle: React.FC<ScenarioToggleProps> = ({ value, onChange 
       className="inline-flex items-center rounded-lg p-0.5 gap-0.5"
       style={{
         background: 'rgba(15,22,41,0.8)',
-        border: '1px solid rgba(34,211,238,0.15)',
+        border: '1px solid rgba(34,211,238,0.25)',
+        boxShadow: '0 0 12px rgba(34,211,238,0.06)',
       }}
     >
       {scenarios.map((s) => {
@@ -29,7 +30,7 @@ export const ScenarioToggle: React.FC<ScenarioToggleProps> = ({ value, onChange 
           <button
             key={s.key}
             onClick={() => onChange(s.key)}
-            className="px-3 py-1.5 rounded-md text-xs font-mono transition-all duration-200"
+            className="px-3 py-1.5 rounded-md text-sm font-mono transition-all duration-200"
             style={{
               fontFamily: "'JetBrains Mono', monospace",
               background: active ? `${s.color}20` : 'transparent',

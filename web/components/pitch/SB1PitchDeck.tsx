@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { Navigation } from './pitch-ui/SB1Navigation';
-import { SlideWrapper } from './pitch-ui/SB1SlideWrapper';
+import { SB1Sidebar } from './pitch-ui/SB1Sidebar';
 import { SlideTitle as SlideTitleSlide } from './sb1-slides/SlideTitle';
 import { SlideThreat } from './sb1-slides/SlideThreat';
 import { SlideDORA } from './sb1-slides/SlideDORA';
@@ -79,7 +79,7 @@ export const SB1PitchDeck: React.FC = () => {
 
   return (
     <div
-      className="flex flex-col"
+      className="flex"
       style={{
         width: '100%',
         height: '100vh',
@@ -87,25 +87,34 @@ export const SB1PitchDeck: React.FC = () => {
         fontFamily: "'DM Sans', sans-serif",
       }}
     >
-      <div className="flex-1 overflow-hidden relative">
-        <div
-          className="absolute inset-0 transition-opacity duration-150"
-          style={{ opacity: isTransitioning ? 0 : 1 }}
-        >
-          <SlideWrapper>
-            <CurrentSlide scenario={scenario} onScenarioChange={setScenario} />
-          </SlideWrapper>
-        </div>
-      </div>
-
-      <Navigation
+      {/* Sidebar */}
+      <SB1Sidebar
+        slides={SLIDES.map(s => ({ id: s.id, title: s.title }))}
         current={current}
-        total={SLIDES.length}
-        onPrev={prev}
-        onNext={next}
         onGoTo={goTo}
-        slideTitle={SLIDES[current].title}
       />
+
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 overflow-hidden relative">
+          <div
+            className="absolute inset-0 transition-opacity duration-150"
+            style={{ opacity: isTransitioning ? 0 : 1 }}
+          >
+            {/* No outer SlideWrapper — each slide manages its own */}
+            <CurrentSlide scenario={scenario} onScenarioChange={setScenario} />
+          </div>
+        </div>
+
+        <Navigation
+          current={current}
+          total={SLIDES.length}
+          onPrev={prev}
+          onNext={next}
+          onGoTo={goTo}
+          slideTitle={SLIDES[current].title}
+        />
+      </div>
     </div>
   );
 };

@@ -43,7 +43,7 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
 
   return (
     <SlideWrapper>
-      <div className="flex flex-col h-full px-10 py-8">
+      <div className="flex flex-col h-full px-12 py-10">
         <SlideTitle
           eyebrow="Trusselbilde · Q-Day"
           title="RSA er allerede kompromittert."
@@ -81,16 +81,17 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
             style={{
               background: 'rgba(251,113,133,0.04)',
               border: '1px solid rgba(251,113,133,0.15)',
+              boxShadow: '0 0 16px rgba(251,113,133,0.1)',
             }}
           >
             <span
-              className="text-rose-400 text-[10px] font-mono tracking-wider uppercase mb-1"
+              className="text-rose-400 text-xs font-mono tracking-wider uppercase mb-1"
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
               Risikoradar
             </span>
-            <div className="flex-1 min-h-0" style={{ height: 90 }}>
-              <ResponsiveContainer width="100%" height={90}>
+            <div className="flex-1 min-h-0" style={{ height: 120 }}>
+              <ResponsiveContainer width="100%" height={120}>
                 <RadarChart data={threatRadarData} margin={{ top: 4, right: 8, bottom: 4, left: 8 }}>
                   <PolarGrid stroke="rgba(251,113,133,0.2)" />
                   <PolarAngleAxis
@@ -123,6 +124,7 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
             style={{
               background: 'rgba(251,113,133,0.05)',
               border: '1px solid rgba(251,113,133,0.2)',
+              boxShadow: '0 0 16px rgba(251,113,133,0.1)',
             }}
           >
             <div className="flex items-center gap-2 mb-4">
@@ -172,7 +174,7 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
               ))}
             </div>
             <p
-              className="text-slate-500 text-xs mt-auto pt-3 leading-relaxed"
+              className="text-slate-400 text-sm mt-auto pt-3 leading-relaxed"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               Finanstilsynet registrerte{' '}
@@ -187,6 +189,7 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
             style={{
               background: 'rgba(245,158,11,0.05)',
               border: '1px solid rgba(245,158,11,0.2)',
+              boxShadow: '0 0 16px rgba(245,158,11,0.1)',
             }}
           >
             <div className="flex items-center justify-between mb-1">
@@ -205,7 +208,7 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
             </h3>
 
             <div className="flex-1 min-h-0">
-              <ResponsiveContainer width="100%" height={160}>
+              <ResponsiveContainer width="100%" height={240}>
                 <AreaChart
                   data={chartData}
                   margin={{ top: 4, right: 8, left: -20, bottom: 0 }}
@@ -317,13 +320,13 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
                   }}
                 >
                   <span
-                    className="text-slate-400 text-xs"
+                    className="text-slate-400 text-sm"
                     style={{ fontFamily: "'DM Sans', sans-serif" }}
                   >
                     {row.label}
                   </span>
                   <span
-                    className="text-xs font-mono font-semibold"
+                    className="text-sm font-mono font-semibold"
                     style={{
                       color: row.danger ? '#FB7185' : row.highlight ? '#F59E0B' : '#F1F5F9',
                       fontFamily: "'JetBrains Mono', monospace",

@@ -12,11 +12,11 @@ interface MetricCardProps {
 }
 
 const colorMap = {
-  cyan:    { text: '#22D3EE', border: 'rgba(34,211,238,0.2)',  bg: 'rgba(34,211,238,0.05)'  },
-  amber:   { text: '#F59E0B', border: 'rgba(245,158,11,0.2)', bg: 'rgba(245,158,11,0.05)' },
-  rose:    { text: '#FB7185', border: 'rgba(251,113,133,0.2)',bg: 'rgba(251,113,133,0.05)' },
-  emerald: { text: '#34D399', border: 'rgba(52,211,153,0.2)', bg: 'rgba(52,211,153,0.05)'  },
-  slate:   { text: '#94A3B8', border: 'rgba(148,163,184,0.2)',bg: 'rgba(148,163,184,0.05)' },
+  cyan:    { text: '#22D3EE', border: 'rgba(34,211,238,0.35)',  bg: 'rgba(34,211,238,0.08)',  glow: 'rgba(34,211,238,0.12)'  },
+  amber:   { text: '#F59E0B', border: 'rgba(245,158,11,0.35)', bg: 'rgba(245,158,11,0.08)', glow: 'rgba(245,158,11,0.12)' },
+  rose:    { text: '#FB7185', border: 'rgba(251,113,133,0.35)',bg: 'rgba(251,113,133,0.08)', glow: 'rgba(251,113,133,0.12)' },
+  emerald: { text: '#34D399', border: 'rgba(52,211,153,0.35)', bg: 'rgba(52,211,153,0.08)',  glow: 'rgba(52,211,153,0.12)'  },
+  slate:   { text: '#94A3B8', border: 'rgba(148,163,184,0.3)', bg: 'rgba(148,163,184,0.06)', glow: 'rgba(148,163,184,0.08)' },
 };
 
 export const MetricCard: React.FC<MetricCardProps> = ({
@@ -28,7 +28,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   source,
 }) => {
   const c = colorMap[color];
-  const valueSize = size === 'lg' ? 'text-4xl lg:text-5xl' : size === 'md' ? 'text-3xl lg:text-4xl' : 'text-2xl';
+  const valueSize = size === 'lg' ? 'text-4xl lg:text-5xl' : size === 'md' ? 'text-3xl lg:text-4xl' : 'text-2xl lg:text-3xl';
 
   return (
     <div
@@ -36,6 +36,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       style={{
         background: c.bg,
         border: `1px solid ${c.border}`,
+        boxShadow: `0 0 20px ${c.glow}, inset 0 1px 0 ${c.border}`,
       }}
     >
       <div
@@ -49,14 +50,14 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         {value}
       </span>
       <span
-        className="text-slate-300 text-sm font-medium leading-snug mt-1"
+        className="text-slate-200 text-sm font-medium leading-snug mt-1"
         style={{ fontFamily: "'DM Sans', sans-serif" }}
       >
         {label}
       </span>
       {sublabel && (
         <span
-          className="text-slate-500 text-xs leading-snug"
+          className="text-slate-400 text-xs leading-snug"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           {sublabel}
@@ -64,7 +65,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       )}
       {source && (
         <span
-          className="text-slate-600 text-[10px] mt-1 font-mono"
+          className="text-slate-500 text-[10px] mt-1 font-mono"
           style={{ fontFamily: "'JetBrains Mono', monospace" }}
         >
           src: {source}
@@ -93,7 +94,7 @@ export const DataRow: React.FC<DataRowProps> = ({
     }`}
   >
     <span
-      className="text-slate-400 text-sm"
+      className="text-slate-300 text-sm"
       style={{ fontFamily: "'DM Sans', sans-serif" }}
     >
       {label}

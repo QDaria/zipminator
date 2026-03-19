@@ -94,7 +94,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
 
   return (
     <SlideWrapper>
-      <div className="flex flex-col h-full px-10 py-8">
+      <div className="flex flex-col h-full px-12 py-10">
         <SlideTitle
           eyebrow="Regulatorisk ramme · DORA"
           title="Compliance er ikke valgfritt lenger."
@@ -108,10 +108,11 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
           style={{
             background: 'rgba(245,158,11,0.04)',
             border: '1px solid rgba(245,158,11,0.15)',
+            boxShadow: '0 0 16px rgba(245,158,11,0.1)',
           }}
         >
           <p
-            className="text-amber-400 text-[10px] font-mono tracking-wider uppercase mb-3"
+            className="text-amber-400 text-xs font-mono tracking-wider uppercase mb-3"
             style={{ fontFamily: "'JetBrains Mono', monospace" }}
           >
             Regulatorisk tidslinje 2023–2035
@@ -126,7 +127,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                   style={{ background: CATEGORY_COLORS[key] }}
                 />
                 <span
-                  className="text-[9px] font-mono"
+                  className="text-[10px] font-mono"
                   style={{ color: '#64748B', fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   {label}
@@ -154,7 +155,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                   style={{ left: `${pct}%`, top: 36, transform: 'translateX(-50%)' }}
                 >
                   <span
-                    className="text-[9px] font-mono"
+                    className="text-[10px] font-mono"
                     style={{ color: '#475569', fontFamily: "'JetBrains Mono', monospace" }}
                   >
                     {year}
@@ -183,7 +184,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                 >
                   {/* Label above/at */}
                   <div
-                    className="text-[8px] font-mono whitespace-nowrap mb-0.5 px-1 rounded"
+                    className="text-[9px] font-mono whitespace-nowrap mb-0.5 px-1 rounded"
                     style={{
                       color: item.highlight ? '#F59E0B' : item.danger ? '#FB7185' : color,
                       fontFamily: "'JetBrains Mono', monospace",
@@ -233,7 +234,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
             {timelineItems.filter((e) => e.done || e.highlight).slice(0, 5).map((item, i) => (
               <span
                 key={i}
-                className="text-[9px] font-mono"
+                className="text-[10px] font-mono"
                 style={{
                   color: item.highlight ? '#F59E0B' : CATEGORY_COLORS[item.category],
                   fontFamily: "'JetBrains Mono', monospace",
@@ -255,6 +256,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                 style={{
                   background: 'rgba(245,158,11,0.04)',
                   border: '1px solid rgba(245,158,11,0.15)',
+                  boxShadow: '0 0 16px rgba(245,158,11,0.1)',
                 }}
               >
                 <div className="flex items-center justify-between mb-1.5">
@@ -275,7 +277,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                   <Tag color={a.tagColor}>{a.tag}</Tag>
                 </div>
                 <p
-                  className="text-slate-400 text-xs leading-relaxed"
+                  className="text-slate-400 text-sm leading-relaxed"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
                   {a.text}
@@ -296,7 +298,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
             >
               <div className="flex items-center justify-between mb-3">
                 <span
-                  className="text-rose-400 text-[10px] font-mono tracking-wider uppercase"
+                  className="text-rose-400 text-xs font-mono tracking-wider uppercase"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   DORA-bøter per enhet
@@ -304,7 +306,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                 <ScenarioToggle value={fineScenario} onChange={setFineScenario} />
               </div>
 
-              <ResponsiveContainer width="100%" height={120}>
+              <ResponsiveContainer width="100%" height={180}>
                 <BarChart
                   data={fineData}
                   margin={{ top: 0, right: 4, left: -16, bottom: 0 }}
@@ -374,13 +376,13 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
               }}
             >
               <span
-                className="text-cyan-400 text-[10px] font-mono tracking-wider uppercase"
+                className="text-cyan-400 text-xs font-mono tracking-wider uppercase"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 SpareBank 1 Fordel
               </span>
               <p
-                className="text-slate-300 text-xs leading-relaxed mt-2"
+                className="text-slate-300 text-sm leading-relaxed mt-2"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
                 Én implementering via{' '}
