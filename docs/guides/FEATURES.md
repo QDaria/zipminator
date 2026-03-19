@@ -21,13 +21,13 @@
 
 | # | Pillar | Overall | Crypto | Tests | UI | Integration | Notes |
 |---|--------|:-------:|:------:|:-----:|:--:|:-----------:|-------|
-| 1 | **Quantum Vault** | **95%** | Done | Done | Done | Partial | Self-destruct Tauri UI wiring incomplete |
+| 1 | **Quantum Vault** | **100%** | Done | Done | Done | Done | DoD 5220.22-M 3-pass self-destruct wired to Tauri UI (6 tests) |
 | 2 | **PQC Messenger** | **85%** | Done | Done | Done | Partial | MessageStore + offline queue done; e2e needs running API |
 | 3 | **Quantum VoIP** | **90%** | Done | Done | Done | Partial | PQ-SRTP frame encryption + encrypted voicemail storage (33 tests) |
 | 4 | **Q-VPN** | **90%** | Done | Done | Done | Partial | Packet wrapping has shortcuts; no mobile VPN service |
 | 5 | **10-Level Anonymizer** | **95%** | Done | Done | Done | Done | All L1-L10 verified; CLI `--level N` wired |
-| 6 | **Q-AI Assistant** | **75%** | Partial | Done | Done | Partial | Prompt guard + Ollama + PII scan before send done; PQC tunnel missing |
-| 7 | **Quantum Mail** | **60%** | Done | Done | Done | Planned | PQC envelope roundtrip done; SMTP/IMAP transport not deployed |
+| 6 | **Q-AI Assistant** | **85%** | Done | Done | Done | Partial | Prompt guard + Ollama + PII scan + PQC tunnel done (45 AI tests) |
+| 7 | **Quantum Mail** | **75%** | Done | Done | Done | Partial | PQC envelope + SMTP transport + server-side self-destruct TTL (15 tests) |
 | 8 | **ZipBrowser** | **85%** | Done | Done | Done | Done | AI sidebar integrated (Recipe W); WebView limitation (ADR documented) |
 | 9 | **Q-Mesh (RuView)** | **85%** | Done | Done | Planned | Partial | HKDF entropy bridge + NVS binary provisioner done (50 tests); RuView repo link pending |
 
@@ -35,15 +35,14 @@
 
 ---
 
-## Pillar 1: Quantum Vault & Self-Destruct Storage (95%)
+## Pillar 1: Quantum Vault & Self-Destruct Storage (100%)
 
 - **Encryption**: AES-256-GCM with keys derived from ML-KEM-768 (FIPS 203)
 - **Key seeding**: 32-byte seeds from real IBM Quantum entropy (`quantum_entropy_pool.bin`)
 - **Formats**: CSV, JSON, Parquet, Excel via Pandas integration
 - **Compression**: AES-encrypted ZIP archives with configurable passwords
-- **Self-destruct**: Timer-based, DoD 5220.22-M 3-pass overwrite (zeros, ones, random), scheduled destruction, memory clearing
+- **Self-destruct**: Timer-based, DoD 5220.22-M 3-pass overwrite (zeros, ones, random), scheduled destruction, memory clearing. **Tauri UI wired**: `self_destruct_file` command with two-step confirmation, progress spinner, system path safety guard (6 tests)
 - **PII scanning**: Auto-detects 20+ PII types before encryption with risk assessment
-- **Gap**: Self-destruct UI wiring in Tauri desktop incomplete
 
 ### File Paths
 
@@ -154,7 +153,7 @@
 
 ---
 
-## Pillar 6: Q-AI PQC AI Assistant (75%)
+## Pillar 6: Q-AI PQC AI Assistant (85%)
 
 - **What works**:
   - OllamaClient for local-first LLM (localhost:11434, models: llama3.2, mistral, phi-3)
@@ -165,8 +164,9 @@
   - All routes run PromptGuard then PII scan before forwarding to LLM
   - Flutter UI shell with model selector and chat interface
   - Tauri AI sidebar with config structs
-- **Tests**: 67 tests (30 prompt guard + 10 LLM service + 27 PII guard)
-- **What's missing**: PQC tunnel mode for remote LLM calls not implemented; local model auto-download; Tauri sidebar not integrated with Ollama backend
+- **PQC tunnel**: `PQCTunnel` class with ephemeral ML-KEM-768 keypair per session. Encrypts prompts with AES-256-GCM, wraps in JSON envelope `{ct, kem_ct, nonce}`. Activated via `X-PQC-Tunnel: enabled` header. 18 tunnel tests
+- **Tests**: 85 tests (30 prompt guard + 10 LLM service + 27 PII guard + 18 PQC tunnel)
+- **What's missing**: Local model auto-download; Tauri sidebar not integrated with Ollama backend; streaming mode PQC wrapping
 
 ### File Paths
 
@@ -180,11 +180,11 @@
 
 ---
 
-## Pillar 7: Quantum-Secure Email (60%)
+## Pillar 7: Quantum-Secure Email (75%)
 
 - **Domain**: `@zipminator.zip` (`.zip` = real Google TLD, brand-perfect)
-- **What works**: Envelope crypto (ML-KEM-768 key exchange, AES-256-GCM at rest, QRNG-seeded per-message keys); Rust `email_crypto.rs` encrypt/decrypt roundtrip; config files for Postfix/Dovecot exist
-- **What's missing**: No SMTP/IMAP transport deployed or tested end-to-end; self-destruct timer is UI-only (no server-side enforcement); attachment anonymization references L1-L10 but anonymizer only does binary detection (see Pillar 5); PII scanning not wired into email pipeline
+- **What works**: Envelope crypto (ML-KEM-768 key exchange, AES-256-GCM at rest, QRNG-seeded per-message keys); Rust `email_crypto.rs` encrypt/decrypt roundtrip; config files for Postfix/Dovecot; SMTP transport with PQC bridge; server-side self-destruct TTL via `X-Zipminator-TTL` header (parses seconds, sets `self_destruct_at`, existing `purge_loop` handles deletion); Docker compose integration with GreenMail + mail-transport service; 15 transport tests (6 PQC bridge + 9 storage/SMTP requiring Docker)
+- **What's missing**: Production SMTP/IMAP deployment (Docker stack ready but needs hosting); attachment anonymization not wired into email pipeline; PII scanning not wired into compose flow
 
 ### File Paths
 
@@ -490,11 +490,11 @@ Settings screen: theme toggle (dark/light), Rust bridge version, crypto engine i
 | Rust NIST | 5 | `cargo test -p nist-kat` |
 | Rust bench | 17 | `cargo test -p zipminator-bench` |
 | Rust mesh | 50 | `cargo test -p zipminator-mesh` |
-| **Rust total** | **451** | `cargo test --workspace` |
+| **Rust total** | **457** | `cargo test --workspace` |
 | Flutter widget | 23 | `cd app && flutter test` |
 | Web vitest | 30 | `cd web && npm test` |
 | Mobile Expo | 267/274 | `cd mobile && npm test` |
-| Python + integration | 776 | `micromamba activate zip-pqc && pytest tests/` |
+| Python + integration | 800 | `micromamba activate zip-pqc && pytest tests/` |
 
 ---
 
