@@ -56,6 +56,31 @@ services:
       interval: 10s
       retries: 10
 
+  mail-transport:
+    build:
+      context: ./email/transport
+      dockerfile: Dockerfile
+    ports:
+      - "2525:2525"
+      - "1143:1143"
+      - "8025:8025"
+    environment:
+      DATABASE_URL: "postgresql://test:test@postgres:5432/zipminator_test"
+      SMTP_HOST: "0.0.0.0"
+      SMTP_PORT: "2525"
+      IMAP_HOST: "0.0.0.0"
+      IMAP_PORT: "1143"
+      KEYDIR_URL: "http://greenmail:8080"
+      GREENMAIL_SMTP_HOST: "greenmail"
+      GREENMAIL_SMTP_PORT: "3025"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8025/health')"]
+      interval: 5s
+      retries: 10
+
   esp32-mock:
     build:
       context: ./tests/integration/esp32_mock

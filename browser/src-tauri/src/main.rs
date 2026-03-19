@@ -161,6 +161,8 @@ fn main() {
             pqc::pqc_self_test,
             // ── PQC Scanning ─────────────────────────────────────────────
             commands::scan_pqc_endpoint,
+            // ── Self-destruct (Pillar 1: Quantum Vault) ─────────────────
+            commands::self_destruct_file,
             // ── AI Sidebar (Domain 4) ───────────────────────────────────────
             ai::sidebar::ai_chat,
             ai::sidebar::ai_summarize,

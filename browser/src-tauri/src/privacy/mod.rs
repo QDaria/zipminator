@@ -31,6 +31,7 @@ pub mod cookie_rotation;
 pub mod entropy;
 pub mod fingerprint;
 pub mod password_manager;
+pub mod self_destruct;
 pub mod session;
 pub mod telemetry_blocker;
 

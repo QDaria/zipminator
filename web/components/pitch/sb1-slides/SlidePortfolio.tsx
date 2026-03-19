@@ -78,7 +78,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
             {/* Area chart: klassisk vs kvantum performance */}
             <div
               className="rounded-lg overflow-hidden flex-1 flex flex-col"
-              style={{ border: '1px solid rgba(245,158,11,0.2)' }}
+              style={{ border: '1px solid rgba(245,158,11,0.2)', boxShadow: '0 0 16px rgba(245,158,11,0.1)' }}
             >
               <div
                 className="px-4 py-2.5 border-b shrink-0"
@@ -95,7 +95,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                 </span>
               </div>
               <div className="flex-1 p-3 min-h-0">
-                <ResponsiveContainer width="100%" height={160}>
+                <ResponsiveContainer width="100%" height={220}>
                   <AreaChart
                     data={perfData}
                     margin={{ top: 4, right: 8, bottom: 4, left: 0 }}
@@ -177,7 +177,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
             {/* Speedup bar chart */}
             <div
               className="rounded-lg overflow-hidden"
-              style={{ border: '1px solid rgba(34,211,238,0.12)' }}
+              style={{ border: '1px solid rgba(34,211,238,0.12)', boxShadow: '0 0 16px rgba(34,211,238,0.1)' }}
             >
               <div
                 className="px-4 py-2 border-b"
@@ -194,7 +194,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                 </span>
               </div>
               <div className="p-3">
-                <ResponsiveContainer width="100%" height={90}>
+                <ResponsiveContainer width="100%" height={130}>
                   <BarChart
                     data={speedupComparisons}
                     margin={{ top: 4, right: 8, bottom: 4, left: 0 }}
@@ -249,6 +249,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
               style={{
                 background: 'rgba(245,158,11,0.05)',
                 border: '1px solid rgba(245,158,11,0.2)',
+                boxShadow: '0 0 16px rgba(245,158,11,0.1)',
               }}
             >
               <p
@@ -279,7 +280,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
 
             <div
               className="rounded-lg overflow-hidden"
-              style={{ border: '1px solid rgba(245,158,11,0.15)' }}
+              style={{ border: '1px solid rgba(245,158,11,0.15)', boxShadow: '0 0 16px rgba(245,158,11,0.1)' }}
             >
               <div
                 className="px-4 py-2.5 border-b"

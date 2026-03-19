@@ -81,7 +81,7 @@ const TOOLTIP_STYLE = {
 export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _scenario }) => {
   return (
     <SlideWrapper>
-      <div className="flex flex-col h-full px-10 py-8">
+      <div className="flex flex-col h-full px-12 py-10">
         <SlideTitle
           eyebrow="Konkurransebilde · Global banksektor"
           title="80% av verdens 50 største banker er i gang."
@@ -101,6 +101,9 @@ export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _s
                   border: b.isTarget
                     ? '1px solid rgba(245,158,11,0.4)'
                     : '1px solid rgba(34,211,238,0.1)',
+                  boxShadow: b.isTarget
+                    ? '0 0 16px rgba(245,158,11,0.15)'
+                    : '0 0 12px rgba(34,211,238,0.06)',
                 }}
               >
                 {b.isTarget && (
@@ -121,14 +124,14 @@ export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _s
                         {b.bank}
                       </span>
                       <span
-                        className="text-slate-600 text-[10px] font-mono shrink-0"
+                        className="text-slate-400 text-xs font-mono shrink-0"
                         style={{ fontFamily: "'JetBrains Mono', monospace" }}
                       >
                         {b.region}
                       </span>
                     </div>
                     <span
-                      className="text-[10px] font-mono px-1.5 py-0.5 rounded shrink-0"
+                      className="text-xs font-mono px-1.5 py-0.5 rounded shrink-0"
                       style={{
                         color: b.tagColor,
                         background: `${b.tagColor}15`,
@@ -140,7 +143,7 @@ export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _s
                     </span>
                   </div>
                   <p
-                    className="text-[11px] leading-snug"
+                    className="text-sm leading-snug"
                     style={{
                       color: b.isTarget ? '#D97706' : '#64748B',
                       fontFamily: "'DM Sans', sans-serif",
@@ -159,6 +162,7 @@ export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _s
             style={{
               background: 'rgba(15,22,41,0.6)',
               border: '1px solid rgba(34,211,238,0.12)',
+              boxShadow: '0 0 16px rgba(34,211,238,0.08)',
             }}
           >
             <div
@@ -166,7 +170,7 @@ export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _s
               style={{ borderColor: 'rgba(34,211,238,0.1)' }}
             >
               <span
-                className="text-cyan-400 text-[10px] font-mono tracking-wider uppercase"
+                className="text-cyan-400 text-xs font-mono tracking-wider uppercase"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Kvantum-modenhetsprofil · Konkurrentanalyse

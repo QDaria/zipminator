@@ -294,6 +294,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
               style={{
                 background: 'rgba(251,113,133,0.04)',
                 border: '1px solid rgba(251,113,133,0.15)',
+                boxShadow: '0 0 16px rgba(251,113,133,0.1)',
               }}
             >
               <div className="flex items-center justify-between mb-3">
@@ -373,6 +374,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
               style={{
                 background: 'rgba(34,211,238,0.05)',
                 border: '1px solid rgba(34,211,238,0.2)',
+                boxShadow: '0 0 16px rgba(34,211,238,0.1)',
               }}
             >
               <span

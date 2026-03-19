@@ -25,7 +25,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
 
   return (
     <SlideWrapper>
-      <div className="flex flex-col h-full px-10 py-6">
+      <div className="flex flex-col h-full px-12 py-10">
         <SlideTitle
           eyebrow="QDaria AS · Posisjonering"
           title="Norges eneste kvanteselskap. Første kommersielle kvantedatamaskin."
@@ -45,10 +45,10 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
             {/* Org tree */}
             <div
               className="rounded-lg p-4 flex flex-col items-center"
-              style={{ background: 'rgba(34,211,238,0.03)', border: '1px solid rgba(34,211,238,0.12)' }}
+              style={{ background: 'rgba(34,211,238,0.03)', border: '1px solid rgba(34,211,238,0.12)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
             >
               <p
-                className="text-[10px] font-mono tracking-widest uppercase mb-3 self-start opacity-70"
+                className="text-xs font-mono tracking-widest uppercase mb-3 self-start opacity-90"
                 style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Konsernstruktur
@@ -68,13 +68,13 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                   {hq.name}
                 </p>
                 <p
-                  className="text-[10px]"
+                  className="text-xs"
                   style={{ color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   {hq.location}
                 </p>
                 <p
-                  className="text-[10px]"
+                  className="text-xs"
                   style={{ color: '#64748B', fontFamily: "'DM Sans', sans-serif" }}
                 >
                   {hq.purpose}
@@ -102,13 +102,13 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                       }}
                     >
                       <p
-                        className="text-[9px] font-semibold leading-tight"
+                        className="text-[10px] font-semibold leading-tight"
                         style={{ color: node.color, fontFamily: "'JetBrains Mono', monospace" }}
                       >
                         {node.location.split(',')[0]}
                       </p>
                       <p
-                        className="text-[8px] leading-tight mt-0.5"
+                        className="text-[9px] leading-tight mt-0.5"
                         style={{ color: '#64748B', fontFamily: "'DM Sans', sans-serif" }}
                       >
                         {node.purpose}
@@ -125,7 +125,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
               style={{ background: 'rgba(34,211,238,0.02)', border: '1px solid rgba(34,211,238,0.1)' }}
             >
               <p
-                className="text-[10px] font-mono tracking-widest uppercase mb-2 opacity-70"
+                className="text-xs font-mono tracking-widest uppercase mb-2 opacity-90"
                 style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Globalt fotavtrykk — 6 jurisdiksjoner

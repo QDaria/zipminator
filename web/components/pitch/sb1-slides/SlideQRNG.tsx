@@ -136,9 +136,8 @@ interface SlideQRNGProps {
 
 export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => {
   return (
-    <div className="flex flex-col h-full">
       <SlideWrapper>
-        <div className="flex flex-col h-full px-10 py-8">
+        <div className="flex flex-col h-full px-12 py-10">
           {/* Header row */}
           <div className="flex items-center justify-between mb-1">
             <span
@@ -181,11 +180,11 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
             {/* Left: entropy visualization */}
             <div
               className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.18)' }}
+              style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.18)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
             >
               <div className="flex items-center justify-between mb-3">
                 <p
-                  className="text-cyan-400 text-[10px] font-mono tracking-wider uppercase"
+                  className="text-cyan-400 text-xs font-mono tracking-wider uppercase"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   Live entropifeed — kvantum RNG
@@ -203,7 +202,7 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
               </div>
               <EntropyGrid />
               <p
-                className="text-slate-600 text-[9px] font-mono mt-2"
+                className="text-slate-400 text-[10px] font-mono mt-2"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Simulert QRNG-strøm · Rigetti hardware i produksjon
@@ -215,10 +214,10 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
               {/* Use cases */}
               <div
                 className="rounded-lg p-4"
-                style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.15)' }}
+                style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.15)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
               >
                 <p
-                  className="text-cyan-400 text-[10px] font-mono tracking-wider uppercase mb-2"
+                  className="text-cyan-400 text-xs font-mono tracking-wider uppercase mb-2"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   SB1 QRNG Use Cases
@@ -233,13 +232,13 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
                   ].map((u) => (
                     <div key={u.app} className="flex flex-col">
                       <span
-                        className="text-cyan-400 text-[10px] font-mono"
+                        className="text-cyan-400 text-xs font-mono"
                         style={{ fontFamily: "'JetBrains Mono', monospace" }}
                       >
                         {u.app}
                       </span>
                       <p
-                        className="text-slate-500 text-xs leading-snug"
+                        className="text-slate-400 text-sm leading-snug"
                         style={{ fontFamily: "'DM Sans', sans-serif" }}
                       >
                         {u.desc}
@@ -308,6 +307,5 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
 
         <SpeakerNotes notes={SPEAKER_NOTES[8]} />
       </SlideWrapper>
-    </div>
   );
 };

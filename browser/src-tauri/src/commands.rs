@@ -564,6 +564,32 @@ pub async fn scan_pqc_endpoint(host: String, port: u16) -> Result<PqcScanResult,
 }
 
 // ---------------------------------------------------------------------------
+// Self-destruct (Pillar 1: Quantum Vault)
+// ---------------------------------------------------------------------------
+
+/// Securely destroy a file using DoD 5220.22-M 3-pass overwrite.
+///
+/// Pass 1: zeros, Pass 2: ones, Pass 3: cryptographic random.
+/// Then delete and verify removal.
+#[tauri::command]
+pub async fn self_destruct_file(
+    file_path: String,
+) -> Result<zipbrowser::privacy::self_destruct::SelfDestructResult, String> {
+    if file_path.is_empty() {
+        return Err("File path must not be empty".to_string());
+    }
+
+    let path = std::path::PathBuf::from(&file_path);
+
+    // Run the blocking I/O on a spawn_blocking thread.
+    tokio::task::spawn_blocking(move || {
+        zipbrowser::privacy::self_destruct::secure_delete_file(&path)
+    })
+    .await
+    .map_err(|e| format!("Task join error: {e}"))?
+}
+
+// ---------------------------------------------------------------------------
 // Input validation helpers
 // ---------------------------------------------------------------------------
 

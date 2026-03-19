@@ -20,6 +20,7 @@ import asyncio
 import email
 import logging
 import os
+from datetime import datetime, timedelta, timezone
 from email.policy import default as email_policy
 from typing import Any
 
@@ -73,6 +74,17 @@ class PQCSmtpHandler(AsyncMessage):
         recipient_header: str = message.get("To", "")
         subject: str = message.get("Subject", "")
 
+        # Parse self-destruct TTL from custom header (seconds)
+        ttl_header = message.get("X-Zipminator-TTL", "")
+        self_destruct_at: datetime | None = None
+        if ttl_header:
+            try:
+                ttl_seconds = int(ttl_header.strip())
+                if ttl_seconds > 0:
+                    self_destruct_at = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
+            except ValueError:
+                log.warning("smtp: invalid X-Zipminator-TTL header: %s", ttl_header)
+
         # Collect all RCPT TO addresses from the envelope (envelope_recipients
         # attribute is set by aiosmtpd on the message object).
         recipients: list[str] = []
@@ -99,6 +111,7 @@ class PQCSmtpHandler(AsyncMessage):
                 subject=subject,
                 body_bytes=body_bytes,
                 aad=aad,
+                self_destruct_at=self_destruct_at,
             )
 
     async def _process_for_recipient(
@@ -108,6 +121,7 @@ class PQCSmtpHandler(AsyncMessage):
         subject: str,
         body_bytes: bytes,
         aad: bytes,
+        self_destruct_at: datetime | None = None,
     ) -> None:
         pk_b64 = await _lookup_recipient_pk(recipient)
         if pk_b64 is None:
@@ -132,6 +146,7 @@ class PQCSmtpHandler(AsyncMessage):
                 subject=subject,
                 encrypted_body=encrypted_body,
                 envelope_data=envelope_dict,
+                self_destruct_at=self_destruct_at,
             )
             log.info("smtp: stored email %s for %s", email_id, recipient)
         except Exception as exc:

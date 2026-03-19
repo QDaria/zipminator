@@ -110,15 +110,15 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
             {/* Fraud loss history: two lines */}
             <div
               className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(251,113,133,0.04)', border: '1px solid rgba(251,113,133,0.18)' }}
+              style={{ background: 'rgba(251,113,133,0.04)', border: '1px solid rgba(251,113,133,0.18)', boxShadow: '0 0 20px rgba(251,113,133,0.08)' }}
             >
               <p
-                className="text-rose-400 text-[10px] font-mono tracking-wider uppercase mb-3"
+                className="text-rose-400 text-xs font-mono tracking-wider uppercase mb-3"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Svindel tap vs. forhindret (MNOK)
               </p>
-              <ResponsiveContainer width="100%" height={160}>
+              <ResponsiveContainer width="100%" height={220}>
                 <LineChart
                   data={fraudLossHistory}
                   margin={{ top: 4, right: 8, bottom: 4, left: -10 }}
@@ -166,15 +166,15 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
             {/* ML Accuracy Radar */}
             <div
               className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(167,139,250,0.04)', border: '1px solid rgba(167,139,250,0.18)' }}
+              style={{ background: 'rgba(167,139,250,0.04)', border: '1px solid rgba(167,139,250,0.18)', boxShadow: '0 0 20px rgba(167,139,250,0.08)' }}
             >
               <p
-                className="text-violet-400 text-[10px] font-mono tracking-wider uppercase mb-3"
+                className="text-violet-400 text-xs font-mono tracking-wider uppercase mb-3"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 ML-nøyaktighet: Klassisk vs. Kvantum
               </p>
-              <ResponsiveContainer width="100%" height={160}>
+              <ResponsiveContainer width="100%" height={220}>
                 <RadarChart data={radarData} cx="50%" cy="50%" outerRadius={55}>
                   <PolarGrid stroke="rgba(255,255,255,0.1)" />
                   <PolarAngleAxis
@@ -208,15 +208,15 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
             {/* Fraud savings scenario: area chart */}
             <div
               className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(52,211,153,0.04)', border: '1px solid rgba(52,211,153,0.18)' }}
+              style={{ background: 'rgba(52,211,153,0.04)', border: '1px solid rgba(52,211,153,0.18)', boxShadow: '0 0 20px rgba(52,211,153,0.08)' }}
             >
               <p
-                className="text-emerald-400 text-[10px] font-mono tracking-wider uppercase mb-3"
+                className="text-emerald-400 text-xs font-mono tracking-wider uppercase mb-3"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Svindeltap-prognose — {scenario.charAt(0).toUpperCase() + scenario.slice(1)} (MNOK)
               </p>
-              <ResponsiveContainer width="100%" height={160}>
+              <ResponsiveContainer width="100%" height={220}>
                 <AreaChart
                   data={fraudSavings[scenario]}
                   margin={{ top: 4, right: 8, bottom: 4, left: -10 }}

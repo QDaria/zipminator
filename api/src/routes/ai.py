@@ -14,6 +14,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from zipminator.ai.prompt_guard import PromptGuard
+from zipminator.ai.pqc_tunnel import PQCTunnel
 from zipminator.crypto.pii_scanner import PIIScanner
 from api.src.services.llm_service import OllamaClient
 
@@ -94,12 +95,23 @@ def _scan_pii(messages: List[ChatMessage]) -> None:
 async def ai_chat(
     req: ChatRequest,
     x_pii_scan: Optional[str] = Header(None, alias="X-PII-Scan"),
+    x_pqc_tunnel: Optional[str] = Header(None, alias="X-PQC-Tunnel"),
 ):
-    """Chat with the local LLM. Prompt guard and PII scan run first."""
+    """Chat with the local LLM. Prompt guard and PII scan run first.
+
+    When the ``X-PQC-Tunnel: enabled`` header is present, the response payload
+    is wrapped in a PQC (ML-KEM-768) envelope before being returned.  This
+    protects the response even if the transport layer is compromised.
+    """
     _scan_messages(req.messages)
 
     if x_pii_scan != "skip":
         _scan_pii(req.messages)
+
+    # Initialise PQC tunnel when requested
+    tunnel: Optional[PQCTunnel] = None
+    if x_pqc_tunnel == "enabled":
+        tunnel = PQCTunnel()
 
     if req.stream:
         async def _gen():
@@ -119,10 +131,19 @@ async def ai_chat(
     if "error" in result:
         return ChatResponse(error=result["error"])
 
-    return ChatResponse(
+    response = ChatResponse(
         message=result.get("message"),
         model=result.get("model"),
     )
+
+    if tunnel is not None:
+        envelope = tunnel.encrypt(response.model_dump_json())
+        return {
+            "pqc_envelope": envelope,
+            "pqc_public_key": __import__("base64").b64encode(tunnel.public_key).decode("ascii"),
+        }
+
+    return response
 
 
 @router.post("/api/ai/summarize", response_model=ChatResponse, tags=["ai"])

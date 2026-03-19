@@ -245,7 +245,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
                 >
                   <div className="flex items-center gap-2">
                     <span
-                      className="text-[10px] font-mono"
+                      className="text-xs font-mono"
                       style={{ color: '#64748B', fontFamily: "'JetBrains Mono', monospace" }}
                     >
                       {row.country}
@@ -258,7 +258,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
                     </span>
                   </div>
                   <span
-                    className="text-[10px]"
+                    className="text-xs"
                     style={{
                       color: row.done ? '#34D399' : row.highlight ? '#F59E0B' : '#64748B',
                       fontFamily: "'DM Sans', sans-serif",
