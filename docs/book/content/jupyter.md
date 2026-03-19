@@ -5,10 +5,12 @@ Zipminator provides JupyterLab magics and interactive widgets for exploring post
 ## Installation
 
 ```bash
-pip install zipminator[jupyter]
+micromamba activate zip-pqc
+uv pip install 'zipminator[jupyter]'
 ```
 
-This installs JupyterLab, ipywidgets, and plotly as additional dependencies.
+This installs JupyterLab, ipywidgets, ipython, and plotly as additional dependencies.
+Optionally run `maturin develop` to build the faster Rust backend.
 
 ## Loading the Extension
 
@@ -35,8 +37,8 @@ This creates two variables in the notebook namespace:
 
 ```python
 %keygen
-print(f"Public key: {len(pk.to_bytes())} bytes")
-print(f"Secret key: {len(sk.to_bytes())} bytes")
+print(f"Public key: {len(pk)} bytes")
+print(f"Secret key: {len(sk)} bytes")
 ```
 
 ### `%encrypt`
@@ -71,11 +73,11 @@ Creates:
 
 # Generate keypair
 %keygen
-print(f"PK: {len(pk.to_bytes())} bytes, SK: {len(sk.to_bytes())} bytes")
+print(f"PK: {len(pk)} bytes, SK: {len(sk)} bytes")
 
 # Encrypt (encapsulate)
 %encrypt pk
-print(f"CT: {len(ct.to_bytes())} bytes")
+print(f"CT: {len(ct)} bytes")
 print(f"Shared secret: {shared_secret.hex()[:32]}...")
 
 # Decrypt (decapsulate)
@@ -158,7 +160,7 @@ decapsulate(ct, sk)
 from zipminator import keypair
 
 pk, sk = keypair()
-pk_bytes = pk.to_bytes()
+pk_bytes = pk.to_bytes() if hasattr(pk, 'to_bytes') else pk
 
 # Display first 64 bytes in a formatted hex view
 for i in range(0, min(64, len(pk_bytes)), 16):

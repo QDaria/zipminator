@@ -229,3 +229,91 @@ class PIIScannerWidget:
     def show(self) -> None:
         controls = widgets.HBox([self.df_name_input, self.scan_btn])
         display(widgets.VBox([controls, self.output]))
+
+
+# ---------------------------------------------------------------------------
+# Convenience functions (documented in docs/book/content/jupyter.md)
+# ---------------------------------------------------------------------------
+
+
+def key_size_comparison() -> None:
+    """Display an interactive Plotly bar chart comparing PQC key sizes.
+
+    Compares ML-KEM-768 against RSA-2048, RSA-4096, and other PQC candidates.
+    """
+    _require_widgets()
+    try:
+        import plotly.graph_objects as go
+    except ImportError:
+        raise ImportError(
+            "plotly is required for key_size_comparison. "
+            "Install with: pip install 'zipminator[jupyter]'"
+        )
+
+    algorithms = [
+        "RSA-2048", "RSA-4096", "ML-KEM-512", "ML-KEM-768", "ML-KEM-1024",
+    ]
+    pk_sizes = [256, 512, 800, 1184, 1568]
+    sk_sizes = [256, 512, 1632, 2400, 3168]
+    ct_sizes = [256, 512, 768, 1088, 1568]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(name="Public Key", x=algorithms, y=pk_sizes, marker_color="#6366f1"))
+    fig.add_trace(go.Bar(name="Secret Key", x=algorithms, y=sk_sizes, marker_color="#10b981"))
+    fig.add_trace(go.Bar(name="Ciphertext", x=algorithms, y=ct_sizes, marker_color="#f59e0b"))
+    fig.update_layout(
+        title="Key & Ciphertext Sizes (bytes)",
+        barmode="group",
+        template="plotly_dark",
+        height=400,
+        font=dict(family="JetBrains Mono, monospace"),
+    )
+    fig.show()
+
+
+def entropy_monitor() -> None:
+    """Display the quantum entropy pool status widget."""
+    EntropyMonitorWidget().show()
+
+
+def anonymization_demo() -> None:
+    """Display an interactive anonymization level demo widget.
+
+    Creates a sample DataFrame and lets users scan it for PII.
+    """
+    _require_widgets()
+    try:
+        import pandas as pd
+    except ImportError:
+        raise ImportError(
+            "pandas is required for anonymization_demo. "
+            "Install with: pip install 'zipminator[data]'"
+        )
+
+    from IPython.display import display as ipy_display
+
+    sample_df = pd.DataFrame({
+        "name": ["Alice Johnson", "Bob Smith", "Carol Williams"],
+        "email": ["alice@example.com", "bob@corp.net", "carol@hospital.org"],
+        "phone": ["555-123-4567", "555-987-6543", "555-246-8135"],
+        "ssn": ["123-45-6789", "987-65-4321", "456-78-9012"],
+    })
+
+    ipy_display(HTML(
+        '<div style="font-family:JetBrains Mono,monospace;color:#6366f1;'
+        'font-weight:bold;margin-bottom:8px">Sample PII DataFrame:</div>'
+    ))
+    ipy_display(sample_df)
+
+    # Store in kernel namespace so PIIScannerWidget can find it
+    try:
+        from IPython import get_ipython
+        ip = get_ipython()
+        if ip is not None:
+            ip.user_ns["demo_df"] = sample_df
+    except Exception:
+        pass
+
+    scanner_widget = PIIScannerWidget()
+    scanner_widget.df_name_input.value = "demo_df"
+    scanner_widget.show()

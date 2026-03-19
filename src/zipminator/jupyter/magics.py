@@ -66,7 +66,7 @@ class ZipminatorMagics(Magics):
         elapsed_ms = (time.perf_counter() - t0) * 1000
 
         self.shell.user_ns["ct"] = ct
-        self.shell.user_ns["ss"] = ss
+        self.shell.user_ns["shared_secret"] = ss
 
         display(HTML(fmt.render_encapsulate_result(ct, ss, elapsed_ms)))
 
@@ -96,7 +96,7 @@ class ZipminatorMagics(Magics):
         ss = pqc.decapsulate(sk, ct)
         elapsed_ms = (time.perf_counter() - t0) * 1000
 
-        self.shell.user_ns["ss_dec"] = ss
+        self.shell.user_ns["recovered"] = ss
 
         display(HTML(fmt.render_decapsulate_result(ss, elapsed_ms)))
 

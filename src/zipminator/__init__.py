@@ -15,12 +15,27 @@ __version__ = "0.5.0b1"
 from zipminator.crypto.quantum_random import QuantumRandom
 from zipminator.crypto.pqc import PQC
 
-# Try importing Rust bindings
+# Try importing Rust bindings; fall back to pure-Python PQC wrapper
 try:
     from zipminator._core import keypair, encapsulate, decapsulate
     RUST_AVAILABLE = True
 except ImportError:
     RUST_AVAILABLE = False
+
+    def keypair(seed=None):
+        """Generate ML-KEM-768 keypair (Python fallback)."""
+        pqc = PQC(level=768)
+        return pqc.generate_keypair(seed=seed)
+
+    def encapsulate(pk):
+        """Encapsulate a shared secret (Python fallback)."""
+        pqc = PQC(level=768)
+        return pqc.encapsulate(pk)
+
+    def decapsulate(ct, sk):
+        """Decapsulate a shared secret (Python fallback)."""
+        pqc = PQC(level=768)
+        return pqc.decapsulate(sk, ct)
 
 
 def __getattr__(name):

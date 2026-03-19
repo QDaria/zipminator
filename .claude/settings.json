@@ -135,6 +135,7 @@
   },
   "enabledPlugins": {
     "autofix-bot@claude-plugins-official": true,
-    "terraform@claude-plugins-official": true
+    "terraform@claude-plugins-official": true,
+    "stagehand@claude-plugins-official": true
   }
 }
