@@ -1,17 +1,21 @@
-# How to Create the Actual Zipminator Video
+# Zipminator Video Creation Guide
+
+This document explains how to create the Zipminator promotional video using the provided specification file.
+
+## How to Create the Actual Zipminator Video
 
 The specification file contains detailed scene descriptions. Here's how to turn it into an actual video:
 
 ## 🎬 AI Video Generation Tools
 
-### Recommended Tools:
+### Recommended Tools
 
-1. **Runway Gen-2** (https://runwayml.com)
+1. **Runway Gen-2** (<https://runwayml.com>)
    - Best for cinematic quality
    - Upload scene prompts from the specification
    - Generate 4-second clips, then concatenate
 
-2. **Pika Labs** (https://pika.art)
+2. **Pika Labs** (<https://pika.art>)
    - Good for motion graphics
    - Text-to-video from scene descriptions
 
@@ -19,7 +23,7 @@ The specification file contains detailed scene descriptions. Here's how to turn 
    - Open source option
    - Requires local setup
 
-### Using the Specification:
+### Using the Specification
 
 ```bash
 # Each scene in video-output/zipminator-video-specification.json has:
@@ -56,11 +60,13 @@ For each of the 9 scenes:
 Use the `voiceover` field from each scene:
 
 **Tools:**
-- **ElevenLabs** (https://elevenlabs.io) - AI voice generation
+
+- **ElevenLabs** (<https://elevenlabs.io>) - AI voice generation
 - **Professional voice artist** on Fiverr/Upwork
 - Voice style: "Professional, authoritative female"
 
 **Script:**
+
 ```
 Scene 1: "Introducing Zipminator from QDaria - The world's most sophisticated cybersecurity suite."
 Scene 2: "The only platform combining multi-provider quantum entropy from Rigetti Computing and IBM Quantum with military-grade encryption."
@@ -74,9 +80,10 @@ Scene 2: "The only platform combining multi-provider quantum entropy from Rigett
 **Duration:** 90 seconds
 
 **Music Sources:**
-- Epidemic Sound (https://epidemicsound.com)
-- Artlist (https://artlist.io)
-- AudioJungle (https://audiojungle.net)
+
+- Epidemic Sound (<https://epidemicsound.com>)
+- Artlist (<https://artlist.io>)
+- AudioJungle (<https://audiojungle.net>)
 
 Search for: "corporate technology", "quantum computing", "futuristic"
 
@@ -90,6 +97,7 @@ Use video editing software:
 4. **iMovie** (Simple, free on Mac)
 
 **Assembly Steps:**
+
 ```
 1. Import all 9 scene videos
 2. Arrange on timeline sequentially
@@ -121,11 +129,13 @@ Style: Ultra-modern, professional, 4K, 60fps, cinematic lighting."
 ## 💡 Alternative: Hire a Professional
 
 **Where to find video producers:**
+
 - **Fiverr** - Budget-friendly ($100-$500)
 - **Upwork** - Mid-range ($500-$2000)
 - **Production House** - Premium ($5000+)
 
 **What to provide:**
+
 - The `zipminator-video-specification.json` file
 - Logos from `public/logos/`
 - `docs/VIDEO_SCRIPT.md` for reference
@@ -141,6 +151,7 @@ Style: Ultra-modern, professional, 4K, 60fps, cinematic lighting."
 ## 🎯 Deliverables
 
 Once complete, you should have:
+
 - ✅ Full 4K version (3840x2160) - 90 seconds
 - ✅ HD version (1920x1080)
 - ✅ Social media square (1080x1080)
