@@ -131,6 +131,25 @@ coverage.xml
 .python-version
 
 # -----------------------------------------------------------------------------
+# Flutter / Mobile Build Artifacts
+# -----------------------------------------------------------------------------
+app/android/.gradle/
+app/ios/Pods/
+app/ios/Runner.xcodeproj/xcuserdata/
+app/ios/Runner.xcworkspace/xcuserdata/
+app/macos/Pods/
+app/macos/Runner.xcodeproj/xcuserdata/
+app/macos/Runner.xcworkspace/xcuserdata/
+app/macos/Flutter/ephemeral/
+**/*.xcuserdatad/
+**/Pods/
+**/ephemeral/
+**/Podfile.lock
+**/pubspec.lock
+**/*.xcworkspace/xcshareddata/
+**/xcuserdata/
+
+# -----------------------------------------------------------------------------
 # Node.js / Next.js
 # -----------------------------------------------------------------------------
 node_modules/
