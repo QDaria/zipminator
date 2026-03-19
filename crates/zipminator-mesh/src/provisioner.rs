@@ -1,15 +1,23 @@
 //! MeshProvisioner: derives a complete key set for ESP32 mesh provisioning.
 //!
 //! Takes an entropy pool path and mesh network ID, derives beacon PSK + frame
-//! SipHash key, and serializes to JSON for flashing onto ESP32-S3 nodes.
+//! SipHash key, and serializes to JSON or NVS-compatible binary for flashing
+//! onto ESP32-S3 nodes.
 
 use std::path::Path;
 
 use serde::Serialize;
+use sha2::{Digest, Sha256};
 
 use crate::entropy_bridge::{EntropyBridge, EntropyBridgeError, FilePoolSource};
 use crate::mesh_key::MeshKey;
 use crate::siphash_key::SipHashKey;
+
+/// Magic bytes identifying a Zipminator NVS mesh binary blob.
+pub const NVS_MAGIC: &[u8; 6] = b"ZMESH\x01";
+
+/// Size of the SHA-256 checksum appended to the NVS binary.
+const NVS_CHECKSUM_SIZE: usize = 32;
 
 /// A complete key set for one mesh provisioning epoch.
 #[derive(Debug, Serialize)]
@@ -84,6 +92,64 @@ impl MeshProvisioner {
         serde_json::to_string_pretty(&key_set).map_err(|e| {
             EntropyBridgeError::PoolNotAccessible(format!("JSON serialization failed: {e}"))
         })
+    }
+
+    /// Produce an NVS-compatible binary blob for ESP32-S3 flash provisioning.
+    ///
+    /// The binary layout is:
+    /// ```text
+    /// [0..6]       "ZMESH\x01"         magic header
+    /// [6..8]       mesh_id.len() as u16 LE
+    /// [8..8+N]     mesh_id UTF-8 bytes
+    /// [8+N..8+N+16]   16-byte PSK (beacon auth)
+    /// [8+N+16..8+N+32] 16-byte SipHash key (frame integrity)
+    /// [8+N+32..8+N+64] SHA-256 checksum of all preceding bytes
+    /// ```
+    ///
+    /// The `mesh_id` parameter is the network identifier used as HKDF salt
+    /// for domain separation. It must be non-empty and at most 65535 bytes.
+    pub fn provision_nvs_binary(
+        &mut self,
+        mesh_id: &str,
+    ) -> Result<Vec<u8>, EntropyBridgeError> {
+        if mesh_id.is_empty() {
+            return Err(EntropyBridgeError::PoolNotAccessible(
+                "mesh_id must not be empty".into(),
+            ));
+        }
+        let id_bytes = mesh_id.as_bytes();
+        if id_bytes.len() > u16::MAX as usize {
+            return Err(EntropyBridgeError::PoolNotAccessible(
+                "mesh_id exceeds maximum length (65535 bytes)".into(),
+            ));
+        }
+
+        // Derive keys using mesh_id as salt for domain separation
+        let salt = format!("{}:epoch:{}", mesh_id, self.epoch).into_bytes();
+        let source = FilePoolSource::new(&self.pool_path)?;
+        let mut bridge = EntropyBridge::new(source);
+        let (mesh_key, siphash_key) = bridge.derive_mesh_key_pair(Some(&salt))?;
+
+        // Build the binary blob (without checksum first)
+        let payload_len = NVS_MAGIC.len() + 2 + id_bytes.len() + 16 + 16;
+        let mut buf = Vec::with_capacity(payload_len + NVS_CHECKSUM_SIZE);
+
+        // Magic header
+        buf.extend_from_slice(NVS_MAGIC);
+        // Mesh ID length (u16 LE)
+        buf.extend_from_slice(&(id_bytes.len() as u16).to_le_bytes());
+        // Mesh ID bytes
+        buf.extend_from_slice(id_bytes);
+        // PSK (16 bytes)
+        buf.extend_from_slice(mesh_key.as_bytes());
+        // SipHash key (16 bytes)
+        buf.extend_from_slice(siphash_key.as_bytes());
+
+        // SHA-256 checksum over everything so far
+        let checksum = Sha256::digest(&buf);
+        buf.extend_from_slice(&checksum);
+
+        Ok(buf)
     }
 
     /// Rotate keys by incrementing the epoch and re-deriving.

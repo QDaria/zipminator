@@ -154,6 +154,55 @@ class PIIScanner:
             compiled[pii_type] = [re.compile(p) for p in patterns]
         return compiled
 
+    def scan_text(self, text: str) -> Dict[str, Any]:
+        """
+        Scan a plain text string for PII.
+
+        Args:
+            text: Text to scan for PII patterns.
+
+        Returns:
+            Dictionary with:
+                - pii_detected: bool
+                - types: List[str] — human-readable names of detected PII types
+                - risk_level: RiskLevel
+                - details: Dict[str, List[str]] — PII type -> list of redacted matches
+        """
+        if not text:
+            return {"pii_detected": False, "types": [], "risk_level": RiskLevel.LOW, "details": {}}
+
+        detected: Dict[str, List[str]] = {}
+        detected_types: Set[PIIType] = set()
+
+        for pii_type, patterns in self.compiled_patterns.items():
+            for pattern in patterns:
+                matches = pattern.findall(text)
+                if matches:
+                    detected_types.add(pii_type)
+                    label = pii_type.value
+                    if label not in detected:
+                        detected[label] = []
+                    # Store match count, not raw values (avoid leaking PII in responses)
+                    detected[label].append(f"{len(matches)} occurrence(s)")
+                    break  # one pattern match per type is enough
+
+        if not detected_types:
+            return {"pii_detected": False, "types": [], "risk_level": RiskLevel.LOW, "details": {}}
+
+        # Build lightweight PIIMatch list for risk calculation
+        fake_matches = [
+            PIIMatch(pii_type=t, column="text", sample_count=1, confidence=1.0, pattern="")
+            for t in detected_types
+        ]
+        risk = self._calculate_risk(fake_matches)
+
+        return {
+            "pii_detected": True,
+            "types": sorted(detected.keys()),
+            "risk_level": risk,
+            "details": detected,
+        }
+
     def scan_dataframe(self, df: pd.DataFrame) -> Dict[str, Any]:
         """
         Scan DataFrame for PII

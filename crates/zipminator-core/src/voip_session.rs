@@ -200,6 +200,89 @@ fn hex_sha256(data: &[u8]) -> String {
     hash.iter().map(|b| format!("{b:02x}")).collect()
 }
 
+// ── Encrypted voicemail storage ────────────────────────────────────────────
+
+/// Encrypted voicemail: stores SRTP-protected audio frames for later playback.
+///
+/// Each frame is encrypted individually with AES-256-GCM via `SrtpContext`,
+/// using the frame index as the sequence number. Playback decrypts all frames
+/// in order using the same shared secret that was used during recording.
+#[derive(Debug)]
+pub struct Voicemail {
+    /// Session that produced this voicemail.
+    pub session_id: u64,
+    /// Encrypted SRTP payloads, one per audio frame.
+    pub frames: Vec<Vec<u8>>,
+    /// Unix timestamp when recording started.
+    pub recorded_at: u64,
+    /// Caller identifier (phone number, SIP URI, etc.).
+    pub caller_id: String,
+    /// SRTP context used for encryption/decryption.
+    ctx: SrtpContext,
+    /// Next sequence number for recording.
+    next_seq: u64,
+}
+
+impl Voicemail {
+    /// Create a new empty voicemail bound to a shared secret.
+    ///
+    /// The `shared_secret` is the 32-byte ML-KEM-768 output from the VoIP
+    /// session handshake. A dedicated `SrtpContext` is derived from it so
+    /// voicemail keys are independent of the live call keys.
+    pub fn new(
+        session_id: u64,
+        caller_id: String,
+        recorded_at: u64,
+        shared_secret: &[u8],
+    ) -> Result<Self, SrtpError> {
+        // Derive a voicemail-specific context by hashing the secret with a
+        // domain separator, so voicemail keys never collide with live SRTP keys.
+        let mut vm_secret = [0u8; 32];
+        let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, shared_secret);
+        hk.expand(b"zipminator-voicemail-key", &mut vm_secret)
+            .map_err(|_| SrtpError::KeyDerivation)?;
+
+        let ctx = SrtpContext::from_shared_secret(&vm_secret)?;
+        Ok(Self {
+            session_id,
+            frames: Vec::new(),
+            recorded_at,
+            caller_id,
+            ctx,
+            next_seq: 0,
+        })
+    }
+
+    /// Encrypt and append a single audio frame.
+    ///
+    /// The plaintext `payload` is protected with AES-256-GCM using the frame
+    /// index as the SRTP sequence number, then stored in `self.frames`.
+    pub fn record_frame(&mut self, payload: &[u8]) -> Result<(), SrtpError> {
+        let encrypted = self.ctx.protect(payload, self.next_seq)?;
+        self.frames.push(encrypted);
+        self.next_seq += 1;
+        Ok(())
+    }
+
+    /// Decrypt and return all recorded frames in order.
+    ///
+    /// Returns an empty `Vec` if no frames have been recorded. Fails with
+    /// `SrtpError::DecryptionFailed` if the internal key material does not
+    /// match (e.g., the `Voicemail` was reconstructed with the wrong secret).
+    pub fn playback(&self) -> Result<Vec<Vec<u8>>, SrtpError> {
+        self.frames
+            .iter()
+            .enumerate()
+            .map(|(i, ct)| self.ctx.unprotect(ct, i as u64))
+            .collect()
+    }
+
+    /// Number of recorded frames.
+    pub fn frame_count(&self) -> usize {
+        self.frames.len()
+    }
+}
+
 // ── Tests ──────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -302,5 +385,75 @@ mod tests {
         assert_eq!(s1.session_id, 1);
         assert_eq!(s2.session_id, 2);
         assert_eq!(s3.session_id, 3);
+    }
+
+    // ── Voicemail tests ──────────────────────────────────────────────────
+
+    const VM_SECRET: [u8; 32] = [0xAAu8; 32];
+
+    #[test]
+    fn voicemail_record_and_playback_three_frames() {
+        let mut vm = Voicemail::new(1, "alice@sip.example".into(), 1700000000, &VM_SECRET).unwrap();
+
+        let frames: Vec<&[u8]> = vec![b"frame-one", b"frame-two", b"frame-three"];
+        for f in &frames {
+            vm.record_frame(f).unwrap();
+        }
+
+        assert_eq!(vm.frame_count(), 3);
+
+        let decrypted = vm.playback().unwrap();
+        assert_eq!(decrypted.len(), 3);
+        assert_eq!(&decrypted[0], b"frame-one");
+        assert_eq!(&decrypted[1], b"frame-two");
+        assert_eq!(&decrypted[2], b"frame-three");
+    }
+
+    #[test]
+    fn voicemail_playback_wrong_key_fails() {
+        let mut vm = Voicemail::new(2, "bob@sip.example".into(), 1700000001, &VM_SECRET).unwrap();
+        vm.record_frame(b"secret audio").unwrap();
+
+        // Build a second voicemail with a different secret and steal the encrypted frames
+        let wrong_secret = [0xBBu8; 32];
+        let mut vm_wrong = Voicemail::new(2, "bob@sip.example".into(), 1700000001, &wrong_secret).unwrap();
+        vm_wrong.frames = vm.frames.clone();
+        vm_wrong.next_seq = vm.next_seq;
+
+        let result = vm_wrong.playback();
+        assert!(result.is_err(), "Playback with wrong key must fail");
+        assert_eq!(result.unwrap_err(), SrtpError::DecryptionFailed);
+    }
+
+    #[test]
+    fn voicemail_empty_returns_empty_vec() {
+        let vm = Voicemail::new(3, "nobody@sip.example".into(), 1700000002, &VM_SECRET).unwrap();
+        assert_eq!(vm.frame_count(), 0);
+
+        let decrypted = vm.playback().unwrap();
+        assert!(decrypted.is_empty());
+    }
+
+    #[test]
+    fn voicemail_from_live_session_shared_secret() {
+        // Full integration: run a VoIP handshake, then record voicemail with the
+        // resulting shared secret.
+        let mut mgr = VoipSessionManager::new();
+        let (mut offerer, offer) = mgr.create_offer();
+        let (answerer, answer) = mgr.accept_offer(&offer).unwrap();
+        VoipSessionManager::complete_handshake(&mut offerer, &answer).unwrap();
+
+        let ss = offerer.shared_secret.unwrap();
+
+        let mut vm = Voicemail::new(offerer.session_id, "caller".into(), 1700000003, &ss).unwrap();
+        vm.record_frame(b"hello voicemail").unwrap();
+
+        // Answerer can also play back with the same shared secret
+        let mut vm2 = Voicemail::new(answerer.session_id, "caller".into(), 1700000003, &answerer.shared_secret.unwrap()).unwrap();
+        vm2.frames = vm.frames.clone();
+        vm2.next_seq = vm.next_seq;
+
+        let decrypted = vm2.playback().unwrap();
+        assert_eq!(&decrypted[0], b"hello voicemail");
     }
 }

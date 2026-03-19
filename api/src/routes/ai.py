@@ -9,11 +9,12 @@ import json
 import logging
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Header, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from zipminator.ai.prompt_guard import PromptGuard
+from zipminator.crypto.pii_scanner import PIIScanner
 from api.src.services.llm_service import OllamaClient
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ router = APIRouter()
 
 # Singletons
 _guard = PromptGuard()
+_pii = PIIScanner(confidence_threshold=0.0)
 _llm = OllamaClient()
 
 
