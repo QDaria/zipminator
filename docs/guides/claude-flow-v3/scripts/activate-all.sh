@@ -16,7 +16,7 @@ export RUFLO_AGENT_BOOSTER=true
 export RUFLO_MODEL_ROUTING=auto
 
 # Project paths
-export ZIPMINATOR_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+export ZIPMINATOR_ROOT="$(cd "$(dirname "$0")/../../../.." && pwd)"
 export ZIPMINATOR_WEB="$ZIPMINATOR_ROOT/web"
 export ENTROPY_POOL="$ZIPMINATOR_ROOT/quantum_entropy/quantum_entropy_pool.bin"
 
