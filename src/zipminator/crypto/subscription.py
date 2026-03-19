@@ -82,7 +82,7 @@ TIER_FEATURES = {
         character_name="Amir",
         public_name="Free",
         max_level=3,
-        qrng_access=False,
+        qrng_access=True,  # Early adopter: QRNG on all tiers
         data_limit_gb=1,
         support_level="Community",
         api_access=False,
@@ -100,7 +100,7 @@ TIER_FEATURES = {
         character_name="Nils",
         public_name="Developer",
         max_level=5,
-        qrng_access=False,
+        qrng_access=True,  # Early adopter: QRNG on all tiers
         data_limit_gb=10,
         support_level="Email",
         api_access=True,
@@ -118,7 +118,7 @@ TIER_FEATURES = {
         character_name="Solveig",
         public_name="Pro",
         max_level=7,
-        qrng_access=False,
+        qrng_access=True,  # Early adopter: QRNG on all tiers
         data_limit_gb=100,
         support_level="Priority",
         api_access=True,
@@ -345,7 +345,7 @@ class SubscriptionManager:
         """
         Check if activation code allows quantum random number generation.
 
-        Only Enterprise tier (Robindra) with LEVEL10 can access true QRNG.
+        During the early adopter period, QRNG is available on all tiers.
 
         Args:
             code: Activation code string
@@ -359,16 +359,15 @@ class SubscriptionManager:
             >>> SubscriptionManager.can_use_qrng("BETA2026-LEVEL10")
             True
             >>> SubscriptionManager.can_use_qrng("FREE-LEVEL3")
-            False
+            True
         """
         code_info = cls.validate_activation_code(code)
 
         if not code_info.valid:
             return False
 
-        # QRNG requires both enterprise tier AND level 10
-        return (code_info.features.qrng_access and
-                code_info.level == 10)
+        # Early adopter: QRNG available on all tiers
+        return code_info.features.qrng_access
 
     @classmethod
     def can_use_level(cls, code: str, level: int) -> tuple[bool, Optional[str]]:

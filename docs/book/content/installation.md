@@ -128,13 +128,34 @@ print("Kyber768 round-trip: OK")
 
 If `RUST_AVAILABLE` is `False`, the Rust extension failed to load. This typically means the wheel does not match your platform. Build from source as a fallback.
 
+## Jupyter Kernel Registration
+
+To use Zipminator notebooks interactively, register a Jupyter kernel:
+
+```bash
+micromamba activate zip-pqc
+pip install 'zipminator[jupyter]'
+python -m ipykernel install --user --name zip-pqc --display-name "Zipminator PQC"
+```
+
+Then select **"Zipminator PQC"** from the kernel picker in JupyterLab.
+
 ## Troubleshooting
 
-**`ImportError: cannot import name 'keypair'`**
-: The Rust extension module (`_core.abi3.so`) is not found. Ensure you installed the correct platform wheel, or build from source with `maturin develop --release`.
+```{dropdown} ImportError: cannot import name 'keypair'
+The Rust extension module (`_core.abi3.so`) is not found. Ensure you installed the correct platform wheel, or build from source with `maturin develop --release`.
+```
 
-**`maturin develop` fails with compiler errors**
-: Ensure Rust 1.70+ is installed (`rustup update stable`). On macOS, Xcode command-line tools must be present (`xcode-select --install`).
+```{dropdown} maturin develop fails with compiler errors
+Ensure Rust 1.70+ is installed (`rustup update stable`). On macOS, Xcode command-line tools must be present (`xcode-select --install`).
+```
 
-**Slow key generation**
-: You may be running a debug build. Use `maturin develop --release --strip` for optimized performance.
+```{dropdown} Slow key generation
+You may be running a debug build. Use `maturin develop --release --strip` for optimized performance.
+```
+
+```{dropdown} Jupyter kernel not showing up
+Run `jupyter kernelspec list` to verify the kernel is registered. If missing, re-run:
+
+    python -m ipykernel install --user --name zip-pqc --display-name "Zipminator PQC"
+```

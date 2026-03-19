@@ -9,3 +9,7 @@ dependencies:
   - jupyter-book
   - sphinx-book-theme
   - myst-nb
+  - pip
+  - pip:
+    - sphinx-design
+    - sphinx-copybutton

@@ -2,13 +2,46 @@
 
 Three minutes to your first post-quantum key exchange.
 
-## Install
+## Prerequisites
 
-```bash
-pip install zipminator
+```{admonition} Environment Setup
+:class: tip
+
+We recommend using micromamba (or conda) to isolate dependencies:
+
+    micromamba create -n zip-pqc python=3.11
+    micromamba activate zip-pqc
+    pip install zipminator
+
+For Jupyter notebook support, also install the kernel:
+
+    pip install 'zipminator[jupyter]'
+    python -m ipykernel install --user --name zip-pqc --display-name "Zipminator PQC"
 ```
 
-The wheel is ~894KB and includes the pre-compiled Rust Kyber768 engine. No Rust toolchain needed for installation from PyPI.
+## Install
+
+````{tab-set}
+```{tab-item} pip (PyPI)
+    pip install zipminator
+
+The wheel is ~894KB and includes the pre-compiled Rust Kyber768 engine. No Rust toolchain needed.
+```
+
+```{tab-item} micromamba
+    micromamba create -n zip-pqc python=3.11
+    micromamba activate zip-pqc
+    pip install zipminator[all]
+```
+
+```{tab-item} From source
+    git clone https://github.com/QDaria/zipminator.git
+    cd zipminator
+    pip install maturin
+    maturin develop --release --strip
+    pip install -e ".[dev,data,anonymization,cli]"
+```
+````
 
 ## Generate a Keypair and Exchange a Secret
 

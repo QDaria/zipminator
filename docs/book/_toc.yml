@@ -1,29 +1,56 @@
 format: jb-book
 root: index
 parts:
-  - caption: Getting Started
+  - caption: "Part I: Getting Started"
     chapters:
-      - file: content/getting_started
       - file: content/installation
-  - caption: Core Features
+      - file: content/getting_started
+      - file: notebooks/01_quickstart
+
+  - caption: "Part II: Core Cryptography"
     chapters:
       - file: content/core_crypto
-      - file: content/anonymization
-      - file: content/pii_scanning
       - file: content/entropy
-      - file: content/subscription
-  - caption: Tools
+        sections:
+          - file: notebooks/03_qrng_entropy
+      - file: notebooks/05_shor_demo
+
+  - caption: "Part III: Data Protection"
     chapters:
-      - file: content/cli
+      - file: content/pii_scanning
+      - file: content/anonymization
+        sections:
+          - file: content/anonymization_levels
+          - file: notebooks/02_anonymization
+      - file: content/self_destruct
+      - file: content/zipndel
+
+  - caption: "Part IV: Jupyter & Interactive"
+    chapters:
       - file: content/jupyter
-  - caption: Use Cases
+      - file: notebooks/06_quantum_capabilities
+
+  - caption: "Part V: Tiers & API"
     chapters:
+      - file: content/subscription
+      - file: content/api_credentials
+      - file: content/api_reference
+
+  - caption: "Part VI: Compliance & Use Cases"
+    chapters:
+      - file: content/compliance
       - file: content/use_cases/government
       - file: content/use_cases/healthcare
       - file: content/use_cases/finance
       - file: content/use_cases/ecommerce
       - file: content/use_cases/defense
-  - caption: Appendix
+
+  - caption: "Part VII: CLI Reference"
+    chapters:
+      - file: content/cli
+      - file: content/cli_reference
+
+  - caption: "Appendix"
     chapters:
       - file: content/appendix/anonymization_techniques
       - file: content/appendix/fips_203

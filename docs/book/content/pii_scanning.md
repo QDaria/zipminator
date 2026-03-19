@@ -57,25 +57,38 @@ The scanner recognizes 18+ PII patterns:
 
 ## Country Coverage
 
-The scanner supports jurisdiction-specific patterns for 15 countries:
+The scanner supports jurisdiction-specific patterns for 15 countries across 5 regions:
 
-| Country | Code | Key Patterns |
-|---------|:----:|-------------|
-| United States | US | SSN, EIN, ITIN, driver's license |
-| United Kingdom | UK | NIN, NHS number, sort code |
-| United Arab Emirates | UAE | Emirates ID, trade license |
-| Norway | NO | Fodselsnummer, D-nummer, bankgiro |
-| Sweden | SE | Personnummer, samordningsnummer |
-| Denmark | DK | CPR-nummer |
-| Finland | FI | Henkilotunnus (HETU) |
-| European Union | EU | IBAN, VAT ID, GDPR identifiers |
-| Germany | DE | Personalausweisnummer, Steuer-ID |
-| France | FR | NIR (INSEE), carte d'identite |
-| India | IN | Aadhaar, PAN, voter ID |
-| Brazil | BR | CPF, CNPJ, RG |
-| Japan | JP | My Number, residence card |
-| Canada | CA | SIN, health card, driver's license |
-| Australia | AU | TFN, Medicare, ABN |
+::::{grid} 2
+:gutter: 2
+
+:::{grid-item-card} Nordics
+- **Norway (NO)**: Fodselsnummer, D-nummer, bankgiro
+- **Sweden (SE)**: Personnummer, samordningsnummer
+- **Denmark (DK)**: CPR-nummer
+- **Finland (FI)**: Henkilotunnus (HETU)
+:::
+
+:::{grid-item-card} Europe
+- **EU**: IBAN, VAT ID, GDPR identifiers
+- **Germany (DE)**: Personalausweisnummer, Steuer-ID
+- **France (FR)**: NIR (INSEE), carte d'identite
+- **UK**: NIN, NHS number, sort code
+:::
+
+:::{grid-item-card} Americas
+- **US**: SSN, EIN, ITIN, driver's license
+- **Canada (CA)**: SIN, health card, driver's license
+- **Brazil (BR)**: CPF, CNPJ, RG
+:::
+
+:::{grid-item-card} Asia-Pacific & Middle East
+- **India (IN)**: Aadhaar, PAN, voter ID
+- **Japan (JP)**: My Number, residence card
+- **Australia (AU)**: TFN, Medicare, ABN
+- **UAE**: Emirates ID, trade license
+:::
+::::
 
 ## Multi-Country Scanning
 

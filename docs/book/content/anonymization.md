@@ -2,20 +2,30 @@
 
 Zipminator provides a progressive anonymization system with 10 levels, ranging from basic SHA-256 hashing to Paillier homomorphic encryption. Each level is designed for different use cases, regulatory requirements, and data sensitivity levels.
 
+```{admonition} Pseudonymization vs. Anonymization (GDPR Art. 4(5))
+:class: note
+
+Levels 1-4 are **pseudonymization** techniques: the data can be re-identified using additional information (hash reversal via lookup, token maps, or deterministic mappings). These remain "personal data" under GDPR.
+
+Levels 5-10 are **anonymization** techniques: the transformation is statistically irreversible. Properly anonymized data falls outside GDPR scope entirely.
+```
+
 ## Overview
 
-| Level | Technique | Tier Required | Reversible? |
-|------:|-----------|:-------------:|:-----------:|
-| 1 | SHA-256 hashing | Free | No |
-| 2 | Quantum-random replacement | Free | No |
-| 3 | Deterministic tokenization | Free | Yes (with map) |
-| 4 | Generalization (ranges/categories) | Developer | No |
-| 5 | Suppression (NULL replacement) | Developer | No |
-| 6 | Quantum noise injection | Pro | No |
-| 7 | Synthetic data generation (Faker) | Pro | No |
-| 8 | k-Anonymity grouping | Enterprise | No |
-| 9 | Differential privacy (Laplace noise) | Enterprise | No |
-| 10 | Paillier homomorphic encryption | Enterprise | Yes (with key) |
+| Level | Technique | Category | Tier Required | Reversible? |
+|------:|-----------|----------|:-------------:|:-----------:|
+| 1 | SHA-256 hashing | Pseudonymization | Free | No* |
+| 2 | Quantum-random replacement | Pseudonymization | Free | No |
+| 3 | Deterministic tokenization | Pseudonymization | Free | Yes (with map) |
+| 4 | Generalization (ranges/categories) | Pseudonymization | Developer | No |
+| 5 | Suppression (NULL replacement) | Anonymization | Developer | No |
+| 6 | Quantum noise injection | Anonymization | Pro | No |
+| 7 | Synthetic data generation (Faker) | Anonymization | Pro | No |
+| 8 | k-Anonymity grouping | Anonymization | Enterprise | No |
+| 9 | Differential privacy (Laplace noise) | Anonymization | Enterprise | No |
+| 10 | Paillier homomorphic encryption | Anonymization | Enterprise | Yes (with key) |
+
+*L1 hashes are deterministic; identical inputs produce identical outputs, enabling re-identification via rainbow tables.
 
 ## Quick Start
 

@@ -2,21 +2,61 @@
 
 Zipminator uses a four-tier subscription model. The open-source SDK includes all 10 anonymization levels, but levels 4-10 require authentication via an API key or activation code.
 
+```{admonition} Early Adopter Benefit
+:class: tip
+
+During the early adopter period, **QRNG access is enabled on all tiers**. All users get quantum-seeded key generation, entropy pool access, and quantum noise injection regardless of subscription level.
+```
+
 ## Tier Comparison
 
-| Feature | Free | Developer | Pro | Enterprise |
-|---------|:----:|:---------:|:---:|:----------:|
-| **Price** | $0 | $9/mo | $29/mo | Custom |
-| **Anonymization levels** | 1-3 | 1-5 | 1-7 | 1-10 |
-| **Monthly entropy** | 1 MB | 10 MB | 100 MB | Unlimited |
-| **QRNG access** | No | No | No | Yes |
-| **API access** | No | Yes | Yes | Yes |
-| **Team features** | No | No | Yes | Yes |
-| **SSO integration** | No | No | Yes | Yes |
-| **HSM support** | No | No | No | Yes |
-| **SLA guarantee** | No | No | No | Yes |
-| **Support** | Community | Email | Priority | 24/7 Dedicated |
-| **Data limit** | 1 GB/mo | 10 GB/mo | 100 GB/mo | Unlimited |
+::::{grid} 2
+:gutter: 3
+
+:::{grid-item-card} Free
+**$0/month**
+^^^
+- Anonymization levels 1-3
+- 1 MB/mo entropy
+- QRNG access (early adopter)
+- Community support
+- 1 GB/mo data limit
+:::
+
+:::{grid-item-card} Developer
+**$9/month** (early adopter) | $29/month standard
+^^^
+- Anonymization levels 1-5
+- 10 MB/mo entropy
+- QRNG access (early adopter)
+- API access
+- Email support
+- 10 GB/mo data limit
+:::
+
+:::{grid-item-card} Pro
+**$29/month** (early adopter) | $69/month standard
+^^^
+- Anonymization levels 1-7
+- 100 MB/mo entropy
+- QRNG access (early adopter)
+- Team features + SSO
+- Priority support
+- 100 GB/mo data limit
+:::
+
+:::{grid-item-card} Enterprise
+**Custom** ($5K-$50K/month)
+^^^
+- All 10 anonymization levels
+- Unlimited entropy
+- QRNG access
+- HSM + SLA guarantee
+- 24/7 dedicated support
+- On-premise deployment
+- Workshops + certifications
+:::
+::::
 
 ## Authentication Flow
 
@@ -126,9 +166,9 @@ for tier_info in SubscriptionManager.list_all_tiers():
 Output:
 
 ```
-Free         | Levels 1-3   | $0       | QRNG: False
-Developer    | Levels 1-5   | $9       | QRNG: False
-Pro          | Levels 1-7   | $29      | QRNG: False
+Free         | Levels 1-3   | $0       | QRNG: True
+Developer    | Levels 1-5   | $9       | QRNG: True
+Pro          | Levels 1-7   | $29      | QRNG: True
 Enterprise   | Levels 1-10  | Custom   | QRNG: True
 ```
 

@@ -2,6 +2,12 @@
 
 Zipminator harvests real quantum entropy from IBM Quantum hardware (156-qubit Eagle r3 processors) via qBraid. The entropy feeds into key generation, noise injection, and random number generation throughout the SDK.
 
+```{admonition} Early Adopter Benefit
+:class: tip
+
+QRNG access is currently available on **all tiers** during the early adopter period. Every user can seed key generation with quantum entropy.
+```
+
 ## Architecture
 
 The entropy system has four layers:
@@ -9,7 +15,7 @@ The entropy system has four layers:
 1. **Pool file** -- A binary file on disk that grows without limit as entropy is harvested
 2. **Scheduler** -- A daemon or cron job that periodically harvests from quantum backends
 3. **Quota manager** -- Per-user monthly tracking with tier-based limits
-4. **Provider chain** -- Priority-ordered fallback: Pool > qBraid > IBM > Rigetti > OS
+4. **Provider chain** -- Priority-ordered fallback: Pool > qBraid > IBM > Rigetti > API > OS
 
 ```
 Pool File (quantum_entropy/quantum_entropy_pool.bin)
@@ -18,7 +24,13 @@ Pool File (quantum_entropy/quantum_entropy_pool.bin)
 Scheduler (daemon or cron)
     |
     v reads from
-Provider Chain: qBraid -> IBM Quantum -> Rigetti -> OS Fallback
+Provider Chain:
+    1. Pool (local)
+    2. qBraid (IBM Fez / Marrakesh, 156-qubit Eagle r3)
+    3. IBM Quantum (Qiskit Runtime)
+    4. Rigetti (QCS / pyQuil)
+    5. API (remote entropy service)
+    6. OS Fallback (getrandom / os.urandom)
 ```
 
 ## Pool File

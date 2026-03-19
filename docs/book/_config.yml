@@ -1,8 +1,11 @@
-title: Zipminator PQC Documentation
+title: Zipminator
 author: QDaria AS
-logo: ""
+logo: _static/zipminator-logo-light.svg
 execute:
-  execute_notebooks: "off"
+  execute_notebooks: "auto"
+  timeout: 120
+  exclude_patterns:
+    - "_build/*"
 parse:
   myst_enable_extensions:
     - colon_fence
@@ -12,12 +15,26 @@ parse:
     - substitution
     - tasklist
 sphinx:
+  extra_extensions:
+    - sphinx_design
+    - sphinx_copybutton
   config:
     html_theme: sphinx_book_theme
+    html_favicon: _static/Z.svg
     html_theme_options:
+      logo:
+        image_light: _static/zipminator-logo-dark.svg
+        image_dark: _static/zipminator-logo-light.svg
       repository_url: https://github.com/QDaria/zipminator
       use_repository_button: true
       use_issues_button: true
+      use_download_button: true
+      launch_buttons:
+        colab_url: https://colab.research.google.com
+    html_css_files:
+      - custom.css
+    copybutton_prompt_text: "$ "
+    copybutton_prompt_is_regexp: false
 repository:
   url: https://github.com/QDaria/zipminator
   branch: main

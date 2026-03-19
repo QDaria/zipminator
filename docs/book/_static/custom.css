@@ -1,0 +1,67 @@
+/* Zipminator Quantum Documentation Theme */
+
+:root {
+  --quantum-cyan: #22d3ee;
+  --quantum-violet: #a78bfa;
+  --quantum-emerald: #34d399;
+  --bg-deep: #020817;
+  --bg-sidebar: #0f172a;
+}
+
+/* Sidebar branding */
+.bd-sidebar-primary {
+  background-color: var(--bg-sidebar) !important;
+  border-right: 1px solid rgba(34, 211, 238, 0.15);
+}
+
+.bd-sidebar-primary .sidebar-brand-text {
+  color: var(--quantum-cyan) !important;
+}
+
+/* Code block accent */
+div.highlight {
+  border-left: 3px solid var(--quantum-cyan);
+}
+
+/* Table styling */
+table.docutils {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table.docutils th {
+  background-color: rgba(34, 211, 238, 0.08);
+  border-bottom: 2px solid var(--quantum-cyan);
+}
+
+table.docutils td,
+table.docutils th {
+  padding: 0.5rem 0.75rem;
+}
+
+/* Admonition quantum accent */
+.admonition.tip .admonition-title,
+.admonition.note .admonition-title {
+  background-color: rgba(34, 211, 238, 0.1);
+}
+
+/* Card styling for sphinx-design */
+.sd-card {
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 8px;
+}
+
+.sd-card:hover {
+  border-color: var(--quantum-cyan);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.15);
+}
+
+/* Copy button styling */
+button.copybtn {
+  opacity: 0.4;
+}
+
+button.copybtn:hover {
+  opacity: 1;
+  color: var(--quantum-cyan);
+}

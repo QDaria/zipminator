@@ -5,3 +5,4 @@ pandas
 sphinx-book-theme
 myst-nb
 sphinx-design
+sphinx-copybutton
