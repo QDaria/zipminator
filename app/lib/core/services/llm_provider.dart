@@ -1,0 +1,265 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+/// Supported LLM providers.
+enum LLMProvider {
+  claude('Claude', 'Anthropic'),
+  gemini('Gemini', 'Google'),
+  openRouter('OpenRouter', 'OpenRouter');
+
+  final String displayName;
+  final String company;
+  const LLMProvider(this.displayName, this.company);
+}
+
+/// Model metadata for UI display.
+class LLMModel {
+  final String id;
+  final String displayName;
+  final LLMProvider provider;
+
+  const LLMModel({
+    required this.id,
+    required this.displayName,
+    required this.provider,
+  });
+}
+
+/// All available models grouped by provider.
+const kAvailableModels = <LLMModel>[
+  // Claude
+  LLMModel(
+      id: 'claude-opus-4-6',
+      displayName: 'Claude Opus 4.6',
+      provider: LLMProvider.claude),
+  LLMModel(
+      id: 'claude-sonnet-4-6',
+      displayName: 'Claude Sonnet 4.6',
+      provider: LLMProvider.claude),
+  LLMModel(
+      id: 'claude-haiku-4-5-20251001',
+      displayName: 'Claude Haiku 4.5',
+      provider: LLMProvider.claude),
+  // Gemini (free tier available)
+  LLMModel(
+      id: 'gemini-2.5-flash',
+      displayName: 'Gemini 2.5 Flash',
+      provider: LLMProvider.gemini),
+  LLMModel(
+      id: 'gemini-2.5-pro',
+      displayName: 'Gemini 2.5 Pro',
+      provider: LLMProvider.gemini),
+  // OpenRouter (routes to any model)
+  LLMModel(
+      id: 'openai/gpt-4o',
+      displayName: 'GPT-4o',
+      provider: LLMProvider.openRouter),
+  LLMModel(
+      id: 'meta-llama/llama-4-maverick',
+      displayName: 'Llama 4 Maverick',
+      provider: LLMProvider.openRouter),
+];
+
+/// System prompt so Q-AI identifies correctly regardless of backend model.
+String qaiSystemPrompt(String modelName) =>
+    'You are Q-AI, Zipminator\'s quantum-safe AI assistant. '
+    'You are powered by $modelName. '
+    'Help users with privacy, encryption, and security questions.';
+
+/// Abstract LLM service interface.
+abstract class LLMService {
+  Future<String> sendMessage({
+    required String model,
+    required List<Map<String, String>> messages,
+    String? systemPrompt,
+    int maxTokens,
+  });
+  void dispose();
+}
+
+/// Claude (Anthropic Messages API).
+class ClaudeService implements LLMService {
+  static const _baseUrl = 'https://api.anthropic.com/v1/messages';
+  static const _apiVersion = '2023-06-01';
+  final String apiKey;
+  final http.Client _client;
+
+  ClaudeService({required this.apiKey, http.Client? client})
+      : _client = client ?? http.Client();
+
+  @override
+  Future<String> sendMessage({
+    required String model,
+    required List<Map<String, String>> messages,
+    String? systemPrompt,
+    int maxTokens = 1024,
+  }) async {
+    final body = <String, dynamic>{
+      'model': model,
+      'max_tokens': maxTokens,
+      'messages': messages,
+    };
+    if (systemPrompt != null) {
+      body['system'] = systemPrompt;
+    }
+
+    final response = await _client.post(
+      Uri.parse(_baseUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': _apiVersion,
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode != 200) {
+      final parsed = jsonDecode(response.body);
+      throw LLMException(
+          parsed['error']?['message'] ?? 'HTTP ${response.statusCode}');
+    }
+
+    final parsed = jsonDecode(response.body);
+    final content = parsed['content'] as List<dynamic>;
+    return content
+        .where((c) => c['type'] == 'text')
+        .map((c) => c['text'] as String)
+        .join();
+  }
+
+  @override
+  void dispose() => _client.close();
+}
+
+/// Google Gemini (REST API, free tier for Flash).
+class GeminiService implements LLMService {
+  static const _baseUrl =
+      'https://generativelanguage.googleapis.com/v1beta/models';
+  final String apiKey;
+  final http.Client _client;
+
+  GeminiService({required this.apiKey, http.Client? client})
+      : _client = client ?? http.Client();
+
+  @override
+  Future<String> sendMessage({
+    required String model,
+    required List<Map<String, String>> messages,
+    String? systemPrompt,
+    int maxTokens = 1024,
+  }) async {
+    final contents = <Map<String, dynamic>>[];
+    for (final msg in messages) {
+      contents.add({
+        'role': msg['role'] == 'assistant' ? 'model' : 'user',
+        'parts': [
+          {'text': msg['content'] ?? ''}
+        ],
+      });
+    }
+
+    final body = <String, dynamic>{
+      'contents': contents,
+      'generationConfig': {'maxOutputTokens': maxTokens},
+    };
+    if (systemPrompt != null) {
+      body['systemInstruction'] = {
+        'parts': [
+          {'text': systemPrompt}
+        ],
+      };
+    }
+
+    final response = await _client.post(
+      Uri.parse('$_baseUrl/$model:generateContent?key=$apiKey'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode != 200) {
+      final parsed = jsonDecode(response.body);
+      throw LLMException(
+          parsed['error']?['message'] ?? 'HTTP ${response.statusCode}');
+    }
+
+    final parsed = jsonDecode(response.body);
+    final candidates = parsed['candidates'] as List<dynamic>?;
+    if (candidates == null || candidates.isEmpty) {
+      throw LLMException('No response from Gemini');
+    }
+    final parts = candidates[0]['content']?['parts'] as List<dynamic>?;
+    return parts?.map((p) => p['text'] as String? ?? '').join() ?? '';
+  }
+
+  @override
+  void dispose() => _client.close();
+}
+
+/// OpenRouter (OpenAI-compatible, routes to any model).
+class OpenRouterService implements LLMService {
+  static const _baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
+  final String apiKey;
+  final http.Client _client;
+
+  OpenRouterService({required this.apiKey, http.Client? client})
+      : _client = client ?? http.Client();
+
+  @override
+  Future<String> sendMessage({
+    required String model,
+    required List<Map<String, String>> messages,
+    String? systemPrompt,
+    int maxTokens = 1024,
+  }) async {
+    final allMessages = <Map<String, String>>[];
+    if (systemPrompt != null) {
+      allMessages.add({'role': 'system', 'content': systemPrompt});
+    }
+    allMessages.addAll(messages);
+
+    final response = await _client.post(
+      Uri.parse(_baseUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $apiKey',
+      },
+      body: jsonEncode({
+        'model': model,
+        'max_tokens': maxTokens,
+        'messages': allMessages,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      final parsed = jsonDecode(response.body);
+      throw LLMException(
+          parsed['error']?['message'] ?? 'HTTP ${response.statusCode}');
+    }
+
+    final parsed = jsonDecode(response.body);
+    final choices = parsed['choices'] as List<dynamic>?;
+    if (choices == null || choices.isEmpty) {
+      throw LLMException('No response from OpenRouter');
+    }
+    return choices[0]['message']?['content'] ?? '';
+  }
+
+  @override
+  void dispose() => _client.close();
+}
+
+/// Factory to create the right service for a provider.
+LLMService createLLMService(LLMProvider provider, String apiKey) =>
+    switch (provider) {
+      LLMProvider.claude => ClaudeService(apiKey: apiKey),
+      LLMProvider.gemini => GeminiService(apiKey: apiKey),
+      LLMProvider.openRouter => OpenRouterService(apiKey: apiKey),
+    };
+
+class LLMException implements Exception {
+  final String message;
+  LLMException(this.message);
+
+  @override
+  String toString() => 'LLMException: $message';
+}
