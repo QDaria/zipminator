@@ -17,5 +17,6 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #1300 | 11:47 PM | 🟣 | PII detection for AI chat and summarize endpoints | ~457 |
 | #1293 | 11:46 PM | 🟣 | Text-based PII scanning method | ~317 |
 </claude-mem-context>
