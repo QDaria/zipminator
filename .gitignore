@@ -400,6 +400,8 @@ deprecated/
 !quantum_entropy/README.md
 .claude/worktrees/
 web/screenshots/
+web/test-results/
 .vercel
 _screenshots/
 docs/book/_build/
+.playwright-mcp/
