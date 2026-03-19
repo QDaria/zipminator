@@ -23,13 +23,13 @@
 |---|--------|:-------:|:------:|:-----:|:--:|:-----------:|-------|
 | 1 | **Quantum Vault** | **95%** | Done | Done | Done | Partial | Self-destruct Tauri UI wiring incomplete |
 | 2 | **PQC Messenger** | **85%** | Done | Done | Done | Partial | MessageStore + offline queue done; e2e needs running API |
-| 3 | **Quantum VoIP** | **85%** | Done | Done | Done | Partial | PQ-SRTP frame encryption (AES-256-GCM) done; WebRTC DTLS replacement pending |
+| 3 | **Quantum VoIP** | **90%** | Done | Done | Done | Partial | PQ-SRTP frame encryption + encrypted voicemail storage (33 tests) |
 | 4 | **Q-VPN** | **90%** | Done | Done | Done | Partial | Packet wrapping has shortcuts; no mobile VPN service |
-| 5 | **10-Level Anonymizer** | **92%** | Done | Done | Done | Partial | All L1-L10 verified; CLI `--level N` not wired |
-| 6 | **Q-AI Assistant** | **65%** | Partial | Done | Done | Partial | Prompt guard + Ollama done; PII scan before send + PQC tunnel missing |
+| 5 | **10-Level Anonymizer** | **95%** | Done | Done | Done | Done | All L1-L10 verified; CLI `--level N` wired |
+| 6 | **Q-AI Assistant** | **75%** | Partial | Done | Done | Partial | Prompt guard + Ollama + PII scan before send done; PQC tunnel missing |
 | 7 | **Quantum Mail** | **60%** | Done | Done | Done | Planned | PQC envelope roundtrip done; SMTP/IMAP transport not deployed |
 | 8 | **ZipBrowser** | **85%** | Done | Done | Done | Done | AI sidebar integrated (Recipe W); WebView limitation (ADR documented) |
-| 9 | **Q-Mesh (RuView)** | **80%** | Done | Done | Planned | Partial | HKDF entropy bridge + provisioner done; RuView repo integration pending |
+| 9 | **Q-Mesh (RuView)** | **85%** | Done | Done | Planned | Partial | HKDF entropy bridge + NVS binary provisioner done (50 tests); RuView repo link pending |
 
 **Legend**: Done = code exists, tested, reviewed | Partial = code exists but incomplete | Planned = no code yet
 
@@ -81,13 +81,13 @@
 
 ---
 
-## Pillar 3: Quantum VoIP & Video (85%)
+## Pillar 3: Quantum VoIP & Video (90%)
 
 - **Media**: WebRTC peer connections with native camera/microphone
 - **Security**: PQ-SRTP — SRTP master keys derived from ML-KEM-768 shared secrets, AES-256-GCM frame encryption via `SrtpContext`
 - **Signaling**: Shared WebSocket signaling server with Messenger
-- **What works**: SRTP key derivation from ML-KEM-768 shared secret; AES-256-GCM frame encrypt/decrypt (`SrtpContext::protect`/`unprotect`); VoIP session with offer/answer/hangup lifecycle; call state machine; signaling WebSocket; 29 SRTP tests
-- **What's missing**: WebRTC DTLS-SRTP key exchange not replaced at browser level; no TURN/STUN server; no encrypted voicemail storage
+- **What works**: SRTP key derivation from ML-KEM-768 shared secret; AES-256-GCM frame encrypt/decrypt (`SrtpContext::protect`/`unprotect`); VoIP session with offer/answer/hangup lifecycle; encrypted voicemail storage (HKDF-separated keys from live session); call state machine; signaling WebSocket; 33 tests
+- **What's missing**: WebRTC DTLS-SRTP key exchange not replaced at browser level; no TURN/STUN server
 
 ### File Paths
 
@@ -121,7 +121,7 @@
 
 ---
 
-## Pillar 5: 10-Level Anonymization Suite (92%)
+## Pillar 5: 10-Level Anonymization Suite (95%)
 
 - **Origins**: Production code from NAV (Norwegian Labour and Welfare Administration), upgraded with PQC + QRNG
 - **What works**: All 10 levels implemented as selectable tiers via `LevelAnonymizer.apply(df, level=N)`:
@@ -133,9 +133,10 @@
   - L8: Differential privacy (Laplace mechanism with configurable epsilon, QRNG noise)
   - L9: Combined K-Anonymity + Differential privacy
   - L10: Quantum OTP pseudoanonymization from entropy pool
+- **CLI**: `zipminator anonymize --level N input.csv output.csv` (Typer + Rich, levels 1-10)
 - **Entropy**: All L7-L10 use PoolProvider with OS fallback (never crash)
 - **Tests**: 64 new level tests + 45 existing integration tests (109 total)
-- **Gap**: CLI `--level N` flag not yet wired; Flutter UI level selector not connected to backend
+- **Gap**: Flutter UI level selector not connected to backend
 - **Integration**: JupyterLab, Pandas DataFrames, CLI, MCP tools
 
 ### File Paths
@@ -153,18 +154,19 @@
 
 ---
 
-## Pillar 6: Q-AI PQC AI Assistant (65%)
+## Pillar 6: Q-AI PQC AI Assistant (75%)
 
 - **What works**:
   - OllamaClient for local-first LLM (localhost:11434, models: llama3.2, mistral, phi-3)
   - PromptGuard with 18 injection patterns across 6 categories (system override, role hijack, delimiter injection, data extraction, encoding bypass, recursive injection)
+  - **PII scanning before send**: All `/api/ai/chat` and `/api/ai/summarize` routes scan user prompts for PII (SSN, email, credit card, phone, passwords, API keys). PII detected → HTTP 400 with type listing and risk level. Bypass with `X-PII-Scan: skip` header (enterprise opt-in)
   - FastAPI routes: POST /api/ai/chat (streaming), POST /api/ai/summarize, GET /api/ai/models
   - Graceful fallback when Ollama is offline (helpful error, no crash)
-  - All routes run PromptGuard before forwarding to LLM; injection returns HTTP 400
+  - All routes run PromptGuard then PII scan before forwarding to LLM
   - Flutter UI shell with model selector and chat interface
   - Tauri AI sidebar with config structs
-- **Tests**: 40 tests (30 prompt guard + 10 LLM service)
-- **What's missing**: PII scanning before send not wired; PQC tunnel mode for remote LLM calls not implemented; local model auto-download; Tauri sidebar not integrated with Ollama backend
+- **Tests**: 67 tests (30 prompt guard + 10 LLM service + 27 PII guard)
+- **What's missing**: PQC tunnel mode for remote LLM calls not implemented; local model auto-download; Tauri sidebar not integrated with Ollama backend
 
 ### File Paths
 
@@ -234,7 +236,7 @@
 
 ---
 
-## Pillar 9: Q-Mesh — Quantum-Secured WiFi Sensing (80%)
+## Pillar 9: Q-Mesh — Quantum-Secured WiFi Sensing (85%)
 
 - **Integration**: [RuView](https://github.com/MoHoushmand/RuView) WiFi DensePose system with Zipminator QRNG entropy
 - **What RuView does**: ESP32-S3 mesh network that senses human pose, breathing, heartbeat, and presence through WiFi CSI signals. No cameras, no wearables, no internet required
@@ -242,8 +244,8 @@
 - **Zipminator integration**: Replace the classical random entropy source for mesh key generation and rotation with Zipminator's QRNG (IBM Quantum 156q). The QRNG harvester produces 50KB/cycle; a mesh key is 16 bytes. This creates quantum-secured WiFi sensing mesh
 - **QUIC transport (ADR-032a)**: Aggregator-class nodes use `midstreamer-quic` with TLS 1.3 AEAD. ESP32-S3 nodes retain manual HMAC/SipHash over UDP
 - **Use cases**: Healthcare (vital sign monitoring, fall detection), defense (through-wall personnel tracking), elder care, smart buildings
-- **What works**: Entropy bridge crate (`crates/zipminator-mesh/`) with HKDF-SHA256 key derivation from quantum pool; MeshKey (16-byte PSK) and SipHashKey types with zeroize-on-drop; FilePoolSource and MemoryEntropySource; MeshProvisioner for key generation; 44 Rust tests passing
-- **What's missing**: CLI provisioner for writing mesh keys to NVS binary format for ESP32-S3; cross-repo integration script linking Zipminator QRNG output to RuView's `scripts/provision.py`; shared NVS key management
+- **What works**: Entropy bridge crate (`crates/zipminator-mesh/`) with HKDF-SHA256 key derivation from quantum pool; MeshKey (16-byte PSK) and SipHashKey types with zeroize-on-drop; FilePoolSource and MemoryEntropySource; MeshProvisioner with `provision_nvs_binary()` generating ESP32-S3-compatible blobs (magic header, mesh_id, PSK, SipHash key, SHA-256 checksum); 50 Rust tests passing
+- **What's missing**: Cross-repo integration script linking Zipminator QRNG output to RuView's `scripts/provision.py`; shared NVS key management; OTA key rotation over mesh
 
 ### Architecture
 
@@ -477,22 +479,22 @@ Settings screen: theme toggle (dark/light), Rust bridge version, crypto engine i
 
 ---
 
-## Test Summary (verified 2026-03-17)
+## Test Summary (verified 2026-03-19)
 
 | Suite | Count | Command |
 |-------|:-----:|---------|
-| Rust core | 214 | `cargo test -p zipminator-core` |
+| Rust core | 218 | `cargo test -p zipminator-core` |
 | Rust browser | 157 | `cargo test -p zipbrowser` |
 | Rust app bridge | 15 | `cargo test -p zipminator-app` |
 | Rust FRB bridge | 5 | `cargo test -p rust_lib_zipminator` |
 | Rust NIST | 5 | `cargo test -p nist-kat` |
 | Rust bench | 17 | `cargo test -p zipminator-bench` |
-| Rust mesh | 28 | `cargo test -p zipminator-mesh` |
-| **Rust total** | **441** | `cargo test --workspace` |
+| Rust mesh | 50 | `cargo test -p zipminator-mesh` |
+| **Rust total** | **451** | `cargo test --workspace` |
 | Flutter widget | 23 | `cd app && flutter test` |
 | Web vitest | 30 | `cd web && npm test` |
 | Mobile Expo | 267/274 | `cd mobile && npm test` |
-| Python + integration | 429 | `micromamba activate zip-pqc && pytest tests/` |
+| Python + integration | 776 | `micromamba activate zip-pqc && pytest tests/` |
 
 ---
 
