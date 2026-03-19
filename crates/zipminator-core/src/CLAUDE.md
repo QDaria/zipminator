@@ -12,5 +12,6 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #1295 | 11:46 PM | 🟣 | Complete encrypted voicemail implementation with test coverage | ~440 |
 | #1292 | 11:45 PM | 🟣 | Encrypted voicemail storage with SRTP | ~361 |
 </claude-mem-context>
