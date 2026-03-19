@@ -176,6 +176,15 @@ pub struct SrtpContext {
     salt: [u8; 12],
 }
 
+impl std::fmt::Debug for SrtpContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("SrtpContext")
+            .field("key", &"[REDACTED]")
+            .field("salt", &"[REDACTED]")
+            .finish()
+    }
+}
+
 impl SrtpContext {
     /// Create an SRTP context from a 32-byte ML-KEM-768 shared secret.
     ///

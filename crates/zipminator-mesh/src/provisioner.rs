@@ -247,4 +247,109 @@ mod tests {
         let result = MeshProvisioner::new("/nonexistent/pool.bin", "net");
         assert!(result.is_err());
     }
+
+    // --- NVS binary tests ---
+
+    #[test]
+    fn test_nvs_binary_magic_bytes() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "nvs-net").unwrap();
+        let blob = prov.provision_nvs_binary("nvs-net").unwrap();
+        assert_eq!(&blob[..6], b"ZMESH\x01", "binary must start with magic bytes");
+    }
+
+    #[test]
+    fn test_nvs_binary_key_offsets() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "offset-net").unwrap();
+        let mesh_id = "offset-net";
+        let blob = prov.provision_nvs_binary(mesh_id).unwrap();
+
+        let id_len = u16::from_le_bytes([blob[6], blob[7]]) as usize;
+        assert_eq!(id_len, mesh_id.len());
+
+        // Verify mesh_id bytes
+        let id_start = 8;
+        let id_end = id_start + id_len;
+        assert_eq!(&blob[id_start..id_end], mesh_id.as_bytes());
+
+        // PSK starts right after mesh_id, 16 bytes
+        let psk_start = id_end;
+        let psk_end = psk_start + 16;
+        let psk = &blob[psk_start..psk_end];
+        assert_eq!(psk.len(), 16);
+        // PSK should not be all zeros
+        assert!(psk.iter().any(|&b| b != 0), "PSK must not be all zeros");
+
+        // SipHash key follows PSK, 16 bytes
+        let sip_start = psk_end;
+        let sip_end = sip_start + 16;
+        let sip = &blob[sip_start..sip_end];
+        assert_eq!(sip.len(), 16);
+        assert!(sip.iter().any(|&b| b != 0), "SipHash key must not be all zeros");
+
+        // PSK and SipHash key must differ
+        assert_ne!(psk, sip, "PSK and SipHash key must differ");
+
+        // Checksum is the final 32 bytes
+        let checksum_start = sip_end;
+        assert_eq!(blob.len(), checksum_start + 32);
+    }
+
+    #[test]
+    fn test_nvs_binary_checksum_validates() {
+        use sha2::{Digest, Sha256};
+
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "cksum-net").unwrap();
+        let blob = prov.provision_nvs_binary("cksum-net").unwrap();
+
+        // Split payload and checksum
+        let (payload, stored_checksum) = blob.split_at(blob.len() - 32);
+        let computed = Sha256::digest(payload);
+        assert_eq!(
+            computed.as_slice(),
+            stored_checksum,
+            "SHA-256 checksum must match payload"
+        );
+    }
+
+    #[test]
+    fn test_nvs_binary_different_mesh_ids_differ() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov1 = MeshProvisioner::new(&pool_path, "net-alpha").unwrap();
+        let mut prov2 = MeshProvisioner::new(&pool_path, "net-beta").unwrap();
+
+        let blob1 = prov1.provision_nvs_binary("net-alpha").unwrap();
+        let blob2 = prov2.provision_nvs_binary("net-beta").unwrap();
+
+        // Different lengths (different mesh_id strings) or different key material
+        assert_ne!(blob1, blob2, "different mesh_ids must produce different binaries");
+
+        // Also verify different key material specifically: extract PSK from each
+        let psk_offset_1 = 8 + "net-alpha".len();
+        let psk_offset_2 = 8 + "net-beta".len();
+        let psk1 = &blob1[psk_offset_1..psk_offset_1 + 16];
+        let psk2 = &blob2[psk_offset_2..psk_offset_2 + 16];
+        assert_ne!(psk1, psk2, "different mesh_ids must derive different PSKs");
+    }
+
+    #[test]
+    fn test_nvs_binary_empty_mesh_id_rejected() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "some-net").unwrap();
+        let result = prov.provision_nvs_binary("");
+        assert!(result.is_err(), "empty mesh_id must be rejected");
+    }
+
+    #[test]
+    fn test_nvs_binary_deterministic() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov1 = MeshProvisioner::new(&pool_path, "det-nvs").unwrap();
+        let mut prov2 = MeshProvisioner::new(&pool_path, "det-nvs").unwrap();
+
+        let blob1 = prov1.provision_nvs_binary("det-nvs").unwrap();
+        let blob2 = prov2.provision_nvs_binary("det-nvs").unwrap();
+        assert_eq!(blob1, blob2, "same inputs must produce identical binaries");
+    }
 }

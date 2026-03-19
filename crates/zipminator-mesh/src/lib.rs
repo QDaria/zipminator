@@ -21,5 +21,5 @@ pub mod siphash_key;
 
 pub use entropy_bridge::{EntropyBridge, EntropyBridgeError, PoolEntropySource};
 pub use mesh_key::MeshKey;
-pub use provisioner::MeshProvisioner;
+pub use provisioner::{MeshProvisioner, NVS_MAGIC};
 pub use siphash_key::SipHashKey;

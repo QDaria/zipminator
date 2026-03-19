@@ -68,12 +68,38 @@ def _scan_messages(messages: List[ChatMessage]) -> None:
                 )
 
 
+def _scan_pii(messages: List[ChatMessage]) -> None:
+    """Scan user messages for PII. Raises HTTPException(400) if PII is found."""
+    for msg in messages:
+        if msg.role == "user":
+            result = _pii.scan_text(msg.content)
+            if result["pii_detected"]:
+                types_str = ", ".join(result["types"])
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "error": (
+                            f"Prompt contains PII: {types_str}. "
+                            "Remove sensitive data before sending to AI."
+                        ),
+                        "pii_types": result["types"],
+                        "risk_level": result["risk_level"].value,
+                    },
+                )
+
+
 # ---------- Routes ----------
 
 @router.post("/api/ai/chat", response_model=ChatResponse, tags=["ai"])
-async def ai_chat(req: ChatRequest):
-    """Chat with the local LLM. Prompt guard runs first."""
+async def ai_chat(
+    req: ChatRequest,
+    x_pii_scan: Optional[str] = Header(None, alias="X-PII-Scan"),
+):
+    """Chat with the local LLM. Prompt guard and PII scan run first."""
     _scan_messages(req.messages)
+
+    if x_pii_scan != "skip":
+        _scan_pii(req.messages)
 
     if req.stream:
         async def _gen():
@@ -100,7 +126,10 @@ async def ai_chat(req: ChatRequest):
 
 
 @router.post("/api/ai/summarize", response_model=ChatResponse, tags=["ai"])
-async def ai_summarize(req: SummarizeRequest):
+async def ai_summarize(
+    req: SummarizeRequest,
+    x_pii_scan: Optional[str] = Header(None, alias="X-PII-Scan"),
+):
     """Summarize text using the local LLM."""
     result = _guard.scan(req.text)
     if not result.is_safe:
@@ -112,6 +141,22 @@ async def ai_summarize(req: SummarizeRequest):
                 "risk_score": result.risk_score,
             },
         )
+
+    if x_pii_scan != "skip":
+        pii_result = _pii.scan_text(req.text)
+        if pii_result["pii_detected"]:
+            types_str = ", ".join(pii_result["types"])
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "error": (
+                        f"Text contains PII: {types_str}. "
+                        "Remove sensitive data before sending to AI."
+                    ),
+                    "pii_types": pii_result["types"],
+                    "risk_level": pii_result["risk_level"].value,
+                },
+            )
 
     messages = [
         {
