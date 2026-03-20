@@ -174,195 +174,140 @@ requires_postgres = pytest.mark.skipif(
 
 @requires_postgres
 class TestEmailStorage:
-    """Test the async PostgreSQL storage layer."""
+    """Test the async PostgreSQL storage layer.
 
-    def _run(self, coro):
-        """Run an async coroutine synchronously."""
-        loop = asyncio.new_event_loop()
-        try:
-            return loop.run_until_complete(coro)
-        finally:
-            loop.close()
+    Uses subprocess to run each async test in isolation, avoiding the
+    event loop conflict between asyncpg and pytest-asyncio strict mode.
+    """
 
-    @pytest.fixture(autouse=True)
-    def storage(self):
-        """Create and tear down a storage instance with a clean table."""
-        EmailStorage = _get_email_storage_class()
+    def _run_async(self, code: str) -> str:
+        """Run async code in a subprocess to avoid event loop conflicts."""
+        import subprocess
+        full_code = f"""
+import asyncio, sys, os, base64, importlib.util, json
+sys.path.insert(0, '{PROJECT_ROOT}')
+spec = importlib.util.spec_from_file_location('storage', '{PROJECT_ROOT}/email/transport/storage.py')
+mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mod)
+EmailStorage = mod.EmailStorage
+spec2 = importlib.util.spec_from_file_location('pqc_bridge', '{PROJECT_ROOT}/email/transport/pqc_bridge.py')
+mod2 = importlib.util.module_from_spec(spec2)
+spec2.loader.exec_module(mod2)
+encrypt_email = mod2.encrypt_email
 
-        async def _setup():
-            s = await EmailStorage.create(_TEST_DB_URL)
-            async with s._pool.acquire() as conn:
-                await conn.execute("DELETE FROM emails")
-            return s
+async def _main():
+    s = await EmailStorage.create('{_TEST_DB_URL}')
+    async with s._pool.acquire() as conn:
+        await conn.execute('DELETE FROM emails')
+    {code}
+    await s.close()
+    print('OK')
 
-        self._storage = self._run(_setup())
-        yield self._storage
-        self._run(self._storage.close())
+asyncio.run(_main())
+"""
+        result = subprocess.run(
+            [sys.executable, "-c", full_code],
+            capture_output=True, text=True, timeout=15,
+        )
+        assert result.returncode == 0, f"Storage test failed:\n{result.stderr}"
+        return result.stdout
 
     def test_store_and_fetch_email(self):
-        async def _test():
-            pk_b64 = base64.b64encode(os.urandom(1184)).decode()
-            envelope = encrypt_email(b"Test body", pk_b64)
-            ct_bytes = base64.b64decode(envelope["ciphertext"])
-
-            email_id = await self._storage.store_email(
-                sender="alice@zipminator.zip",
-                recipient="bob@zipminator.zip",
-                subject="PQC Test",
-                encrypted_body=ct_bytes,
-                envelope_data=envelope,
-            )
-            assert email_id
-
-            fetched = await self._storage.fetch_email(email_id, "bob@zipminator.zip")
-            assert fetched is not None
-            assert fetched["sender"] == "alice@zipminator.zip"
-            assert fetched["subject"] == "PQC Test"
-            assert fetched["encrypted_body"] == ct_bytes
-
-        self._run(_test())
+        self._run_async("""
+    pk_b64 = base64.b64encode(os.urandom(1184)).decode()
+    envelope = encrypt_email(b'Test body', pk_b64)
+    ct_bytes = base64.b64decode(envelope['ciphertext'])
+    email_id = await s.store_email(
+        sender='alice@zipminator.zip', recipient='bob@zipminator.zip',
+        subject='PQC Test', encrypted_body=ct_bytes, envelope_data=envelope,
+    )
+    assert email_id
+    fetched = await s.fetch_email(email_id, 'bob@zipminator.zip')
+    assert fetched is not None
+    assert fetched['sender'] == 'alice@zipminator.zip'
+    assert fetched['subject'] == 'PQC Test'
+    assert fetched['encrypted_body'] == ct_bytes
+""")
 
     def test_list_emails_for_recipient(self):
-        async def _test():
-            pk_b64 = base64.b64encode(os.urandom(32)).decode()
-            envelope = encrypt_email(b"msg1", pk_b64)
-
-            for i in range(3):
-                await self._storage.store_email(
-                    sender="alice@zipminator.zip",
-                    recipient="bob@zipminator.zip",
-                    subject=f"Email #{i}",
-                    encrypted_body=b"encrypted",
-                    envelope_data=envelope,
-                )
-
-            emails = await self._storage.list_emails("bob@zipminator.zip")
-            assert len(emails) == 3
-
-            emails_carol = await self._storage.list_emails("carol@zipminator.zip")
-            assert len(emails_carol) == 0
-
-        self._run(_test())
+        self._run_async("""
+    pk_b64 = base64.b64encode(os.urandom(32)).decode()
+    envelope = encrypt_email(b'msg1', pk_b64)
+    for i in range(3):
+        await s.store_email(sender='alice@zipminator.zip', recipient='bob@zipminator.zip',
+            subject=f'Email #{i}', encrypted_body=b'encrypted', envelope_data=envelope)
+    emails = await s.list_emails('bob@zipminator.zip')
+    assert len(emails) == 3
+    emails_carol = await s.list_emails('carol@zipminator.zip')
+    assert len(emails_carol) == 0
+""")
 
     def test_mark_read(self):
-        async def _test():
-            pk_b64 = base64.b64encode(os.urandom(32)).decode()
-            envelope = encrypt_email(b"read test", pk_b64)
-
-            email_id = await self._storage.store_email(
-                sender="alice@zipminator.zip",
-                recipient="bob@zipminator.zip",
-                subject="Read Test",
-                encrypted_body=b"encrypted",
-                envelope_data=envelope,
-            )
-
-            unseen = await self._storage.count_unseen("bob@zipminator.zip")
-            assert unseen == 1
-
-            result = await self._storage.mark_read(email_id, "bob@zipminator.zip")
-            assert result is True
-
-            unseen_after = await self._storage.count_unseen("bob@zipminator.zip")
-            assert unseen_after == 0
-
-        self._run(_test())
+        self._run_async("""
+    pk_b64 = base64.b64encode(os.urandom(32)).decode()
+    envelope = encrypt_email(b'read test', pk_b64)
+    email_id = await s.store_email(sender='alice@zipminator.zip', recipient='bob@zipminator.zip',
+        subject='Read Test', encrypted_body=b'encrypted', envelope_data=envelope)
+    unseen = await s.count_unseen('bob@zipminator.zip')
+    assert unseen == 1
+    result = await s.mark_read(email_id, 'bob@zipminator.zip')
+    assert result is True
+    unseen_after = await s.count_unseen('bob@zipminator.zip')
+    assert unseen_after == 0
+""")
 
     def test_soft_delete(self):
-        async def _test():
-            pk_b64 = base64.b64encode(os.urandom(32)).decode()
-            envelope = encrypt_email(b"delete test", pk_b64)
-
-            email_id = await self._storage.store_email(
-                sender="alice@zipminator.zip",
-                recipient="bob@zipminator.zip",
-                subject="Delete Test",
-                encrypted_body=b"encrypted",
-                envelope_data=envelope,
-            )
-
-            result = await self._storage.soft_delete(email_id, "bob@zipminator.zip")
-            assert result is True
-
-            fetched = await self._storage.fetch_email(email_id, "bob@zipminator.zip")
-            assert fetched is None
-
-        self._run(_test())
+        self._run_async("""
+    pk_b64 = base64.b64encode(os.urandom(32)).decode()
+    envelope = encrypt_email(b'delete test', pk_b64)
+    email_id = await s.store_email(sender='alice@zipminator.zip', recipient='bob@zipminator.zip',
+        subject='Delete Test', encrypted_body=b'encrypted', envelope_data=envelope)
+    result = await s.soft_delete(email_id, 'bob@zipminator.zip')
+    assert result is True
+    fetched = await s.fetch_email(email_id, 'bob@zipminator.zip')
+    assert fetched is None
+""")
 
     def test_self_destruct_ttl_purge(self):
         """Store an email with TTL=1s, wait 2s, run purge, verify deleted."""
-
-        async def _test():
-            pk_b64 = base64.b64encode(os.urandom(32)).decode()
-            envelope = encrypt_email(b"self-destruct payload", pk_b64)
-
-            destruct_at = datetime.now(timezone.utc) + timedelta(seconds=1)
-
-            email_id = await self._storage.store_email(
-                sender="alice@zipminator.zip",
-                recipient="bob@zipminator.zip",
-                subject="Self-Destruct Test",
-                encrypted_body=b"encrypted",
-                envelope_data=envelope,
-                self_destruct_at=destruct_at,
-            )
-
-            # Immediately: email should exist
-            fetched = await self._storage.fetch_email(email_id, "bob@zipminator.zip")
-            assert fetched is not None, "Email should exist immediately after storage"
-
-            # Purge now: TTL not yet expired, should not delete
-            await self._storage.delete_expired()
-            fetched_still = await self._storage.fetch_email(email_id, "bob@zipminator.zip")
-            assert fetched_still is not None, "Email should survive early purge"
-
-            # Wait for TTL to expire
-            await asyncio.sleep(2)
-
-            # Purge again: TTL expired, should delete
-            purged = await self._storage.delete_expired()
-            assert purged >= 1, f"Expected at least 1 purged email, got {purged}"
-
-            # Verify email is gone
-            fetched_after = await self._storage.fetch_email(email_id, "bob@zipminator.zip")
-            assert fetched_after is None, "Email should be deleted after TTL expiry and purge"
-
-        self._run(_test())
+        self._run_async("""
+    from datetime import datetime, timedelta, timezone
+    pk_b64 = base64.b64encode(os.urandom(32)).decode()
+    envelope = encrypt_email(b'self-destruct payload', pk_b64)
+    destruct_at = datetime.now(timezone.utc) + timedelta(seconds=1)
+    email_id = await s.store_email(sender='alice@zipminator.zip', recipient='bob@zipminator.zip',
+        subject='Self-Destruct Test', encrypted_body=b'encrypted', envelope_data=envelope,
+        self_destruct_at=destruct_at)
+    fetched = await s.fetch_email(email_id, 'bob@zipminator.zip')
+    assert fetched is not None, 'Email should exist immediately'
+    await s.delete_expired()
+    fetched_still = await s.fetch_email(email_id, 'bob@zipminator.zip')
+    assert fetched_still is not None, 'Email should survive early purge'
+    await asyncio.sleep(2)
+    purged = await s.delete_expired()
+    assert purged >= 1, f'Expected at least 1 purged, got {purged}'
+    fetched_after = await s.fetch_email(email_id, 'bob@zipminator.zip')
+    assert fetched_after is None, 'Email should be deleted after TTL expiry'
+""")
 
     def test_self_destruct_does_not_affect_permanent_emails(self):
         """Emails without self_destruct_at should never be purged."""
-
-        async def _test():
-            pk_b64 = base64.b64encode(os.urandom(32)).decode()
-            envelope = encrypt_email(b"permanent message", pk_b64)
-
-            email_id = await self._storage.store_email(
-                sender="alice@zipminator.zip",
-                recipient="bob@zipminator.zip",
-                subject="Permanent Email",
-                encrypted_body=b"encrypted",
-                envelope_data=envelope,
-            )
-
-            expired_id = await self._storage.store_email(
-                sender="alice@zipminator.zip",
-                recipient="bob@zipminator.zip",
-                subject="Expired Email",
-                encrypted_body=b"encrypted",
-                envelope_data=envelope,
-                self_destruct_at=datetime.now(timezone.utc) - timedelta(seconds=10),
-            )
-
-            purged = await self._storage.delete_expired()
-            assert purged == 1
-
-            fetched = await self._storage.fetch_email(email_id, "bob@zipminator.zip")
-            assert fetched is not None
-
-            fetched_expired = await self._storage.fetch_email(expired_id, "bob@zipminator.zip")
-            assert fetched_expired is None
-
-        self._run(_test())
+        self._run_async("""
+    from datetime import datetime, timedelta, timezone
+    pk_b64 = base64.b64encode(os.urandom(32)).decode()
+    envelope = encrypt_email(b'permanent message', pk_b64)
+    email_id = await s.store_email(sender='alice@zipminator.zip', recipient='bob@zipminator.zip',
+        subject='Permanent Email', encrypted_body=b'encrypted', envelope_data=envelope)
+    expired_id = await s.store_email(sender='alice@zipminator.zip', recipient='bob@zipminator.zip',
+        subject='Expired Email', encrypted_body=b'encrypted', envelope_data=envelope,
+        self_destruct_at=datetime.now(timezone.utc) - timedelta(seconds=10))
+    purged = await s.delete_expired()
+    assert purged == 1
+    fetched = await s.fetch_email(email_id, 'bob@zipminator.zip')
+    assert fetched is not None
+    fetched_expired = await s.fetch_email(expired_id, 'bob@zipminator.zip')
+    assert fetched_expired is None
+""")
 
 
 # ---------------------------------------------------------------------------
