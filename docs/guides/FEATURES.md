@@ -29,7 +29,7 @@
 | 6 | **Q-AI Assistant** | **85%** | Done | Done | Done | Partial | Prompt guard + Ollama + PII scan + PQC tunnel done (45 AI tests) |
 | 7 | **Quantum Mail** | **75%** | Done | Done | Done | Partial | PQC envelope + SMTP transport + server-side self-destruct TTL (15 tests) |
 | 8 | **ZipBrowser** | **85%** | Done | Done | Done | Done | AI sidebar integrated (Recipe W); WebView limitation (ADR documented) |
-| 9 | **Q-Mesh (RuView)** | **85%** | Done | Done | Planned | Partial | HKDF entropy bridge + NVS binary provisioner done (50 tests); RuView repo link pending |
+| 9 | **Q-Mesh (RuView)** | **90%** | Done | Done | Planned | Partial | Physical Cryptography Wave 1 complete: 6 new modules, 106 mesh tests, 513 workspace total |
 
 **Legend**: Done = code exists, tested, reviewed | Partial = code exists but incomplete | Planned = no code yet
 

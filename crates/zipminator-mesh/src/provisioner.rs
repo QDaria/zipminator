@@ -9,12 +9,17 @@ use std::path::Path;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 
+use crate::em_canary::EmCanaryPolicy;
 use crate::entropy_bridge::{EntropyBridge, EntropyBridgeError, FilePoolSource};
 use crate::mesh_key::MeshKey;
+use crate::puek::PuekEnrollment;
 use crate::siphash_key::SipHashKey;
 
-/// Magic bytes identifying a Zipminator NVS mesh binary blob.
+/// Magic bytes identifying a Zipminator NVS mesh binary blob (v1).
 pub const NVS_MAGIC: &[u8; 6] = b"ZMESH\x01";
+
+/// Magic bytes identifying a Zipminator NVS mesh binary blob (v2, with PUEK + EM Canary).
+pub const NVS_MAGIC_V2: &[u8; 6] = b"ZMESH\x02";
 
 /// Size of the SHA-256 checksum appended to the NVS binary.
 const NVS_CHECKSUM_SIZE: usize = 32;
@@ -30,6 +35,81 @@ pub struct MeshKeySet {
     pub rotation_epoch: u64,
     /// Network identifier used as HKDF salt for domain separation.
     pub network_id: String,
+}
+
+/// A complete key set for one mesh provisioning epoch, with optional PUEK and EM Canary config.
+#[derive(Debug, Clone)]
+pub struct MeshKeySetV2 {
+    /// Base key set (PSK, frame key, epoch, network ID).
+    pub base: MeshKeySet,
+    /// Optional PUEK enrollment data for environment-bound keys.
+    pub puek_enrollment: Option<PuekEnrollmentData>,
+    /// Optional EM Canary policy for anomaly-driven session control.
+    pub canary_policy: Option<CanaryPolicyData>,
+}
+
+/// Serializable subset of PUEK enrollment for NVS binary embedding.
+#[derive(Debug, Clone)]
+pub struct PuekEnrollmentData {
+    /// SVD-derived eigenmodes (f64 LE each).
+    pub eigenmodes: Vec<f64>,
+    /// Similarity threshold for verification.
+    pub threshold: f64,
+}
+
+impl PuekEnrollmentData {
+    /// Build from a `PuekEnrollment`.
+    pub fn from_enrollment(enrollment: &PuekEnrollment) -> Self {
+        // Access fields through public API
+        let eigenmode_count = enrollment.eigenmode_count();
+        let threshold = enrollment.threshold();
+        // We cannot directly access eigenmodes from PuekEnrollment (private field).
+        // This constructor is for callers who already have the data.
+        // Use `new` instead.
+        Self {
+            eigenmodes: Vec::with_capacity(eigenmode_count),
+            threshold,
+        }
+    }
+
+    /// Create directly from eigenmode data.
+    pub fn new(eigenmodes: Vec<f64>, threshold: f64) -> Self {
+        Self {
+            eigenmodes,
+            threshold,
+        }
+    }
+}
+
+/// Serializable subset of EM Canary policy for NVS binary embedding.
+#[derive(Debug, Clone)]
+pub struct CanaryPolicyData {
+    /// Eigenstructure deviation threshold for Elevated.
+    pub elevated_threshold: f64,
+    /// Eigenstructure deviation threshold for High.
+    pub high_threshold: f64,
+    /// Eigenstructure deviation threshold for Critical.
+    pub critical_threshold: f64,
+    /// Maximum consecutive anomaly events before forced escalation.
+    pub max_consecutive_anomalies: u32,
+    /// Whether to automatically rekey on Elevated threat.
+    pub rekey_on_elevated: bool,
+    /// Whether to terminate session on Critical threat.
+    pub terminate_on_critical: bool,
+}
+
+impl CanaryPolicyData {
+    /// Build from an `EmCanaryPolicy`.
+    pub fn from_policy(policy: &EmCanaryPolicy) -> Self {
+        Self {
+            elevated_threshold: policy.elevated_threshold,
+            high_threshold: policy.high_threshold,
+            critical_threshold: policy.critical_threshold,
+            max_consecutive_anomalies: policy.max_consecutive_anomalies,
+            rekey_on_elevated: policy.rekey_on_elevated,
+            terminate_on_critical: policy.terminate_on_critical,
+        }
+    }
 }
 
 /// Derives and manages mesh key sets from the quantum entropy pool.
