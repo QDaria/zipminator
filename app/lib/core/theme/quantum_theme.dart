@@ -13,6 +13,18 @@ class QuantumTheme {
   static const Color quantumOrange = Color(0xFFFF9100);
   static const Color quantumRed = Color(0xFFFF5252);
 
+  // ── Glassmorphic Constants ─────────────────────────────────────────────
+  static const double glassBlur = 12.0;
+  static const double glassOpacity = 0.08;
+  static const double glassBorderOpacity = 0.3;
+  static const double glassBorderRadius = 16.0;
+
+  /// Two-layer glow shadow preset, tinted by pillar color.
+  static List<BoxShadow> pillarGlow(Color color) => [
+    BoxShadow(color: color.withValues(alpha: 0.2), blurRadius: 24, spreadRadius: -4),
+    BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 48, spreadRadius: -8),
+  ];
+
   // ── Surface Colors ────────────────────────────────────────────────────
   static const Color surfaceDark = Color(0xFF0A0A1A);
   static const Color surfaceCard = Color(0xFF111128);

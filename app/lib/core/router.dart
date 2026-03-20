@@ -1,4 +1,7 @@
 import 'package:go_router/go_router.dart';
+import 'package:zipminator/core/services/supabase_service.dart';
+import 'package:zipminator/features/auth/login_screen.dart';
+import 'package:zipminator/features/auth/profile_screen.dart';
 import 'package:zipminator/features/vault/vault_screen.dart';
 import 'package:zipminator/features/messenger/messenger_screen.dart';
 import 'package:zipminator/features/voip/voip_screen.dart';
@@ -13,9 +16,23 @@ import 'package:zipminator/shared/widgets/shell_scaffold.dart';
 /// App-wide GoRouter configuration.
 ///
 /// Uses ShellRoute for persistent bottom navigation across all 8 pillars.
+/// Unauthenticated users are redirected to /login.
 final GoRouter appRouter = GoRouter(
   initialLocation: '/vault',
+  redirect: (context, state) {
+    final loggedIn = SupabaseService.currentUser != null;
+    final isLoginRoute = state.matchedLocation == '/login';
+
+    if (!loggedIn && !isLoginRoute) return '/login';
+    if (loggedIn && isLoginRoute) return '/vault';
+    return null;
+  },
   routes: [
+    GoRoute(
+      path: '/login',
+      name: 'login',
+      builder: (context, state) => const LoginScreen(),
+    ),
     ShellRoute(
       builder: (context, state, child) => ShellScaffold(child: child),
       routes: [
@@ -63,6 +80,11 @@ final GoRouter appRouter = GoRouter(
           path: '/settings',
           name: 'settings',
           builder: (context, state) => const SettingsScreen(),
+        ),
+        GoRoute(
+          path: '/profile',
+          name: 'profile',
+          builder: (context, state) => const ProfileScreen(),
         ),
       ],
     ),
