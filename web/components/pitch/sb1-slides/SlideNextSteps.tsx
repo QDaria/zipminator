@@ -183,6 +183,12 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
             >
               Hva SpareBank 1 får
             </p>
+            <p
+              className="text-slate-200 text-sm font-semibold mb-2 px-2 py-1.5 rounded"
+              style={{ fontFamily: "'DM Sans', sans-serif", background: 'rgba(34,211,238,0.08)', border: '1px solid rgba(34,211,238,0.2)' }}
+            >
+              Total pilot-investering: <span className="text-cyan-400">NOK 2–5M</span> for Fase 1. Full implementering: <span className="text-emerald-400">NOK 8–15M</span>.
+            </p>
             <div className="space-y-1">
               {[
                 'Nordens første post-kvantum sikrede bank-infrastruktur',

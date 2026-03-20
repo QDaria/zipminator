@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import {
   BarChart,
   Bar,
@@ -76,9 +77,11 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
           </div>
         </div>
 
+        <Image src="/logos/Zipminator_0_light.svg" alt="Zipminator" width={200} height={33} className="object-contain mb-2" />
+
         <SlideTitle
           eyebrow="Post-Kvantum Kryptografi"
-          title="Zipminator: Kvantesikker infrastruktur for hele alliansen."
+          title="Kvantesikker infrastruktur for hele alliansen."
           subtitle="SB1 Utvikling sin sentraliserte Azure-plattform er én arkitektur for 14 banker. Én Zipminator-implementering beskytter alle 14 — til én brøkdel av individuelle kostnader."
           accentColor="#FB7185"
         />
@@ -298,31 +301,33 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
               </div>
             </div>
 
-            {/* Rigetti differentiator */}
+            {/* Investment & ROI */}
             <div
-              className="rounded-lg p-3"
-              style={{
-                background: 'rgba(245,158,11,0.05)',
-                border: '1px solid rgba(245,158,11,0.2)',
-                boxShadow: '0 0 16px rgba(245,158,11,0.1)',
-              }}
+              className="rounded-lg overflow-hidden"
+              style={{ border: '1px solid rgba(34,211,238,0.25)', boxShadow: '0 0 16px rgba(34,211,238,0.1)' }}
             >
-              <p
-                className="text-amber-400 text-xs font-mono mb-1 uppercase tracking-wider"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              <div
+                className="px-4 py-2.5 border-b"
+                style={{
+                  background: 'rgba(34,211,238,0.08)',
+                  borderColor: 'rgba(34,211,238,0.2)',
+                }}
               >
-                Rigetti-fordel
-              </p>
-              <p
-                className="text-slate-300 text-sm leading-relaxed"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
-                Rigetti har aktive prosjekter med{' '}
-                <strong className="text-slate-100">HSBC</strong>,{' '}
-                <strong className="text-slate-100">Standard Chartered</strong> og{' '}
-                <strong className="text-slate-100">Nasdaq</strong>. QDaria bringer denne
-                kompetansen direkte inn i SpareBank 1-alliansen som eneste norske aktør.
-              </p>
+                <span
+                  className="text-cyan-400 text-xs font-mono tracking-wider uppercase"
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                >
+                  Investering og avkastning
+                </span>
+              </div>
+              <div className="p-1">
+                <DataRow label="Implementeringskostnad" value="NOK 8–15M" accent="#34D399" highlight />
+                <DataRow label="Dekker antall banker" value="14 (hele alliansen)" />
+                <DataRow label="Kostnad per bank" value="NOK 570K–1.1M" />
+                <DataRow label="Beskytter forvaltningskapital" value="NOK 625 mrd." accent="#22D3EE" highlight />
+                <DataRow label="Estimert ROI (5 år)" value=">400%" accent="#34D399" highlight />
+                <DataRow label="Tid til full implementering" value="12–24 mnd." />
+              </div>
             </div>
           </div>
         </div>

@@ -28,19 +28,20 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   source,
 }) => {
   const c = colorMap[color];
-  const valueSize = size === 'lg' ? 'text-4xl lg:text-5xl' : size === 'md' ? 'text-3xl lg:text-4xl' : 'text-2xl lg:text-3xl';
+  const valueSize = size === 'lg' ? 'text-4xl lg:text-5xl' : size === 'md' ? 'text-3xl lg:text-4xl' : 'text-3xl lg:text-4xl';
 
   return (
     <div
       className="rounded-lg p-5 flex flex-col gap-1 relative overflow-hidden"
       style={{
-        background: c.bg,
+        background: `linear-gradient(135deg, ${c.bg} 0%, rgba(2,8,23,0.6) 100%)`,
         border: `1px solid ${c.border}`,
-        boxShadow: `0 0 20px ${c.glow}, inset 0 1px 0 ${c.border}`,
+        boxShadow: `0 0 24px ${c.glow}, 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 ${c.border}`,
+        backdropFilter: 'blur(8px)',
       }}
     >
       <div
-        className="absolute top-0 left-0 right-0 h-px"
+        className="absolute top-0 left-0 right-0 h-0.5"
         style={{ background: `linear-gradient(90deg, transparent, ${c.text}, transparent)` }}
       />
       <span
@@ -92,6 +93,9 @@ export const DataRow: React.FC<DataRowProps> = ({
     className={`flex justify-between items-center py-2.5 px-4 rounded ${
       highlight ? 'bg-slate-800/60' : 'border-b border-slate-800/50'
     }`}
+    style={{
+      borderLeft: highlight ? `3px solid ${accent}` : 'none',
+    }}
   >
     <span
       className="text-slate-300 text-sm"
@@ -100,7 +104,7 @@ export const DataRow: React.FC<DataRowProps> = ({
       {label}
     </span>
     <span
-      className="text-sm font-mono font-semibold"
+      className={`${highlight ? 'text-base' : 'text-sm'} font-mono font-semibold`}
       style={{ color: highlight ? accent : '#F1F5F9', fontFamily: "'JetBrains Mono', monospace" }}
     >
       {value}
@@ -122,6 +126,7 @@ export const Tag: React.FC<TagProps> = ({ children, color = 'cyan' }) => {
         color: c.text,
         background: c.bg,
         border: `1px solid ${c.border}`,
+        boxShadow: `0 0 8px ${c.glow}`,
         fontFamily: "'JetBrains Mono', monospace",
       }}
     >

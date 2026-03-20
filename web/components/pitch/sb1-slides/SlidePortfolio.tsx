@@ -297,7 +297,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                 </span>
               </div>
               <div className="p-1">
-                <DataRow label="Leveringsmodell" value="QCaaS (SaaS)" accent="#F59E0B" />
+                <DataRow label="Leveringsmodell" value="QCaaS (SaaS)" accent="#F59E0B" highlight />
                 <DataRow label="Hardware-CAPEX SB1" value="NOK 0" accent="#34D399" highlight />
                 <DataRow label="Første pilot (estimat)" value="3 mnd." />
                 <DataRow

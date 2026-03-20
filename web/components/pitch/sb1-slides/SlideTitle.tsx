@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import type { Scenario } from '@/lib/sb1-chart-data';
 import { AnimatedCounter } from '../pitch-ui/AnimatedCounter';
 import { SpeakerNotes } from '../pitch-ui/SpeakerNotes';
@@ -106,22 +107,7 @@ export const SlideTitle: React.FC<SlideTitleProps> = ({ scenario: _scenario }) =
                 boxShadow: '0 0 16px rgba(34,211,238,0.1)',
               }}
             >
-              <div
-                className="w-7 h-7 rounded flex items-center justify-center font-bold text-sm"
-                style={{
-                  background: 'rgba(34,211,238,0.2)',
-                  color: '#22D3EE',
-                  fontFamily: "'JetBrains Mono', monospace",
-                }}
-              >
-                Q
-              </div>
-              <span
-                className="text-slate-200 text-sm font-medium"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
-                QDaria AS
-              </span>
+              <Image src="/logos/QDwordmark2.svg" alt="QDaria" width={100} height={26} className="object-contain" />
             </div>
             <div
               className="text-slate-400 text-lg"

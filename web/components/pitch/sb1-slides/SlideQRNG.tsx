@@ -271,6 +271,7 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
                   <DataRow label="Volum (Vipps+BankID/år)" value="~2 mrd. operasjoner" />
                   <DataRow label="Kostnad per million ops" value="NOK ~0.1" />
                   <DataRow label="Inkrementell sikkerhetspremie" value="Prishevingsgrunnlag" accent="#F59E0B" highlight />
+                  <DataRow label="Estimert årlig verdi SB1" value="NOK 5–15M" accent="#34D399" highlight />
                 </div>
               </div>
 

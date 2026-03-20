@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 
 interface SB1SidebarProps {
   slides: { id: number; title: string }[];
@@ -25,31 +26,13 @@ export const SB1Sidebar: React.FC<SB1SidebarProps> = ({ slides, current, onGoTo 
         style={{ borderColor: 'rgba(34,211,238,0.1)' }}
       >
         <div className="flex items-center gap-2 mb-1">
-          <div
-            className="w-7 h-7 rounded flex items-center justify-center font-bold text-sm"
-            style={{
-              background: 'rgba(34,211,238,0.15)',
-              border: '1px solid rgba(34,211,238,0.4)',
-              color: '#22D3EE',
-              fontFamily: "'JetBrains Mono', monospace",
-            }}
+          <Image src="/logos/QDwordmark2.svg" alt="QDaria" width={90} height={23} className="object-contain" />
+          <p
+            className="text-slate-500 text-[10px] font-mono leading-tight"
+            style={{ fontFamily: "'JetBrains Mono', monospace" }}
           >
-            Q
-          </div>
-          <div>
-            <p
-              className="text-slate-200 text-sm font-semibold leading-tight"
-              style={{ fontFamily: "'Fraunces', Georgia, serif" }}
-            >
-              QDaria
-            </p>
-            <p
-              className="text-slate-500 text-[10px] font-mono leading-tight"
-              style={{ fontFamily: "'JetBrains Mono', monospace" }}
-            >
-              × SpareBank 1
-            </p>
-          </div>
+            × SpareBank 1
+          </p>
         </div>
         <div className="flex items-center gap-1.5 mt-2">
           <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
