@@ -62,7 +62,7 @@ const Navigation = () => {
     { name: 'Features', href: '/features' },
     { name: 'Technology', href: '/technology' },
     { name: 'Demo', href: '/demo' },
-    { name: 'Docs', href: '/docs' },
+    { name: 'Docs', href: 'https://qdaria.github.io/zipminator/' },
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Invest', href: '/invest' },
   ]
@@ -162,6 +162,7 @@ const Navigation = () => {
               <Link
                 key={link.name}
                 href={link.href}
+                {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                 className="nav-glow px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200 font-medium"
               >
                 {link.name}
@@ -260,6 +261,7 @@ const Navigation = () => {
                 <Link
                   key={link.name}
                   href={link.href}
+                  {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                   className="block py-2.5 px-3 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all font-medium"
                   onClick={() => setIsOpen(false)}
                 >
