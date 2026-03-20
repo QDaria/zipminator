@@ -48,6 +48,21 @@ pub struct MeshKeySetV2 {
     pub canary_policy: Option<CanaryPolicyData>,
 }
 
+/// Parsed result of a V2 NVS binary blob.
+#[derive(Debug, Clone)]
+pub struct ParsedNvsV2 {
+    /// Mesh network identifier.
+    pub mesh_id: String,
+    /// 16-byte PSK for beacon auth.
+    pub psk: [u8; 16],
+    /// 16-byte SipHash key for frame integrity.
+    pub siphash: [u8; 16],
+    /// Optional PUEK enrollment data.
+    pub puek: Option<PuekEnrollmentData>,
+    /// Optional EM Canary policy.
+    pub canary: Option<CanaryPolicyData>,
+}
+
 /// Serializable subset of PUEK enrollment for NVS binary embedding.
 #[derive(Debug, Clone)]
 pub struct PuekEnrollmentData {
@@ -339,16 +354,7 @@ impl MeshProvisioner {
     /// Validates the SHA-256 checksum.
     pub fn parse_nvs_v2_binary(
         blob: &[u8],
-    ) -> Result<
-        (
-            String,
-            [u8; 16],
-            [u8; 16],
-            Option<PuekEnrollmentData>,
-            Option<CanaryPolicyData>,
-        ),
-        EntropyBridgeError,
-    > {
+    ) -> Result<ParsedNvsV2, EntropyBridgeError> {
         if blob.len() < NVS_MAGIC_V2.len() + 2 + NVS_CHECKSUM_SIZE {
             return Err(EntropyBridgeError::PoolNotAccessible(
                 "blob too short for V2 format".into(),
@@ -465,7 +471,13 @@ impl MeshProvisioner {
             None
         };
 
-        Ok((mesh_id, psk, sip, puek_data, canary_data))
+        Ok(ParsedNvsV2 {
+            mesh_id,
+            psk,
+            siphash: sip,
+            puek: puek_data,
+            canary: canary_data,
+        })
     }
 
     /// Rotate keys by incrementing the epoch and re-deriving.
@@ -695,21 +707,20 @@ mod tests {
             .provision_nvs_v2_binary("v2-puek", Some(&puek), None)
             .unwrap();
 
-        let (mesh_id, psk, sip, parsed_puek, parsed_canary) =
-            MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
+        let parsed = MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
 
-        assert_eq!(mesh_id, "v2-puek");
-        assert!(psk.iter().any(|&b| b != 0), "PSK must not be all zeros");
-        assert!(sip.iter().any(|&b| b != 0), "SipHash must not be all zeros");
-        assert_ne!(psk, sip);
+        assert_eq!(parsed.mesh_id, "v2-puek");
+        assert!(parsed.psk.iter().any(|&b| b != 0), "PSK must not be all zeros");
+        assert!(parsed.siphash.iter().any(|&b| b != 0), "SipHash must not be all zeros");
+        assert_ne!(parsed.psk, parsed.siphash);
 
-        let p = parsed_puek.expect("PUEK data should be present");
+        let p = parsed.puek.expect("PUEK data should be present");
         assert_eq!(p.eigenmodes.len(), 4);
         assert!((p.eigenmodes[0] - 100.5).abs() < 1e-10);
         assert!((p.eigenmodes[3] - 5.1).abs() < 1e-10);
         assert!((p.threshold - 0.85).abs() < 1e-10);
 
-        assert!(parsed_canary.is_none(), "canary should be absent");
+        assert!(parsed.canary.is_none(), "canary should be absent");
     }
 
     #[test]
@@ -721,13 +732,12 @@ mod tests {
             .provision_nvs_v2_binary("v2-canary", None, Some(&canary))
             .unwrap();
 
-        let (mesh_id, _psk, _sip, parsed_puek, parsed_canary) =
-            MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
+        let parsed = MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
 
-        assert_eq!(mesh_id, "v2-canary");
-        assert!(parsed_puek.is_none(), "PUEK should be absent");
+        assert_eq!(parsed.mesh_id, "v2-canary");
+        assert!(parsed.puek.is_none(), "PUEK should be absent");
 
-        let c = parsed_canary.expect("canary data should be present");
+        let c = parsed.canary.expect("canary data should be present");
         assert!((c.elevated_threshold - 0.10).abs() < 1e-10);
         assert!((c.high_threshold - 0.25).abs() < 1e-10);
         assert!((c.critical_threshold - 0.50).abs() < 1e-10);
@@ -746,12 +756,11 @@ mod tests {
             .provision_nvs_v2_binary("v2-both", Some(&puek), Some(&canary))
             .unwrap();
 
-        let (mesh_id, _psk, _sip, parsed_puek, parsed_canary) =
-            MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
+        let parsed = MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
 
-        assert_eq!(mesh_id, "v2-both");
-        assert!(parsed_puek.is_some(), "PUEK should be present");
-        assert!(parsed_canary.is_some(), "canary should be present");
+        assert_eq!(parsed.mesh_id, "v2-both");
+        assert!(parsed.puek.is_some(), "PUEK should be present");
+        assert!(parsed.canary.is_some(), "canary should be present");
     }
 
     #[test]
@@ -762,14 +771,13 @@ mod tests {
             .provision_nvs_v2_binary("v2-none", None, None)
             .unwrap();
 
-        let (mesh_id, psk, sip, parsed_puek, parsed_canary) =
-            MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
+        let parsed = MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
 
-        assert_eq!(mesh_id, "v2-none");
-        assert!(psk.iter().any(|&b| b != 0));
-        assert!(sip.iter().any(|&b| b != 0));
-        assert!(parsed_puek.is_none());
-        assert!(parsed_canary.is_none());
+        assert_eq!(parsed.mesh_id, "v2-none");
+        assert!(parsed.psk.iter().any(|&b| b != 0));
+        assert!(parsed.siphash.iter().any(|&b| b != 0));
+        assert!(parsed.puek.is_none());
+        assert!(parsed.canary.is_none());
     }
 
     #[test]
@@ -828,18 +836,17 @@ mod tests {
         let blob = prov
             .provision_nvs_v2_binary("v2-rt", Some(&puek), Some(&canary))
             .unwrap();
-        let (mesh_id, psk, sip, parsed_puek, parsed_canary) =
-            MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
+        let parsed = MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
 
-        assert_eq!(mesh_id, "v2-rt");
+        assert_eq!(parsed.mesh_id, "v2-rt");
 
         // Verify PUEK roundtrip
-        let p = parsed_puek.unwrap();
+        let p = parsed.puek.unwrap();
         assert_eq!(p.eigenmodes, vec![1.0, 2.0, 3.0]);
         assert!((p.threshold - 0.75).abs() < 1e-10);
 
         // Verify canary roundtrip
-        let c = parsed_canary.unwrap();
+        let c = parsed.canary.unwrap();
         assert!((c.elevated_threshold - 0.05).abs() < 1e-10);
         assert!((c.high_threshold - 0.20).abs() < 1e-10);
         assert!((c.critical_threshold - 0.40).abs() < 1e-10);
@@ -853,8 +860,8 @@ mod tests {
         let id_len = u16::from_le_bytes([blob_v1[6], blob_v1[7]]) as usize;
         let psk_v1 = &blob_v1[8 + id_len..8 + id_len + 16];
         let sip_v1 = &blob_v1[8 + id_len + 16..8 + id_len + 32];
-        assert_eq!(&psk, psk_v1, "V2 PSK must match V1 derivation");
-        assert_eq!(&sip, sip_v1, "V2 SipHash must match V1 derivation");
+        assert_eq!(&parsed.psk, psk_v1, "V2 PSK must match V1 derivation");
+        assert_eq!(&parsed.siphash, sip_v1, "V2 SipHash must match V1 derivation");
     }
 
     #[test]
