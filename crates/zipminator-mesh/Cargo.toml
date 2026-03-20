@@ -29,10 +29,26 @@ hex = "0.4"
 # Logging
 log = "0.4"
 
+# CSI entropy harvesting (complex-valued subcarrier data)
+num-complex = "0.4"
+
+# SVD for eigenstructure extraction (PUEK)
+nalgebra = "0.33"
+
+# Rolling HMAC for vital-sign continuous auth
+hmac = "0.12"
+
+# Graph operations for topology-based key derivation
+petgraph = "0.6"
+
+# SipHash-2-4 computation for topology fingerprinting
+siphasher = "1.0"
+
 [dev-dependencies]
 tempfile = "3"
 hex = "0.4"
 serde_json = "1"
+rand = "0.8"
 
 [lib]
 name = "zipminator_mesh"

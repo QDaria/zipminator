@@ -19,6 +19,14 @@ pub mod mesh_key;
 pub mod provisioner;
 pub mod siphash_key;
 
+// Wave 1: Physical Cryptography primitives
+pub mod csi_entropy;
+pub mod em_canary;
+pub mod puek;
+pub mod spatiotemporal;
+pub mod topology_auth;
+pub mod vital_auth;
+
 pub use entropy_bridge::{EntropyBridge, EntropyBridgeError, PoolEntropySource};
 pub use mesh_key::MeshKey;
 pub use provisioner::{MeshProvisioner, NVS_MAGIC};
