@@ -39,6 +39,8 @@ parts:
   - caption: "Part VI: Compliance & Use Cases"
     chapters:
       - file: content/compliance
+        sections:
+          - file: notebooks/04_compliance
       - file: content/use_cases/government
       - file: content/use_cases/healthcare
       - file: content/use_cases/finance

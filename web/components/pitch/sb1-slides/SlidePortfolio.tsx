@@ -114,8 +114,8 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                     <XAxis
                       dataKey="year"
                       tick={{
-                        fill: '#64748B',
-                        fontSize: 10,
+                        fill: '#94A3B8',
+                        fontSize: 11,
                         fontFamily: "'JetBrains Mono', monospace",
                       }}
                       tickLine={false}
@@ -124,8 +124,8 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                     <YAxis
                       domain={['auto', 'auto']}
                       tick={{
-                        fill: '#64748B',
-                        fontSize: 10,
+                        fill: '#94A3B8',
+                        fontSize: 11,
                         fontFamily: "'JetBrains Mono', monospace",
                       }}
                       tickLine={false}
@@ -145,7 +145,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                       iconType="circle"
                       iconSize={8}
                       wrapperStyle={{
-                        fontSize: 10,
+                        fontSize: 11,
                         fontFamily: "'JetBrains Mono', monospace",
                         color: '#94A3B8',
                       }}
@@ -177,7 +177,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
             {/* Speedup bar chart */}
             <div
               className="rounded-lg overflow-hidden"
-              style={{ border: '1px solid rgba(34,211,238,0.12)', boxShadow: '0 0 16px rgba(34,211,238,0.1)' }}
+              style={{ border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 16px rgba(34,211,238,0.1)' }}
             >
               <div
                 className="px-4 py-2 border-b"
@@ -208,7 +208,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                       dataKey="name"
                       tick={{
                         fill: '#94A3B8',
-                        fontSize: 10,
+                        fontSize: 11,
                         fontFamily: "'DM Sans', sans-serif",
                       }}
                       tickLine={false}
@@ -216,8 +216,8 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                     />
                     <YAxis
                       tick={{
-                        fill: '#64748B',
-                        fontSize: 9,
+                        fill: '#94A3B8',
+                        fontSize: 11,
                         fontFamily: "'JetBrains Mono', monospace",
                       }}
                       tickLine={false}

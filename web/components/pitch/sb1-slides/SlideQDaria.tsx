@@ -102,13 +102,13 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                       }}
                     >
                       <p
-                        className="text-[10px] font-semibold leading-tight"
+                        className="text-xs font-semibold leading-tight"
                         style={{ color: node.color, fontFamily: "'JetBrains Mono', monospace" }}
                       >
                         {node.location.split(',')[0]}
                       </p>
                       <p
-                        className="text-[9px] leading-tight mt-0.5"
+                        className="text-xs leading-tight mt-0.5"
                         style={{ color: '#64748B', fontFamily: "'DM Sans', sans-serif" }}
                       >
                         {node.purpose}
@@ -215,7 +215,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                         {p.product}
                       </span>
                       <span
-                        className="text-[10px] font-mono px-1.5 py-0.5 rounded"
+                        className="text-xs font-mono px-1.5 py-0.5 rounded"
                         style={{ color: p.color, background: `${p.color}15`, fontFamily: "'JetBrains Mono', monospace" }}
                       >
                         {p.tag}
@@ -248,8 +248,8 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                   className="grid grid-cols-3 px-3 py-1.5"
                   style={{ background: 'rgba(34,211,238,0.06)', borderBottom: '1px solid rgba(34,211,238,0.1)' }}
                 >
-                  <span className="text-[10px] font-mono text-slate-400" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Dimensjon</span>
-                  <span className="text-[10px] font-mono text-cyan-400 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>QDaria</span>
+                  <span className="text-xs font-mono text-slate-300" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Dimensjon</span>
+                  <span className="text-xs font-mono text-cyan-400 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>QDaria</span>
                   <span className="text-[10px] font-mono text-slate-400 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Globale</span>
                 </div>
                 {[

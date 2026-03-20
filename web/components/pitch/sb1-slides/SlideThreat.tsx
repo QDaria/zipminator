@@ -174,6 +174,19 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
               ))}
             </div>
             <p
+              className="text-rose-400/70 text-xs mt-3 leading-relaxed italic"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              &ldquo;By 2029, advances in quantum computing will make most conventional asymmetric
+              cryptography unsafe to use.&rdquo;
+              <span
+                className="text-slate-500 not-italic ml-1 font-mono text-[10px]"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                — Gartner, Top 10 Strategic Technology Trends 2025
+              </span>
+            </p>
+            <p
               className="text-slate-400 text-sm mt-auto pt-3 leading-relaxed"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >

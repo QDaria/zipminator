@@ -124,12 +124,15 @@ class TestQRNGAccess:
     def test_enterprise_level10_has_qrng(self):
         assert SubscriptionManager.can_use_qrng("ENTERPRISE-LEVEL10") is True
 
-    def test_free_no_qrng(self):
-        assert SubscriptionManager.can_use_qrng("FREE-LEVEL3") is False
+    def test_free_has_qrng_early_adopter(self):
+        # Early adopter: QRNG on all tiers
+        assert SubscriptionManager.can_use_qrng("FREE-LEVEL3") is True
 
-    def test_enterprise_level8_no_qrng(self):
-        # QRNG requires level 10 specifically
-        assert SubscriptionManager.can_use_qrng("ENTERPRISE-LEVEL8") is False
+    def test_all_tiers_have_qrng_early_adopter(self):
+        # Early adopter: QRNG on all tiers
+        assert SubscriptionManager.can_use_qrng("PRO-LEVEL5") is True
+        assert SubscriptionManager.can_use_qrng("TEAM-LEVEL7") is True
+        assert SubscriptionManager.can_use_qrng("ENTERPRISE-LEVEL8") is True
 
 
 class TestDataLimits:

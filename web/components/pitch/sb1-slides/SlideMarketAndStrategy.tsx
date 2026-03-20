@@ -52,7 +52,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
           <SlideTitle
             eyebrow="Markedsstørrelse · Investmentcase"
             title="$450 milliarder i vei. Norge mangler sin aktør."
-            subtitle="Quantum computing og PQC vokser i finanssektoren med 40–72% CAGR. McKinsey anslår $400–600B i verdiskapning innen 2035. QDaria er Norges eneste selskap posisjonert til å levere dette til nordisk finanssektor."
+            subtitle="Quantum computing og PQC vokser i finanssektoren med 40–72% CAGR. BCG anslår opptil $850B i verdiskapning innen 2040; McKinsey estimerer $97B totalmarked innen 2035, der QC alene er $72B. QDaria er Norges eneste selskap posisjonert til å levere dette til nordisk finanssektor."
             accentColor="#22D3EE"
           />
           <div className="pt-1 shrink-0">
@@ -65,7 +65,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
           {/* Stacked area chart */}
           <div
             className="col-span-2 rounded-lg p-3 flex flex-col"
-            style={{ background: 'rgba(34,211,238,0.03)', border: '1px solid rgba(34,211,238,0.12)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
+            style={{ background: 'rgba(34,211,238,0.03)', border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
           >
             <p
               className="text-xs font-mono tracking-widest uppercase mb-2 opacity-90"
@@ -88,12 +88,12 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(34,211,238,0.07)" />
                 <XAxis
                   dataKey="year"
-                  tick={{ fill: '#64748B', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }}
+                  tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fill: '#64748B', fontSize: 10, fontFamily: "'JetBrains Mono', monospace" }}
+                  tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(v: number) => `$${v}B`}
@@ -158,7 +158,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
                   iconType="circle"
                   iconSize={7}
                   wrapperStyle={{
-                    fontSize: 9,
+                    fontSize: 11,
                     fontFamily: "'JetBrains Mono', monospace",
                     color: '#94A3B8',
                   }}
@@ -173,7 +173,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
           {/* CAGR comparison */}
           <div
             className="rounded-lg p-3 flex flex-col"
-            style={{ background: 'rgba(245,158,11,0.03)', border: '1px solid rgba(245,158,11,0.12)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
+            style={{ background: 'rgba(245,158,11,0.03)', border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
           >
             <p
               className="text-xs font-mono tracking-widest uppercase mb-2 opacity-90"
@@ -190,7 +190,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(245,158,11,0.07)" horizontal={false} />
                 <XAxis
                   type="number"
-                  tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                  tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(v: number) => `${v}%`}
@@ -200,7 +200,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
                   type="category"
                   dataKey="segment"
                   width={90}
-                  tick={{ fill: '#94A3B8', fontSize: 9, fontFamily: "'DM Sans', sans-serif" }}
+                  tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'DM Sans', sans-serif" }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -228,6 +228,12 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
             >
               Nordisk first-mover landscape
             </p>
+            <p
+              className="text-amber-400/60 text-[10px] font-mono mb-2"
+              style={{ fontFamily: "'JetBrains Mono', monospace" }}
+            >
+              Kvantum-investeringer: $2.0 mrd. i 2024 (+50% YoY) — McKinsey 2025
+            </p>
             <div className="space-y-2 flex-1">
               {[
                 { bank: 'Danske Bank', country: 'DK', status: 'QKD pilot 2022 · CryptQ prosjekt', done: true },
@@ -246,7 +252,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
                   <div className="flex items-center gap-2">
                     <span
                       className="text-xs font-mono"
-                      style={{ color: '#64748B', fontFamily: "'JetBrains Mono', monospace" }}
+                      style={{ color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}
                     >
                       {row.country}
                     </span>

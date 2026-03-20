@@ -107,7 +107,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
           className="rounded-lg p-4 mb-5"
           style={{
             background: 'rgba(245,158,11,0.04)',
-            border: '1px solid rgba(245,158,11,0.15)',
+            border: '1px solid rgba(245,158,11,0.3)',
             boxShadow: '0 0 16px rgba(245,158,11,0.1)',
           }}
         >
@@ -127,8 +127,8 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                   style={{ background: CATEGORY_COLORS[key] }}
                 />
                 <span
-                  className="text-[10px] font-mono"
-                  style={{ color: '#64748B', fontFamily: "'JetBrains Mono', monospace" }}
+                  className="text-xs font-mono"
+                  style={{ color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   {label}
                 </span>
@@ -155,8 +155,8 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                   style={{ left: `${pct}%`, top: 36, transform: 'translateX(-50%)' }}
                 >
                   <span
-                    className="text-[10px] font-mono"
-                    style={{ color: '#475569', fontFamily: "'JetBrains Mono', monospace" }}
+                    className="text-xs font-mono"
+                    style={{ color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}
                   >
                     {year}
                   </span>
@@ -184,7 +184,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                 >
                   {/* Label above/at */}
                   <div
-                    className="text-[9px] font-mono whitespace-nowrap mb-0.5 px-1 rounded"
+                    className="text-xs font-mono whitespace-nowrap mb-0.5 px-1 rounded"
                     style={{
                       color: item.highlight ? '#F59E0B' : item.danger ? '#FB7185' : color,
                       fontFamily: "'JetBrains Mono', monospace",
@@ -234,7 +234,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
             {timelineItems.filter((e) => e.done || e.highlight).slice(0, 5).map((item, i) => (
               <span
                 key={i}
-                className="text-[10px] font-mono"
+                className="text-xs font-mono"
                 style={{
                   color: item.highlight ? '#F59E0B' : CATEGORY_COLORS[item.category],
                   fontFamily: "'JetBrains Mono', monospace",
@@ -255,7 +255,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                 className="rounded-lg p-4"
                 style={{
                   background: 'rgba(245,158,11,0.04)',
-                  border: '1px solid rgba(245,158,11,0.15)',
+                  border: '1px solid rgba(245,158,11,0.3)',
                   boxShadow: '0 0 16px rgba(245,158,11,0.1)',
                 }}
               >
@@ -317,7 +317,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                     dataKey="entity"
                     tick={{
                       fill: '#94A3B8',
-                      fontSize: 9,
+                      fontSize: 11,
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
                     axisLine={false}
@@ -326,7 +326,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                   <YAxis
                     tick={{
                       fill: '#64748B',
-                      fontSize: 9,
+                      fontSize: 11,
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
                     axisLine={false}
@@ -391,6 +391,19 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                 <strong className="text-slate-100">SB1 Utvikling</strong> dekker alle{' '}
                 <strong className="text-cyan-400">14 banker</strong> i alliansen. Laveste
                 kostnad-per-bank i sektoren.
+              </p>
+              <p
+                className="text-amber-400/70 text-xs mt-2 leading-relaxed italic"
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              >
+                &ldquo;Transitioning to PQC requires more extensive preparation than Y2K
+                remediation.&rdquo;
+                <span
+                  className="text-slate-400 not-italic ml-1 font-mono text-xs"
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                >
+                  — Gartner 2025
+                </span>
               </p>
             </div>
           </div>

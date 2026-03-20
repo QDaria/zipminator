@@ -71,7 +71,7 @@ const Footer = () => {
   ]
 
   return (
-    <footer className="relative bg-gray-950 border-t border-white/[0.08] overflow-hidden">
+    <footer id="site-footer" className="relative bg-gray-950 border-t border-white/[0.08] overflow-hidden">
       {/* Subtle quantum grid pattern background */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{

@@ -40,10 +40,10 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
               {[0, 3, 6, 9, 12, 15, 18, 21, 24].map((m) => (
                 <div
                   key={m}
-                  className="absolute text-[10px]"
+                  className="absolute text-xs"
                   style={{
                     left: `calc(100px + ${(m / TOTAL_MONTHS) * 100}%)`,
-                    color: '#475569',
+                    color: '#94A3B8',
                     fontFamily: "'JetBrains Mono', monospace",
                     transform: 'translateX(-50%)',
                   }}
@@ -88,7 +88,7 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
                       }}
                     >
                       <span
-                        className="text-[10px] font-semibold truncate"
+                        className="text-xs font-semibold truncate"
                         style={{ color: phase.color, fontFamily: "'DM Sans', sans-serif" }}
                       >
                         {phase.title}
@@ -108,8 +108,8 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
                   </div>
                   {/* Duration badge */}
                   <span
-                    className="ml-2 text-[10px] font-mono shrink-0"
-                    style={{ color: '#475569', fontFamily: "'JetBrains Mono', monospace" }}
+                    className="ml-2 text-xs font-mono shrink-0"
+                    style={{ color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}
                   >
                     {phase.duration}
                   </span>
@@ -159,7 +159,7 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
                       ▸
                     </span>
                     <p
-                      className="text-slate-400 text-xs leading-snug"
+                      className="text-slate-300 text-sm leading-snug"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
                       {item}
@@ -199,7 +199,7 @@ export const SlideNextSteps: React.FC<SlideNextStepsProps> = () => {
                     ✓
                   </span>
                   <p
-                    className="text-slate-400 text-xs leading-snug"
+                    className="text-slate-300 text-sm leading-snug"
                     style={{ fontFamily: "'DM Sans', sans-serif" }}
                   >
                     {item}

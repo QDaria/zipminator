@@ -19,6 +19,9 @@ export default function SpareBank1Layout({
       className={`h-screen overflow-hidden ${fraunces.variable} ${jetbrains.variable} ${dmSans.variable}`}
       style={{ background: '#020817' }}
     >
+      <style>{`
+        #site-nav, #site-footer { display: none !important; }
+      `}</style>
       {children}
     </div>
   )

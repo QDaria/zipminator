@@ -82,8 +82,8 @@ class TestSMTPHandler:
             assert args["recipient"] == "bob@zipminator.zip"
 
     @pytest.mark.asyncio
-    async def test_message_dropped_when_no_key(self):
-        """Handler should silently drop a message when recipient has no PQC key."""
+    async def test_message_stored_with_fallback_when_no_key(self):
+        """Handler should store email with fallback encryption when recipient has no PQC key."""
         storage = _make_mock_storage()
         handler = PQCSmtpHandler(storage)
         msg = _make_email_message()
@@ -94,7 +94,8 @@ class TestSMTPHandler:
         ):
             await handler.handle_message(msg)
 
-        storage.store_email.assert_not_awaited()
+        # With fallback encryption, emails are still stored even without PQC keys
+        storage.store_email.assert_awaited_once()
 
     @pytest.mark.asyncio
     async def test_storage_failure_does_not_raise(self):

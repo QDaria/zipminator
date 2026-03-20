@@ -331,7 +331,7 @@ class SubscriptionManager:
             >>> SubscriptionManager.has_feature_access("ENTERPRISE-LEVEL10", "qrng_access")
             True
             >>> SubscriptionManager.has_feature_access("FREE-LEVEL3", "qrng_access")
-            False
+            True
         """
         code_info = cls.validate_activation_code(code)
 

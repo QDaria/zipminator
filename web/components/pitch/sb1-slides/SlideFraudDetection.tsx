@@ -118,7 +118,8 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
               >
                 Svindel tap vs. forhindret (MNOK)
               </p>
-              <ResponsiveContainer width="100%" height={220}>
+              <div className="flex-1 min-h-0">
+              <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={fraudLossHistory}
                   margin={{ top: 4, right: 8, bottom: 4, left: -10 }}
@@ -126,10 +127,10 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis
                     dataKey="year"
-                    tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                    tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                   />
                   <YAxis
-                    tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                    tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                     tickFormatter={(v: number) => `${v}`}
                   />
                   <Tooltip
@@ -156,11 +157,12 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
                     name="forhindret"
                   />
                   <Legend
-                    wrapperStyle={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                    wrapperStyle={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                     formatter={(value: string) => value === 'tap' ? 'Tap' : 'Forhindret'}
                   />
                 </LineChart>
               </ResponsiveContainer>
+              </div>
             </div>
 
             {/* ML Accuracy Radar */}
@@ -174,12 +176,13 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
               >
                 ML-nøyaktighet: Klassisk vs. Kvantum
               </p>
-              <ResponsiveContainer width="100%" height={220}>
+              <div className="flex-1 min-h-0">
+              <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} cx="50%" cy="50%" outerRadius={55}>
                   <PolarGrid stroke="rgba(255,255,255,0.1)" />
                   <PolarAngleAxis
                     dataKey="metric"
-                    tick={{ fill: '#94A3B8', fontSize: 8, fontFamily: "'JetBrains Mono', monospace" }}
+                    tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                   />
                   <Radar
                     name="Klassisk"
@@ -198,11 +201,12 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
                     strokeWidth={2}
                   />
                   <Legend
-                    wrapperStyle={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                    wrapperStyle={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                   />
                   <Tooltip {...TOOLTIP_STYLE} formatter={(v: number) => `${v}%`} />
                 </RadarChart>
               </ResponsiveContainer>
+              </div>
             </div>
 
             {/* Fraud savings scenario: area chart */}
@@ -216,7 +220,8 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
               >
                 Svindeltap-prognose — {scenario.charAt(0).toUpperCase() + scenario.slice(1)} (MNOK)
               </p>
-              <ResponsiveContainer width="100%" height={220}>
+              <div className="flex-1 min-h-0">
+              <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={fraudSavings[scenario]}
                   margin={{ top: 4, right: 8, bottom: 4, left: -10 }}
@@ -234,10 +239,10 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis
                     dataKey="year"
-                    tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                    tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                   />
                   <YAxis
-                    tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                    tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                     tickFormatter={(v: number) => `${v}`}
                   />
                   <Tooltip
@@ -264,11 +269,12 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
                     name="medKvantum"
                   />
                   <Legend
-                    wrapperStyle={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                    wrapperStyle={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                     formatter={(value: string) => value === 'utenKvantum' ? 'Uten kvantum' : 'Med kvantum'}
                   />
                 </AreaChart>
               </ResponsiveContainer>
+              </div>
             </div>
           </div>
         </div>

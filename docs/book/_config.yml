@@ -1,11 +1,15 @@
 title: Zipminator
 author: QDaria AS
 logo: _static/zipminator-logo-light.svg
+exclude_patterns:
+  - "_build"
+  - "**.ipynb_checkpoints"
+  - "**/CLAUDE.md"
+  - "content/intro.md"
+  - "content/appendix.md"
 execute:
-  execute_notebooks: "auto"
+  execute_notebooks: "off"
   timeout: 120
-  exclude_patterns:
-    - "_build/*"
 parse:
   myst_enable_extensions:
     - colon_fence

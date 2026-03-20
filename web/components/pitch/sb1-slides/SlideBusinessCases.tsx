@@ -48,7 +48,7 @@ export const SlidePortfolio: React.FC = () => (
             ))}
           </div>
         </div>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(245,158,11,0.15)' }}>
+        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 0 16px rgba(245,158,11,0.08)' }}>
           <div className="px-4 py-2.5 border-b" style={{ background: 'rgba(245,158,11,0.08)', borderColor: 'rgba(245,158,11,0.2)' }}>
             <span className="text-amber-400 text-xs font-mono tracking-wider uppercase" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Kommersielle parametre</span>
           </div>
@@ -102,15 +102,15 @@ export const SlideRiskModeling: React.FC = () => (
               ].map((u) => (
                 <div key={u.label} className="flex flex-col">
                   <span className="text-emerald-400 text-xs font-mono" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{u.label}</span>
-                  <p className="text-slate-400 text-xs leading-snug" style={{ fontFamily: "'DM Sans', sans-serif" }}>{u.desc}</p>
+                  <p className="text-slate-300 text-sm leading-snug" style={{ fontFamily: "'DM Sans', sans-serif" }}>{u.desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(52,211,153,0.15)' }}>
-            <div className="px-4 py-2.5 border-b" style={{ background: 'rgba(52,211,153,0.08)', borderColor: 'rgba(52,211,153,0.15)' }}>
+          <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(52,211,153,0.3)', boxShadow: '0 0 16px rgba(52,211,153,0.08)' }}>
+            <div className="px-4 py-2.5 border-b" style={{ background: 'rgba(52,211,153,0.08)', borderColor: 'rgba(52,211,153,0.3)' }}>
               <span className="text-emerald-400 text-xs font-mono tracking-wider uppercase" style={{ fontFamily: "'JetBrains Mono', monospace" }}>SB1 eksponeringer</span>
             </div>
             <div className="p-1">
@@ -121,7 +121,7 @@ export const SlideRiskModeling: React.FC = () => (
               <DataRow label="NOK-verdi kapitaleffekt" value="625M–3.1B" accent="#34D399" highlight />
             </div>
           </div>
-          <div className="rounded-lg p-4" style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+          <div className="rounded-lg p-4" style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 0 16px rgba(245,158,11,0.08)' }}>
             <p className="text-amber-400 text-xs font-mono mb-2 uppercase tracking-wider" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Regulatorisk driver</p>
             <p className="text-slate-300 text-sm leading-relaxed" style={{ fontFamily: "'DM Sans', sans-serif" }}>
               Basel IV (CRR3) krever mer granulære risikomodeller fra 2025. Quantum MC gir SpareBank 1 en strukturell presisjonsmarginal over konkurrentene.
@@ -177,8 +177,8 @@ export const SlideFraudDetection: React.FC = () => (
             ))}
           </div>
         </div>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(167,139,250,0.15)' }}>
-          <div className="px-4 py-2.5 border-b" style={{ background: 'rgba(167,139,250,0.08)', borderColor: 'rgba(167,139,250,0.15)' }}>
+        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(167,139,250,0.3)', boxShadow: '0 0 16px rgba(167,139,250,0.08)' }}>
+          <div className="px-4 py-2.5 border-b" style={{ background: 'rgba(167,139,250,0.08)', borderColor: 'rgba(167,139,250,0.3)' }}>
             <span className="text-violet-400 text-xs font-mono tracking-wider uppercase" style={{ fontFamily: "'JetBrains Mono', monospace" }}>ROI-scenario</span>
           </div>
           <div className="p-1">
@@ -233,14 +233,14 @@ export const SlideQRNG: React.FC = () => (
               ].map((u) => (
                 <div key={u.app} className="flex flex-col">
                   <span className="text-cyan-400 text-xs font-mono" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{u.app}</span>
-                  <p className="text-slate-500 text-xs" style={{ fontFamily: "'DM Sans', sans-serif" }}>{u.desc}</p>
+                  <p className="text-slate-300 text-sm leading-snug" style={{ fontFamily: "'DM Sans', sans-serif" }}>{u.desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(34,211,238,0.15)' }}>
+          <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 16px rgba(34,211,238,0.08)' }}>
             <div className="px-4 py-2.5 border-b" style={{ background: 'rgba(34,211,238,0.08)', borderColor: 'rgba(34,211,238,0.15)' }}>
               <span className="text-cyan-400 text-xs font-mono tracking-wider uppercase" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Kommersielle parametre</span>
             </div>
@@ -253,7 +253,7 @@ export const SlideQRNG: React.FC = () => (
               <DataRow label="Inkrementell sikkerhetspremie" value="Prishevingsgrunnlag" accent="#F59E0B" highlight />
             </div>
           </div>
-          <div className="rounded-lg p-4" style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)' }}>
+          <div className="rounded-lg p-4" style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 0 16px rgba(245,158,11,0.08)' }}>
             <p className="text-amber-400 text-xs font-mono mb-2 uppercase tracking-wider" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Globale presedenser</p>
             <div className="space-y-1.5">
               {[
@@ -261,7 +261,7 @@ export const SlideQRNG: React.FC = () => (
                 'JPMorgan: Sertifisert kvantum-tilfeldighet (Nature, 2025)',
                 'London Quantum Secure Metro Network',
               ].map((p, i) => (
-                <p key={i} className="text-slate-500 text-xs leading-snug" style={{ fontFamily: "'DM Sans', sans-serif" }}>↗ {p}</p>
+                <p key={i} className="text-slate-300 text-sm leading-snug" style={{ fontFamily: "'DM Sans', sans-serif" }}>↗ {p}</p>
               ))}
             </div>
           </div>

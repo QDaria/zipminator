@@ -81,8 +81,8 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
             />
           </div>
 
-          {/* Charts grid */}
-          <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
+          {/* Charts grid — takes remaining vertical space */}
+          <div className="grid grid-cols-3 gap-4 flex-1 min-h-0 mb-4">
             {/* VaR Convergence: ComposedChart with log X-axis */}
             <div
               className="rounded-lg p-4 flex flex-col"
@@ -94,52 +94,54 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
               >
                 VaR Konvergensrate (feil %)
               </p>
-              <ResponsiveContainer width="100%" height={220}>
-                <ComposedChart data={varConvergence} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis
-                    dataKey="simulations"
-                    scale="log"
-                    domain={['auto', 'auto']}
-                    type="number"
-                    tickFormatter={(v: number) => `${v}K`}
-                    tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
-                    label={{ value: 'Simuleringer (K)', position: 'insideBottom', offset: -2, fill: '#475569', fontSize: 8 }}
-                  />
-                  <YAxis
-                    tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
-                    tickFormatter={(v: number) => `${v}%`}
-                  />
-                  <Tooltip
-                    {...TOOLTIP_STYLE}
-                    formatter={(value: number, name: string) => [
-                      `${value}%`,
-                      name === 'klassisk' ? 'Klassisk' : 'Kvantum',
-                    ]}
-                    labelFormatter={(label: number) => `${label}K simuleringer`}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="klassisk"
-                    stroke="#FB7185"
-                    strokeWidth={2}
-                    dot={false}
-                    name="klassisk"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="kvantum"
-                    stroke="#34D399"
-                    strokeWidth={2}
-                    dot={false}
-                    name="kvantum"
-                  />
-                  <Legend
-                    wrapperStyle={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
-                    formatter={(value: string) => value === 'klassisk' ? 'Klassisk' : 'Kvantum'}
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
+              <div className="flex-1 min-h-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={varConvergence} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                    <XAxis
+                      dataKey="simulations"
+                      scale="log"
+                      domain={['auto', 'auto']}
+                      type="number"
+                      tickFormatter={(v: number) => `${v}K`}
+                      tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                      label={{ value: 'Simuleringer (K)', position: 'insideBottom', offset: -2, fill: '#475569', fontSize: 8 }}
+                    />
+                    <YAxis
+                      tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                      tickFormatter={(v: number) => `${v}%`}
+                    />
+                    <Tooltip
+                      {...TOOLTIP_STYLE}
+                      formatter={(value: number, name: string) => [
+                        `${value}%`,
+                        name === 'klassisk' ? 'Klassisk' : 'Kvantum',
+                      ]}
+                      labelFormatter={(label: number) => `${label}K simuleringer`}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="klassisk"
+                      stroke="#FB7185"
+                      strokeWidth={2}
+                      dot={false}
+                      name="klassisk"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="kvantum"
+                      stroke="#34D399"
+                      strokeWidth={2}
+                      dot={false}
+                      name="kvantum"
+                    />
+                    <Legend
+                      wrapperStyle={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                      formatter={(value: string) => value === 'klassisk' ? 'Klassisk' : 'Kvantum'}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
             {/* SB1 Entity Exposure: horizontal bar chart */}
@@ -153,35 +155,37 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
               >
                 SB1 Utlånsvolum (mrd. NOK)
               </p>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart
-                  data={sb1EntityExposure}
-                  layout="vertical"
-                  margin={{ top: 4, right: 12, bottom: 4, left: 8 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
-                  <XAxis
-                    type="number"
-                    tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
-                    tickFormatter={(v: number) => `${v}`}
-                  />
-                  <YAxis
-                    dataKey="entity"
-                    type="category"
-                    width={58}
-                    tick={{ fill: '#94A3B8', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
-                  />
-                  <Tooltip
-                    {...TOOLTIP_STYLE}
-                    formatter={(value: number) => [`NOK ${value} mrd.`, 'Utlån']}
-                  />
-                  <Bar dataKey="utlaan" radius={[0, 3, 3, 0]}>
-                    {sb1EntityExposure.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.8} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="flex-1 min-h-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={sb1EntityExposure}
+                    layout="vertical"
+                    margin={{ top: 4, right: 12, bottom: 4, left: 8 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+                    <XAxis
+                      type="number"
+                      tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                      tickFormatter={(v: number) => `${v}`}
+                    />
+                    <YAxis
+                      dataKey="entity"
+                      type="category"
+                      width={58}
+                      tick={{ fill: '#94A3B8', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                    />
+                    <Tooltip
+                      {...TOOLTIP_STYLE}
+                      formatter={(value: number) => [`NOK ${value} mrd.`, 'Utlån']}
+                    />
+                    <Bar dataKey="utlaan" radius={[0, 3, 3, 0]}>
+                      {sb1EntityExposure.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.8} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
             {/* Capital Allocation: donut PieChart */}
@@ -195,36 +199,38 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
               >
                 Kapitalallokering (%)
               </p>
-              <ResponsiveContainer width="100%" height={220}>
-                <PieChart>
-                  <Pie
-                    data={capitalAllocation}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={35}
-                    outerRadius={58}
-                    dataKey="value"
-                    paddingAngle={2}
-                  >
-                    {capitalAllocation.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.85} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    {...TOOLTIP_STYLE}
-                    formatter={(value: number, name: string) => [`${value}%`, name]}
-                  />
-                  <Legend
-                    wrapperStyle={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: '#94A3B8' }}
-                    iconSize={8}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="flex-1 min-h-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={capitalAllocation}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={35}
+                      outerRadius={58}
+                      dataKey="value"
+                      paddingAngle={2}
+                    >
+                      {capitalAllocation.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.85} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      {...TOOLTIP_STYLE}
+                      formatter={(value: number, name: string) => [`${value}%`, name]}
+                    />
+                    <Legend
+                      wrapperStyle={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: '#94A3B8' }}
+                      iconSize={8}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
 
-          {/* Bottom content: technical use cases + regulatory driver */}
-          <div className="grid grid-cols-2 gap-4 mt-4">
+          {/* Bottom content: technical use cases + regulatory driver — scrollable below charts */}
+          <div className="grid grid-cols-2 gap-4 shrink-0">
             <div
               className="rounded-lg p-4"
               style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.18)', boxShadow: '0 0 20px rgba(52,211,153,0.08)' }}

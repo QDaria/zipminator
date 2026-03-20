@@ -100,7 +100,7 @@ export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _s
                   background: b.isTarget ? 'rgba(245,158,11,0.06)' : 'rgba(15,22,41,0.8)',
                   border: b.isTarget
                     ? '1px solid rgba(245,158,11,0.4)'
-                    : '1px solid rgba(34,211,238,0.1)',
+                    : '1px solid rgba(34,211,238,0.3)',
                   boxShadow: b.isTarget
                     ? '0 0 16px rgba(245,158,11,0.15)'
                     : '0 0 12px rgba(34,211,238,0.06)',
@@ -145,7 +145,7 @@ export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _s
                   <p
                     className="text-sm leading-snug"
                     style={{
-                      color: b.isTarget ? '#D97706' : '#64748B',
+                      color: b.isTarget ? '#D97706' : '#94A3B8',
                       fontFamily: "'DM Sans', sans-serif",
                     }}
                   >
@@ -161,7 +161,7 @@ export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _s
             className="col-span-7 rounded-lg flex flex-col"
             style={{
               background: 'rgba(15,22,41,0.6)',
-              border: '1px solid rgba(34,211,238,0.12)',
+              border: '1px solid rgba(34,211,238,0.3)',
               boxShadow: '0 0 16px rgba(34,211,238,0.08)',
             }}
           >
@@ -194,7 +194,7 @@ export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _s
                   <PolarRadiusAxis
                     angle={90}
                     domain={[0, 100]}
-                    tick={{ fill: '#475569', fontSize: 9 }}
+                    tick={{ fill: '#94A3B8', fontSize: 11 }}
                     tickCount={4}
                   />
                   <Tooltip
@@ -263,11 +263,12 @@ export const SlideGlobalBanks: React.FC<SlideGlobalBanksProps> = ({ scenario: _s
             source="Evident 2024"
           />
           <MetricCard
-            value="10%"
-            label="Vekst kvantum-ansettelser"
-            sublabel="Siden aug. 2024"
+            value="~40%"
+            label="Av store bedrifter planlegger kvantum-initiativ"
+            sublabel="Gartner prediksjon innen 2025"
             color="emerald"
             size="sm"
+            source="Gartner"
           />
           <MetricCard
             value="15"
