@@ -14,17 +14,18 @@ use crate::entropy_bridge::{EntropyBridgeError, PoolEntropySource};
 /// Number of subcarriers in a standard WiFi CSI frame (802.11n HT20).
 pub const CSI_SUBCARRIERS: usize = 56;
 
-/// Minimum number of CSI frames needed to produce one byte of entropy.
-/// Von Neumann debiasing discards ~75% of input bits on average,
-/// and we need phase LSBs from subcarrier pairs.
-const MIN_FRAMES_PER_BYTE: usize = 4;
-
 /// Von Neumann debiaser: converts biased bit streams into unbiased output.
 ///
 /// Operates on consecutive bit pairs:
 /// - (0, 1) → output 0
 /// - (1, 0) → output 1
 /// - (0, 0) or (1, 1) → discard
+impl Default for VonNeumannExtractor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct VonNeumannExtractor {
     /// Accumulated output bits (up to 8 before flushing to byte buffer).
     bit_accumulator: u8,
@@ -104,6 +105,12 @@ fn extract_phase_lsbs(frame: &[Complex<f32>; CSI_SUBCARRIERS]) -> Vec<bool> {
 /// Accepts raw CSI frames (56 complex subcarrier values each) and extracts
 /// entropy via Von Neumann debiasing. Optionally XORs output with an existing
 /// entropy source for defense-in-depth.
+impl Default for CsiEntropySource {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct CsiEntropySource {
     extractor: VonNeumannExtractor,
     /// Buffered entropy bytes ready for consumption.
