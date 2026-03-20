@@ -8,8 +8,10 @@ exclude_patterns:
   - "content/intro.md"
   - "content/appendix.md"
 execute:
-  execute_notebooks: "off"
+  execute_notebooks: "auto"
   timeout: 120
+  exclude_patterns:
+    - "notebooks/05_shor_demo*"
 parse:
   myst_enable_extensions:
     - colon_fence
