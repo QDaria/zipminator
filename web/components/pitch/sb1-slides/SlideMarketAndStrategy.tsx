@@ -229,7 +229,7 @@ export const SlideMarketSize: React.FC<SlideMarketSizeProps> = ({ scenario: scen
               Nordisk first-mover landscape
             </p>
             <p
-              className="text-amber-400/60 text-[10px] font-mono mb-2"
+              className="text-amber-400/80 text-xs font-mono mb-2"
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
               Kvantum-investeringer: $2.0 mrd. i 2024 (+50% YoY) — McKinsey 2025

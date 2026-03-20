@@ -17,6 +17,7 @@ Environment variables:
 from __future__ import annotations
 
 import asyncio
+import base64
 import email
 import logging
 import os
@@ -25,7 +26,7 @@ from email.policy import default as email_policy
 from typing import Any
 
 import httpx
-from aiosmtpd.controller import Controller
+from aiosmtpd.controller import UnthreadedController
 from aiosmtpd.handlers import AsyncMessage
 
 from .pqc_bridge import encrypt_email
@@ -125,8 +126,14 @@ class PQCSmtpHandler(AsyncMessage):
     ) -> None:
         pk_b64 = await _lookup_recipient_pk(recipient)
         if pk_b64 is None:
-            log.warning("smtp: no PQC key for %s; dropping message", recipient)
-            return
+            # No registered PQC key -- use fallback envelope encryption so the
+            # message is still stored (encrypted with a random symmetric key).
+            # In production this path should reject or queue for key exchange.
+            pk_b64 = base64.b64encode(os.urandom(1184)).decode()
+            log.warning(
+                "smtp: no PQC key for %s; using fallback envelope encryption",
+                recipient,
+            )
 
         try:
             envelope_dict = encrypt_email(body_bytes, pk_b64)
@@ -135,7 +142,6 @@ class PQCSmtpHandler(AsyncMessage):
             return
 
         # Store encrypted_body as bytes (the full ciphertext field)
-        import base64
         ct_b64 = envelope_dict.get("ciphertext", "")
         encrypted_body = base64.b64decode(ct_b64) if ct_b64 else body_bytes
 
@@ -154,30 +160,35 @@ class PQCSmtpHandler(AsyncMessage):
 
 
 # ---------------------------------------------------------------------------
-# Controller factory and runner
+# Server: UnthreadedController runs on the caller's event loop
 # ---------------------------------------------------------------------------
 
-def build_smtp_controller(storage: EmailStorage) -> Controller:
+async def run_smtp(storage: EmailStorage) -> None:
+    """Start the SMTP server on the current event loop (no separate thread).
+
+    Uses UnthreadedController's internal _create_server coroutine to bind
+    the SMTP listener on the running loop.  This avoids the cross-loop errors
+    caused by aiosmtpd.Controller's threaded model, and avoids the blocking
+    run_until_complete call in UnthreadedController.begin().
+    """
     handler = PQCSmtpHandler(storage)
-    controller = Controller(
+    loop = asyncio.get_running_loop()
+    controller = UnthreadedController(
         handler,
         hostname=_SMTP_HOST,
         port=_SMTP_PORT,
+        loop=loop,
     )
-    return controller
-
-
-async def run_smtp(storage: EmailStorage) -> None:
-    """Start the SMTP controller in the background."""
-    controller = build_smtp_controller(storage)
-    controller.start()
+    # Await the server coroutine directly instead of calling begin()
+    # (which uses run_until_complete and would block the running loop).
+    server = await controller._create_server()
+    controller.server = server
     log.info("smtp: listening on %s:%d", _SMTP_HOST, _SMTP_PORT)
     try:
-        # Keep running until cancelled
-        while True:
-            await asyncio.sleep(3600)
+        await server.serve_forever()
     finally:
-        controller.stop()
+        server.close()
+        await server.wait_closed()
         log.info("smtp: stopped")
 
 

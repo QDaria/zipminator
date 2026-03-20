@@ -226,8 +226,8 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
                     <XAxis
                       type="number"
                       tick={{
-                        fill: '#64748B',
-                        fontSize: 10,
+                        fill: '#94A3B8',
+                        fontSize: 11,
                         fontFamily: "'JetBrains Mono', monospace",
                       }}
                       tickLine={false}
@@ -239,7 +239,7 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
                       width={130}
                       tick={{
                         fill: '#94A3B8',
-                        fontSize: 10,
+                        fontSize: 11,
                         fontFamily: "'DM Sans', sans-serif",
                       }}
                       tickLine={false}
@@ -258,7 +258,7 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
                       iconType="square"
                       iconSize={8}
                       wrapperStyle={{
-                        fontSize: 10,
+                        fontSize: 11,
                         fontFamily: "'JetBrains Mono', monospace",
                         color: '#94A3B8',
                       }}
@@ -314,7 +314,7 @@ export const SlideZipminator: React.FC<SlideZiminatorProps> = ({ scenario: initi
                 Rigetti-fordel
               </p>
               <p
-                className="text-slate-300 text-xs leading-relaxed"
+                className="text-slate-300 text-sm leading-relaxed"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
                 Rigetti har aktive prosjekter med{' '}

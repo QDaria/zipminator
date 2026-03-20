@@ -45,7 +45,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
             {/* Org tree */}
             <div
               className="rounded-lg p-4 flex flex-col items-center"
-              style={{ background: 'rgba(34,211,238,0.03)', border: '1px solid rgba(34,211,238,0.12)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
+              style={{ background: 'rgba(34,211,238,0.03)', border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
             >
               <p
                 className="text-xs font-mono tracking-widest uppercase mb-3 self-start opacity-90"
@@ -75,7 +75,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                 </p>
                 <p
                   className="text-xs"
-                  style={{ color: '#64748B', fontFamily: "'DM Sans', sans-serif" }}
+                  style={{ color: '#94A3B8', fontFamily: "'DM Sans', sans-serif" }}
                 >
                   {hq.purpose}
                 </p>
@@ -109,7 +109,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                       </p>
                       <p
                         className="text-xs leading-tight mt-0.5"
-                        style={{ color: '#64748B', fontFamily: "'DM Sans', sans-serif" }}
+                        style={{ color: '#94A3B8', fontFamily: "'DM Sans', sans-serif" }}
                       >
                         {node.purpose}
                       </p>
@@ -122,7 +122,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
             {/* Globe / world map */}
             <div
               className="rounded-lg p-3 flex-1"
-              style={{ background: 'rgba(34,211,238,0.02)', border: '1px solid rgba(34,211,238,0.1)' }}
+              style={{ background: 'rgba(34,211,238,0.02)', border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 16px rgba(34,211,238,0.08)' }}
             >
               <p
                 className="text-xs font-mono tracking-widest uppercase mb-2 opacity-90"
@@ -174,8 +174,8 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                     <div key={`leg-${node.location}`} className="flex items-center gap-1">
                       <div className="w-1.5 h-1.5 rounded-full" style={{ background: node.color }} />
                       <span
-                        className="text-[8px]"
-                        style={{ color: '#64748B', fontFamily: "'JetBrains Mono', monospace" }}
+                        className="text-[10px]"
+                        style={{ color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}
                       >
                         {node.location.split(',')[0]}
                       </span>
@@ -241,7 +241,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
               </p>
               <div
                 className="rounded-lg overflow-hidden"
-                style={{ border: '1px solid rgba(34,211,238,0.12)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
+                style={{ border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
               >
                 {/* Header */}
                 <div
@@ -250,7 +250,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                 >
                   <span className="text-xs font-mono text-slate-300" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Dimensjon</span>
                   <span className="text-xs font-mono text-cyan-400 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>QDaria</span>
-                  <span className="text-[10px] font-mono text-slate-400 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Globale</span>
+                  <span className="text-xs font-mono text-slate-300 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Globale</span>
                 </div>
                 {[
                   { dim: 'Norsk regulatorisk ekspertise', qdaria: '✓✓✓', global: '✗' },
@@ -263,7 +263,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                   <div
                     key={row.dim}
                     className="grid grid-cols-3 px-3 py-1.5 border-b"
-                    style={{ borderColor: 'rgba(34,211,238,0.07)' }}
+                    style={{ borderColor: 'rgba(34,211,238,0.2)' }}
                   >
                     <span
                       className="text-slate-400 text-xs"

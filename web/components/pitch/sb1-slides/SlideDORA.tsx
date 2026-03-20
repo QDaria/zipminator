@@ -325,7 +325,7 @@ export const SlideDORA: React.FC<SlideDORAProps> = ({ scenario: initialScenario 
                   />
                   <YAxis
                     tick={{
-                      fill: '#64748B',
+                      fill: '#94A3B8',
                       fontSize: 11,
                       fontFamily: "'JetBrains Mono', monospace",
                     }}

@@ -97,8 +97,8 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
                   <PolarAngleAxis
                     dataKey="metric"
                     tick={{
-                      fill: '#64748B',
-                      fontSize: 8,
+                      fill: '#94A3B8',
+                      fontSize: 11,
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
                   />
@@ -180,7 +180,7 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
               &ldquo;By 2029, advances in quantum computing will make most conventional asymmetric
               cryptography unsafe to use.&rdquo;
               <span
-                className="text-slate-500 not-italic ml-1 font-mono text-[10px]"
+                className="text-slate-400 not-italic ml-1 font-mono text-xs"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 — Gartner, Top 10 Strategic Technology Trends 2025
@@ -242,13 +242,13 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
                   </defs>
                   <XAxis
                     dataKey="year"
-                    tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                    tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                     axisLine={false}
                     tickLine={false}
                     interval={2}
                   />
                   <YAxis
-                    tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                    tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                     axisLine={false}
                     tickLine={false}
                     tickFormatter={(v: number) => `${v}%`}
@@ -270,7 +270,7 @@ export const SlideThreat: React.FC<SlideThreatProps> = ({ scenario }) => {
                     iconType="circle"
                     iconSize={8}
                     wrapperStyle={{
-                      fontSize: 10,
+                      fontSize: 11,
                       fontFamily: "'JetBrains Mono', monospace",
                       color: '#94A3B8',
                       paddingTop: 4,

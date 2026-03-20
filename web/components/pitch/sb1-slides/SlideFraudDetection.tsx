@@ -119,7 +119,7 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
                 Svindel tap vs. forhindret (MNOK)
               </p>
               <div className="flex-1 min-h-0">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={180}>
                 <LineChart
                   data={fraudLossHistory}
                   margin={{ top: 4, right: 8, bottom: 4, left: -10 }}
@@ -177,7 +177,7 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
                 ML-nøyaktighet: Klassisk vs. Kvantum
               </p>
               <div className="flex-1 min-h-0">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={180}>
                 <RadarChart data={radarData} cx="50%" cy="50%" outerRadius={55}>
                   <PolarGrid stroke="rgba(255,255,255,0.1)" />
                   <PolarAngleAxis
@@ -221,7 +221,7 @@ export const SlideFraudDetection: React.FC<SlideFraudDetectionProps> = ({
                 Svindeltap-prognose — {scenario.charAt(0).toUpperCase() + scenario.slice(1)} (MNOK)
               </p>
               <div className="flex-1 min-h-0">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={180}>
                 <AreaChart
                   data={fraudSavings[scenario]}
                   margin={{ top: 4, right: 8, bottom: 4, left: -10 }}

@@ -117,7 +117,7 @@ const EntropyHexStream: React.FC = () => {
             fontFamily: "'JetBrains Mono', monospace",
             color: 'rgba(34,211,238,0.7)',
             background: 'rgba(34,211,238,0.06)',
-            border: '1px solid rgba(34,211,238,0.12)',
+            border: '1px solid rgba(34,211,238,0.3)',
             transition: 'color 0.1s ease',
           }}
         >
@@ -190,7 +190,7 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
                   Live entropifeed — kvantum RNG
                 </p>
                 <span
-                  className="flex items-center gap-1 text-[9px] font-mono text-emerald-400"
+                  className="flex items-center gap-1 text-xs font-mono text-emerald-400"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   <span
@@ -202,7 +202,7 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
               </div>
               <EntropyGrid />
               <p
-                className="text-slate-400 text-[10px] font-mono mt-2"
+                className="text-slate-300 text-xs font-mono mt-2"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 Simulert QRNG-strøm · Rigetti hardware i produksjon
@@ -214,7 +214,7 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
               {/* Use cases */}
               <div
                 className="rounded-lg p-4"
-                style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.15)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
+                style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
               >
                 <p
                   className="text-cyan-400 text-xs font-mono tracking-wider uppercase mb-2"
@@ -251,11 +251,11 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
               {/* Commercial params */}
               <div
                 className="rounded-lg overflow-hidden"
-                style={{ border: '1px solid rgba(34,211,238,0.15)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
+                style={{ border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
               >
                 <div
                   className="px-4 py-2 border-b"
-                  style={{ background: 'rgba(34,211,238,0.07)', borderColor: 'rgba(34,211,238,0.15)' }}
+                  style={{ background: 'rgba(34,211,238,0.07)', borderColor: 'rgba(34,211,238,0.3)' }}
                 >
                   <span
                     className="text-cyan-400 text-xs font-mono tracking-wider uppercase"
@@ -277,7 +277,7 @@ export const SlideQRNG: React.FC<SlideQRNGProps> = ({ scenario: _scenario }) => 
               {/* Global precedents */}
               <div
                 className="rounded-lg p-3"
-                style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
+                style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
               >
                 <p
                   className="text-amber-400 text-xs font-mono mb-2 uppercase tracking-wider"

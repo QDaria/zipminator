@@ -183,7 +183,7 @@ export const SlidePortfolio: React.FC<SlidePortfolioProps> = ({ scenario: initia
                 className="px-4 py-2 border-b"
                 style={{
                   background: 'rgba(34,211,238,0.05)',
-                  borderColor: 'rgba(34,211,238,0.1)',
+                  borderColor: 'rgba(34,211,238,0.2)',
                 }}
               >
                 <span

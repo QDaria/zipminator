@@ -95,7 +95,7 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
                 VaR Konvergensrate (feil %)
               </p>
               <div className="flex-1 min-h-0">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={180}>
                   <ComposedChart data={varConvergence} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                     <XAxis
@@ -104,11 +104,11 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
                       domain={['auto', 'auto']}
                       type="number"
                       tickFormatter={(v: number) => `${v}K`}
-                      tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
-                      label={{ value: 'Simuleringer (K)', position: 'insideBottom', offset: -2, fill: '#475569', fontSize: 8 }}
+                      tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
+                      label={{ value: 'Simuleringer (K)', position: 'insideBottom', offset: -2, fill: '#94A3B8', fontSize: 11 }}
                     />
                     <YAxis
-                      tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                      tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                       tickFormatter={(v: number) => `${v}%`}
                     />
                     <Tooltip
@@ -136,7 +136,7 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
                       name="kvantum"
                     />
                     <Legend
-                      wrapperStyle={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                      wrapperStyle={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                       formatter={(value: string) => value === 'klassisk' ? 'Klassisk' : 'Kvantum'}
                     />
                   </ComposedChart>
@@ -147,7 +147,7 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
             {/* SB1 Entity Exposure: horizontal bar chart */}
             <div
               className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.15)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
+              style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
             >
               <p
                 className="text-cyan-400 text-xs font-mono tracking-wider uppercase mb-3"
@@ -156,7 +156,7 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
                 SB1 Utlånsvolum (mrd. NOK)
               </p>
               <div className="flex-1 min-h-0">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={180}>
                   <BarChart
                     data={sb1EntityExposure}
                     layout="vertical"
@@ -165,14 +165,14 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
                     <XAxis
                       type="number"
-                      tick={{ fill: '#64748B', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                      tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                       tickFormatter={(v: number) => `${v}`}
                     />
                     <YAxis
                       dataKey="entity"
                       type="category"
                       width={58}
-                      tick={{ fill: '#94A3B8', fontSize: 9, fontFamily: "'JetBrains Mono', monospace" }}
+                      tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
                     />
                     <Tooltip
                       {...TOOLTIP_STYLE}
@@ -191,7 +191,7 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
             {/* Capital Allocation: donut PieChart */}
             <div
               className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(167,139,250,0.04)', border: '1px solid rgba(167,139,250,0.15)', boxShadow: '0 0 20px rgba(167,139,250,0.08)' }}
+              style={{ background: 'rgba(167,139,250,0.04)', border: '1px solid rgba(167,139,250,0.3)', boxShadow: '0 0 20px rgba(167,139,250,0.08)' }}
             >
               <p
                 className="text-violet-400 text-xs font-mono tracking-wider uppercase mb-3"
@@ -200,7 +200,7 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
                 Kapitalallokering (%)
               </p>
               <div className="flex-1 min-h-0">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={180}>
                   <PieChart>
                     <Pie
                       data={capitalAllocation}
@@ -220,7 +220,7 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
                       formatter={(value: number, name: string) => [`${value}%`, name]}
                     />
                     <Legend
-                      wrapperStyle={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: '#94A3B8' }}
+                      wrapperStyle={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: '#94A3B8' }}
                       iconSize={8}
                     />
                   </PieChart>
@@ -268,11 +268,11 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
 
             <div
               className="rounded-lg overflow-hidden"
-              style={{ border: '1px solid rgba(245,158,11,0.15)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
+              style={{ border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
             >
               <div
                 className="px-4 py-2.5 border-b"
-                style={{ background: 'rgba(245,158,11,0.06)', borderColor: 'rgba(245,158,11,0.15)' }}
+                style={{ background: 'rgba(245,158,11,0.06)', borderColor: 'rgba(245,158,11,0.3)' }}
               >
                 <span
                   className="text-amber-400 text-xs font-mono tracking-wider uppercase"

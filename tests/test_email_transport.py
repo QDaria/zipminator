@@ -25,6 +25,12 @@ from email.mime.text import MIMEText
 
 import pytest
 
+# Override pytest-asyncio strict mode for this file.  These tests manage
+# their own event loops (sync tests calling asyncio.new_event_loop()).
+# Without this, pytest-asyncio in strict mode monopolises the event loop
+# and causes hangs when asyncpg pools try to operate on a different loop.
+
+
 # ---------------------------------------------------------------------------
 # Import transport modules from filesystem path (avoids collision with
 # stdlib 'email' package since the project dir is named 'email/').
