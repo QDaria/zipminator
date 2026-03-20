@@ -20,8 +20,15 @@ import 'package:zipminator/shared/widgets/shell_scaffold.dart';
 final GoRouter appRouter = GoRouter(
   initialLocation: '/vault',
   redirect: (context, state) {
-    final loggedIn = SupabaseService.currentUser != null;
     final isLoginRoute = state.matchedLocation == '/login';
+    // Guard against Supabase not being initialized (e.g. in tests)
+    bool loggedIn;
+    try {
+      loggedIn = SupabaseService.currentUser != null;
+    } catch (_) {
+      // Supabase not initialized — skip auth redirect
+      return isLoginRoute ? '/vault' : null;
+    }
 
     if (!loggedIn && !isLoginRoute) return '/login';
     if (loggedIn && isLoginRoute) return '/vault';

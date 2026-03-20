@@ -8,18 +8,19 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(milliseconds: 100));
 
     // Verify the Vault screen is shown (initial route)
     expect(find.text('Quantum Vault'), findsOneWidget);
-    expect(find.text('ML-KEM-768 Key Management'), findsOneWidget);
+    expect(find.text('ML-KEM-768 File Encryption'), findsOneWidget);
   });
 
   testWidgets('App has MaterialApp.router with correct title', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
 
     // Verify MaterialApp exists with correct title
     final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
@@ -34,7 +35,8 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
 
     await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(milliseconds: 100));
 
     // Should show bottom NavigationBar with 4 primary tabs + More overflow
     expect(find.byType(NavigationBar), findsOneWidget);
@@ -57,7 +59,8 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
 
     await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(milliseconds: 100));
 
     // Should show NavigationRail instead of bottom bar
     expect(find.byType(NavigationRail), findsOneWidget);
@@ -71,8 +74,10 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('Generate Keypair'), findsOneWidget);
+    // Key management is in a collapsible section
+    expect(find.text('Key Management'), findsOneWidget);
   });
 }

@@ -2,18 +2,41 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/src/rust/api/simple.dart' as rust;
 
+/// A sent or received email record.
+class SentEmail {
+  final String to;
+  final String subject;
+  final DateTime sentAt;
+  final int envelopeSize;
+  final bool encrypted;
+  final String? selfDestructDuration;
+
+  const SentEmail({
+    required this.to,
+    required this.subject,
+    required this.sentAt,
+    required this.envelopeSize,
+    this.encrypted = true,
+    this.selfDestructDuration,
+  });
+}
+
 /// State for email encryption operations.
 class EmailCryptoState {
   final Uint8List? encryptedEnvelope;
   final Uint8List? decryptedBody;
   final bool isProcessing;
   final String? error;
+  final List<SentEmail> sentEmails;
+  final List<SentEmail> receivedEmails;
 
   const EmailCryptoState({
     this.encryptedEnvelope,
     this.decryptedBody,
     this.isProcessing = false,
     this.error,
+    this.sentEmails = const [],
+    this.receivedEmails = const [],
   });
 
   EmailCryptoState copyWith({
@@ -21,12 +44,16 @@ class EmailCryptoState {
     Uint8List? decryptedBody,
     bool? isProcessing,
     String? error,
+    List<SentEmail>? sentEmails,
+    List<SentEmail>? receivedEmails,
   }) =>
       EmailCryptoState(
         encryptedEnvelope: encryptedEnvelope ?? this.encryptedEnvelope,
         decryptedBody: decryptedBody ?? this.decryptedBody,
         isProcessing: isProcessing ?? this.isProcessing,
         error: error,
+        sentEmails: sentEmails ?? this.sentEmails,
+        receivedEmails: receivedEmails ?? this.receivedEmails,
       );
 }
 
@@ -47,7 +74,10 @@ class EmailCryptoNotifier extends Notifier<EmailCryptoState> {
         plaintext: Uint8List.fromList(body.codeUnits),
         aad: Uint8List.fromList(headers.codeUnits),
       );
-      state = EmailCryptoState(encryptedEnvelope: envelope);
+      state = state.copyWith(
+        encryptedEnvelope: envelope,
+        isProcessing: false,
+      );
       return envelope;
     } catch (e) {
       state = state.copyWith(isProcessing: false, error: e.toString());
@@ -68,12 +98,45 @@ class EmailCryptoNotifier extends Notifier<EmailCryptoState> {
         aad: Uint8List.fromList(headers.codeUnits),
       );
       final body = String.fromCharCodes(plaintext);
-      state = EmailCryptoState(decryptedBody: plaintext);
+      state = state.copyWith(
+        decryptedBody: plaintext,
+        isProcessing: false,
+      );
       return body;
     } catch (e) {
       state = state.copyWith(isProcessing: false, error: e.toString());
       return null;
     }
+  }
+
+  /// Encrypts and records a sent email in local state.
+  Future<bool> sendEncryptedEmail({
+    required String to,
+    required String subject,
+    required String body,
+    required Uint8List recipientPk,
+    String? selfDestructDuration,
+  }) async {
+    final headers = 'From: me@qdaria.com\nTo: $to\nSubject: $subject';
+    final envelope = await encryptEmail(
+      recipientPk: recipientPk,
+      body: body,
+      headers: headers,
+    );
+    if (envelope == null) return false;
+
+    final email = SentEmail(
+      to: to,
+      subject: subject,
+      sentAt: DateTime.now(),
+      envelopeSize: envelope.length,
+      encrypted: true,
+      selfDestructDuration: selfDestructDuration,
+    );
+    state = state.copyWith(
+      sentEmails: [...state.sentEmails, email],
+    );
+    return true;
   }
 
   void clear() {

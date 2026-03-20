@@ -14,7 +14,8 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
 
       await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Start at Vault
       expect(find.text('Quantum Vault'), findsOneWidget);
@@ -32,7 +33,6 @@ void main() {
 
       for (final (tab, expectedTitle) in pillars) {
         await tester.tap(find.text(tab));
-        // Use pump instead of pumpAndSettle — some screens have looping animations
         await tester.pump(const Duration(seconds: 1));
         await tester.pump(const Duration(milliseconds: 100));
         expect(find.text(expectedTitle), findsWidgets,
@@ -85,7 +85,8 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
 
       await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Tap settings icon
       await tester.tap(find.byIcon(Icons.settings_outlined));
@@ -104,25 +105,26 @@ void main() {
   });
 
   group('Shared crypto state', () {
-    testWidgets('email screen reflects crypto provider key status',
+    testWidgets('email screen shows tabbed interface',
         (tester) async {
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
 
       await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 100));
 
-      // Go to Email - auto-generates key, shows pre-filled subject
+      // Go to Email
       await tester.tap(find.text('Email'));
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.text('Test PQC Encryption'), findsOneWidget);
+      expect(find.text('Quantum Mail'), findsWidgets);
 
-      // Go to Vault - generate button should be available
+      // Go to Vault - key management should be available
       await tester.tap(find.text('Vault'));
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.text('Generate Keypair'), findsOneWidget);
+      expect(find.text('Key Management'), findsOneWidget);
 
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();

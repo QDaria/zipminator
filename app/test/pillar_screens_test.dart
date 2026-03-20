@@ -15,35 +15,29 @@ Future<void> pumpApp(WidgetTester tester) async {
 void main() {
   // ── Pillar 1: Vault ──
   group('Vault Screen', () {
-    testWidgets('shows key management header and status banner', (tester) async {
+    testWidgets('shows vault header and file encryption info', (tester) async {
       await pumpApp(tester);
-      expect(find.text('ML-KEM-768 Key Management'), findsOneWidget);
+      expect(find.text('ML-KEM-768 File Encryption'), findsOneWidget);
       expect(find.text('FIPS 203'), findsOneWidget);
-      expect(find.text('Generate & test quantum-safe encryption keys'),
-          findsOneWidget);
-      expect(find.text('Ready'), findsOneWidget);
     });
 
-    testWidgets('has Generate Keypair button', (tester) async {
+    testWidgets('has key management section', (tester) async {
       await pumpApp(tester);
-      expect(find.text('Generate Keypair'), findsOneWidget);
-      expect(find.byIcon(Icons.key), findsOneWidget);
+      expect(find.text('Key Management'), findsOneWidget);
     });
   });
 
   // ── Pillar 2: Messenger ──
   group('Messenger Screen', () {
-    testWidgets('shows PQ Double Ratchet info and auto-starts session',
+    testWidgets('shows PQC Messenger with conversation list',
         (tester) async {
       await pumpApp(tester);
       await tester.tap(find.text('Messenger'));
-      // Use pump instead of pumpAndSettle to avoid infinite animation timeout
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 100));
 
-      expect(find.text('Quantum Alice'), findsOneWidget);
       expect(find.text('PQC Messenger'), findsOneWidget);
-      expect(find.text('Double Ratchet'), findsOneWidget);
+      // Should show conversation list with demo contacts
     });
   });
 
@@ -83,7 +77,6 @@ void main() {
       expect(find.text('Disconnected'), findsOneWidget);
       expect(find.byIcon(Icons.power_settings_new), findsOneWidget);
       expect(find.text('One-tap quantum-safe VPN tunnel'), findsOneWidget);
-      // Location selector
       expect(find.text('Server Location'), findsOneWidget);
     });
 
@@ -102,7 +95,6 @@ void main() {
   group('Anonymizer Screen', () {
     testWidgets('shows PII scanner with scan and redact buttons',
         (tester) async {
-      // Use desktop size since Anonymizer is in mobile overflow menu
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
       await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));

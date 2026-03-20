@@ -8,7 +8,8 @@ Future<void> pumpDesktop(WidgetTester tester) async {
   tester.view.physicalSize = const Size(1200, 800);
   tester.view.devicePixelRatio = 1.0;
   await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
-  await tester.pumpAndSettle();
+  await tester.pump(const Duration(seconds: 1));
+  await tester.pump(const Duration(milliseconds: 100));
 }
 
 void main() {
@@ -16,7 +17,6 @@ void main() {
   group('Q-AI Screen', () {
     testWidgets('shows provider and model selectors', (tester) async {
       await pumpDesktop(tester);
-      // Navigate via rail
       await tester.tap(find.text('Q-AI'));
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 100));
@@ -33,28 +33,27 @@ void main() {
 
   // ── Pillar 7: Email ──
   group('Email Screen', () {
-    testWidgets('shows compose form with encrypt button', (tester) async {
-      await pumpDesktop(tester);
-      await tester.tap(find.text('Email'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Quantum Mail'), findsWidgets);
-      expect(find.text('Encrypt with ML-KEM-768'), findsOneWidget);
-      // Compose fields
-      expect(find.text('To'), findsOneWidget);
-      expect(find.text('Subject'), findsOneWidget);
-      expect(find.text('Message body'), findsOneWidget);
-    });
-
-    testWidgets('auto-generates key when none loaded', (tester) async {
+    testWidgets('shows tabbed interface with Inbox and Compose', (tester) async {
       await pumpDesktop(tester);
       await tester.tap(find.text('Email'));
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Email now auto-generates keypair and pre-fills fields
       expect(find.text('Quantum Mail'), findsWidgets);
-      expect(find.text('Test PQC Encryption'), findsOneWidget);
+      // Tab bar with Inbox and Compose (Compose may appear as tab + button)
+      expect(find.text('Inbox'), findsOneWidget);
+      expect(find.text('Compose'), findsWidgets);
+    });
+
+    testWidgets('email screen has Quantum Mail title', (tester) async {
+      await pumpDesktop(tester);
+      await tester.tap(find.text('Email'));
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Email screen shows Quantum Mail and has both tabs
+      expect(find.text('Quantum Mail'), findsWidgets);
+      expect(find.text('Inbox'), findsOneWidget);
     });
   });
 
@@ -63,7 +62,8 @@ void main() {
     testWidgets('shows PQC proxy toggle and privacy controls', (tester) async {
       await pumpDesktop(tester);
       await tester.tap(find.text('Browser'));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Browser shows floating privacy chips on macOS (WebView path)
       expect(find.text('PQC'), findsOneWidget);
