@@ -309,6 +309,10 @@ production/entropy_pool/*.qep
 production/entropy_pool/*.bin
 quantum_entropy/*.qep
 quantum_entropy/*.bin
+quantum_entropy/*.pos
+quantum_entropy/*.log
+quantum_entropy/*.jsonl
+quantum_entropy/harvester-*.log
 entropy_data/
 *.entropy
 

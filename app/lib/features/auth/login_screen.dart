@@ -252,21 +252,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 24),
 
                   // OAuth buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 8,
                     children: [
                       _OAuthButton(
                         icon: Icons.g_mobiledata,
                         label: 'Google',
                         onPressed: () => _oauthSignIn(OAuthProvider.google),
                       ),
-                      const SizedBox(width: 12),
                       _OAuthButton(
                         icon: Icons.code,
                         label: 'GitHub',
                         onPressed: () => _oauthSignIn(OAuthProvider.github),
                       ),
-                      const SizedBox(width: 12),
                       _OAuthButton(
                         icon: Icons.business,
                         label: 'LinkedIn',
