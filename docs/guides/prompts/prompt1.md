@@ -1,7 +1,11 @@
 # Prompt1 
 automate and sophisticated approach with parallelised agent  teams, ruflo v3 prompting, superpowers, ralph loop and other avilable plugins so it can be paralleised with ultrathink mode and high effort at least, use newest chanelogs and mos recent ones including the industry best ppraactices, /batch , /simplify /ralph-loop tdd with screenshot, PCT, MCP servers, and  whatnot. I want to make the best out of the both worlds so we can parallelise it in most sopisticated manner and a world class agentic implementation and orchestration.  please implement the given task and create the  appropriate dir and file structure with eithr or .sh, .xml, .md, .json, .yaml or whatever or a combination for high end  context engineering, promt engineering, rules and etc, phase by phase or workstreams workflows, recipes see @docs/guides/ and @docs/guides/claude-flow-v3/ with recipes and verification  ands skill and ralph looop until N=20 on each and or convergence, and or threshold 0.995. And a parallel agent teams with the same approach as above; to nail task completeness 
 - So in total x amount of agent teams one for each task and the team has one agent and or subagents for each subtask, ralph looop until n=20 on each and task/subtask in addition;
-Use these; “/Users/mos/dev/qdaria/zipminator/.claude/skills/agentic-jujutsu/SKILL.md
+Use these; 
+
+## Default Skills
+
+/Users/mos/dev/qdaria/zipminator/.claude/skills/agentic-jujutsu/SKILL.md
 /Users/mos/dev/qdaria/zipminator/.claude/skills/hive-mind-advanced/SKILL.md
 /Users/mos/dev/qdaria/zipminator/.claude/skills/pair-programming/SKILL.md
 /Users/mos/dev/qdaria/zipminator/.claude/skills/quantum-hive-mind-therese-helen/SKILL.md
@@ -13,8 +17,11 @@ Use these; “/Users/mos/dev/qdaria/zipminator/.claude/skills/agentic-jujutsu/SK
 /Users/mos/dev/qdaria/zipminator/.claude/skills/quantum-hive-mind-therese-helen
 /Users/mos/dev/qdaria/zipminator/.claude/skills/reasoningbank-agentdb
 /Users/mos/dev/qdaria/zipminator/.claude/skills/reasoningbank-intelligence
-“
+
 to spawn a combination the following distributed on task/subtasks each with its own agen teams, superpower,  /batch /simplify, ralph looop until N=20 or threshold +0.995 on task/subtasks:
+
+## Agents
+
 @/Users/mos/dev/qdaria/zipminator/.claude/agents/testing
 @/Users/mos/dev/qdaria/zipminator/.claude/agents/analysis
 @/Users/mos/dev/qdaria/zipminator/.claude/agents/architecture
@@ -32,6 +39,8 @@ to spawn a combination the following distributed on task/subtasks each with its 
 @/Users/mos/dev/qdaria/zipminator/.claude/agents/reasoning
 @/Users/mos/dev/qdaria/zipminator/.claude/agents/specialized
 @/Users/mos/dev/qdaria/zipminator/.claude/agents/templates 
+
+## Commands
 
 /Users/mos/dev/qdaria/zipminator/.claude/commands/agents
 /Users/mos/dev/qdaria/zipminator/.claude/commands/analysis
@@ -51,12 +60,20 @@ to spawn a combination the following distributed on task/subtasks each with its 
 /Users/mos/dev/qdaria/zipminator/.claude/commands/self-improve.md
 /Users/mos/dev/qdaria/zipminator/.claude/commands/sprint-task.md
 
+## Helpers
 /Users/mos/dev/qdaria/zipminator/.claude/helpers
 
+## Rules
+
 /Users/mos/dev/qdaria/zipminator/.claude/rules/00-core.md
+/Users/mos/dev/qdaria/zipminator/.claude/rules/01-stack.md
+/Users/mos/dev/qdaria/zipminator/.claude/rules/02-security-pqc.md
+/Users/mos/dev/qdaria/zipminator/.claude/rules/context-management.md
+/Users/mos/dev/qdaria/zipminator/.claude/rules/model-routing.md
+/Users/mos/dev/qdaria/zipminator/.claude/rules/tdd-ralph.md
+/Users/mos/dev/qdaria/zipminator/.claude/rules/zero-hallucination.md
 
-
-/Users/mos/dev/qdaria/zipminator/docs/guides/prompts/prompt1.md
+## Skills
 /Users/mos/dev/qdaria/zipminator/.claude/skills/document-skills
 /Users/mos/dev/qdaria/zipminator/.claude/skills/pitch-deck
 /Users/mos/dev/qdaria/zipminator/.claude/skills/pitch-deck-improve
@@ -105,3 +122,8 @@ to spawn a combination the following distributed on task/subtasks each with its 
 /Users/mos/dev/qdaria/zipminator/.claude/skills/quantum-knowledge-graph-weaver
 /Users/mos/dev/qdaria/zipminator/.claude/skills/quantum-deep-tech-ip-strategist
 /Users/mos/dev/qdaria/zipminator/.claude/skills/quantum-cryptanalysis-expert
+
+
+
+## Coockboks;
+

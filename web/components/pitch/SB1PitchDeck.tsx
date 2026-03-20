@@ -4,6 +4,9 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Navigation } from './pitch-ui/SB1Navigation';
 import { SB1Sidebar } from './pitch-ui/SB1Sidebar';
 import { SlideTitle as SlideTitleSlide } from './sb1-slides/SlideTitle';
+import { SlideQDaria } from './sb1-slides/SlideQDaria';
+import { SlideSpinoffs } from './sb1-slides/SlideSpinoffs';
+import { SlideAgenticAI } from './sb1-slides/SlideAgenticAI';
 import { SlideThreat } from './sb1-slides/SlideThreat';
 import { SlideDORA } from './sb1-slides/SlideDORA';
 import { SlideGlobalBanks } from './sb1-slides/SlideGlobalBanks';
@@ -13,7 +16,8 @@ import { SlideRiskModeling } from './sb1-slides/SlideRiskModeling';
 import { SlideFraudDetection } from './sb1-slides/SlideFraudDetection';
 import { SlideQRNG } from './sb1-slides/SlideQRNG';
 import { SlideMarketSize } from './sb1-slides/SlideMarketAndStrategy';
-import { SlideQDaria } from './sb1-slides/SlideQDaria';
+import { SlideCostComparison } from './sb1-slides/SlideCostComparison';
+import { SlideSmartHouse } from './sb1-slides/SlideSmartHouse';
 import { SlideNextSteps } from './sb1-slides/SlideNextSteps';
 import type { Scenario } from '@/lib/sb1-chart-data';
 
@@ -25,18 +29,22 @@ interface SlideConfig {
 }
 
 const SLIDES: SlideConfig[] = [
-  { id: 0, title: 'QDaria × SpareBank 1', component: SlideTitleSlide },
-  { id: 1, title: 'Trusselbilde · HNDL', component: SlideThreat },
-  { id: 2, title: 'DORA Compliance', component: SlideDORA },
-  { id: 3, title: 'Globale banker i gang', component: SlideGlobalBanks },
-  { id: 4, title: 'BC 01 · Zipminator', component: SlideZipminator },
-  { id: 5, title: 'BC 02 · Portefølje', component: SlidePortfolio },
-  { id: 6, title: 'BC 03 · Risikomodellering', component: SlideRiskModeling },
-  { id: 7, title: 'BC 04 · Svindeldeteksjon', component: SlideFraudDetection },
-  { id: 8, title: 'BC 05 · QRNG', component: SlideQRNG },
-  { id: 9, title: 'Markedsstørrelse', component: SlideMarketSize },
-  { id: 10, title: 'QDaria-posisjon', component: SlideQDaria },
-  { id: 11, title: 'Neste steg', component: SlideNextSteps },
+  { id: 0,  title: 'QDaria × SpareBank 1',      component: SlideTitleSlide },
+  { id: 1,  title: 'QDaria — Selskap',           component: SlideQDaria },
+  { id: 2,  title: 'Produktportefølje & Spinoffs', component: SlideSpinoffs },
+  { id: 3,  title: 'Agentisk AI-plattform',      component: SlideAgenticAI },
+  { id: 4,  title: 'Trusselbilde · HNDL',        component: SlideThreat },
+  { id: 5,  title: 'DORA Compliance',             component: SlideDORA },
+  { id: 6,  title: 'Globale banker i gang',       component: SlideGlobalBanks },
+  { id: 7,  title: 'BC 01 · Zipminator',          component: SlideZipminator },
+  { id: 8,  title: 'BC 02 · Portefølje',          component: SlidePortfolio },
+  { id: 9,  title: 'BC 03 · Risikomodellering',   component: SlideRiskModeling },
+  { id: 10, title: 'BC 04 · Svindeldeteksjon',    component: SlideFraudDetection },
+  { id: 11, title: 'BC 05 · QRNG',                component: SlideQRNG },
+  { id: 12, title: 'Markedsstørrelse',             component: SlideMarketSize },
+  { id: 13, title: 'Kostnadsbilde',               component: SlideCostComparison },
+  { id: 14, title: 'RuView Smart House',          component: SlideSmartHouse },
+  { id: 15, title: 'Neste steg',                  component: SlideNextSteps },
 ];
 
 export const SB1PitchDeck: React.FC = () => {

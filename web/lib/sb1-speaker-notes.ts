@@ -70,4 +70,30 @@ export const SPEAKER_NOTES: Record<number, string> = {
 **Call to action**: Vi ber ikke om en kjøpsbeslutning i dag. Vi ber om en pilot-avtale som lar SpareBank 1 evaluere teknologien i sitt eget miljø. Risikoen er lav, men oppsiden — å bli Nordens første kvantebank — er historisk.
 
 **Kontakt**: Daniel Mo Houshmand, CEO, mo@qdaria.com. Mike Piech (Rigetti VP) er invitert til neste møte.`,
+
+  // New slides — unique keys 100+ to avoid conflicts with old content-keyed notes
+
+  100: `**Produktportefølje**: QDaria er et holdingselskap med fem spinoff-selskaper som dekker hele kvantum-verdikjeden. Zipminator er PQC-flaggskipet i beta. QCaaS leverer kvantumberegning via Rigetti. Qm9 er fintech-spinoffen for prising og risiko. QDiana er live edtech-plattform. QDaria Smart House kombinerer RuView WiFi-sensing med kvantumkrypto for kamerafri sikkerhet.
+
+**Seeding**: Total seed-runde på $9M fordelt på fem selskaper. Hvert selskap har eget marked, egen P&L og direkte relevans for SB1. Alle fem har SB1-overlapp: fra DORA-compliance til eiendomsfinansiering.
+
+**SB1-vinkel**: Geir (Real Estate) har direkte interesse i Smart House. Peder og Jostein (TMT) ser QCaaS og Zipminator. ODIN ser porteføljeoptimalisering. Alliansen ser compliance. Alle fem spinoffs kan aktiveres.`,
+
+  101: `**Agentisk AI**: QDaria har bygget en enterprise-klar AI-orkestreringsplattform med 200+ spesialiserte agenter. Hver SB1-ansatt kan få sin egen personlige AI-assistent som hjelper med daglige oppgaver: compliance-sjekk, rapportgenerering, risikoanalyse, svindelovervåking.
+
+**Teknisk plattform**: Ruflo (tidl. claude-flow) er orkestreringsmotoren med 215 MCP-verktøy, swarm-intelligens og skill-system. Agentene kjører på Claude Opus 4 med 1M token kontekstvindu.
+
+**Daglig verdi**: En typisk dag starter med compliance-sjekk kl. 08, risikoanalyse kl. 09, svindelflaging kl. 10, nyhetsbriefing kl. 14 og styrenotat kl. 16. Alt automatisert. Spare timer daglig per ansatt.`,
+
+  102: `**Kostnadsbilde**: Vi presenterer tre scenarier. Med QDaria: NOK 8–15M, 12–24 måneder, 14 banker beskyttet. Egenutviklet: NOK 80–150M, 3–5 år, krever 10+ kvantumspesialister som ikke finnes i Norge. Gjør ingenting: potensielt NOK 600M–1.3 mrd. i DORA-bøter, pluss $6.08M per datalekkasje.
+
+**Nøkkelargument**: Det finnes ikke 10 kvantumkryptografer tilgjengelig i Norge. Rekrutteringstiden alene overskrider DORA-fristen. QDaria er den eneste realistiske veien til compliance i tide.
+
+**Kilde**: IBM Cost of a Data Breach 2024 ($6.08M finans-snitt). DORA Art. 6 bøter inntil 2% av global omsetning.`,
+
+  103: `**QDaria Smart House**: Vår neste spinoff kombinerer RuView (WiFi DensePose) med Zipminator kvantumkryptografi. RuView bruker ESP32-S3 mesh-nettverk til å detektere mennesker, pust, hjerteslag og bevegelse gjennom vegger via WiFi CSI-signaler — uten kameraer, uten wearables, uten internett.
+
+**Physical Cryptography**: Fire lag: (1) WiFi DensePose for sensing, (2) PUEK — stedsbundne krypteringsnøkler fra rommets EM-signatur, (3) Vital-Sign Auth — kontinuerlig biometrisk autentisering, (4) EM Canary — automatisk nøkkelrotasjon ved avlyttingsforsøk.
+
+**SB1-relevans**: SpareBank 1 Markets Real Estate finansierer smarte bygg. QDaria Smart House leverer sikkerhet uten kameraer for sykehjem, forsvarsobjekter og nybygde leiligheter. Geir Rønnestad sin avdeling har direkte interesse.`,
 };

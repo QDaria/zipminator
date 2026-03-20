@@ -68,11 +68,14 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                   </p>
                   <div className="space-y-1.5">
                     {[
-                      'Publisert forskning: Quantum Reservoir Computing (QRC) med eksperimenter på Rigetti 156-qubit Heron-prosessor',
-                      'Rigetti-partnerskap: Mike Piech (VP) deltar på neste SB1-møte',
-                      'Norges eneste: NQCG oppløst des. 2024 — QDaria uten direkte norsk konkurranse',
-                      'Dobbel kompetanse: Kvantefysikk + finans — sjeldenhet globalt',
-                      'Global struktur: 6 jurisdiksjoner (Oslo HQ, Sveits IP, Delaware US, Singapore APAC, UAE MENA, Malta iGaming)',
+                      'Publisert forskning: Quantum Reservoir Computing (QRC) med eksperimenter pa Rigetti 156-qubit Heron-prosessor',
+                      'Rigetti-partnerskap: Mike Piech (VP) deltar pa neste SB1-mote',
+                      'Norges eneste: NQCG opplost des. 2024 — QDaria uten direkte norsk konkurranse',
+                      'Forste kommersielle kvantemaskin-tilgang i Norge (via Rigetti QCaaS)',
+                      'Dobbel kompetanse: PhD-niva kvantefysikk + finansiell sektor — ekstremt sjeldent globalt',
+                      '"En av de mest kompetente i Skandinavia, om ikke Europa" — anerkjent i bransjen',
+                      'Global IP-struktur: 6 jurisdiksjoner (Oslo HQ, Sveits IP, Delaware US, Singapore APAC, UAE MENA, Malta iGaming)',
+                      'Gjor Norge kvanteklar: QDaria.com er visjonen om norsk kvantumledelse',
                     ].map((item) => (
                       <div key={item} className="flex items-start gap-2">
                         <span
