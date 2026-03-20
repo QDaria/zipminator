@@ -53,9 +53,9 @@ parts:
       - file: content/use_cases/ecommerce
       - file: content/use_cases/defense
 
-  - caption: "Part VII: Notebooks"
+  - caption: "Part VII: Monte Carlo & Banking"
     chapters:
-      - file: notebooks/07_monte_carlo_prng_vs_qrng
+      - file: notebooks/09_monte_carlo_prng_vs_qrng
 
   - caption: "Part VIII: CLI Reference"
     chapters:

@@ -12,7 +12,8 @@ execute:
   timeout: 120
   exclude_patterns:
     - "notebooks/05_shor_demo*"
-    - "notebooks/07_monte_carlo*"
+    - "notebooks/08_qmesh*"
+    - "notebooks/09_monte_carlo*"
 parse:
   myst_enable_extensions:
     - colon_fence
