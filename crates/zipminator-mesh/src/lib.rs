@@ -27,6 +27,9 @@ pub mod spatiotemporal;
 pub mod topology_auth;
 pub mod vital_auth;
 
+// Wave 2: RuView attestation wire format
+pub mod attestation;
+
 pub use entropy_bridge::{EntropyBridge, EntropyBridgeError, PoolEntropySource};
 pub use mesh_key::MeshKey;
 pub use provisioner::{MeshProvisioner, NVS_MAGIC};

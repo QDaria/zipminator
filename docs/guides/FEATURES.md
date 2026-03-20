@@ -2,11 +2,12 @@
 
 > **Single Source of Truth** for all pillar statuses. Updated after every code change session.
 >
-> Last verified: 2026-03-19 | Verifier: Claude Code 100% Completion Sprint
+> Last verified: 2026-03-20 | Verifier: Claude Code Physical Cryptography Wave 1
 >
 > Percentages reconciled Mar 19 2026 — summary table now matches detail sections.
 > Summary table reflects actual production-readiness, not just code-structure completeness.
 >
+> **Mar 20 update**: Q-Mesh upgraded to 90% (Physical Cryptography Wave 1: 6 new modules, 106 mesh tests, 513 workspace total).
 > **Mar 19 update**: Reconciled all pillar percentages. VoIP upgraded to 85% (frame encryption exists). Mesh upgraded to 80% (entropy bridge functional). Browser upgraded to 85% (AI sidebar integrated).
 
 ---
@@ -236,7 +237,7 @@
 
 ---
 
-## Pillar 9: Q-Mesh — Quantum-Secured WiFi Sensing (85%)
+## Pillar 9: Q-Mesh — Quantum-Secured WiFi Sensing (90%)
 
 - **Integration**: [RuView](https://github.com/MoHoushmand/RuView) WiFi DensePose system with Zipminator QRNG entropy
 - **What RuView does**: ESP32-S3 mesh network that senses human pose, breathing, heartbeat, and presence through WiFi CSI signals. No cameras, no wearables, no internet required
@@ -244,8 +245,23 @@
 - **Zipminator integration**: Replace the classical random entropy source for mesh key generation and rotation with Zipminator's QRNG (IBM Quantum 156q). The QRNG harvester produces 50KB/cycle; a mesh key is 16 bytes. This creates quantum-secured WiFi sensing mesh
 - **QUIC transport (ADR-032a)**: Aggregator-class nodes use `midstreamer-quic` with TLS 1.3 AEAD. ESP32-S3 nodes retain manual HMAC/SipHash over UDP
 - **Use cases**: Healthcare (vital sign monitoring, fall detection), defense (through-wall personnel tracking), elder care, smart buildings
-- **What works**: Entropy bridge crate (`crates/zipminator-mesh/`) with HKDF-SHA256 key derivation from quantum pool; MeshKey (16-byte PSK) and SipHashKey types with zeroize-on-drop; FilePoolSource and MemoryEntropySource; MeshProvisioner with `provision_nvs_binary()` generating ESP32-S3-compatible blobs (magic header, mesh_id, PSK, SipHash key, SHA-256 checksum); 50 Rust tests passing
-- **What's missing**: Cross-repo integration script linking Zipminator QRNG output to RuView's `scripts/provision.py`; shared NVS key management; OTA key rotation over mesh
+
+### Physical Cryptography — Wave 1 (Complete)
+
+Six new modules in `crates/zipminator-mesh/` implementing physical-layer crypto primitives:
+
+1. **CSI Entropy Harvester** (`csi_entropy.rs`) — Von Neumann debiasing of WiFi CSI phase data; implements `PoolEntropySource` trait; XOR-mixed with QRNG for defense-in-depth
+2. **PUEK (Physical Unclonable Environment Key)** (`puek.rs`) — Location-as-key via SVD eigenstructure of CSI snapshots; configurable security profiles (SCIF/Office/Home) with tunable eigenvalue thresholds
+3. **EM Canary Session Controller** (`em_canary.rs`) — 4-level threat escalation (Normal → Elevated → High → Critical); policy-driven key rotation and destruction on electromagnetic anomaly detection
+4. **Vital-Sign Continuous Auth** (`vital_auth.rs`) — WiFi-derived biometric session authentication with rolling HMAC; drift detection for liveness verification
+5. **Topological Mesh Authentication** (`topo_auth.rs`) — Network key derived from graph topology invariants via petgraph; topology changes trigger re-authentication
+6. **Spatiotemporal Non-Repudiation** (`spatiotemporal.rs`) — Presence-proof signatures combining CSI fingerprint + vital signs + timestamp for undeniable physical attestation
+
+- **What else works**: Entropy bridge crate with HKDF-SHA256 key derivation from quantum pool; MeshKey (16-byte PSK) and SipHashKey types with zeroize-on-drop; FilePoolSource and MemoryEntropySource; MeshProvisioner with `provision_nvs_binary()` generating ESP32-S3-compatible blobs (magic header, mesh_id, PSK, SipHash key, SHA-256 checksum)
+- **Tests**: 106 Rust tests in mesh crate (90 unit + 16 integration); 513 total workspace tests passing
+- **Wave 2 (in progress)**: Attestation wire format, provisioner extensions for new module keys
+- **Wave 3 (research-phase)**: Ghost Protocol, TEMPEST countermeasures, ZKP presence proofs, RF Shroud
+- **Remaining integration**: Cross-repo integration script linking Zipminator QRNG output to RuView's `scripts/provision.py`; shared NVS key management; OTA key rotation over mesh
 
 ### Architecture
 

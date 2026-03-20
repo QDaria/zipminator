@@ -25,7 +25,7 @@ pub const NVS_MAGIC_V2: &[u8; 6] = b"ZMESH\x02";
 const NVS_CHECKSUM_SIZE: usize = 32;
 
 /// A complete key set for one mesh provisioning epoch.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct MeshKeySet {
     /// 16-byte PSK for HMAC-SHA256 beacon authentication (hex-encoded in JSON).
     pub beacon_psk: String,
@@ -232,6 +232,242 @@ impl MeshProvisioner {
         Ok(buf)
     }
 
+    /// Produce a V2 NVS-compatible binary blob with optional PUEK enrollment and EM Canary policy.
+    ///
+    /// Binary layout:
+    /// ```text
+    /// [magic: 6B "ZMESH\x02"]
+    /// [mesh_id_len: 2B LE] [mesh_id: N bytes]
+    /// [psk: 16B] [siphash: 16B]
+    /// [has_puek: 1B] [puek_data: variable if has_puek=1]
+    ///   - puek_eigenmode_count: 2B LE
+    ///   - puek_eigenmodes: eigenmode_count * 8B (f64 LE each)
+    ///   - puek_threshold: 8B (f64 LE)
+    /// [has_canary: 1B] [canary_data: variable if has_canary=1]
+    ///   - elevated_threshold: 8B (f64 LE)
+    ///   - high_threshold: 8B (f64 LE)
+    ///   - critical_threshold: 8B (f64 LE)
+    ///   - max_consecutive: 4B (u32 LE)
+    ///   - flags: 1B (bit 0 = rekey_on_elevated, bit 1 = terminate_on_critical)
+    /// [sha256_checksum: 32B]
+    /// ```
+    pub fn provision_nvs_v2_binary(
+        &mut self,
+        mesh_id: &str,
+        puek: Option<&PuekEnrollmentData>,
+        canary: Option<&CanaryPolicyData>,
+    ) -> Result<Vec<u8>, EntropyBridgeError> {
+        if mesh_id.is_empty() {
+            return Err(EntropyBridgeError::PoolNotAccessible(
+                "mesh_id must not be empty".into(),
+            ));
+        }
+        let id_bytes = mesh_id.as_bytes();
+        if id_bytes.len() > u16::MAX as usize {
+            return Err(EntropyBridgeError::PoolNotAccessible(
+                "mesh_id exceeds maximum length (65535 bytes)".into(),
+            ));
+        }
+
+        // Derive keys
+        let salt = format!("{}:epoch:{}", mesh_id, self.epoch).into_bytes();
+        let source = FilePoolSource::new(&self.pool_path)?;
+        let mut bridge = EntropyBridge::new(source);
+        let (mesh_key, siphash_key) = bridge.derive_mesh_key_pair(Some(&salt))?;
+
+        let mut buf = Vec::with_capacity(256);
+
+        // Magic header (v2)
+        buf.extend_from_slice(NVS_MAGIC_V2);
+        // Mesh ID length (u16 LE)
+        buf.extend_from_slice(&(id_bytes.len() as u16).to_le_bytes());
+        // Mesh ID bytes
+        buf.extend_from_slice(id_bytes);
+        // PSK (16 bytes)
+        buf.extend_from_slice(mesh_key.as_bytes());
+        // SipHash key (16 bytes)
+        buf.extend_from_slice(siphash_key.as_bytes());
+
+        // PUEK section
+        match puek {
+            Some(p) => {
+                buf.push(1); // has_puek = 1
+                let count = p.eigenmodes.len() as u16;
+                buf.extend_from_slice(&count.to_le_bytes());
+                for eigenmode in &p.eigenmodes {
+                    buf.extend_from_slice(&eigenmode.to_le_bytes());
+                }
+                buf.extend_from_slice(&p.threshold.to_le_bytes());
+            }
+            None => {
+                buf.push(0); // has_puek = 0
+            }
+        }
+
+        // Canary section
+        match canary {
+            Some(c) => {
+                buf.push(1); // has_canary = 1
+                buf.extend_from_slice(&c.elevated_threshold.to_le_bytes());
+                buf.extend_from_slice(&c.high_threshold.to_le_bytes());
+                buf.extend_from_slice(&c.critical_threshold.to_le_bytes());
+                buf.extend_from_slice(&c.max_consecutive_anomalies.to_le_bytes());
+                let mut flags: u8 = 0;
+                if c.rekey_on_elevated {
+                    flags |= 0x01;
+                }
+                if c.terminate_on_critical {
+                    flags |= 0x02;
+                }
+                buf.push(flags);
+            }
+            None => {
+                buf.push(0); // has_canary = 0
+            }
+        }
+
+        // SHA-256 checksum over everything so far
+        let checksum = Sha256::digest(&buf);
+        buf.extend_from_slice(&checksum);
+
+        Ok(buf)
+    }
+
+    /// Parse a V2 NVS binary blob back into its components.
+    ///
+    /// Returns the mesh_id, PSK bytes, SipHash bytes, optional PUEK data, and optional canary data.
+    /// Validates the SHA-256 checksum.
+    pub fn parse_nvs_v2_binary(
+        blob: &[u8],
+    ) -> Result<
+        (
+            String,
+            [u8; 16],
+            [u8; 16],
+            Option<PuekEnrollmentData>,
+            Option<CanaryPolicyData>,
+        ),
+        EntropyBridgeError,
+    > {
+        if blob.len() < NVS_MAGIC_V2.len() + 2 + NVS_CHECKSUM_SIZE {
+            return Err(EntropyBridgeError::PoolNotAccessible(
+                "blob too short for V2 format".into(),
+            ));
+        }
+
+        // Verify magic
+        if &blob[..6] != NVS_MAGIC_V2 {
+            return Err(EntropyBridgeError::PoolNotAccessible(
+                "invalid V2 magic bytes".into(),
+            ));
+        }
+
+        // Verify checksum
+        let (payload, stored_checksum) = blob.split_at(blob.len() - NVS_CHECKSUM_SIZE);
+        let computed = Sha256::digest(payload);
+        if computed.as_slice() != stored_checksum {
+            return Err(EntropyBridgeError::PoolNotAccessible(
+                "V2 checksum mismatch".into(),
+            ));
+        }
+
+        let mut pos = 6;
+
+        // Mesh ID
+        if pos + 2 > payload.len() {
+            return Err(EntropyBridgeError::PoolNotAccessible("truncated mesh_id length".into()));
+        }
+        let id_len = u16::from_le_bytes([payload[pos], payload[pos + 1]]) as usize;
+        pos += 2;
+        if pos + id_len > payload.len() {
+            return Err(EntropyBridgeError::PoolNotAccessible("truncated mesh_id".into()));
+        }
+        let mesh_id = String::from_utf8(payload[pos..pos + id_len].to_vec())
+            .map_err(|e| EntropyBridgeError::PoolNotAccessible(format!("invalid mesh_id UTF-8: {e}")))?;
+        pos += id_len;
+
+        // PSK (16 bytes)
+        if pos + 16 > payload.len() {
+            return Err(EntropyBridgeError::PoolNotAccessible("truncated PSK".into()));
+        }
+        let mut psk = [0u8; 16];
+        psk.copy_from_slice(&payload[pos..pos + 16]);
+        pos += 16;
+
+        // SipHash key (16 bytes)
+        if pos + 16 > payload.len() {
+            return Err(EntropyBridgeError::PoolNotAccessible("truncated SipHash key".into()));
+        }
+        let mut sip = [0u8; 16];
+        sip.copy_from_slice(&payload[pos..pos + 16]);
+        pos += 16;
+
+        // PUEK section
+        if pos + 1 > payload.len() {
+            return Err(EntropyBridgeError::PoolNotAccessible("truncated has_puek".into()));
+        }
+        let has_puek = payload[pos];
+        pos += 1;
+        let puek_data = if has_puek == 1 {
+            if pos + 2 > payload.len() {
+                return Err(EntropyBridgeError::PoolNotAccessible("truncated puek eigenmode count".into()));
+            }
+            let eigenmode_count = u16::from_le_bytes([payload[pos], payload[pos + 1]]) as usize;
+            pos += 2;
+            let eigenmodes_bytes = eigenmode_count * 8;
+            if pos + eigenmodes_bytes + 8 > payload.len() {
+                return Err(EntropyBridgeError::PoolNotAccessible("truncated puek data".into()));
+            }
+            let mut eigenmodes = Vec::with_capacity(eigenmode_count);
+            for _ in 0..eigenmode_count {
+                let val = f64::from_le_bytes(payload[pos..pos + 8].try_into().unwrap());
+                eigenmodes.push(val);
+                pos += 8;
+            }
+            let threshold = f64::from_le_bytes(payload[pos..pos + 8].try_into().unwrap());
+            pos += 8;
+            Some(PuekEnrollmentData::new(eigenmodes, threshold))
+        } else {
+            None
+        };
+
+        // Canary section
+        if pos + 1 > payload.len() {
+            return Err(EntropyBridgeError::PoolNotAccessible("truncated has_canary".into()));
+        }
+        let has_canary = payload[pos];
+        pos += 1;
+        let canary_data = if has_canary == 1 {
+            // 3 * f64 (24) + u32 (4) + flags (1) = 29 bytes
+            if pos + 29 > payload.len() {
+                return Err(EntropyBridgeError::PoolNotAccessible("truncated canary data".into()));
+            }
+            let elevated = f64::from_le_bytes(payload[pos..pos + 8].try_into().unwrap());
+            pos += 8;
+            let high = f64::from_le_bytes(payload[pos..pos + 8].try_into().unwrap());
+            pos += 8;
+            let critical = f64::from_le_bytes(payload[pos..pos + 8].try_into().unwrap());
+            pos += 8;
+            let max_consecutive = u32::from_le_bytes(payload[pos..pos + 4].try_into().unwrap());
+            pos += 4;
+            let flags = payload[pos];
+            // pos += 1; // not needed, end of data
+
+            Some(CanaryPolicyData {
+                elevated_threshold: elevated,
+                high_threshold: high,
+                critical_threshold: critical,
+                max_consecutive_anomalies: max_consecutive,
+                rekey_on_elevated: flags & 0x01 != 0,
+                terminate_on_critical: flags & 0x02 != 0,
+            })
+        } else {
+            None
+        };
+
+        Ok((mesh_id, psk, sip, puek_data, canary_data))
+    }
+
     /// Rotate keys by incrementing the epoch and re-deriving.
     ///
     /// Returns the new key set. The epoch counter advances by 1, which
@@ -431,5 +667,227 @@ mod tests {
         let blob1 = prov1.provision_nvs_binary("det-nvs").unwrap();
         let blob2 = prov2.provision_nvs_binary("det-nvs").unwrap();
         assert_eq!(blob1, blob2, "same inputs must produce identical binaries");
+    }
+
+    // --- NVS V2 binary tests ---
+
+    fn make_test_puek() -> PuekEnrollmentData {
+        PuekEnrollmentData::new(vec![100.5, 42.3, 17.8, 5.1], 0.85)
+    }
+
+    fn make_test_canary() -> CanaryPolicyData {
+        CanaryPolicyData {
+            elevated_threshold: 0.10,
+            high_threshold: 0.25,
+            critical_threshold: 0.50,
+            max_consecutive_anomalies: 5,
+            rekey_on_elevated: true,
+            terminate_on_critical: true,
+        }
+    }
+
+    #[test]
+    fn test_nvs_v2_binary_with_puek() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "v2-puek").unwrap();
+        let puek = make_test_puek();
+        let blob = prov
+            .provision_nvs_v2_binary("v2-puek", Some(&puek), None)
+            .unwrap();
+
+        let (mesh_id, psk, sip, parsed_puek, parsed_canary) =
+            MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
+
+        assert_eq!(mesh_id, "v2-puek");
+        assert!(psk.iter().any(|&b| b != 0), "PSK must not be all zeros");
+        assert!(sip.iter().any(|&b| b != 0), "SipHash must not be all zeros");
+        assert_ne!(psk, sip);
+
+        let p = parsed_puek.expect("PUEK data should be present");
+        assert_eq!(p.eigenmodes.len(), 4);
+        assert!((p.eigenmodes[0] - 100.5).abs() < 1e-10);
+        assert!((p.eigenmodes[3] - 5.1).abs() < 1e-10);
+        assert!((p.threshold - 0.85).abs() < 1e-10);
+
+        assert!(parsed_canary.is_none(), "canary should be absent");
+    }
+
+    #[test]
+    fn test_nvs_v2_binary_with_canary() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "v2-canary").unwrap();
+        let canary = make_test_canary();
+        let blob = prov
+            .provision_nvs_v2_binary("v2-canary", None, Some(&canary))
+            .unwrap();
+
+        let (mesh_id, _psk, _sip, parsed_puek, parsed_canary) =
+            MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
+
+        assert_eq!(mesh_id, "v2-canary");
+        assert!(parsed_puek.is_none(), "PUEK should be absent");
+
+        let c = parsed_canary.expect("canary data should be present");
+        assert!((c.elevated_threshold - 0.10).abs() < 1e-10);
+        assert!((c.high_threshold - 0.25).abs() < 1e-10);
+        assert!((c.critical_threshold - 0.50).abs() < 1e-10);
+        assert_eq!(c.max_consecutive_anomalies, 5);
+        assert!(c.rekey_on_elevated);
+        assert!(c.terminate_on_critical);
+    }
+
+    #[test]
+    fn test_nvs_v2_binary_with_both() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "v2-both").unwrap();
+        let puek = make_test_puek();
+        let canary = make_test_canary();
+        let blob = prov
+            .provision_nvs_v2_binary("v2-both", Some(&puek), Some(&canary))
+            .unwrap();
+
+        let (mesh_id, _psk, _sip, parsed_puek, parsed_canary) =
+            MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
+
+        assert_eq!(mesh_id, "v2-both");
+        assert!(parsed_puek.is_some(), "PUEK should be present");
+        assert!(parsed_canary.is_some(), "canary should be present");
+    }
+
+    #[test]
+    fn test_nvs_v2_binary_with_neither() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "v2-none").unwrap();
+        let blob = prov
+            .provision_nvs_v2_binary("v2-none", None, None)
+            .unwrap();
+
+        let (mesh_id, psk, sip, parsed_puek, parsed_canary) =
+            MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
+
+        assert_eq!(mesh_id, "v2-none");
+        assert!(psk.iter().any(|&b| b != 0));
+        assert!(sip.iter().any(|&b| b != 0));
+        assert!(parsed_puek.is_none());
+        assert!(parsed_canary.is_none());
+    }
+
+    #[test]
+    fn test_nvs_v2_magic_bytes_correct() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "v2-magic").unwrap();
+        let blob = prov
+            .provision_nvs_v2_binary("v2-magic", None, None)
+            .unwrap();
+
+        assert_eq!(&blob[..6], b"ZMESH\x02", "V2 binary must start with ZMESH\\x02");
+        // Confirm it differs from V1 magic
+        assert_ne!(&blob[..6], b"ZMESH\x01");
+    }
+
+    #[test]
+    fn test_nvs_v2_checksum_validates() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "v2-cksum").unwrap();
+        let puek = make_test_puek();
+        let canary = make_test_canary();
+        let blob = prov
+            .provision_nvs_v2_binary("v2-cksum", Some(&puek), Some(&canary))
+            .unwrap();
+
+        // Split payload and checksum, verify manually
+        let (payload, stored_checksum) = blob.split_at(blob.len() - 32);
+        let computed = Sha256::digest(payload);
+        assert_eq!(
+            computed.as_slice(),
+            stored_checksum,
+            "SHA-256 checksum must match payload"
+        );
+
+        // Also verify that a corrupted blob fails parsing
+        let mut corrupted = blob.clone();
+        corrupted[10] ^= 0xFF;
+        let result = MeshProvisioner::parse_nvs_v2_binary(&corrupted);
+        assert!(result.is_err(), "corrupted blob must fail checksum validation");
+    }
+
+    #[test]
+    fn test_nvs_v2_roundtrip() {
+        let (_dir, pool_path) = create_test_pool(1024);
+        let mut prov = MeshProvisioner::new(&pool_path, "v2-rt").unwrap();
+        let puek = PuekEnrollmentData::new(vec![1.0, 2.0, 3.0], 0.75);
+        let canary = CanaryPolicyData {
+            elevated_threshold: 0.05,
+            high_threshold: 0.20,
+            critical_threshold: 0.40,
+            max_consecutive_anomalies: 3,
+            rekey_on_elevated: false,
+            terminate_on_critical: true,
+        };
+
+        let blob = prov
+            .provision_nvs_v2_binary("v2-rt", Some(&puek), Some(&canary))
+            .unwrap();
+        let (mesh_id, psk, sip, parsed_puek, parsed_canary) =
+            MeshProvisioner::parse_nvs_v2_binary(&blob).unwrap();
+
+        assert_eq!(mesh_id, "v2-rt");
+
+        // Verify PUEK roundtrip
+        let p = parsed_puek.unwrap();
+        assert_eq!(p.eigenmodes, vec![1.0, 2.0, 3.0]);
+        assert!((p.threshold - 0.75).abs() < 1e-10);
+
+        // Verify canary roundtrip
+        let c = parsed_canary.unwrap();
+        assert!((c.elevated_threshold - 0.05).abs() < 1e-10);
+        assert!((c.high_threshold - 0.20).abs() < 1e-10);
+        assert!((c.critical_threshold - 0.40).abs() < 1e-10);
+        assert_eq!(c.max_consecutive_anomalies, 3);
+        assert!(!c.rekey_on_elevated);
+        assert!(c.terminate_on_critical);
+
+        // Verify the keys are real (same as V1 derivation for same mesh_id)
+        let mut prov_v1 = MeshProvisioner::new(&pool_path, "v2-rt").unwrap();
+        let blob_v1 = prov_v1.provision_nvs_binary("v2-rt").unwrap();
+        let id_len = u16::from_le_bytes([blob_v1[6], blob_v1[7]]) as usize;
+        let psk_v1 = &blob_v1[8 + id_len..8 + id_len + 16];
+        let sip_v1 = &blob_v1[8 + id_len + 16..8 + id_len + 32];
+        assert_eq!(&psk, psk_v1, "V2 PSK must match V1 derivation");
+        assert_eq!(&sip, sip_v1, "V2 SipHash must match V1 derivation");
+    }
+
+    #[test]
+    fn test_nvs_v2_different_configs_different_blobs() {
+        let (_dir, pool_path) = create_test_pool(1024);
+
+        let mut prov1 = MeshProvisioner::new(&pool_path, "v2-diff").unwrap();
+        let mut prov2 = MeshProvisioner::new(&pool_path, "v2-diff").unwrap();
+        let mut prov3 = MeshProvisioner::new(&pool_path, "v2-diff").unwrap();
+        let mut prov4 = MeshProvisioner::new(&pool_path, "v2-diff").unwrap();
+
+        let puek = make_test_puek();
+        let canary = make_test_canary();
+
+        let blob_none = prov1
+            .provision_nvs_v2_binary("v2-diff", None, None)
+            .unwrap();
+        let blob_puek = prov2
+            .provision_nvs_v2_binary("v2-diff", Some(&puek), None)
+            .unwrap();
+        let blob_canary = prov3
+            .provision_nvs_v2_binary("v2-diff", None, Some(&canary))
+            .unwrap();
+        let blob_both = prov4
+            .provision_nvs_v2_binary("v2-diff", Some(&puek), Some(&canary))
+            .unwrap();
+
+        // All four must differ (different payload = different checksum too)
+        assert_ne!(blob_none, blob_puek, "none vs puek must differ");
+        assert_ne!(blob_none, blob_canary, "none vs canary must differ");
+        assert_ne!(blob_none, blob_both, "none vs both must differ");
+        assert_ne!(blob_puek, blob_canary, "puek vs canary must differ");
+        assert_ne!(blob_puek, blob_both, "puek vs both must differ");
+        assert_ne!(blob_canary, blob_both, "canary vs both must differ");
     }
 }
