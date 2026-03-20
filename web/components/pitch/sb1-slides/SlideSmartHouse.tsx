@@ -205,7 +205,7 @@ export const SlideSmartHouse: React.FC<SlideSmartHouseProps> = () => {
         </div>
       </div>
 
-      <SpeakerNotes notes={SPEAKER_NOTES[15]} />
+      <SpeakerNotes notes={SPEAKER_NOTES[103]} />
     </SlideWrapper>
   );
 };

@@ -14,6 +14,10 @@ parts:
         sections:
           - file: notebooks/03_qrng_entropy
       - file: notebooks/05_shor_demo
+      - file: content/qmesh
+        sections:
+          - file: content/clearance_levels
+          - file: notebooks/08_qmesh_physical_crypto
 
   - caption: "Part III: Data Protection"
     chapters:
@@ -24,6 +28,8 @@ parts:
           - file: notebooks/02_anonymization
       - file: content/self_destruct
       - file: content/zipndel
+        sections:
+          - file: notebooks/07_vault_workflow
 
   - caption: "Part IV: Jupyter & Interactive"
     chapters:
@@ -47,7 +53,11 @@ parts:
       - file: content/use_cases/ecommerce
       - file: content/use_cases/defense
 
-  - caption: "Part VII: CLI Reference"
+  - caption: "Part VII: Notebooks"
+    chapters:
+      - file: notebooks/07_monte_carlo_prng_vs_qrng
+
+  - caption: "Part VIII: CLI Reference"
     chapters:
       - file: content/cli
       - file: content/cli_reference

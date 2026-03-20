@@ -3,7 +3,6 @@
 import React from 'react';
 import {
   ComposedChart,
-  LineChart,
   Line,
   BarChart,
   Bar,
@@ -19,6 +18,7 @@ import {
 } from 'recharts';
 import { SlideWrapper, SlideTitle } from '../pitch-ui/SB1SlideWrapper';
 import { MetricCard, DataRow, Tag } from '../pitch-ui/MetricCard';
+import { SlideTabs } from '../pitch-ui/SlideTabs';
 import { SpeakerNotes } from '../pitch-ui/SpeakerNotes';
 import {
   varConvergence,
@@ -81,222 +81,181 @@ export const SlideRiskModeling: React.FC<SlideRiskModelingProps> = ({ scenario: 
             />
           </div>
 
-          {/* Charts grid — takes remaining vertical space */}
-          <div className="grid grid-cols-3 gap-4 flex-1 min-h-0 mb-4">
-            {/* VaR Convergence: ComposedChart with log X-axis */}
-            <div
-              className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(52,211,153,0.04)', border: '1px solid rgba(52,211,153,0.18)', boxShadow: '0 0 20px rgba(52,211,153,0.08)' }}
-            >
-              <p
-                className="text-emerald-400 text-xs font-mono tracking-wider uppercase mb-3"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              >
-                VaR Konvergensrate (feil %)
-              </p>
-              <div className="flex-1 min-h-0">
-                <ResponsiveContainer width="100%" height={180}>
-                  <ComposedChart data={varConvergence} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                    <XAxis
-                      dataKey="simulations"
-                      scale="log"
-                      domain={['auto', 'auto']}
-                      type="number"
-                      tickFormatter={(v: number) => `${v}K`}
-                      tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
-                      label={{ value: 'Simuleringer (K)', position: 'insideBottom', offset: -2, fill: '#94A3B8', fontSize: 11 }}
-                    />
-                    <YAxis
-                      tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
-                      tickFormatter={(v: number) => `${v}%`}
-                    />
-                    <Tooltip
-                      {...TOOLTIP_STYLE}
-                      formatter={(value: number, name: string) => [
-                        `${value}%`,
-                        name === 'klassisk' ? 'Klassisk' : 'Kvantum',
-                      ]}
-                      labelFormatter={(label: number) => `${label}K simuleringer`}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="klassisk"
-                      stroke="#FB7185"
-                      strokeWidth={2}
-                      dot={false}
-                      name="klassisk"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="kvantum"
-                      stroke="#34D399"
-                      strokeWidth={2}
-                      dot={false}
-                      name="kvantum"
-                    />
-                    <Legend
-                      wrapperStyle={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
-                      formatter={(value: string) => value === 'klassisk' ? 'Klassisk' : 'Kvantum'}
-                    />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* SB1 Entity Exposure: horizontal bar chart */}
-            <div
-              className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
-            >
-              <p
-                className="text-cyan-400 text-xs font-mono tracking-wider uppercase mb-3"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              >
-                SB1 Utlånsvolum (mrd. NOK)
-              </p>
-              <div className="flex-1 min-h-0">
-                <ResponsiveContainer width="100%" height={180}>
-                  <BarChart
-                    data={sb1EntityExposure}
-                    layout="vertical"
-                    margin={{ top: 4, right: 12, bottom: 4, left: 8 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
-                    <XAxis
-                      type="number"
-                      tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
-                      tickFormatter={(v: number) => `${v}`}
-                    />
-                    <YAxis
-                      dataKey="entity"
-                      type="category"
-                      width={58}
-                      tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
-                    />
-                    <Tooltip
-                      {...TOOLTIP_STYLE}
-                      formatter={(value: number) => [`NOK ${value} mrd.`, 'Utlån']}
-                    />
-                    <Bar dataKey="utlaan" radius={[0, 3, 3, 0]}>
-                      {sb1EntityExposure.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.8} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Capital Allocation: donut PieChart */}
-            <div
-              className="rounded-lg p-4 flex flex-col"
-              style={{ background: 'rgba(167,139,250,0.04)', border: '1px solid rgba(167,139,250,0.3)', boxShadow: '0 0 20px rgba(167,139,250,0.08)' }}
-            >
-              <p
-                className="text-violet-400 text-xs font-mono tracking-wider uppercase mb-3"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              >
-                Kapitalallokering (%)
-              </p>
-              <div className="flex-1 min-h-0">
-                <ResponsiveContainer width="100%" height={180}>
-                  <PieChart>
-                    <Pie
-                      data={capitalAllocation}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={35}
-                      outerRadius={58}
-                      dataKey="value"
-                      paddingAngle={2}
-                    >
-                      {capitalAllocation.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.85} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      {...TOOLTIP_STYLE}
-                      formatter={(value: number, name: string) => [`${value}%`, name]}
-                    />
-                    <Legend
-                      wrapperStyle={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: '#94A3B8' }}
-                      iconSize={8}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom content: technical use cases + regulatory driver — scrollable below charts */}
-          <div className="grid grid-cols-2 gap-4 shrink-0">
-            <div
-              className="rounded-lg p-4"
-              style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.18)', boxShadow: '0 0 20px rgba(52,211,153,0.08)' }}
-            >
-              <p
-                className="text-emerald-400 text-xs font-mono tracking-wider uppercase mb-2"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              >
-                Teknisk use case
-              </p>
-              <div className="space-y-1.5">
-                {[
-                  { label: 'VaR (Value-at-Risk)', desc: 'Intradag-beregning i stedet for nattbatch' },
-                  { label: 'Stressed VaR', desc: 'FRTB IMA-krav oppfylt med quantum MC-presisjon' },
-                  { label: 'Kredittrisiko (CVA/DVA)', desc: 'Simulering av 10 000+ scenarier i real-time' },
-                  { label: 'ILAAP / ICAAP stress-tester', desc: 'Finanstilsynet-rapportering med høyere presisjon' },
-                ].map((u) => (
-                  <div key={u.label} className="flex flex-col">
-                    <span
-                      className="text-emerald-400 text-xs font-mono"
-                      style={{ fontFamily: "'JetBrains Mono', monospace" }}
-                    >
-                      {u.label}
-                    </span>
-                    <p
-                      className="text-slate-400 text-sm leading-snug"
-                      style={{ fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      {u.desc}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div
-              className="rounded-lg overflow-hidden"
-              style={{ border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
-            >
+          {/* Tabbed content to prevent overlap */}
+          <SlideTabs tabs={['Visualisering', 'SB1-eksponering']} accentColor="#34D399">
+            {/* Tab 1: Charts */}
+            <div className="grid grid-cols-3 gap-4 h-full">
+              {/* VaR Convergence */}
               <div
-                className="px-4 py-2.5 border-b"
-                style={{ background: 'rgba(245,158,11,0.06)', borderColor: 'rgba(245,158,11,0.3)' }}
+                className="rounded-lg p-4 flex flex-col"
+                style={{ background: 'rgba(52,211,153,0.04)', border: '1px solid rgba(52,211,153,0.18)', boxShadow: '0 0 20px rgba(52,211,153,0.08)' }}
               >
-                <span
-                  className="text-amber-400 text-xs font-mono tracking-wider uppercase"
+                <p
+                  className="text-emerald-400 text-xs font-mono tracking-wider uppercase mb-3"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
-                  SB1 eksponeringer + regulatorisk driver
-                </span>
-              </div>
-              <div className="p-1">
-                <DataRow label="SMN utlånsvolum" value="NOK 249 mrd." accent="#34D399" highlight />
-                <DataRow label="SR-Bank (Sør-Norge) utlån" value="NOK 220+ mrd." />
-                <DataRow label="Alliance total forvaltning" value="NOK 625 mrd." accent="#34D399" highlight />
-                <DataRow label="NOK-verdi kapitaleffekt" value="625M–3.1B" accent="#34D399" highlight />
-              </div>
-              <div className="px-4 py-2">
-                <p
-                  className="text-slate-400 text-sm leading-relaxed"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  Basel IV (CRR3) krever mer granulære risikomodeller fra 2025. Quantum MC gir SpareBank 1 en strukturell presisjonsmarginal over konkurrentene.
+                  VaR Konvergensrate (feil %)
                 </p>
+                <div className="flex-1 min-h-0">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <ComposedChart data={varConvergence} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                      <XAxis
+                        dataKey="simulations"
+                        scale="log"
+                        domain={['auto', 'auto']}
+                        type="number"
+                        tickFormatter={(v: number) => `${v}K`}
+                        tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
+                        label={{ value: 'Simuleringer (K)', position: 'insideBottom', offset: -2, fill: '#94A3B8', fontSize: 11 }}
+                      />
+                      <YAxis
+                        tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
+                        tickFormatter={(v: number) => `${v}%`}
+                      />
+                      <Tooltip
+                        {...TOOLTIP_STYLE}
+                        formatter={(value: number, name: string) => [
+                          `${value}%`,
+                          name === 'klassisk' ? 'Klassisk' : 'Kvantum',
+                        ]}
+                        labelFormatter={(label: number) => `${label}K simuleringer`}
+                      />
+                      <Line type="monotone" dataKey="klassisk" stroke="#FB7185" strokeWidth={2} dot={false} name="klassisk" />
+                      <Line type="monotone" dataKey="kvantum" stroke="#34D399" strokeWidth={2} dot={false} name="kvantum" />
+                      <Legend
+                        wrapperStyle={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}
+                        formatter={(value: string) => value === 'klassisk' ? 'Klassisk' : 'Kvantum'}
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* SB1 Entity Exposure */}
+              <div
+                className="rounded-lg p-4 flex flex-col"
+                style={{ background: 'rgba(34,211,238,0.04)', border: '1px solid rgba(34,211,238,0.3)', boxShadow: '0 0 20px rgba(34,211,238,0.08)' }}
+              >
+                <p
+                  className="text-cyan-400 text-xs font-mono tracking-wider uppercase mb-3"
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                >
+                  SB1 Utlånsvolum (mrd. NOK)
+                </p>
+                <div className="flex-1 min-h-0">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={sb1EntityExposure} layout="vertical" margin={{ top: 4, right: 12, bottom: 4, left: 8 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+                      <XAxis type="number" tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }} tickFormatter={(v: number) => `${v}`} />
+                      <YAxis dataKey="entity" type="category" width={58} tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }} />
+                      <Tooltip {...TOOLTIP_STYLE} formatter={(value: number) => [`NOK ${value} mrd.`, 'Utlån']} />
+                      <Bar dataKey="utlaan" radius={[0, 3, 3, 0]}>
+                        {sb1EntityExposure.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.8} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Capital Allocation */}
+              <div
+                className="rounded-lg p-4 flex flex-col"
+                style={{ background: 'rgba(167,139,250,0.04)', border: '1px solid rgba(167,139,250,0.3)', boxShadow: '0 0 20px rgba(167,139,250,0.08)' }}
+              >
+                <p
+                  className="text-violet-400 text-xs font-mono tracking-wider uppercase mb-3"
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                >
+                  Kapitalallokering (%)
+                </p>
+                <div className="flex-1 min-h-0">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie data={capitalAllocation} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" paddingAngle={2}>
+                        {capitalAllocation.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.85} />
+                        ))}
+                      </Pie>
+                      <Tooltip {...TOOLTIP_STYLE} formatter={(value: number, name: string) => [`${value}%`, name]} />
+                      <Legend wrapperStyle={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: '#94A3B8' }} iconSize={8} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </div>
-          </div>
+
+            {/* Tab 2: SB1 Exposure + Use Cases */}
+            <div className="grid grid-cols-2 gap-4 h-full">
+              <div
+                className="rounded-lg p-4"
+                style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.18)', boxShadow: '0 0 20px rgba(52,211,153,0.08)' }}
+              >
+                <p
+                  className="text-emerald-400 text-xs font-mono tracking-wider uppercase mb-3"
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                >
+                  Teknisk use case
+                </p>
+                <div className="space-y-3">
+                  {[
+                    { label: 'VaR (Value-at-Risk)', desc: 'Intradag-beregning i stedet for nattbatch' },
+                    { label: 'Stressed VaR', desc: 'FRTB IMA-krav oppfylt med quantum MC-presisjon' },
+                    { label: 'Kredittrisiko (CVA/DVA)', desc: 'Simulering av 10 000+ scenarier i real-time' },
+                    { label: 'ILAAP / ICAAP stress-tester', desc: 'Finanstilsynet-rapportering med høyere presisjon' },
+                  ].map((u) => (
+                    <div key={u.label} className="flex flex-col">
+                      <span
+                        className="text-emerald-400 text-xs font-mono"
+                        style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                      >
+                        {u.label}
+                      </span>
+                      <p
+                        className="text-slate-400 text-sm leading-snug"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {u.desc}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div
+                className="rounded-lg overflow-hidden"
+                style={{ border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 0 20px rgba(245,158,11,0.08)' }}
+              >
+                <div
+                  className="px-4 py-2.5 border-b"
+                  style={{ background: 'rgba(245,158,11,0.06)', borderColor: 'rgba(245,158,11,0.3)' }}
+                >
+                  <span
+                    className="text-amber-400 text-xs font-mono tracking-wider uppercase"
+                    style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                  >
+                    SB1 eksponeringer + regulatorisk driver
+                  </span>
+                </div>
+                <div className="p-1">
+                  <DataRow label="SMN utlånsvolum" value="NOK 249 mrd." accent="#34D399" highlight />
+                  <DataRow label="SR-Bank (Sør-Norge) utlån" value="NOK 220+ mrd." />
+                  <DataRow label="Alliance total forvaltning" value="NOK 625 mrd." accent="#34D399" highlight />
+                  <DataRow label="NOK-verdi kapitaleffekt" value="625M–3.1B" accent="#34D399" highlight />
+                </div>
+                <div className="px-4 py-3">
+                  <p
+                    className="text-slate-400 text-sm leading-relaxed"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    Basel IV (CRR3) krever mer granulære risikomodeller fra 2025. Quantum MC gir SpareBank 1 en strukturell presisjonsmarginal over konkurrentene.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </SlideTabs>
         </div>
 
         <SpeakerNotes notes={SPEAKER_NOTES[6]} />
