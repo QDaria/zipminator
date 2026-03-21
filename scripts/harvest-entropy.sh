@@ -8,17 +8,24 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Load environment variables
+# Use the conda env Python directly (no shell activation needed)
+PYTHON="/Users/mos/y/envs/zip-pqc/bin/python3"
+
+# Load environment variables from .env
 if [ -f "$PROJECT_ROOT/.env" ]; then
     set -a
-    source "$PROJECT_ROOT/.env"
+    # Only export lines that look like KEY=VALUE (skip comments, empty lines)
+    while IFS= read -r line; do
+        # Skip comments and empty lines
+        [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+        # Only export valid env var assignments
+        [[ "$line" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]] && export "$line"
+    done < "$PROJECT_ROOT/.env"
     set +a
 fi
 
-# Activate micromamba environment
-eval "$(/Users/mos/y/bin/micromamba shell hook --shell bash)" 2>/dev/null
-micromamba activate zip-pqc
+export PYTHONPATH="$PROJECT_ROOT/src"
 
 # Run one-shot harvest
 cd "$PROJECT_ROOT"
-exec /Users/mos/y/envs/zip-pqc/bin/python3 -m zipminator.entropy.scheduler --once
+exec "$PYTHON" -m zipminator.entropy.scheduler --once

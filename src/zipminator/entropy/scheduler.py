@@ -1,25 +1,27 @@
 """
 Scheduled Quantum Entropy Harvester
 
-Continuously harvests real quantum entropy from IBM Quantum (Fez / Marrakesh
-156-qubit Heron r2 processors) into an ever-growing pool file. Runs as a
-background daemon or cron-triggered one-shot.
+Continuously harvests real quantum entropy from IBM Fez / Marrakesh
+156-qubit Heron r2 processors (via qBraid or direct IBM Quantum Platform)
+into an ever-growing pool file. Runs as a background daemon or launchd
+scheduled task.
 
 Usage:
     # Daemon mode (runs forever, harvests every INTERVAL seconds):
     python -m zipminator.entropy.scheduler --daemon --interval 3600
 
-    # One-shot (harvest once, then exit; suitable for cron):
+    # One-shot (harvest once, then exit; suitable for cron/launchd):
     python -m zipminator.entropy.scheduler --once
 
-    # Crontab example (every 6 hours):
-    # 0 */6 * * * /path/to/micromamba run -n zip-pqc python -m zipminator.entropy.scheduler --once
+    # Check pool stats:
+    python -m zipminator.entropy.scheduler --stats
 
-    # launchd plist installed at ~/Library/LaunchAgents/com.qdaria.entropy-harvester.plist
+    # launchd (macOS): ~/Library/LaunchAgents/com.qdaria.entropy-harvester.plist
+    # Wrapper script: scripts/harvest-entropy.sh
 
 Environment:
-    IBM_CLOUD_TOKEN               IBM Quantum Platform API token (primary)
-    QBRAID_API_KEY                qBraid API key (secondary, if IBM unavailable)
+    QBRAID_API_KEY                qBraid API key (primary, free Fez/Marrakesh access)
+    IBM_CLOUD_TOKEN               IBM Quantum Platform API token (secondary/fallback)
     ZIPMINATOR_ENTROPY_INTERVAL   Override default interval (seconds, default 3600)
     ZIPMINATOR_ENTROPY_DIR        Override entropy directory path
 """
@@ -75,11 +77,11 @@ def _log_harvest(record: dict) -> None:
 
 def harvest_quantum(target_bytes: int = TARGET_BYTES_PER_CYCLE) -> dict:
     """
-    Harvest real quantum entropy from IBM Quantum backends.
+    Harvest real quantum entropy from IBM Fez/Marrakesh backends.
 
     Priority:
-        1. IBM Quantum Platform (direct, via IBM_CLOUD_TOKEN)
-        2. qBraid multi-cloud gateway (via QBRAID_API_KEY)
+        1. qBraid (free access to IBM Fez/Marrakesh, via QBRAID_API_KEY)
+        2. IBM Quantum Platform direct (via IBM_CLOUD_TOKEN)
         3. os.urandom fallback (cryptographically secure, but not quantum)
 
     Returns a dict with harvest metadata.
@@ -90,21 +92,21 @@ def harvest_quantum(target_bytes: int = TARGET_BYTES_PER_CYCLE) -> dict:
     entropy_bytes = None
     backend_used = None
 
-    # 1. Try IBM Quantum Platform directly
-    ibm_token = os.getenv("IBM_CLOUD_TOKEN")
-    if ibm_token and entropy_bytes is None:
-        try:
-            entropy_bytes, backend_used = _harvest_ibm(ibm_token, target_bytes)
-        except Exception as e:
-            logger.warning("IBM Quantum harvest failed: %s", e)
-
-    # 2. Try qBraid as secondary
+    # 1. Try qBraid (primary -- free access to IBM Fez/Marrakesh)
     qbraid_key = os.getenv("QBRAID_API_KEY")
     if qbraid_key and entropy_bytes is None:
         try:
             entropy_bytes, backend_used = _harvest_qbraid(qbraid_key, target_bytes)
         except Exception as e:
             logger.warning("qBraid harvest failed: %s", e)
+
+    # 2. Try IBM Quantum Platform directly (secondary)
+    ibm_token = os.getenv("IBM_CLOUD_TOKEN")
+    if ibm_token and entropy_bytes is None:
+        try:
+            entropy_bytes, backend_used = _harvest_ibm(ibm_token, target_bytes)
+        except Exception as e:
+            logger.warning("IBM Quantum harvest failed: %s", e)
 
     # 3. Fallback: cryptographically secure system entropy
     if entropy_bytes is None:
@@ -198,26 +200,37 @@ def _harvest_ibm(token: str, target_bytes: int) -> Tuple[bytes, str]:
 
 
 def _harvest_qbraid(api_key: str, target_bytes: int) -> Tuple[bytes, str]:
-    """Harvest from qBraid quantum backends (secondary path)."""
-    from qiskit.circuit import QuantumCircuit
-    from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
+    """Harvest from qBraid quantum backends (Fez/Marrakesh via qBraid SDK v0.8)."""
+    import warnings
+    warnings.filterwarnings("ignore", category=UserWarning, module="qbraid")
+    warnings.filterwarnings("ignore", category=UserWarning, module="qbraid_core")
     import qbraid
+    from qiskit.circuit import QuantumCircuit
 
     provider = qbraid.QbraidProvider(api_key=api_key)
 
-    backend = None
-    backend_name = None
+    # Find first available backend from priority list
+    device = None
+    device_name = None
     for name in BACKEND_PRIORITY:
         try:
-            backend = provider.get_device(f"ibm_quantum_{name}")
-            backend_name = name
-            break
+            d = provider.get_device(name)
+            if d.status().name == "ONLINE":
+                device = d
+                device_name = name
+                break
         except Exception:
             continue
 
-    if backend is None:
-        raise RuntimeError(f"No qBraid backend available: {BACKEND_PRIORITY}")
+    if device is None:
+        raise RuntimeError(f"No online qBraid backend in {BACKEND_PRIORITY}")
 
+    logger.info("Using qBraid device %s (%d qubits, queue=%d)",
+                device_name, device.num_qubits, device.queue_depth())
+
+    # Hadamard circuit: H on every qubit, then measure all.
+    # Each measurement collapses the superposition via Born's rule,
+    # producing a truly random bit from quantum mechanics.
     qc = QuantumCircuit(NUM_QUBITS)
     qc.h(range(NUM_QUBITS))
     qc.measure_all()
@@ -225,16 +238,35 @@ def _harvest_qbraid(api_key: str, target_bytes: int) -> Tuple[bytes, str]:
     bytes_per_shot = NUM_QUBITS // 8
     shots_needed = math.ceil(target_bytes / bytes_per_shot)
 
-    job = backend.run(qc, shots=shots_needed)
+    # Convert to OpenQASM 2.0 and submit via qBraid's submit endpoint.
+    # device.run() has a bug with qiskit 2.x circuits (tries to unpack
+    # QuantumCircuit as dict), so we use the lower-level submit() path.
+    from qiskit.qasm2 import dumps as qasm2_dumps
+    qasm_str = qasm2_dumps(qc)
+    payload = {"openQasm": qasm_str}
+    job = device.submit(payload, shots=shots_needed)
+    logger.info("Submitted qBraid job %s (%d shots) to %s",
+                getattr(job, 'id', 'unknown'), shots_needed, device_name)
+
     result = job.result()
-    counts = result.get_counts()
 
+    # Extract bitstrings from result
     byte_data = b""
-    for bit_string, count in counts.items():
-        chunk = int(bit_string, 2).to_bytes(bytes_per_shot, "big")
-        byte_data += chunk * count
+    if hasattr(result, 'get_counts'):
+        counts = result.get_counts()
+        for bit_string, count in counts.items():
+            # Remove spaces if present in bitstring
+            bs = bit_string.replace(" ", "")
+            chunk = int(bs, 2).to_bytes(bytes_per_shot, "big")
+            byte_data += chunk * count
+    elif hasattr(result, 'measurements'):
+        for bits in result.measurements:
+            bs = "".join(str(b) for b in bits)
+            byte_data += int(bs, 2).to_bytes(bytes_per_shot, "big")
+    else:
+        raise RuntimeError(f"Unknown result format: {type(result)}")
 
-    return byte_data[:target_bytes], f"qbraid:{backend_name}"
+    return byte_data[:target_bytes], f"qbraid:{device_name}"
 
 
 def get_pool_stats() -> dict:
