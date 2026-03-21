@@ -187,6 +187,7 @@ export const COMPETITORS = [
     qrng: true,
     pqc: true,
     superApp: true,
+    quantumAnon: true,
   },
   {
     name: 'Signal',
@@ -198,6 +199,7 @@ export const COMPETITORS = [
     qrng: false,
     pqc: 'partial' as const,
     superApp: false,
+    quantumAnon: false,
   },
   {
     name: 'ProtonMail',
@@ -209,6 +211,7 @@ export const COMPETITORS = [
     qrng: false,
     pqc: 'partial' as const,
     superApp: false,
+    quantumAnon: false,
   },
   {
     name: 'NordVPN',
@@ -220,6 +223,7 @@ export const COMPETITORS = [
     qrng: false,
     pqc: false,
     superApp: false,
+    quantumAnon: false,
   },
   {
     name: 'Brave',
@@ -231,6 +235,7 @@ export const COMPETITORS = [
     qrng: false,
     pqc: false,
     superApp: false,
+    quantumAnon: false,
   },
   {
     name: 'Wire',
@@ -242,6 +247,7 @@ export const COMPETITORS = [
     qrng: false,
     pqc: false,
     superApp: false,
+    quantumAnon: false,
   },
   {
     name: 'SandboxAQ',
@@ -253,6 +259,7 @@ export const COMPETITORS = [
     qrng: false,
     pqc: true,
     superApp: false,
+    quantumAnon: false,
   },
   {
     name: 'PQShield',
@@ -264,6 +271,7 @@ export const COMPETITORS = [
     qrng: false,
     pqc: true,
     superApp: false,
+    quantumAnon: false,
   },
 ]
 

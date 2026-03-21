@@ -18,6 +18,7 @@ const FEATURES = [
   { key: 'email' as const, label: 'Quantum Mail' },
   { key: 'qrng' as const, label: 'QRNG' },
   { key: 'pqc' as const, label: 'Full PQC' },
+  { key: 'quantumAnon' as const, label: 'Quantum Anonymization' },
   { key: 'superApp' as const, label: 'Super-App' },
 ]
 

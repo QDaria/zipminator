@@ -14,15 +14,16 @@ const features = [
   '10-Level Anonymizer',
   'PQ VoIP',
   'AI Assistant',
+  'Quantum Anonymization',
 ]
 
 const competitors: { name: string; highlight?: boolean; values: CellValue[] }[] = [
-  { name: 'Zipminator', highlight: true, values: ['yes', 'yes', 'yes', 'yes', 'yes', 'yes', 'yes', 'yes'] },
-  { name: 'Signal', values: ['no', 'na', 'na', 'na', 'no', 'no', 'no', 'no'] },
-  { name: 'ProtonMail', values: ['no', 'partial', 'no', 'na', 'no', 'no', 'na', 'no'] },
-  { name: 'NordVPN', values: ['na', 'no', 'na', 'na', 'no', 'no', 'na', 'no'] },
-  { name: 'Brave', values: ['na', 'na', 'na', 'no', 'no', 'no', 'na', 'partial'] },
-  { name: 'Wire', values: ['no', 'na', 'na', 'na', 'no', 'no', 'no', 'no'] },
+  { name: 'Zipminator', highlight: true, values: ['yes', 'yes', 'yes', 'yes', 'yes', 'yes', 'yes', 'yes', 'yes'] },
+  { name: 'Signal', values: ['no', 'na', 'na', 'na', 'no', 'no', 'no', 'no', 'no'] },
+  { name: 'ProtonMail', values: ['no', 'partial', 'no', 'na', 'no', 'no', 'na', 'no', 'no'] },
+  { name: 'NordVPN', values: ['na', 'no', 'na', 'na', 'no', 'no', 'na', 'no', 'no'] },
+  { name: 'Brave', values: ['na', 'na', 'na', 'no', 'no', 'no', 'na', 'partial', 'no'] },
+  { name: 'Wire', values: ['no', 'na', 'na', 'na', 'no', 'no', 'no', 'no', 'no'] },
 ]
 
 function CellIcon({ value }: { value: CellValue }) {

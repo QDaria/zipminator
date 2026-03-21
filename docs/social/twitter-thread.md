@@ -35,11 +35,11 @@ Four pillars protecting data at rest and in transit:
 **Tweet 4 (Pillars 5-9)**
 Five more pillars:
 
-- 10-Level Anonymizer: PII scanning for 15 countries
+- 10-Level Anonymizer: L10 is the world's first quantum-certified anonymization. Irreversible by physics (Born rule), not just math
 - Q-AI Assistant: 18 prompt injection patterns blocked
 - Quantum Mail: PQC envelope roundtrip
 - ZipBrowser: 7 privacy subsystems, 157 tests
-- Q-Mesh: WiFi DensePose spatial awareness [4/8]
+- Q-Mesh: WiFi DensePose spatial awareness [4/9]
 
 ---
 

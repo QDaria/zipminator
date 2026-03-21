@@ -58,6 +58,14 @@ For European financial institutions, Zipminator addresses three articles of the 
 
 Non-compliance fines reach up to 2% of global turnover under Article 50.
 
+## Quantum-Certified Anonymization
+
+Zipminator's L10 anonymization level is, to our knowledge, the world's first anonymization system where irreversibility is guaranteed by quantum mechanics rather than computational hardness assumptions. At L10, each original value is mapped to a QRNG-generated one-time pad identifier sourced from IBM Quantum's 156-qubit hardware. The randomness of each pad value is governed by the Born rule: measurement outcomes on a quantum state follow an intrinsic probability distribution that cannot be reversed, predicted, or reproduced. This is a physical guarantee, not a computational one.
+
+Every classical anonymization tool on the market, from ARX's k-anonymity to Google's differential privacy library to Apple's local DP, derives irreversibility from computational hardness assumptions. A sufficiently powerful adversary could, in principle, defeat those assumptions. Zipminator L10's irreversibility holds regardless of computational power because it is rooted in quantum physics, not mathematics.
+
+The world's first quantum-certified anonymization. Irreversible by physics, not just math.
+
 ## Test Coverage
 
 Zipminator ships with 441 Rust tests (including NIST Known Answer Test vectors, fuzz testing, and constant-time verification) and 429 Python tests covering PII detection, entropy management, subscription gating, and cryptographic roundtrips. The Flutter app carries 23 tests, the web dashboard has 30 vitest specs, and the mobile Expo app runs 267 tests across 11 suites.

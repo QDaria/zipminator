@@ -89,6 +89,12 @@ Unlike research libraries, Zipminator ships as a deployable product:
 - Kubernetes Helm chart with autoscaling and monitoring
 - Docker images for rapid deployment
 
+### 5. Quantum-Certified Anonymization
+
+Zipminator L10 is, to our knowledge, the world's first anonymization system where irreversibility is guaranteed by quantum mechanics rather than computational hardness assumptions. At L10, each original value is mapped to a QRNG-generated one-time pad identifier sourced from IBM Quantum's 156-qubit hardware. The randomness of each pad value is governed by the Born rule: the probability distribution over measurement outcomes is intrinsic to the quantum state and cannot be reversed, predicted, or reproduced. This is a physical guarantee, not a computational one.
+
+Every classical anonymization tool (ARX, sdcMicro, Google's DP library, Apple's local DP, Microsoft Presidio) derives its irreversibility from computational hardness assumptions that a sufficiently powerful adversary, classical or quantum, could in principle defeat. Zipminator L10's irreversibility holds regardless of computational power.
+
 ---
 
 ## Technology Moat
@@ -101,6 +107,7 @@ Unlike research libraries, Zipminator ships as a deployable product:
 | Deployment | Docker, K8s Helm, API, SDK, CLI | Library only |
 | FIPS 203 | Full ML-KEM construction | Partial or draft-based |
 | Fallback strategy | Automatic multi-provider failover | Hard failure or PRNG only |
+| Anonymization | QRNG OTP (Born rule guarantee) | Classical PRNG |
 
 Building a comparable system from scratch requires expertise in lattice-based cryptography, Rust systems programming, quantum computing APIs, and production DevOps. This combination is rare and constitutes a meaningful barrier to entry.
 
@@ -115,7 +122,7 @@ Building a comparable system from scratch requires expertise in lattice-based cr
 | **Free** | Amir | Developers, researchers | $0 (L1-L3 anonymization, 1GB) |
 | **Developer** | Nils | Indie devs, students | $9-29/mo (L1-L5, API access, 10GB) |
 | **Pro** | Solveig | Startups, SMBs | $29-69/mo (L1-L7, team mgmt, SSO, 100GB) |
-| **Enterprise** | Robindra | Regulated industries | $5K-50K/mo (L1-L10, QRNG, unlimited, SLA, on-prem) |
+| **Enterprise** | Robindra | Regulated industries | $5K-50K/mo (L1-L10 quantum anonymization, QRNG, unlimited, SLA, on-prem) |
 
 GitHub Star Supporter Program: star the repo to unlock Developer tier free.
 

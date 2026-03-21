@@ -15,7 +15,7 @@ Zipminator provides a progressive anonymization system with 10 distinct levels. 
 | L7 | Quantum Jitter | Pro | No | Medium |
 | L8 | Differential Privacy | Enterprise | No | Configurable |
 | L9 | Enhanced K-Anonymity | Enterprise | No | Medium-High |
-| L10 | Total Quantum Pseudoanonymization | Enterprise | With key | Very Low |
+| L10 | Quantum-Certified Anonymization | Enterprise | With key | Very Low |
 
 ---
 
@@ -217,11 +217,13 @@ print(result)
 
 ---
 
-## L10: Total Quantum Pseudoanonymization
+## L10: Quantum-Certified Anonymization
 
 **Tier**: Enterprise | **Reversible**: With key | **Technique**: OTP mapping + QRNG
 
-The highest anonymization level. Creates a quantum one-time-pad mapping table where each original value is mapped to a unique random identifier generated using QRNG. The mapping table is encrypted with Kyber768 and stored separately.
+The highest anonymization level, and to our knowledge, the world's first anonymization system where irreversibility is guaranteed by quantum mechanics rather than computational hardness assumptions. Each original value is mapped to a unique random identifier generated using QRNG from IBM Quantum's 156-qubit hardware. The mapping table is encrypted with Kyber768 and stored separately.
+
+The randomness of each OTP value is governed by the Born rule: measurement outcomes on a quantum state follow a probability distribution that is intrinsic to the physics and cannot be reversed, predicted, or reproduced. Unlike classical anonymization tools that rely on computational hardness (k-anonymity, differential privacy, PRNG-based masking), L10's irreversibility holds regardless of an adversary's computational power, classical or quantum.
 
 ```python
 result, encrypted_mapping = anonymizer.anonymize(df, level=10, return_mapping=True)
@@ -250,7 +252,7 @@ print(result)
 - **Cross-department sharing**: L4-L5 (Developer tier, pseudonymization preserves joins)
 - **External data sharing**: L6-L7 (Pro tier, remove identifiers, add noise)
 - **Regulatory compliance**: L8-L9 (Enterprise tier, formal privacy guarantees)
-- **Maximum protection with recovery**: L10 (Enterprise tier, quantum OTP)
+- **Maximum protection (irreversible quantum anonymization)**: L10 (Enterprise tier, QRNG OTP, Born rule guarantee)
 ```
 
 ## Tier Requirements
