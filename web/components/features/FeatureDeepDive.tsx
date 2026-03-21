@@ -58,7 +58,7 @@ const features = [
     tag: 'L1 to L10',
     metric: '10',
     metricLabel: 'levels',
-    description: 'Graduated anonymization: L1 basic pseudonymization, L5 multi-hop onion routing, L10 quantum-randomized identity with temporal decorrelation.',
+    description: 'Graduated anonymization: L1 regex masking, L5 k-anonymity, L10 irreversible quantum anonymization via QRNG one-time pad.',
     gradient: 'from-orange-500 to-red-500',
   },
   {

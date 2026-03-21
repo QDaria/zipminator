@@ -45,9 +45,9 @@ Pillar 5: 10-Level Anonymizer
 Originally built for the Norwegian government (NAV). Now upgraded with PQC + quantum random noise.
 
 L1-3: Regex masking
-L4-6: PQC pseudonymization
-L7: Quantum jitter (QRNG Gaussian noise)
-L8-10: Differential privacy, k-anonymity
+L4-6: PQC tokenization + k-anonymity
+L7-9: Quantum noise + differential privacy
+L10: Quantum anonymization (irreversible OTP)
 
 **7/**
 Pillar 6: Q-AI Assistant

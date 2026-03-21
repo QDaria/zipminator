@@ -24,7 +24,10 @@
 : Cryptographic algorithms designed to resist attacks from both classical and quantum computers. Zipminator uses ML-KEM-768 (Kyber768), standardized as NIST FIPS 203.
 
 **Pseudonymization**
-: Replacing identifying fields with artificial identifiers (pseudonyms). Unlike anonymization, pseudonymization is reversible with the mapping key. Used at L4 and L10.
+: Replacing identifying fields with artificial identifiers (pseudonyms). Unlike anonymization, pseudonymization is reversible with the mapping key. Used at L4.
+
+**Quantum Anonymization**
+: Irreversible data transformation using a one-time pad derived from real quantum random numbers (QRNG). Because the OTP comes from true quantum randomness with no deterministic seed, the mapping cannot be reconstructed. Used at L10. This satisfies GDPR Recital 26 for true anonymization.
 
 **QRNG (Quantum Random Number Generator)**
 : A hardware device or service that generates random numbers using quantum mechanical phenomena (e.g., measurement of superposition states). Provides true randomness, unlike classical PRNGs.

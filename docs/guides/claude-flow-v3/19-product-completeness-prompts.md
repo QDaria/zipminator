@@ -110,7 +110,7 @@ L6: L-Diversity (ensure l-diverse sensitive attributes)
 L7: Quantum noise jitter (numerical perturbation using QRNG)
 L8: Differential privacy (epsilon-delta, Laplace mechanism, QRNG noise)
 L9: K-Anonymity + Differential privacy combined
-L10: Quantum pseudoanonymization (OTP mapping from QRNG)
+L10: Quantum anonymization (irreversible OTP mapping from QRNG)
 
 SPAWN 3 teammates:
 

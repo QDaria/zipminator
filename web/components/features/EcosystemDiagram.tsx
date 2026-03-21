@@ -48,7 +48,7 @@ const modules = [
     icon: Eye,
     name: '10-Level Anonymizer',
     color: 'from-orange-500 to-red-500',
-    description: 'Graduated anonymization from L1 basic pseudonymization to L10 quantum-randomized identity.',
+    description: 'Graduated anonymization from L1 regex masking to L10 irreversible quantum anonymization via QRNG.',
   },
   {
     id: 'browser',

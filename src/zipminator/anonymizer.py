@@ -14,7 +14,7 @@ Levels:
   L7  Quantum noise jitter (numerical perturbation using QRNG entropy)
   L8  Differential privacy (Laplace mechanism, configurable epsilon, QRNG)
   L9  K-Anonymity + Differential privacy combined
-  L10 Quantum pseudoanonymization (OTP mapping from QRNG pool)
+  L10 Quantum anonymization (irreversible OTP mapping from QRNG pool)
 """
 
 from __future__ import annotations
@@ -626,7 +626,7 @@ class LevelAnonymizer:
         return df
 
     # ------------------------------------------------------------------
-    # L10: Quantum OTP pseudoanonymization
+    # L10: Quantum OTP anonymization (irreversible with real QRNG)
     # ------------------------------------------------------------------
 
     def _apply_l10(self, df: pd.DataFrame, **kw: Any) -> pd.DataFrame:

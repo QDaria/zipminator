@@ -152,7 +152,7 @@ async def anonymize_attachment(
     - **Levels 1-3**: Deterministic masking (regex, partial, static)
     - **Levels 4-6**: Hashing, generalization, suppression
     - **Levels 7-9**: Quantum noise (QRNG Gaussian/Laplace/k-anonymity)
-    - **Level 10**: Total OTP quantum pseudoanonymization
+    - **Level 10**: Total OTP quantum anonymization (irreversible with real QRNG)
 
     Supported file types: CSV, JSON, Excel (.xlsx/.xls), Parquet, plain text.
     Returns HTTP 415 for unsupported types.
