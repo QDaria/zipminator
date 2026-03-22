@@ -17,10 +17,19 @@ from zipminator.entropy.quota import (
 from zipminator.entropy.scheduler import (
     harvest_quantum,
     get_pool_stats,
+    get_budget_status,
     _get_pool_size,
     _append_to_pool,
+    _check_budget,
+    _estimate_qpu_seconds,
+    _record_qpu_usage,
+    _load_budget,
+    _save_budget,
+    _current_month,
     ENTROPY_POOL,
     ENTROPY_DIR,
+    BUDGET_FILE,
+    DEFAULT_QPU_BUDGET_SECONDS,
 )
 
 
@@ -175,3 +184,85 @@ class TestQuotaSubscriptionMapping:
         sub_tiers = {t.value for t in SubscriptionTier}
         quota_tiers = set(TIER_QUOTAS.keys())
         assert quota_tiers == sub_tiers
+
+
+# ─── IBM QPU Budget Guard ───
+
+
+@pytest.fixture(autouse=False)
+def clean_budget():
+    """Remove budget file before and after each budget test."""
+    if BUDGET_FILE.exists():
+        BUDGET_FILE.unlink()
+    yield
+    if BUDGET_FILE.exists():
+        BUDGET_FILE.unlink()
+
+
+class TestQPUBudgetGuard:
+    """Tests for the IBM QPU credit guard that prevents exceeding 10 min free tier."""
+
+    def test_default_budget_is_480_seconds(self, clean_budget):
+        assert DEFAULT_QPU_BUDGET_SECONDS == 480
+
+    def test_budget_starts_empty(self, clean_budget):
+        status = get_budget_status()
+        assert status["used_seconds"] == 0.0
+        assert status["month"] == _current_month()
+        assert status["jobs_this_month"] == 0
+
+    def test_estimate_qpu_seconds(self):
+        est = _estimate_qpu_seconds(10_000)
+        assert est == 10.0  # 0.001s/shot * 10000
+
+    def test_check_budget_passes_when_empty(self, clean_budget):
+        assert _check_budget(100.0) is True
+
+    def test_check_budget_blocks_when_exceeded(self, clean_budget):
+        _record_qpu_usage("ibm_fez", 50000, 475.0)
+        assert _check_budget(10.0) is False  # 475 + 10 = 485 > 480
+
+    def test_record_actual_usage(self, clean_budget):
+        _record_qpu_usage("ibm_fez", 5000, 4.2)
+        status = get_budget_status()
+        assert status["used_seconds"] == 4.2
+        assert status["jobs_this_month"] == 1
+
+    def test_record_estimated_usage_when_no_actual(self, clean_budget):
+        _record_qpu_usage("qbraid:ibm_fez", 5000, None)
+        status = get_budget_status()
+        assert status["used_seconds"] == 5.0  # 5000 * 0.001
+
+    def test_cumulative_tracking(self, clean_budget):
+        _record_qpu_usage("ibm_fez", 1000, 1.0)
+        _record_qpu_usage("ibm_marrakesh", 2000, 2.5)
+        _record_qpu_usage("ibm_fez", 3000, 3.0)
+        status = get_budget_status()
+        assert status["used_seconds"] == 6.5
+        assert status["jobs_this_month"] == 3
+
+    def test_budget_env_override(self, clean_budget, monkeypatch):
+        monkeypatch.setenv("IBM_QPU_BUDGET_SECONDS", "60")
+        _record_qpu_usage("ibm_fez", 50000, 55.0)
+        assert _check_budget(10.0) is False  # 55 + 10 > 60
+        assert _check_budget(4.0) is True   # 55 + 4 < 60
+
+    def test_month_rollover_resets(self, clean_budget):
+        budget = _load_budget()
+        budget["month"] = "2025-01"  # old month
+        budget["cumulative_seconds"] = 999.0
+        _save_budget(budget)
+        # Loading for current month should reset
+        fresh = _load_budget()
+        assert fresh["month"] == _current_month()
+        assert fresh["cumulative_seconds"] == 0.0
+
+    def test_remaining_seconds(self, clean_budget):
+        _record_qpu_usage("ibm_fez", 10000, 100.0)
+        status = get_budget_status()
+        assert status["remaining_seconds"] == 380.0  # 480 - 100
+
+    def test_percent_used(self, clean_budget):
+        _record_qpu_usage("ibm_fez", 10000, 240.0)
+        status = get_budget_status()
+        assert status["percent_used"] == 50.0
