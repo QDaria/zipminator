@@ -20,6 +20,7 @@ pub mod message_store;
 pub mod ntt;
 pub mod openpgp_keys;
 pub mod anonymize;
+pub mod are;
 pub mod pii;
 pub mod poly;
 pub mod qrng;
