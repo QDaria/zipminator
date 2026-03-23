@@ -452,10 +452,10 @@ class AreExtractor:
     def extract_bytes(self, input_data: bytes, output_len: int = 32) -> bytes:
         """Extract randomness from input bytes, returning output_len bytes.
 
-        Splits input into 16-byte blocks (zero-padded), extracts each
-        through the ARE program, and concatenates the results. If more
-        output bytes are needed than one pass produces, the process
-        chains: each block's output seeds the next extraction.
+        Processes input in 16-byte blocks through the ARE program, then
+        uses SHA-256 in counter mode to expand each extracted value into
+        uniformly distributed output bytes. This ensures the output has
+        full byte-level entropy regardless of the ARE modulus/domain size.
 
         Parameters
         ----------
@@ -472,28 +472,35 @@ class AreExtractor:
         if output_len < 1:
             raise ValueError("output_len must be >= 1")
 
-        result = bytearray()
-        block_size = 16  # Process 128-bit blocks.
-
-        # Pad input to be a multiple of block_size.
+        # Step 1: Extract ARE values from input blocks to build a seed.
+        block_size = 16
         padded = input_data
         if len(padded) % block_size != 0:
             padded = padded + b"\x00" * (block_size - len(padded) % block_size)
 
-        # Extract from each block.
+        # Collect extracted values into a hash state.
+        # Each block is processed through ARE, then the extracted value
+        # is fed into a running SHA-256 digest. This concentrates the
+        # algebraic extraction into a single seed for counter-mode expansion.
+        h = hashlib.sha256()
         for i in range(0, len(padded), block_size):
             block = padded[i : i + block_size]
             val = int.from_bytes(block, "big", signed=False)
             extracted = self.extract(val)
-            # Encode extracted value as 8 bytes (u64 range from modulus).
-            result.extend(extracted.to_bytes(8, "big", signed=False))
-            if len(result) >= output_len:
-                break
+            # Encode extracted value compactly (8 bytes covers up to 2^64).
+            h.update(extracted.to_bytes(8, "big", signed=False))
 
-        # If we still need more bytes, chain extractions.
-        chain_val = int.from_bytes(input_data[:8].ljust(8, b"\x00"), "big")
+        are_seed = h.digest()  # 32-byte seed derived from ARE extraction.
+
+        # Step 2: Counter-mode expansion using SHA-256.
+        # Each counter value produces 32 bytes of uniform output.
+        result = bytearray()
+        counter = 0
         while len(result) < output_len:
-            chain_val = self.extract(chain_val)
-            result.extend(chain_val.to_bytes(8, "big", signed=False))
+            block_hash = hashlib.sha256(
+                are_seed + counter.to_bytes(4, "big")
+            ).digest()
+            result.extend(block_hash)
+            counter += 1
 
         return bytes(result[:output_len])
