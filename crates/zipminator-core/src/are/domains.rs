@@ -80,30 +80,39 @@ fn mod_pow(base: i128, exp: i128, modulus: u128) -> i128 {
 /// domain projection (handled at the caller level). All intermediate
 /// results reduce mod `modulus`.
 fn integer_op(op: Operation, input: i128, value: i128, modulus: u128) -> i128 {
+    if modulus == 0 {
+        return input;
+    }
     let m = modulus as i128;
+
+    // Reduce inputs first to keep values within [0, m) before arithmetic.
+    // This prevents overflow on addition/subtraction/multiplication.
+    let a = ((input % m) + m) % m;
+    let b = ((value % m) + m) % m;
+
     match op {
-        Operation::Add => reduce(input + value, modulus),
-        Operation::Sub => reduce(input - value, modulus),
+        Operation::Add => (a + b) % m,
+        Operation::Sub => ((a - b) % m + m) % m,
         Operation::Mul => {
-            // Use checked multiplication to avoid overflow on large i128 values.
-            // For values that fit, direct multiplication is fine since we reduce mod m.
-            let product = input.wrapping_mul(value);
+            // a and b are both < m, so a*b fits in i128 when m < 2^63.
+            // For safety, use wrapping_mul and reduce.
+            let product = a.wrapping_mul(b);
             reduce(product, modulus)
         }
         Operation::Div => {
-            if value == 0 {
-                // Division by zero: identity rule
-                input
+            if b == 0 {
+                // Division by zero: identity rule — return reduced input
+                a
             } else {
-                reduce(input / value, modulus)
+                (a / b) % m
             }
         }
         Operation::Mod => {
-            if value == 0 || m == 0 {
-                // Modulus by zero: identity rule
-                input
+            if b == 0 {
+                // Modulus by zero: identity rule — return reduced input
+                a
             } else {
-                reduce(input % value, modulus)
+                (a % b) % m
             }
         }
         Operation::Exp => mod_pow(input, value, modulus),
@@ -148,38 +157,47 @@ fn real_op(op: Operation, input: i128, value: i128, modulus: u128) -> i128 {
 /// - Mod: falls back to integer mod on real parts
 /// - Exp: falls back to integer exp on real parts
 fn complex_op(op: Operation, input: i128, value: i128, value_imag: i128, modulus: u128) -> i128 {
+    if modulus == 0 {
+        return input;
+    }
     let m = modulus as i128;
+
+    // Pre-reduce to [0, m) to prevent overflow.
+    let a = ((input % m) + m) % m;
+    let c = ((value % m) + m) % m;
+    let d = ((value_imag % m) + m) % m;
+
     match op {
         Operation::Add => {
             // (a + 0i) + (c + di) -> Re = a + c
-            reduce(input + value, modulus)
+            (a + c) % m
         }
         Operation::Sub => {
             // (a + 0i) - (c + di) -> Re = a - c
-            reduce(input - value, modulus)
+            ((a - c) % m + m) % m
         }
         Operation::Mul => {
             // (a + 0i) * (c + di) = ac + adi -> Re = a*c
-            let product = input.wrapping_mul(value);
+            let product = a.wrapping_mul(c);
             reduce(product, modulus)
         }
         Operation::Div => {
             // (a + 0i) / (c + di) = a(c - di) / (c^2 + d^2) -> Re = a*c / (c^2+d^2)
-            let denom = value.wrapping_mul(value) + value_imag.wrapping_mul(value_imag);
+            let denom = c.wrapping_mul(c).wrapping_add(d.wrapping_mul(d));
             if denom == 0 {
                 // Division by zero: identity
-                input
+                a
             } else {
-                let numer = input.wrapping_mul(value);
+                let numer = a.wrapping_mul(c);
                 reduce(numer / denom, modulus)
             }
         }
         Operation::Mod => {
             // Complex mod: fall back to integer mod on real parts
-            if value == 0 {
-                input
+            if c == 0 {
+                a
             } else {
-                reduce(input % value, modulus)
+                (a % c) % m
             }
         }
         Operation::Exp => {
