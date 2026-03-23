@@ -219,27 +219,33 @@ print(result)
 
 ## L10: Quantum-Certified Anonymization
 
-**Tier**: Enterprise | **Reversible**: With key | **Technique**: OTP mapping + QRNG
+**Tier**: Enterprise | **Reversible**: No (irreversible by physics) | **Technique**: QRNG one-time pad with mapping destruction
 
-The highest anonymization level, and to our knowledge, the world's first anonymization system where irreversibility is guaranteed by quantum mechanics rather than computational hardness assumptions. Each original value is mapped to a unique random identifier generated using QRNG from IBM Quantum's 156-qubit hardware. The mapping table is encrypted with Kyber768 and stored separately.
+The highest anonymization level, and to our knowledge, the world's first anonymization system where irreversibility is guaranteed by quantum mechanics rather than computational hardness assumptions. Each original value is mapped to a unique random identifier generated using QRNG from IBM Quantum's 156-qubit hardware. The mapping is intentionally destroyed after use.
 
 The randomness of each OTP value is governed by the Born rule: measurement outcomes on a quantum state follow a probability distribution that is intrinsic to the physics and cannot be reversed, predicted, or reproduced. Unlike classical anonymization tools that rely on computational hardness (k-anonymity, differential privacy, PRNG-based masking), L10's irreversibility holds regardless of an adversary's computational power, classical or quantum.
 
+This method remains secure even in a world where P=NP, because its security guarantee is physical, not computational. If P=NP, every CSPRNG seed becomes recoverable and every classical anonymization method breaks. L10 does not depend on computational hardness assumptions.
+
 ```python
-result, encrypted_mapping = anonymizer.anonymize(df, level=10, return_mapping=True)
-print(result)
-# name                                  email                                 phone
-# qtp_8f2a1b3c4d5e6f7a8b9c0d1e2f3a4b   qtp_3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c   qtp_9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f
-# qtp_c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9   qtp_4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d   qtp_0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a
+from zipminator.anonymizer import LevelAnonymizer
+
+anonymizer = LevelAnonymizer()
+result = anonymizer.apply(df, level=10)
+# Every value replaced with QRNG-derived string
+# The OTP mapping was NOT persisted — it cannot be recovered
+# This is true anonymization, not pseudonymization
 ```
 
 **Properties**:
-- Each value gets a unique QRNG-generated identifier (no collisions)
-- The mapping table is encrypted with Kyber768 and can only be decrypted by the key holder
-- Without the mapping key, re-identification is computationally infeasible
-- Preserves referential integrity (same input maps to same pseudonym within a session)
+- Each value gets a unique QRNG-generated identifier
+- The OTP mapping exists only in process memory during `apply()` and is destroyed on return
+- Re-identification is physically impossible (not just computationally infeasible)
+- Preserves referential integrity (same input maps to same token within a single run)
+- Different runs produce different tokens (non-reproducible)
+- Secure against classical computers, quantum computers, and P=NP
 
-**Trade-offs**: Maximum privacy with full reversibility for authorized parties. Requires secure key management infrastructure. The encrypted mapping table must be stored and protected.
+**Trade-offs**: Maximum privacy, zero reversibility. Once applied, the original data is unrecoverable by anyone, including the data controller. Use when data must be permanently anonymized for sharing, archival, or regulatory exemption (GDPR Recital 26).
 
 ---
 

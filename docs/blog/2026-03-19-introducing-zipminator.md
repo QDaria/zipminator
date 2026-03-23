@@ -64,6 +64,8 @@ Zipminator's L10 anonymization level is, to our knowledge, the world's first ano
 
 Every classical anonymization tool on the market, from ARX's k-anonymity to Google's differential privacy library to Apple's local DP, derives irreversibility from computational hardness assumptions. A sufficiently powerful adversary could, in principle, defeat those assumptions. Zipminator L10's irreversibility holds regardless of computational power because it is rooted in quantum physics, not mathematics.
 
+This method remains secure even in a world where P=NP, because its security guarantee is physical, not computational. Classical anonymization breaks if computational hardness assumptions collapse. L10 does not depend on those assumptions.
+
 The world's first quantum-certified anonymization. Irreversible by physics, not just math.
 
 ## Test Coverage

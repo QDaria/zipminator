@@ -95,6 +95,8 @@ Zipminator L10 is, to our knowledge, the world's first anonymization system wher
 
 Every classical anonymization tool (ARX, sdcMicro, Google's DP library, Apple's local DP, Microsoft Presidio) derives its irreversibility from computational hardness assumptions that a sufficiently powerful adversary, classical or quantum, could in principle defeat. Zipminator L10's irreversibility holds regardless of computational power.
 
+Critically, this method remains secure even in a world where P=NP. Classical anonymization depends on computational hardness; if P=NP, every CSPRNG seed becomes recoverable and every classical anonymization method breaks. L10's guarantee is physical, not computational, making it the only anonymization method that survives the collapse of complexity-theoretic assumptions.
+
 ---
 
 ## Technology Moat
@@ -108,6 +110,7 @@ Every classical anonymization tool (ARX, sdcMicro, Google's DP library, Apple's 
 | FIPS 203 | Full ML-KEM construction | Partial or draft-based |
 | Fallback strategy | Automatic multi-provider failover | Hard failure or PRNG only |
 | Anonymization | QRNG OTP (Born rule guarantee) | Classical PRNG |
+| P=NP resilience | Secure (physics-based) | Broken (hardness-based) |
 
 Building a comparable system from scratch requires expertise in lattice-based cryptography, Rust systems programming, quantum computing APIs, and production DevOps. This combination is rare and constitutes a meaningful barrier to entry.
 

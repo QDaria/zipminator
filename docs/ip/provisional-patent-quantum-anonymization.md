@@ -210,6 +210,22 @@ In an alternative embodiment, the mapping table is constructed entirely in hardw
 6. Since quantum measurement outcomes are information-theoretically random (no hidden state determines them), this is equivalent to guessing a random string — which has success probability 2^{-128} per value (for 16-byte identifiers).
 7. Therefore, the anonymization is information-theoretically irreversible. □
 
+#### Corollary: Independence from Computational Complexity Assumptions
+
+**Claim**: The security of this invention holds regardless of the resolution of the P vs NP problem.
+
+**Proof sketch**:
+
+1. Classical anonymization techniques derive irreversibility from computational hardness assumptions. Specifically, the security of CSPRNGs (ChaCha20, AES-CTR-DRBG) assumes that recovering the internal state from the output is computationally infeasible — a problem believed to be outside the complexity class P.
+
+2. If P = NP were proven (or practically achieved via quantum speedup on specific problem classes), all computational hardness assumptions would collapse. CSPRNG seed recovery, hash pre-image computation, and discrete logarithm problems would become efficiently solvable. Every classical anonymization method would become reversible.
+
+3. The present invention's security does not depend on any computational hardness assumption. The irreversibility is derived from the Born rule of quantum mechanics, which is a physical law independent of computational complexity theory. No algorithm, regardless of its time complexity, can predict or retrodict a quantum measurement outcome, because the outcome is not determined by any prior state.
+
+4. Therefore, this invention remains secure in a world where P = NP, because its security guarantee is physical, not computational. This is a strictly stronger guarantee than any classical anonymization method can provide. □
+
+**Practical implication**: As quantum computing advances and classical computational assumptions weaken, organizations using classical anonymization face increasing risk of re-identification. The present invention provides a migration path to anonymization that is immune to advances in computational capability, including both classical and quantum computational breakthroughs.
+
 #### Comparison with Classical Approaches
 
 | Property | Classical PRNG Anonymization | Quantum OTP Anonymization (This Invention) |
@@ -221,6 +237,7 @@ In an alternative embodiment, the mapping table is constructed entirely in hardw
 | Irreversibility guarantee | Computational hardness | Quantum mechanics (Born rule) |
 | Vulnerable to quantum computers? | Potentially (if seed recovery is improved) | No |
 | GDPR Recital 26 compliance | Arguable (pseudonymization vs. anonymization) | Strong (information-theoretic anonymization) |
+| Secure if P = NP? | No (all hardness assumptions collapse) | Yes (security is physical, not computational) |
 
 ### Embodiments and Variations
 
