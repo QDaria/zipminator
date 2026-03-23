@@ -147,8 +147,13 @@ class TestCsvAnonymization:
             files={"file": ("data.csv", csv_bytes, "text/csv")},
         )
         assert resp.status_code == 200
-        out_df = pd.read_csv(io.StringIO(resp.content.decode()))
-        assert len(out_df.columns) == 0
+        content = resp.content.decode().strip()
+        if not content:
+            # L6 suppresses everything — empty body means zero columns
+            assert True
+        else:
+            out_df = pd.read_csv(io.StringIO(content))
+            assert len(out_df.columns) == 0
 
 
 # ── JSON tests ────────────────────────────────────────────────────────────────

@@ -49,6 +49,17 @@
 			</array>
 		</dict>
 	</dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.qdaria.zipminator</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>com.qdaria.zipminator</string>
+		</dict>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>

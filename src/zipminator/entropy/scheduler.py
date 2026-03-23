@@ -40,7 +40,7 @@ from typing import Optional, Tuple
 logger = logging.getLogger(__name__)
 
 # --- Configuration ---
-TARGET_BYTES_PER_CYCLE = 1024 * 50  # 50 KB per harvest cycle
+TARGET_BYTES_PER_CYCLE = 1024 * 500  # 500 KB per harvest cycle
 NUM_QUBITS = 120  # Use 120 of the 156 available qubits (avoids edge effects)
 DEFAULT_INTERVAL = 3600  # 1 hour
 LOW_POOL_THRESHOLD = 1024 * 100  # 100 KB -- trigger warning below this

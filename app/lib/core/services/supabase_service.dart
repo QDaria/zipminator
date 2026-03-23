@@ -32,8 +32,13 @@ class SupabaseService {
   ) =>
       client.auth.signUp(email: email, password: password);
 
+  static const _redirectTo = 'com.qdaria.zipminator://login-callback';
+
   static Future<bool> signInWithOAuth(OAuthProvider provider) =>
-      client.auth.signInWithOAuth(provider);
+      client.auth.signInWithOAuth(
+        provider,
+        redirectTo: _redirectTo,
+      );
 
   static Future<void> signOut() => client.auth.signOut();
 }
