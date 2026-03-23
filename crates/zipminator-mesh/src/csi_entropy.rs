@@ -1,8 +1,15 @@
-//! CSI Entropy Harvester: extracts cryptographic entropy from WiFi CSI subcarrier data.
+//! CSI Entropy Harvester: extracts classical physical entropy from WiFi CSI subcarrier data.
 //!
-//! Uses Von Neumann debiasing on the least-significant bits of CSI phase measurements
-//! to produce unbiased random bits, then optionally XORs with an existing QRNG pool
-//! for defense-in-depth.
+//! **Important distinction**: CSI entropy is *classical physical randomness* derived from
+//! electromagnetic scattering, thermal motion, and multipath interference — NOT quantum
+//! random number generation (QRNG). QRNG produces information-theoretically secure
+//! randomness from quantum measurements (Born rule). CSI entropy is computationally
+//! unpredictable but not provably non-deterministic in the quantum-mechanical sense.
+//!
+//! The design uses CSI as a *supplementary* entropy source, XORed with the primary QRNG
+//! pool for defense-in-depth: the combined output is at least as strong as whichever
+//! source has higher entropy. Uses Von Neumann debiasing on CSI phase LSBs to remove
+//! measurement bias before combination.
 //!
 //! Architecture #3 from the Physical Cryptography integration plan.
 

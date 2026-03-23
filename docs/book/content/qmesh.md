@@ -76,7 +76,18 @@ Q-Mesh Wave 1 implements six cryptographic modules, each addressing a different 
 
 ### 1. CSI Entropy Harvester
 
-Extracts physical randomness from WiFi CSI measurements. The electromagnetic environment produces high-quality entropy because it reflects the chaotic interactions of radio waves with moving bodies, air currents, and thermal variations. This entropy feeds into Zipminator's quantum entropy pool as an additional source alongside quantum hardware backends.
+Extracts **classical physical randomness** from WiFi CSI measurements. The electromagnetic environment produces high-quality entropy because it reflects the chaotic interactions of radio waves with moving bodies, air currents, and thermal variations.
+
+```{admonition} CSI Entropy vs QRNG
+:class: warning
+
+CSI entropy is **not** quantum random number generation. QRNG derives provably non-deterministic randomness from quantum measurements (the Born rule). CSI entropy derives computationally unpredictable randomness from classical electromagnetic scattering. Both are genuine physical randomness, but they differ in their security guarantees:
+
+- **QRNG** (IBM Quantum, QBraid, Rigetti): Information-theoretically secure. No computational power, classical or quantum, can predict the output.
+- **CSI entropy** (WiFi signals): Computationally secure. Predicting it would require modelling the thermal state of every air molecule in the room simultaneously.
+
+Zipminator uses CSI entropy as a **supplementary source**, XORed with QRNG output. The XOR combination guarantees the result is at least as random as the stronger source. If QRNG hardware is unavailable, CSI provides a high-quality physical fallback. If CSI is compromised, QRNG still protects the output.
+```
 
 ### 2. PUEK (Physical Unclonable Encryption Key)
 

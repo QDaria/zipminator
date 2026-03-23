@@ -269,7 +269,40 @@ def _harvest_ibm(token: str, target_bytes: int) -> Tuple[bytes, str]:
             f"Budget status: {get_budget_status()}"
         )
 
-    svc = QiskitRuntimeService(channel="ibm_quantum_platform", token=token)
+    # CRITICAL: Always use the free "open" instance, NEVER pay-as-you-go.
+    # The account has a paid "qdaria-qrng" instance that charges real money.
+    instance = os.getenv("IBM_QUANTUM_INSTANCE", "open-instance")
+    svc = QiskitRuntimeService(
+        channel="ibm_quantum_platform", token=token, instance=instance
+    )
+    logger.info("Using IBM instance: %s", instance)
+
+    # Double-check: refuse to run on pay-as-you-go
+    try:
+        usage = svc.usage()
+        plan = next(
+            (i["plan"] for i in svc.instances() if i["name"] == instance),
+            "unknown",
+        )
+        if plan == "pay-as-you-go":
+            raise RuntimeError(
+                f"REFUSING to use pay-as-you-go instance '{instance}'. "
+                "Set IBM_QUANTUM_INSTANCE to a free instance."
+            )
+        remaining = usage.get("usage_remaining_seconds", 0)
+        if remaining <= 0:
+            raise RuntimeError(
+                f"IBM free tier exhausted: {usage['usage_consumed_seconds']}s consumed, "
+                f"limit={usage['usage_limit_seconds']}s. Resets next billing period."
+            )
+        logger.info(
+            "IBM budget check: %ds remaining of %ds",
+            remaining, usage["usage_limit_seconds"],
+        )
+    except RuntimeError:
+        raise
+    except Exception as e:
+        logger.warning("Could not verify IBM instance plan: %s", e)
 
     # Find best available backend from priority list
     backend = None

@@ -35,6 +35,12 @@ final GoRouter appRouter = GoRouter(
     return null;
   },
   routes: [
+    // OAuth callback — Supabase handles the code exchange via onAuthStateChange;
+    // just redirect to the main app once the deep link arrives.
+    GoRoute(
+      path: '/login-callback',
+      redirect: (context, state) => '/vault',
+    ),
     GoRoute(
       path: '/login',
       name: 'login',

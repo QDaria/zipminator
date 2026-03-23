@@ -64,17 +64,19 @@ TRACK E: VALIDATION (final, Task 16)
 
 **Dependency graph:**
 ```
-Task 1 ──> Task 2 ──> Task 3 ──> Task 4 ──┐
-Task 1 ──> Task 5 ──> Task 6 ──> Task 7 ──> Task 8 ──┐
-                                                        ├──> Task 9 ──> Task 11
-                                                        ├──> Task 10 ─┘
-Task 4 ────────────────────────────────────────────────┘
+Task 1 ──> Task 2 ──> Task 3 ──> Task 4 ──────────────┐
+Task 1 ──> Task 5 ──> Task 6 ──> Task 7 ──> Task 8 ──┐│
+Task 1 ──> Task 10 (Bell test, can start early) ──────┤│
+                                                       ├┴─> Task 9 ──> Task 11
 Task 9 ──> Task 12 (patent)
 Task 8 ──> Task 13 (whitepaper)
 Task 11 ──> Task 14 (paper)
 Task 11 ──> Task 15 (notebook)
 Task 16 depends on ALL prior tasks
 ```
+
+**Note:** Task 10 (Bell test) only needs Task 1 (health module) and qiskit.
+It can run in parallel with Tasks 2-8, saving wall-clock time.
 
 ---
 
@@ -113,7 +115,7 @@ Task 16 depends on ALL prior tasks
 | File | What Changes |
 |------|-------------|
 | `crates/zipminator-core/src/lib.rs` | Add `pub mod are; pub mod provenance;` |
-| `crates/zipminator-core/Cargo.toml` | Add `sha2`, `merkle-cbt` or equivalent dep |
+| `crates/zipminator-core/Cargo.toml` | `sha2` already present; implement Merkle tree from scratch (~50 lines, avoids new dep) |
 | `src/zipminator/entropy/factory.py` | Insert compositor between pool and consumers |
 | `src/zipminator/entropy/scheduler.py` | Add Bell test circuit, provenance logging |
 | `src/zipminator/entropy/__init__.py` | Export new modules |
@@ -149,6 +151,7 @@ grep -r "health\|nist\|800.90" src/zipminator/entropy/ crates/zipminator-core/sr
 ```python
 # tests/python/test_entropy_health.py
 """NIST SP 800-90B Section 4.4 online health tests."""
+import os
 import pytest
 from zipminator.entropy.health import (
     RepetitionCountTest,
@@ -308,16 +311,15 @@ class AdaptiveProportionTest:
         self.window_size = window_size
         h = assumed_h if assumed_h is not None else float(bit_width)
 
-        # Cutoff from binomial tail bound
-        # For large windows, approximate: C = window_size * 2^(-H) + z * sqrt(...)
+        # Cutoff from NIST SP 800-90B Table 2 approximation.
+        # No scipy dependency: use Chernoff bound for binomial tail.
+        # C = ceil(window_size * p + z * sqrt(window_size * p * (1-p)))
+        # where p = 2^(-H) and z = sqrt(-2 * ln(alpha))
         p = 2**(-h)
-        # Use Chernoff-style bound for simplicity
-        import scipy.stats as stats
-        try:
-            self._cutoff = int(stats.binom.ppf(1 - alpha, window_size, p)) + 1
-        except Exception:
-            # Fallback if scipy not available
-            self._cutoff = max(3, int(window_size * p * 4))
+        z = math.sqrt(-2.0 * math.log(alpha))
+        mean = window_size * p
+        stddev = math.sqrt(window_size * p * (1 - p))
+        self._cutoff = max(3, math.ceil(mean + z * stddev))
 
         self._reference: Optional[int] = None
         self._count = 0
@@ -791,9 +793,49 @@ class TestFactoryIntegration:
 ```
 
 - [ ] **Step 2: Run test — verify fail**
-- [ ] **Step 3: Add `get_compositor()` to factory.py**
+- [ ] **Step 3: Add QuantumProviderAdapter and `get_compositor()` to factory.py**
 
-Add function that wraps existing providers as EntropySource adapters and returns an EntropyCompositor. The existing `get_provider()` remains unchanged for backward compatibility.
+The existing `QuantumProvider` ABC uses `get_entropy(num_bits) -> str` (binary string).
+The compositor expects `EntropySource` protocol with `read(n_bytes) -> bytes`.
+Bridge them with an adapter:
+
+```python
+# Add to src/zipminator/entropy/compositor.py (or factory.py)
+from .base import QuantumProvider
+
+class QuantumProviderAdapter:
+    """Adapts the existing QuantumProvider ABC to EntropySource protocol."""
+
+    def __init__(self, provider: QuantumProvider):
+        self._provider = provider
+        self._health = HealthTestSuite()
+        self._estimator = MinEntropyEstimator()
+
+    @property
+    def name(self) -> str:
+        return self._provider.name()
+
+    def read(self, n: int) -> bytes:
+        bits = self._provider.get_entropy(n * 8)
+        data = int(bits, 2).to_bytes(n, "big")
+        for byte in data:
+            self._health.feed(byte)
+            self._estimator.feed(byte)
+        return data
+
+    @property
+    def estimated_min_entropy(self) -> float:
+        h = self._estimator.estimate()
+        return h if h is not None else 8.0  # assume uniform until enough data
+
+    @property
+    def status(self) -> SourceStatus:
+        if self._health.failure_rate > 0.01:
+            return SourceStatus.FAILED
+        return SourceStatus.HEALTHY
+```
+
+Add `get_compositor()` that wraps existing providers via the adapter and returns an `EntropyCompositor`. The existing `get_provider()` remains unchanged for backward compatibility.
 
 - [ ] **Step 4: Run tests — verify pass (existing + new)**
 - [ ] **Step 5: Polish + Harden**
@@ -888,7 +930,29 @@ pub struct AreProgram {
 }
 ```
 
-- [ ] **Step 4: Commit spec + module skeleton**
+- [ ] **Step 4: Create stub files so crate compiles**
+
+Create empty stub files for submodules declared in mod.rs so `cargo check` passes:
+
+```rust
+// crates/zipminator-core/src/are/domains.rs
+//! Number domain arithmetic implementations. (Stub — implemented in Task 6.)
+
+// crates/zipminator-core/src/are/program.rs
+//! ARE program generation and serialization. (Stub — implemented in Task 6.)
+
+// crates/zipminator-core/src/are/extractor.rs
+//! ARE extraction engine. (Stub — implemented in Task 6.)
+```
+
+- [ ] **Step 5: Verify crate compiles**
+
+```bash
+cargo check --package zipminator-core
+```
+Expected: compiles with no errors (stubs are empty but valid)
+
+- [ ] **Step 6: Commit spec + module skeleton**
 
 ```bash
 git add docs/papers/che-framework/are-spec.md crates/zipminator-core/src/are/
@@ -1055,13 +1119,70 @@ git commit -m "feat(are): Algebraic Randomness Extraction engine in Rust"
 
 - [ ] **Step 1: Write failing Python tests for ARE**
 
-Test that ARE can be called from Python: generate program from seed, extract, verify determinism, verify NIST statistical properties of output.
+```python
+# tests/python/test_entropy_are.py
+"""Tests for Algebraic Randomness Extraction Python bindings."""
+import os
+import pytest
+
+
+class TestArePythonBindings:
+    def test_roundtrip_determinism(self):
+        """Same seed + same input = same output."""
+        from zipminator.entropy.are import AreExtractor
+        seed = os.urandom(35)  # 280 bits for 4-step program
+        ext = AreExtractor.from_seed(seed, num_steps=4)
+        out1 = ext.extract(12345)
+        out2 = ext.extract(12345)
+        assert out1 == out2
+
+    def test_different_seeds_different_output(self):
+        from zipminator.entropy.are import AreExtractor
+        ext1 = AreExtractor.from_seed(b'\x00' * 35, num_steps=4)
+        ext2 = AreExtractor.from_seed(b'\xff' * 35, num_steps=4)
+        assert ext1.extract(42) != ext2.extract(42)
+
+    def test_extract_bytes(self):
+        """Extract raw bytes for entropy pool use."""
+        from zipminator.entropy.are import AreExtractor
+        ext = AreExtractor.from_seed(os.urandom(35), num_steps=4)
+        data = ext.extract_bytes(b'\xde\xad\xbe\xef', output_len=32)
+        assert len(data) == 32
+        assert isinstance(data, bytes)
+
+    def test_large_input_no_panic(self):
+        """Large inputs should not overflow or panic."""
+        from zipminator.entropy.are import AreExtractor
+        ext = AreExtractor.from_seed(os.urandom(35), num_steps=4)
+        big = int.from_bytes(os.urandom(128), 'big')
+        result = ext.extract(big)
+        assert result >= 0
+```
 
 - [ ] **Step 2: Run tests — verify fail**
-- [ ] **Step 3: Add PyO3 bindings for AreProgram**
+
+```bash
+micromamba activate zip-pqc && pytest tests/python/test_entropy_are.py -v
+```
+
+- [ ] **Step 3: Add PyO3 bindings for AreProgram in python_bindings.rs**
+
+Note: Rust `u128` does not auto-convert in PyO3. Use `#[pyo3(signature = (value))]` with
+`value: u128` converted from Python `int` via `.extract::<u128>()`, or pass as bytes and
+convert internally. The bytes approach is more Pythonic.
+
 - [ ] **Step 4: Create Python wrapper `are.py`**
-- [ ] **Step 5: Run tests — verify pass**
-- [ ] **Step 6: Polish + Harden + Commit**
+
+Thin wrapper that imports the native `_core` module and provides `AreExtractor` class.
+
+- [ ] **Step 5: Rebuild native bindings**
+
+```bash
+micromamba activate zip-pqc && maturin develop
+```
+
+- [ ] **Step 6: Run tests — verify pass**
+- [ ] **Step 7: Polish + Harden + Commit**
 
 ```bash
 git commit -m "feat(are): Python bindings for Algebraic Randomness Extraction"
@@ -1075,7 +1196,7 @@ git commit -m "feat(are): Python bindings for Algebraic Randomness Extraction"
 > **Depends on**: Task 7
 
 **Files:**
-- Create: `tests/entropy/test_are_nist.py`
+- Create: `tests/python/test_entropy_are_nist.py`
 
 - [ ] **Step 1: Write NIST SP 800-22 test battery on ARE output**
 
@@ -1104,7 +1225,7 @@ git commit -m "test(are): NIST SP 800-22 validation suite for ARE output"
 - Create: `crates/zipminator-core/src/provenance/certificate.rs`
 - Create: `crates/zipminator-core/src/provenance/verify.rs`
 - Create: `src/zipminator/entropy/provenance.py`
-- Create: `tests/entropy/test_provenance.py`
+- Create: `tests/python/test_entropy_provenance.py`
 
 - [ ] **Step 1: Write failing tests for Merkle-tree certificates**
 
@@ -1128,8 +1249,12 @@ git commit -m "feat(provenance): Merkle-tree entropy certificates with verificat
 
 **Files:**
 - Create: `src/zipminator/entropy/bell_test.py`
-- Create: `tests/entropy/test_bell.py`
+- Create: `tests/python/test_entropy_bell.py`
 - Modify: `src/zipminator/entropy/scheduler.py`
+
+- [ ] **Step 0: Ensure qiskit is in optional deps**
+
+Add `qiskit>=1.0` to `[project.optional-dependencies.quantum]` in `pyproject.toml` if not already present. Bell test functionality requires `pip install zipminator[quantum]`.
 
 - [ ] **Step 1: Write failing tests**
 
@@ -1199,12 +1324,12 @@ git commit -m "feat(entropy): CHSH Bell test for device-independent quantum cert
 
 **Files:**
 - Create: `src/zipminator/entropy/certified.py`
-- Create: `tests/entropy/test_integration_che.py`
+- Create: `tests/python/test_entropy_integration_che.py`
 
 - [ ] **Step 1: Write integration test for full CHE stack**
 
 ```python
-# tests/entropy/test_integration_che.py
+# tests/python/test_entropy_integration_che.py
 def test_full_che_pipeline():
     """End-to-end: sources -> health test -> compositor -> ARE -> certificate."""
     from zipminator.entropy.certified import CertifiedEntropyProvider
@@ -1232,6 +1357,11 @@ git commit -m "feat(entropy): CertifiedEntropyProvider — full CHE stack integr
 ---
 
 ## TRACK D: PUBLICATIONS (parallel with Track C)
+
+> **Note:** Tasks 12-14 produce DRAFTS for human review, not submission-ready documents.
+> The patent draft needs attorney review. The paper needs co-author (formal proofs) and
+> human editorial passes. The whitepaper needs Mo's voice and business context. These
+> drafts provide 80% of the content; the remaining 20% is human refinement.
 
 ### Task 12: Provisional Patent Draft
 
@@ -1382,7 +1512,7 @@ git commit -m "docs(notebook): interactive CHE framework demonstration"
 > **Skills**: `/batch-tdd` (parallel test domains), `/verification-quality` (final gate)
 
 **Files:**
-- Modify: `tests/entropy/test_integration_che.py` (expand)
+- Modify: `tests/python/test_entropy_integration_che.py` (expand)
 
 - [ ] **Step 1: Run ALL existing test suites — verify no regressions**
 
@@ -1424,10 +1554,12 @@ Queen Prompt:
     Spawn Worker-Gamma (Sonnet): Execute Tasks 7-8 (Python + NIST validation).
     Worker-Gamma blocks on Worker-Beta completing Task 6.
 
-  PHASE 3 — CERTIFICATION (Track C: Tasks 9-11, after A+B):
+  PHASE 2b — BELL TEST (can start after Task 1, parallel with everything):
+    Spawn Worker-Epsilon (Sonnet): Task 10 (Bell test). Needs only Task 1.
+
+  PHASE 3 — CERTIFICATION (Track C: Tasks 9+11, after A+B+10):
     Spawn Worker-Delta (Opus): Task 9 (provenance).
-    Spawn Worker-Epsilon (Sonnet): Task 10 (Bell test).
-    Queen: Task 11 (integration, after Delta + Epsilon).
+    Queen: Task 11 (integration, after Delta + Epsilon + all tracks).
 
   PHASE 4 — PUBLICATIONS (Track D: Tasks 12-15, parallel with C):
     Spawn Worker-Zeta (Opus): Task 12 (patent) — start after Task 9.
