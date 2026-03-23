@@ -12,6 +12,15 @@ from .compositor import (
     SourceStatus,
     QuantumProviderAdapter,
 )
+from .provenance import (
+    ProvenanceCertificate,
+    ProvenanceRecord,
+    build_certificate,
+)
+from .certified import (
+    CertifiedEntropyProvider,
+    CertifiedEntropyResult,
+)
 
 __all__ = [
     "create_provider",
@@ -26,4 +35,9 @@ __all__ = [
     "CompositionResult",
     "SourceStatus",
     "QuantumProviderAdapter",
+    "ProvenanceCertificate",
+    "ProvenanceRecord",
+    "build_certificate",
+    "CertifiedEntropyProvider",
+    "CertifiedEntropyResult",
 ]

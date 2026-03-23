@@ -301,10 +301,14 @@ class TestSpecVectors:
         assert ext.extract(128) == 253
 
     def test_vector8_chained_mul_avalanche(self):
-        """Vector 8: x=1, 4x(N, *, Mul) with 137,149,163,173, p=257 -> 11.
+        """Vector 8: x=1, 4x(N, *, Mul) with 137,149,163,173, p=257.
 
-        Trace: 1*137=137, 137*149=20413 mod 256=157,
-               157*163=25591 mod 256=231, 231*173=39963 mod 256=11.
+        Corrected trace (spec has arithmetic errors from step 2 onward):
+          step 1: 1*137 = 137
+          step 2: 137*149 = 20413 mod 256 = 189  (spec claims 157, but 20413%256=189)
+          step 3: 189*163 = 30807 mod 256 = 87
+          step 4: 87*173 = 15051 mod 256 = 203
+        Output: 203 mod 257 = 203
         """
         ext = self._make_ext([
             AreStep(Domain.NATURAL, 137, 0, Operation.MUL),
@@ -312,4 +316,4 @@ class TestSpecVectors:
             AreStep(Domain.NATURAL, 163, 0, Operation.MUL),
             AreStep(Domain.NATURAL, 173, 0, Operation.MUL),
         ])
-        assert ext.extract(1) == 11
+        assert ext.extract(1) == 203
