@@ -11,12 +11,17 @@ This is the standard leftover hash lemma bound for XOR composition.
 
 Part of the Certified Heterogeneous Entropy (CHE) framework.
 """
+from __future__ import annotations
+
 import enum
 import hashlib
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import List, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, List, Protocol, runtime_checkable
+
+if TYPE_CHECKING:
+    from .base import QuantumProvider
 
 logger = logging.getLogger(__name__)
 
@@ -164,3 +169,46 @@ class EntropyCompositor:
             estimated_min_entropy=max_entropy,
             provenance=provenance,
         )
+
+
+class QuantumProviderAdapter:
+    """Adapts the existing QuantumProvider ABC to the EntropySource protocol.
+
+    Bridges the gap between the legacy interface
+    (``get_entropy(num_bits) -> str``) and the compositor's
+    expected interface (``read(n_bytes) -> bytes``).
+
+    Runs NIST SP 800-90B health tests and min-entropy estimation
+    on every byte read, so the compositor has live status and
+    entropy estimates.
+    """
+
+    def __init__(self, provider: QuantumProvider) -> None:
+        from .health import HealthTestSuite, MinEntropyEstimator
+
+        self._provider = provider
+        self._health = HealthTestSuite()
+        self._estimator = MinEntropyEstimator()
+
+    @property
+    def name(self) -> str:
+        return self._provider.name()
+
+    def read(self, n: int) -> bytes:
+        bits = self._provider.get_entropy(n * 8)
+        data = int(bits, 2).to_bytes(n, "big")
+        for byte in data:
+            self._health.feed(byte)
+            self._estimator.feed(byte)
+        return data
+
+    @property
+    def estimated_min_entropy(self) -> float:
+        h = self._estimator.estimate()
+        return h if h is not None else 8.0  # assume uniform until enough data
+
+    @property
+    def status(self) -> SourceStatus:
+        if self._health.failure_rate > 0.01:
+            return SourceStatus.FAILED
+        return SourceStatus.HEALTHY
