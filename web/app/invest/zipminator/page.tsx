@@ -53,139 +53,149 @@ const SLIDES = [
   ContactSlide,       // 22
 ]
 
+const PASS = 'zip2026inv'
+const STORAGE_KEY = 'zipminator-pitch-auth'
+
 export default function InvestPage() {
+  const [authed, setAuthed] = useState(false)
+  const [input, setInput] = useState('')
+  const [error, setError] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [scenario, setScenario] = useState<Scenario>('all')
 
-  const totalSlides = SLIDES.length
+  useEffect(() => {
+    if (sessionStorage.getItem(STORAGE_KEY) === '1') setAuthed(true)
+  }, [])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (input === PASS) {
+      sessionStorage.setItem(STORAGE_KEY, '1')
+      setAuthed(true)
+    } else {
+      setError(true)
+      setInput('')
+    }
+  }
 
   const goToSlide = useCallback(
     (index: number) => {
-      if (index >= 0 && index < totalSlides) {
-        setCurrentSlide(index)
-      }
+      if (index >= 0 && index < SLIDES.length) setCurrentSlide(index)
     },
-    [totalSlides]
-  )
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      // Ignore keyboard nav if user is typing in an input
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement
-      ) {
-        return
-      }
-
-      switch (e.key) {
-        case 'ArrowRight':
-        case 'ArrowDown':
-          e.preventDefault()
-          goToSlide(Math.min(currentSlide + 1, totalSlides - 1))
-          break
-        case 'ArrowLeft':
-        case 'ArrowUp':
-          e.preventDefault()
-          goToSlide(Math.max(currentSlide - 1, 0))
-          break
-        case 'PageDown':
-          e.preventDefault()
-          goToSlide(Math.min(currentSlide + 1, totalSlides - 1))
-          break
-        case 'PageUp':
-          e.preventDefault()
-          goToSlide(Math.max(currentSlide - 1, 0))
-          break
-        case 'Home':
-          e.preventDefault()
-          goToSlide(0)
-          break
-        case 'End':
-          e.preventDefault()
-          goToSlide(totalSlides - 1)
-          break
-        case 'Escape':
-          e.preventDefault()
-          setSidebarOpen((prev) => !prev)
-          break
-      }
-    },
-    [currentSlide, totalSlides, goToSlide]
+    []
   )
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault()
+        goToSlide(currentSlide + 1)
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        goToSlide(currentSlide - 1)
+      } else if (e.key === 'Escape') {
+        setSidebarOpen((prev) => !prev)
+      }
+    }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleKeyDown])
+  }, [currentSlide, goToSlide])
 
-  const CurrentSlide = SLIDES[currentSlide]
+  if (!authed) {
+    return (
+      <div
+        className="flex items-center justify-center"
+        style={{
+          width: '100vw',
+          height: '100vh',
+          background: '#020817',
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col items-center gap-5 p-10 rounded-2xl"
+          style={{
+            background: 'rgba(34,211,238,0.04)',
+            border: '1px solid rgba(34,211,238,0.2)',
+            boxShadow: '0 0 40px rgba(34,211,238,0.08)',
+            minWidth: 340,
+          }}
+        >
+          <div className="flex flex-col items-center gap-1">
+            <span
+              className="text-xs font-mono tracking-widest uppercase"
+              style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
+            >
+              INVESTOR MATERIALS
+            </span>
+            <h1
+              className="text-2xl font-semibold text-slate-100"
+              style={{ fontFamily: "'Fraunces', Georgia, serif" }}
+            >
+              Zipminator-PQC
+            </h1>
+            <p className="text-slate-400 text-sm">Enter password for access</p>
+          </div>
+
+          <input
+            type="password"
+            value={input}
+            onChange={e => { setInput(e.target.value); setError(false) }}
+            autoFocus
+            placeholder="Password"
+            className="w-full px-4 py-3 rounded-lg text-sm text-slate-100 placeholder-slate-500 outline-none"
+            style={{
+              background: 'rgba(15,22,41,0.8)',
+              border: error
+                ? '1.5px solid rgba(251,113,133,0.6)'
+                : '1px solid rgba(34,211,238,0.2)',
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
+          />
+
+          {error && (
+            <p
+              className="text-rose-400 text-xs font-mono"
+              style={{ fontFamily: "'JetBrains Mono', monospace" }}
+            >
+              Wrong password. Try again.
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
+            style={{
+              background: 'rgba(34,211,238,0.9)',
+              color: '#020817',
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
+          >
+            Enter
+          </button>
+        </form>
+      </div>
+    )
+  }
+
+  const SlideComponent = SLIDES[currentSlide]
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] mt-16">
+    <div className="flex h-screen bg-gray-950 text-white overflow-hidden">
       <PitchSidebar
-        slides={SLIDE_TITLES}
         currentSlide={currentSlide}
-        onSlideSelect={goToSlide}
+        onSlideChange={goToSlide}
         isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen((prev) => !prev)}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
         scenario={scenario}
         onScenarioChange={setScenario}
       />
 
-      <main
-        className="relative flex-1 h-full overflow-hidden"
-      >
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className={`fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-900/80 backdrop-blur border border-white/10 md:hidden ${
-            sidebarOpen ? 'hidden' : ''
-          }`}
-          aria-label="Open navigation"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
-
-        {/* Slide navigation footer */}
-        <div className="absolute bottom-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-3 bg-gray-950/80 backdrop-blur border-t border-white/5">
-          <button
-            onClick={() => goToSlide(currentSlide - 1)}
-            disabled={currentSlide === 0}
-            className="px-4 py-1.5 text-sm rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            Previous
-          </button>
-
-          <span className="text-sm text-gray-400 font-mono">
-            {currentSlide + 1} / {totalSlides}
-          </span>
-
-          <button
-            onClick={() => goToSlide(currentSlide + 1)}
-            disabled={currentSlide === totalSlides - 1}
-            className="px-4 py-1.5 text-sm rounded-lg bg-quantum-600 hover:bg-quantum-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            Next
-          </button>
-        </div>
-
-        {/* Slide content */}
+      <main className="flex-1 overflow-hidden relative">
         <AnimatePresence mode="wait">
-          <CurrentSlide key={currentSlide} scenario={scenario} />
+          <SlideComponent key={currentSlide} scenario={scenario} />
         </AnimatePresence>
       </main>
     </div>
