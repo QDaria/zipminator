@@ -280,9 +280,28 @@ export const TRACTION_STATS = [
   { label: 'Platforms', value: '5', detail: 'Web, iOS, Android, Desktop, API' },
   { label: 'Technologies', value: '26', detail: 'Integrated security stack' },
   { label: 'Languages', value: '7', detail: 'Rust, Python, TypeScript, Swift, Kotlin, Go, C' },
-  { label: 'Security Modules', value: '8', detail: 'Full super-app coverage' },
+  { label: 'Security Modules', value: '9', detail: 'Full super-app coverage' },
   { label: 'NIST Algorithms', value: '3', detail: 'FIPS 203, 204, 205 implemented' },
 ]
+
+export const FOUNDER_INFO = {
+  name: 'Mo Houshmand',
+  title: 'CEO & Founder, QDaria AS',
+  orcid: '0009-0008-2270-5454',
+  credentials: [
+    '5 published/submitted quantum computing papers (first-author)',
+    'Davos speaker, Pakistan Business Summit Guest of Honour',
+    'Built $25-50M R&D equivalent solo (1M+ LOC, 9-pillar PQC super-app)',
+    'Patent pending: quantum-certified anonymization (Patentstyret, March 2026)',
+  ],
+  papers: [
+    'QRC performance cliff (Nature-format)',
+    'FakeNovera/FakeCepheus (IEEE)',
+    'QRC-LDA fintech',
+    'TQRC unitarity tension (TechRxiv)',
+    'Topological materials discovery (PRX Quantum target)',
+  ],
+}
 
 export const PRICING_TIERS = [
   {

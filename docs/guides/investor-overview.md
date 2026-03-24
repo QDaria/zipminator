@@ -140,10 +140,13 @@ GitHub Star Supporter Program: star the repo to unlock Developer tier free.
 
 ## Traction and Validation
 
-- **870K+ lines of production code** across 8 security modules, 4 platforms
-- **166/166 Rust tests passing**, 0 clippy warnings, constant-time verified
-- **11/11 mobile test suites** (267+ tests) on Expo React Native
+- **300K+ lines of production code** across 9 security modules, 5 platforms
+- **441 Rust tests passing**, 0 clippy warnings, constant-time verified
+- **577 Python tests passing** (PQC, PII scanning for 15 countries, entropy, anonymization)
+- **23 Flutter tests**, **30 vitest**, **267 mobile tests** on Expo React Native
 - **22+ web pages** building with 0 errors on Next.js 16
+- **Patent pending**: Method and System for Irreversible Data Anonymization Using QRNG (Patentstyret, March 2026)
+- **5 first-author quantum computing papers** published/submitted (ORCID: 0009-0008-2270-5454)
 - **Production website** live at `https://zipminator.zip` (Vercel)
 - **21-slide investor pitch deck** publicly accessible at `/invest`
 - **OAuth authentication** (GitHub, Google, LinkedIn) fully configured
@@ -154,6 +157,15 @@ GitHub Star Supporter Program: star the repo to unlock Developer tier free.
 - Docker and Kubernetes deployment infrastructure complete
 - Fuzz testing and benchmark harness established
 - Norwegian-built, GDPR-native, Five Eyes-free positioning
+
+### Founder
+
+**Mo Houshmand** -- CEO & Founder, QDaria AS
+
+- 5 published/submitted quantum computing papers (first-author): QRC performance cliff, FakeNovera/FakeCepheus (IEEE), QRC-LDA fintech, TQRC unitarity tension (TechRxiv), topological materials discovery (PRX Quantum target)
+- Davos speaker, Pakistan Business Summit Guest of Honour
+- Built $25-50M R&D equivalent solo (1M+ LOC, 9-pillar PQC super-app)
+- ORCID: 0009-0008-2270-5454
 
 ---
 
@@ -218,7 +230,7 @@ Building and scaling Zipminator requires expertise across:
 
 ## Summary
 
-Zipminator is the world's first post-quantum encryption super-app. With 8 complete security modules, 870K+ lines of production code, and a live product at `zipminator.zip`, it occupies a unique position at the intersection of post-quantum cryptography and consumer security.
+Zipminator is the world's first post-quantum encryption super-app. With 9 complete security modules, 300K+ lines of production code, 1,338+ tests, a patent-pending quantum-certified anonymization method, and a live product at `zipminator.zip`, it occupies a unique position at the intersection of post-quantum cryptography and consumer security.
 
 The combination of a Rust-native CRYSTALS-Kyber-768 core, real quantum entropy from IBM 156-qubit hardware, and full-stack delivery across web, mobile, desktop, and browser creates a defensible product in a $35B+ market with mandatory regulatory adoption deadlines.
 

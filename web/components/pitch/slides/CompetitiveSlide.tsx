@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import SlideWrapper from '../SlideWrapper'
 import { COMPETITORS, COMPETITOR_DETAILS } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
-import { Swords, Check, X, Minus, DollarSign, TrendingUp, AlertTriangle } from 'lucide-react'
+import { Swords, Check, X, Minus, DollarSign, TrendingUp, AlertTriangle, ShieldCheck } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts'
 
 import { fadeUp } from '../slide-utils'
@@ -234,8 +234,18 @@ export default function CompetitiveSlide({ scenario: _scenario }: { scenario?: S
         </div>
       </motion.div>
 
+      {/* Quantum Anonymization Monopoly */}
+      <motion.div {...fadeUp(0.17)} className="mt-6 flex items-center gap-3 px-5 py-3 rounded-xl bg-quantum-500/[0.06] border border-quantum-500/15">
+        <ShieldCheck className="w-5 h-5 text-quantum-400 shrink-0" />
+        <p className="text-sm text-gray-300">
+          <span className="text-quantum-400 font-semibold">Zipminator L10</span> is the world&apos;s first
+          quantum-certified anonymization. Patent pending. Irreversible by physics (Born rule), not computational
+          hardness. Secure even if P=NP.
+        </p>
+      </motion.div>
+
       {/* Market Gap callout */}
-      <motion.div {...fadeUp(0.18)} className="mt-6 flex items-center gap-3 px-5 py-3 rounded-xl bg-orange-500/[0.06] border border-orange-500/15">
+      <motion.div {...fadeUp(0.18)} className="mt-4 flex items-center gap-3 px-5 py-3 rounded-xl bg-orange-500/[0.06] border border-orange-500/15">
         <AlertTriangle className="w-5 h-5 text-orange-400 shrink-0" />
         <p className="text-sm text-gray-300">
           <span className="text-orange-400 font-semibold">Market Gap:</span>{' '}

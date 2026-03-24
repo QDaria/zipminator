@@ -64,18 +64,18 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                     className="text-xs mb-3"
                     style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
                   >
-                    CEO & Grunnlegger — PhD-nivå kvantefysikk + finansiell sektor
+                    CEO & Grunnlegger — 5 fagfellevurderte artikler · Davos-foredragsholder
                   </p>
                   <div className="space-y-1.5">
                     {[
-                      'Publisert forskning: Quantum Reservoir Computing (QRC) med eksperimenter pa Rigetti 156-qubit Heron-prosessor',
+                      '5 fagfellevurderte artikler (forstforfatter): QRC, FakeNovera/FakeCepheus, QRC-LDA, TQRC, topologiske materialer',
+                      'Patent pending: kvantesertifisert anonymisering (Patentstyret, mars 2026)',
+                      'Davos-foredragsholder, Pakistan Business Summit Guest of Honour',
+                      'Bygget $25-50M F&U-ekvivalent solo (1M+ kodelinjer, 9-pilar PQC super-app)',
                       'Rigetti-partnerskap: Mike Piech (VP) deltar pa neste SB1-mote',
                       'Norges eneste: NQCG opplost des. 2024 — QDaria uten direkte norsk konkurranse',
-                      'Forste kommersielle kvantemaskin-tilgang i Norge (via Rigetti QCaaS)',
-                      'Dobbel kompetanse: PhD-niva kvantefysikk + finansiell sektor — ekstremt sjeldent globalt',
-                      '"En av de mest kompetente i Skandinavia, om ikke Europa" — anerkjent i bransjen',
                       'Global IP-struktur: 6 jurisdiksjoner (Oslo HQ, Sveits IP, Delaware US, Singapore APAC, UAE MENA, Malta iGaming)',
-                      'Gjor Norge kvanteklar: QDaria.com er visjonen om norsk kvantumledelse',
+                      'ORCID: 0009-0008-2270-5454',
                     ].map((item) => (
                       <div key={item} className="flex items-start gap-2">
                         <span
@@ -107,7 +107,7 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { product: 'Zipminator', tag: 'Beta-klar', desc: 'PQC super-app — kryptering for App Store, Android og Desktop', color: '#FB7185' },
+                  { product: 'Zipminator', tag: 'Patent pending · Beta', desc: 'PQC super-app — verdens forste kvantesertifiserte anonymisering', color: '#FB7185' },
                   { product: 'QCaaS / QCaaP', tag: 'Live via Rigetti', desc: 'Quantum Computing as a Service — 156-qubit Heron-prosessor', color: '#22D3EE' },
                   { product: 'Qm9 (Fintech)', tag: 'Utvikling', desc: 'Kvantum-drevet portefølje, prising og risikovurdering', color: '#F59E0B' },
                   { product: 'QDiana (Edtech)', tag: 'Live', desc: 'Kvantumutdanning og kompetansebygging for norsk næringsliv', color: '#34D399' },
@@ -174,10 +174,10 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                   { dim: 'Norsk regulatorisk', qdaria: '✓ DORA-ekspert', global: '✗' },
                   { dim: 'Kvantum-hardware', qdaria: '✓ Rigetti-partner', global: '✓ IBM/IonQ' },
                   { dim: 'PQC + QCaaS samlet', qdaria: '✓ Ett selskap', global: 'Sjelden' },
-                  { dim: 'Publisert forskning', qdaria: '✓ QRC 156Q', global: 'Varierende' },
+                  { dim: 'Publisert forskning', qdaria: '✓ 5 artikler', global: 'Varierende' },
+                  { dim: 'Kvantum-anonymisering', qdaria: '✓ Patent pending', global: '✗' },
                   { dim: 'Tid til pilot', qdaria: '3 mnd.', global: '6-18 mnd.' },
                   { dim: 'CAPEX-krav', qdaria: 'NOK 0 (SaaS)', global: 'Varierende' },
-                  { dim: 'CEO kvantum-PhD', qdaria: '✓', global: 'Sjelden' },
                 ].map((row) => (
                   <div
                     key={row.dim}

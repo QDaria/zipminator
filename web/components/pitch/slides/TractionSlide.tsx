@@ -293,8 +293,8 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
           {[
             { label: 'NIST FIPS 203 KAT', detail: 'ML-KEM-768 validated against official test vectors', icon: CheckCircle2 },
             { label: 'Dudect Constant-Time', detail: 'Timing side-channel analysis passed', icon: ShieldCheck },
-            { label: '302 Tests + 6 Fuzz Targets', detail: 'Rust core + browser + bridge', icon: FlaskConical },
-            { label: 'MIT Open-Source Core', detail: 'Community-auditable crypto primitives', icon: Github },
+            { label: '1,338 Tests + 6 Fuzz Targets', detail: '441 Rust + 577 Python + 23 Flutter + 30 vitest + 267 mobile', icon: FlaskConical },
+            { label: 'Patent Pending', detail: 'Quantum-certified anonymization (Patentstyret, March 2026)', icon: Shield },
           ].map((cred) => (
             <div key={cred.label} className="flex flex-col items-center text-center gap-2 p-3 rounded-lg bg-emerald-500/[0.05] border border-emerald-500/15">
               <cred.icon className="w-5 h-5 text-emerald-400" />
@@ -311,7 +311,7 @@ export default function TractionSlide({ scenario: _scenario }: { scenario?: Scen
           <DollarSign className="w-5 h-5 text-green-400 shrink-0" />
           <div>
             <p className="text-sm text-white font-semibold">QDaria Technology Stack</p>
-            <p className="text-xs text-gray-400">100K+ LOC, 302 Rust tests, 6 fuzz targets, 8 integrated pillars, 3 platform builds</p>
+            <p className="text-xs text-gray-400">300K+ LOC, 441 Rust + 577 Python tests, 6 fuzz targets, 9 integrated pillars, 5 platform builds</p>
           </div>
         </div>
         <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-quantum-500/[0.06] border border-quantum-500/15">

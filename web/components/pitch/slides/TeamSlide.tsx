@@ -2,9 +2,9 @@
 
 import { motion } from 'framer-motion'
 import SlideWrapper from '../SlideWrapper'
-import { TEAM_ROLES, TEAM_TOTAL } from '@/lib/pitch-data'
+import { TEAM_ROLES, TEAM_TOTAL, FOUNDER_INFO } from '@/lib/pitch-data'
 import type { Scenario } from '@/lib/pitch-data'
-import { Users, Briefcase, Clock, GraduationCap, Building2, UserCheck } from 'lucide-react'
+import { Users, Briefcase, Clock, GraduationCap, Building2, UserCheck, FileText, Award } from 'lucide-react'
 import {
   ResponsiveContainer,
   PieChart,
@@ -84,6 +84,37 @@ export default function TeamSlide({ scenario: _scenario }: { scenario?: Scenario
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           {TEAM_TOTAL.headcount} people across cryptography, systems engineering, mobile, and security
         </p>
+      </motion.div>
+
+      {/* Founder */}
+      <motion.div {...fadeUp(0.03)} className="card-quantum mb-6 border-quantum-500/20">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-lg bg-quantum-500/10 border border-quantum-500/20 flex items-center justify-center shrink-0">
+            <span className="text-lg font-bold text-quantum-400">MH</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-base font-semibold text-white">{FOUNDER_INFO.name}</h3>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-quantum-500/10 text-quantum-400 border border-quantum-500/20">
+                {FOUNDER_INFO.title}
+              </span>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-x-4 gap-y-1 mb-2">
+              {FOUNDER_INFO.credentials.map((c) => (
+                <p key={c} className="text-xs text-gray-400 leading-relaxed flex items-start gap-1.5">
+                  <Award className="w-3 h-3 text-quantum-400 shrink-0 mt-0.5" />
+                  {c}
+                </p>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <FileText className="w-3 h-3 text-gray-500" />
+              <p className="text-[10px] text-gray-500 font-mono">
+                ORCID: {FOUNDER_INFO.orcid} | {FOUNDER_INFO.papers.length} first-author papers
+              </p>
+            </div>
+          </div>
+        </div>
       </motion.div>
 
       {/* Hiring by Priority Donut — moved to upper half */}

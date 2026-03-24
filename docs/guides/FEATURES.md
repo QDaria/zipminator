@@ -132,7 +132,7 @@
   - L7: Quantum noise jitter (numerical perturbation using QRNG entropy)
   - L8: Differential privacy (Laplace mechanism with configurable epsilon, QRNG noise)
   - L9: Combined K-Anonymity + Differential privacy
-  - L10: Quantum OTP anonymization from entropy pool (irreversible with real QRNG)
+  - L10: Quantum OTP anonymization from entropy pool (irreversible with real QRNG). Patent pending (Patentstyret, March 2026)
 - **CLI**: `zipminator anonymize --level N input.csv output.csv` (Typer + Rich, levels 1-10)
 - **Entropy**: All L7-L10 use PoolProvider with OS fallback (never crash)
 - **Tests**: 64 new level tests + 45 existing integration tests (109 total)
