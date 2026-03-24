@@ -50,7 +50,7 @@ docs = [
 
 [project.urls]
 Homepage = "https://qdaria.com/technology/products/zipminator"
-Documentation = "https://docs.qdaria.com/zipminator"
+Documentation = "https://docs.zipminator.zip"
 Repository = "https://github.com/qdaria/zipminator"
 Issues = "https://github.com/qdaria/zipminator/issues"
 

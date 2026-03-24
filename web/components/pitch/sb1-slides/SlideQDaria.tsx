@@ -64,13 +64,13 @@ export const SlideQDaria: React.FC<SlideQDariaProps> = () => {
                     className="text-xs mb-3"
                     style={{ color: '#22D3EE', fontFamily: "'JetBrains Mono', monospace" }}
                   >
-                    CEO & Grunnlegger — 5 fagfellevurderte artikler · Davos-foredragsholder
+                    CEO & Grunnlegger — 5 fagfellevurderte artikler · IQT NYC 2024
                   </p>
                   <div className="space-y-1.5">
                     {[
                       '5 fagfellevurderte artikler (forstforfatter): QRC, FakeNovera/FakeCepheus, QRC-LDA, TQRC, topologiske materialer',
                       'Patent pending: kvantesertifisert anonymisering (Patentstyret, mars 2026)',
-                      'Davos-foredragsholder, Pakistan Business Summit Guest of Honour',
+                      'IQT Quantum+AI NYC 2024 foredragsholder (Quantum AI Algorithms panel)',
                       'Bygget $25-50M F&U-ekvivalent solo (1M+ kodelinjer, 9-pilar PQC super-app)',
                       'Rigetti-partnerskap: Mike Piech (VP) deltar pa neste SB1-mote',
                       'Norges eneste: NQCG opplost des. 2024 — QDaria uten direkte norsk konkurranse',

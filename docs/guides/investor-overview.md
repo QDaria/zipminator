@@ -163,7 +163,8 @@ GitHub Star Supporter Program: star the repo to unlock Developer tier free.
 **Mo Houshmand** -- CEO & Founder, QDaria AS
 
 - 5 published/submitted quantum computing papers (first-author): QRC performance cliff, FakeNovera/FakeCepheus (IEEE), QRC-LDA fintech, TQRC unitarity tension (TechRxiv), topological materials discovery (PRX Quantum target)
-- Davos speaker, Pakistan Business Summit Guest of Honour
+- IQT Quantum+AI NYC 2024 speaker (Quantum AI Algorithms and Software Development panel)
+- MSc Applied Mathematics (UiO), proofreader for Langtangen's Springer textbook on FDM/PDEs
 - Built $25-50M R&D equivalent solo (1M+ LOC, 9-pillar PQC super-app)
 - ORCID: 0009-0008-2270-5454
 

@@ -380,7 +380,7 @@ docker run zipminator:test --version
 ## Support and Documentation
 
 - **User Guide**: `/config/installation-guide.md`
-- **Project Docs**: https://docs.qdaria.com/zipminator
+- **Project Docs**: https://docs.zipminator.zip
 - **GitHub Issues**: https://github.com/qdaria/zipminator/issues
 - **Security Contact**: security@qdaria.com
 

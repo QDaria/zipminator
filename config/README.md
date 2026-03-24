@@ -555,7 +555,7 @@ docker build --no-cache -f config/Dockerfile -t zipminator:local .
 
 ## Support
 
-- **Documentation:** https://docs.qdaria.com/zipminator
+- **Documentation:** https://docs.zipminator.zip
 - **Issues:** https://github.com/qdaria/zipminator/issues
 - **Security:** security@qdaria.com
 - **Email:** hello@qdaria.com

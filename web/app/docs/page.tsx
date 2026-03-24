@@ -4,8 +4,11 @@ import { motion } from 'framer-motion'
 import {
   Code2, Terminal, Shield, Layers, FlaskConical,
   Notebook, Rocket, Key, FileCode, Lock, Server, Building2,
-  ArrowRight, Copy, Check
+  ArrowRight, Copy, Check, BookOpen, ExternalLink
 } from 'lucide-react'
+import { SITE_CONFIG } from '@/lib/constants'
+
+const JUPYTER_BOOK = SITE_CONFIG.links.jupyterBook
 import { Fragment, useState } from 'react'
 
 const fadeUp = {
@@ -40,28 +43,29 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
 }
 
 const quickStartSteps = [
-  { step: '1', title: 'Install', code: 'pip install zipminator-pqc', lang: 'bash' },
+  { step: '1', title: 'Install', code: 'pip install zipminator', lang: 'bash' },
   { step: '2', title: 'Generate Keys', code: 'from zipminator import keypair\npk, sk = keypair()', lang: 'python' },
   { step: '3', title: 'Encrypt', code: 'from zipminator import encapsulate\nct, shared_secret = encapsulate(pk)', lang: 'python' },
   { step: '4', title: 'Deploy', code: 'docker run -p 8000:8000 qdaria/zipminator-api', lang: 'bash' },
 ]
 
 const docSections = [
-  { icon: Rocket, title: 'Getting Started', desc: 'Installation, first key generation, and basic encryption in under 5 minutes.', href: '#quickstart', color: 'text-green-400' },
-  { icon: Code2, title: 'API Reference', desc: 'Full SDK documentation for Python, Rust, and Node.js bindings.', href: '#sdk', color: 'text-blue-400' },
-  { icon: Terminal, title: 'CLI Reference', desc: 'Command-line tool for key management, encryption, and PII scanning.', href: '#sdk', color: 'text-purple-400' },
-  { icon: Layers, title: '10-Level Anonymization', desc: 'From basic redaction to quantum-secure k-anonymity with differential privacy.', href: '#anonymization', color: 'text-orange-400' },
-  { icon: Shield, title: 'Compliance & Standards', desc: 'NIST FIPS 203 (ML-KEM-768), NIST Security Level 3, KAT vector verification.', href: '#compliance', color: 'text-cyan-400' },
-  { icon: FlaskConical, title: 'JupyterLab Integration', desc: 'Magic commands, interactive widgets, and quantum entropy visualization.', href: '#jupyter', color: 'text-yellow-400' },
+  { icon: Rocket, title: 'Getting Started', desc: 'Installation, first key generation, and basic encryption in under 5 minutes.', href: `${JUPYTER_BOOK}content/getting_started.html`, color: 'text-green-400' },
+  { icon: Code2, title: 'API Reference', desc: 'Full SDK documentation for Python, Rust, and Node.js bindings.', href: `${JUPYTER_BOOK}content/api_reference.html`, color: 'text-blue-400' },
+  { icon: Terminal, title: 'CLI Reference', desc: 'Command-line tool for key management, encryption, and PII scanning.', href: `${JUPYTER_BOOK}content/cli.html`, color: 'text-purple-400' },
+  { icon: Layers, title: '10-Level Anonymization', desc: 'From basic redaction to quantum-secure k-anonymity with differential privacy.', href: `${JUPYTER_BOOK}content/anonymization.html`, color: 'text-orange-400' },
+  { icon: Shield, title: 'Compliance & Standards', desc: 'NIST FIPS 203 (ML-KEM-768), NIST Security Level 3, KAT vector verification.', href: `${JUPYTER_BOOK}content/compliance.html`, color: 'text-cyan-400' },
+  { icon: FlaskConical, title: 'JupyterLab Integration', desc: 'Magic commands, interactive widgets, and quantum entropy visualization.', href: `${JUPYTER_BOOK}content/jupyter.html`, color: 'text-yellow-400' },
 ]
 
 const notebooks = [
-  { num: '01', title: 'Quickstart', desc: 'First encryption in 3 cells. Key generation, encapsulation, and decapsulation.' },
-  { num: '02', title: 'Key Management', desc: 'Key storage, rotation, export/import, and multi-recipient workflows.' },
-  { num: '03', title: 'File Encryption', desc: 'Encrypt files of any size with streaming Kyber768 + AES-256-GCM.' },
-  { num: '04', title: 'PII Scanner', desc: 'Detect and redact 40+ PII types before encryption. Configurable rulesets.' },
-  { num: '05', title: 'Compliance Workflows', desc: 'GDPR, HIPAA, and SOX compliance automation with audit trails.' },
-  { num: '06', title: 'Quantum Capabilities', desc: 'Real quantum entropy harvesting from IBM 156-qubit hardware.' },
+  { num: '01', title: 'Quickstart', desc: 'First encryption in 3 cells. Key generation, encapsulation, and decapsulation.', href: `${JUPYTER_BOOK}notebooks/01_quickstart.html` },
+  { num: '02', title: 'Anonymization', desc: 'All 10 anonymization levels demonstrated on sample data with code examples.', href: `${JUPYTER_BOOK}notebooks/02_anonymization.html` },
+  { num: '03', title: 'QRNG Entropy', desc: 'Quantum random number generation, pool health, and distribution analysis.', href: `${JUPYTER_BOOK}notebooks/03_qrng_entropy.html` },
+  { num: '04', title: 'Compliance', desc: 'PII scanning, GDPR-aligned anonymization, and audit trail generation.', href: `${JUPYTER_BOOK}notebooks/04_compliance.html` },
+  { num: '05', title: "Shor's Algorithm", desc: "Demonstrates why RSA is vulnerable and why lattice-based PQC is needed.", href: `${JUPYTER_BOOK}notebooks/05_shor_demo.html` },
+  { num: '06', title: 'Quantum Capabilities', desc: 'Real quantum entropy harvesting from IBM 156-qubit hardware.', href: `${JUPYTER_BOOK}notebooks/06_quantum_capabilities.html` },
+  { num: '07', title: 'Data Vault Workflow', desc: 'Full lifecycle: PII scan, anonymize, encrypt with password or PQC, reopen, self-destruct.', href: `${JUPYTER_BOOK}notebooks/07_vault_workflow.html` },
 ]
 
 const sdkExamples: Record<string, { code: string; lang: string }> = {
@@ -131,6 +135,34 @@ export default function DocsPage() {
         </motion.div>
       </section>
 
+      {/* Jupyter Book Banner */}
+      <section className="container-custom py-4">
+        <motion.a
+          href={JUPYTER_BOOK}
+          target="_blank"
+          rel="noopener noreferrer"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="block mx-auto max-w-3xl p-6 rounded-xl border border-quantum-400/30 bg-quantum-500/5 hover:bg-quantum-500/10 hover:border-quantum-400/50 transition-all group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <BookOpen className="w-8 h-8 text-quantum-400" />
+              <div>
+                <h3 className="text-lg font-semibold text-white group-hover:text-quantum-300 transition-colors">
+                  Full Documentation
+                </h3>
+                <p className="text-sm text-gray-400">
+                  9 parts, 60+ pages, interactive Jupyter notebooks, autodoc API reference, Rust docs
+                </p>
+              </div>
+            </div>
+            <ExternalLink className="w-5 h-5 text-gray-500 group-hover:text-quantum-400 transition-colors" />
+          </div>
+        </motion.a>
+      </section>
+
       {/* Quick Start */}
       <section id="quickstart" className="container-custom py-16">
         <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
@@ -161,6 +193,8 @@ export default function DocsPage() {
               <motion.a
                 key={s.title}
                 href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 variants={fadeUp}
                 className="card-quantum group flex flex-col"
               >
@@ -222,14 +256,21 @@ export default function DocsPage() {
           </motion.p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {notebooks.map((nb) => (
-              <motion.div key={nb.num} variants={fadeUp} className="card-quantum group">
+              <motion.a
+                key={nb.num}
+                href={nb.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                variants={fadeUp}
+                className="card-quantum group block"
+              >
                 <div className="flex items-center gap-3 mb-3">
                   <Notebook className="w-5 h-5 text-yellow-400" />
                   <span className="text-xs font-mono text-gray-500">{nb.num}_</span>
-                  <h3 className="font-semibold text-white">{nb.title}</h3>
+                  <h3 className="font-semibold text-white group-hover:text-quantum-400 transition-colors">{nb.title}</h3>
                 </div>
                 <p className="text-sm text-gray-400">{nb.desc}</p>
-              </motion.div>
+              </motion.a>
             ))}
           </div>
         </motion.div>

@@ -8,10 +8,11 @@ const Footer = () => {
 
   const productLinks = [
     { name: 'Documentation', href: '/docs' },
+    { name: 'Jupyter Book', href: 'https://qdaria.github.io/zipminator/', external: true },
     { name: 'API Reference', href: '/docs#api' },
     { name: 'Pricing', href: '/invest' },
-    { name: 'Changelog', href: 'https://github.com/qdaria/zipminator-pqc/releases' },
-    { name: 'GitHub Repository', href: 'https://github.com/qdaria/zipminator-pqc' },
+    { name: 'Changelog', href: 'https://github.com/QDaria/zipminator/releases', external: true },
+    { name: 'GitHub', href: 'https://github.com/QDaria/zipminator', external: true },
   ]
 
   const qdariaProducts = [
@@ -145,6 +146,7 @@ const Footer = () => {
                 <li key={link.name}>
                   <Link
                     href={link.href}
+                    {...('external' in link && link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                     className="text-gray-400 hover:text-quantum-400 transition-colors text-sm inline-block"
                   >
                     {link.name}

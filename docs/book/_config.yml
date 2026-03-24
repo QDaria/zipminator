@@ -12,8 +12,11 @@ execute:
   timeout: 120
   exclude_patterns:
     - "notebooks/05_shor_demo*"
+    - "notebooks/07_monte_carlo*"
     - "notebooks/08_qmesh*"
     - "notebooks/09_monte_carlo*"
+    - "notebooks/10_*"
+    - "notebooks/Untitled*"
 parse:
   myst_enable_extensions:
     - colon_fence
@@ -41,6 +44,7 @@ sphinx:
       use_repository_button: true
       use_issues_button: true
       use_download_button: true
+      extra_footer: '<p><a href="https://www.zipminator.zip">zipminator.zip</a> | <a href="https://www.zipminator.zip/docs">Docs Overview</a> | <a href="https://qdaria.com">QDaria</a></p>'
       launch_buttons:
         colab_url: https://colab.research.google.com
     html_css_files:

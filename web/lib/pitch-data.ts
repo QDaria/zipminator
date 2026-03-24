@@ -290,7 +290,7 @@ export const FOUNDER_INFO = {
   orcid: '0009-0008-2270-5454',
   credentials: [
     '5 published/submitted quantum computing papers (first-author)',
-    'Davos speaker, Pakistan Business Summit Guest of Honour',
+    'IQT Quantum+AI NYC 2024 speaker (Quantum AI Algorithms panel)',
     'Built $25-50M R&D equivalent solo (1M+ LOC, 9-pillar PQC super-app)',
     'Patent pending: quantum-certified anonymization (Patentstyret, March 2026)',
   ],

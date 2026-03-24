@@ -19,9 +19,11 @@ export const SITE_CONFIG = {
     'lattice-based cryptography',
   ],
   links: {
-    github: 'https://github.com/qdaria/zipminator-pqc',
+    github: 'https://github.com/QDaria/zipminator',
     docs: '/docs',
     api: '/docs#api',
+    // Switch to 'https://docs.zipminator.zip' after DNS CNAME is configured
+    jupyterBook: 'https://qdaria.github.io/zipminator/',
     qdaria: 'https://qdaria.com',
     qdariaProducts: '/technology',
     qdariaZipminator: '/',

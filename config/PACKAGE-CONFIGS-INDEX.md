@@ -301,7 +301,7 @@ See `config/installation-guide.md` section: "Troubleshooting"
 ## Support
 
 - **Issues:** https://github.com/qdaria/zipminator/issues
-- **Documentation:** https://docs.qdaria.com/zipminator
+- **Documentation:** https://docs.zipminator.zip
 - **Security:** security@qdaria.com
 
 ---

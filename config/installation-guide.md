@@ -376,7 +376,7 @@ docker rmi qdaria/zipminator
 
 ## Support
 
-- Documentation: https://docs.qdaria.com/zipminator
+- Documentation: https://docs.zipminator.zip
 - GitHub Issues: https://github.com/qdaria/zipminator/issues
 - Security Issues: security@qdaria.com
 
