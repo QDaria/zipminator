@@ -233,6 +233,13 @@ $\mathcal{A}_4$ & Insider, memory access & Memory snapshot of anonymization serv
 
 The hardware enclave variant (Section~\ref{subsec:destruction}) further reduces the temporal window by isolating the mapping in enclave-protected memory, making it resistant to memory forensics even during execution.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig1_hierarchy}
+\caption{Three-tier irreversibility hierarchy. Computational irreversibility (Definition~\ref{def:comp}) is the weakest tier and breaks if $\mathrm{P} = \mathrm{NP}$. Physics-guaranteed irreversibility (Definition~\ref{def:phys}) is the strongest and holds regardless of computational advances.}
+\label{fig:hierarchy}
+\end{figure}
+
 %% ====================================================================
 \section{Formal Definitions}
 \label{sec:definitions}
@@ -315,6 +322,13 @@ The security of \textsc{QRNG-OTP-Destroy} is independent of the resolution of th
 \begin{proof}
 Theorem~\ref{thm:qrng_secure} does not invoke any computational hardness assumption. If $\mathrm{P} = \mathrm{NP}$ were established, CSPRNG seed recovery would become polynomial-time, hash pre-image computation would become efficient, and every CSPRNG-based anonymization system would become reversible. The Born rule is a statement about measurement outcomes in quantum mechanics, not about the complexity of any computational problem. A world in which $\mathrm{P} = \mathrm{NP}$ but quantum mechanics remains valid is a world in which \textsc{QRNG-OTP-Destroy} remains secure and every CSPRNG-based anonymization system is broken.
 \end{proof}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig2_adversary}
+\caption{Security under four adversary models. Classical PRNG anonymization is secure only against computationally bounded external adversaries ($\mathcal{A}_1$). QRNG-OTP-Destroy remains secure against all four adversary classes, including insiders with memory access ($\mathcal{A}_4$).}
+\label{fig:adversary}
+\end{figure}
 
 %% ====================================================================
 \section{The QRNG-OTP-Destroy Protocol}
@@ -434,6 +448,20 @@ For production deployments, we recommend:
 Classical anonymization methods derive irreversibility from computational hardness. If P$=$NP were established, the implications would cascade through every CSPRNG: seed recovery would become polynomial-time, hash pre-image computation would become efficient, and every noise-based or token-based anonymization system that used a CSPRNG would become reversible.
 
 \textsc{QRNG-OTP-Destroy} is immune to this scenario. The protocol's security does not invoke any computational hardness assumption at any point. The Born rule is a statement about measurement outcomes in quantum mechanics, not about the complexity of any computational problem. This independence from complexity-theoretic assumptions is formalized in Corollary~\ref{cor:pvsnp}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig5_protocol}
+\caption{The four steps of the QRNG-OTP-Destroy protocol. Step~1 acquires entropy from IBM Quantum hardware via the Born rule (no seed). Step~4 destroys the mapping via DoD 5220.22-M 3-pass overwrite, making the transformation physically irreversible.}
+\label{fig:protocol}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig3_entropy}
+\caption{Entropy consumption as a function of dataset size and column count, assuming 70\% unique values per column and 16 bytes per unique value. A single quantum harvest cycle produces approximately 50~KB; the entropy pool bootstrap provides 4~MB.}
+\label{fig:entropy}
+\end{figure}
 
 %% ====================================================================
 \section{Implementation}
@@ -580,6 +608,13 @@ For the benchmark dataset (10,000 rows, 10 columns, approximately 50,000 unique 
 \label{sec:comparison}
 %% ====================================================================
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig4_comparison}
+\caption{Capability matrix comparing Zipminator L10 against seven open-source anonymization tools across six dimensions. L10 is the only tool offering physics-guaranteed irreversibility, P=NP resilience, and QRNG entropy.}
+\label{fig:comparison}
+\end{figure}
+
 We compare Zipminator L10 against the principal open-source anonymization tools available as of early 2026. Our analysis focuses on four dimensions: (1)~the technique employed, (2)~the entropy source underlying any randomized operations, (3)~the basis on which irreversibility is claimed, and (4)~the implications for regulatory compliance under GDPR Recital~26.
 
 \begin{table*}[t]
@@ -722,6 +757,13 @@ A distinct line of research, initiated by Hirche, Rouz\'{e}, and Stilck Fran\c{c
 \section{Discussion}
 \label{sec:discussion}
 %% ====================================================================
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig6_utility_privacy}
+\caption{Privacy-utility spectrum across the 10 anonymization levels. L1--L3 preserve high utility at the cost of weak privacy. L10 provides the maximum privacy guarantee (physics-guaranteed irreversibility) at zero utility. The dashed line marks the maximum irreversibility achievable with classical methods.}
+\label{fig:utility}
+\end{figure}
 
 \subsection{The Privacy-Utility Spectrum}
 \label{subsec:spectrum}
