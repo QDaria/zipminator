@@ -185,8 +185,9 @@ export default function InvestPage() {
   return (
     <div className="flex h-screen bg-gray-950 text-white overflow-hidden">
       <PitchSidebar
+        slides={SLIDE_TITLES}
         currentSlide={currentSlide}
-        onSlideChange={goToSlide}
+        onSlideSelect={goToSlide}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         scenario={scenario}
