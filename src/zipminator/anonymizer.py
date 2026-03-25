@@ -250,10 +250,25 @@ def _entropy_gauss(mu: float, sigma: float, pool_path: Optional[str] = None) -> 
 
 
 def _entropy_random_string(length: int, pool_path: Optional[str] = None) -> str:
-    """Generate a random alphanumeric string from entropy source."""
-    chars = string.ascii_letters + string.digits
-    raw = _get_entropy_bytes(length, pool_path)
-    return "".join(chars[b % len(chars)] for b in raw)
+    """Generate a random alphanumeric string from entropy source.
+
+    Uses rejection sampling to avoid modular bias: bytes >= 248 are
+    discarded (since 248 = 62 * 4 is the largest multiple of 62 that
+    fits in a byte). This ensures uniform distribution over the 62-char
+    alphabet. Each accepted byte provides log2(62) ≈ 5.95 bits of entropy,
+    so a 16-char string provides ≈ 95.3 bits.
+    """
+    chars = string.ascii_letters + string.digits  # 62 characters
+    threshold = 248  # largest multiple of 62 <= 256 (62 * 4 = 248)
+    result: list[str] = []
+    while len(result) < length:
+        raw = _get_entropy_bytes(length - len(result) + 4, pool_path)
+        for b in raw:
+            if b < threshold:
+                result.append(chars[b % 62])
+                if len(result) >= length:
+                    break
+    return "".join(result)
 
 
 # ---------------------------------------------------------------------------
@@ -640,5 +655,15 @@ class LevelAnonymizer:
                 return m[key]
 
             df[col] = df[col].apply(otp_replace)
-            self._otp_maps[col] = mapping
+
+            # CRITICAL: Destroy the OTP mapping. This is the core security
+            # property of L10. Without destruction, this is pseudonymization
+            # (reversible), not anonymization (irreversible).
+            # Overwrite all values with zeros before releasing the dict.
+            for k in list(mapping.keys()):
+                mapping[k] = "\x00" * 16
+            mapping.clear()
+            del mapping
+        # Do NOT store mapping in self._otp_maps for L10.
+        # The mapping is gone. That is the point.
         return df
