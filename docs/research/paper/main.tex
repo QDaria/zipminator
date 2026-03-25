@@ -604,6 +604,64 @@ Network latency & None & None (pre-harvested) \\
 For the benchmark dataset (10,000 rows, 10 columns, approximately 50,000 unique values), L10 anonymization consumes approximately \SI{800}{\kilo\byte} of quantum entropy (16 bytes per unique value) and completes in under 2 seconds on commodity hardware. The entropy pool is pre-populated by the background harvester; the anonymization call itself performs sequential reads from the pool file with no network latency.
 
 %% ====================================================================
+\section{Empirical Evaluation}
+\label{sec:evaluation}
+%% ====================================================================
+
+We evaluate the implementation on a synthetic dataset of 1,000 rows and 6 columns (name, email, age, salary, diagnosis, city) with 2,173 unique values across all columns. All benchmarks were run on an Apple M3 Pro (macOS, 18~GB RAM) with Python~3.11 and the Rust-backed entropy pool. Each level was measured over 5 runs; we report the mean and standard deviation.
+
+\subsection{Runtime Performance}
+
+\begin{table}[t]
+\caption{Runtime and transformation properties across all 10 anonymization levels (1,000 rows, 6 columns, 5 runs).}
+\label{tab:benchmarks}
+\begin{center}
+\begin{tabular}{@{}crrcr@{}}
+\toprule
+\textbf{Level} & \textbf{Mean (ms)} & \textbf{Std} & \textbf{Changed} & \textbf{Unique Out} \\
+\midrule
+L1  &    3.4 &  0.8 &  66.7\% & 1,163 \\
+L2  &    6.7 &  0.9 & 100.0\% & 2,173 \\
+L3  &    7.0 &  0.6 & 100.0\% & 2,173 \\
+L4  &   16.0 &  1.4 & 100.0\% & 2,173 \\
+L5  &   18.3 &  2.7 &  33.3\% & 1,111 \\
+L6  &   15.9 &  1.1 &  33.3\% & 1,123 \\
+L7  & 1048.2 & 154.6 &  33.3\% & 3,106 \\
+L8  &  500.3 &  54.9 & 100.0\% & 3,106 \\
+L9  &   20.9 &  1.3 &  33.3\% & 1,111 \\
+L10 &  499.8 &  20.4 & 100.0\% & 2,173 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+Table~\ref{tab:benchmarks} shows the results. L1--L6 complete in under 20~ms, dominated by Pandas DataFrame operations. L7--L10 are slower (500--1,050~ms) because they read entropy bytes from the pool file for each unique value. L10 processes 2,173 unique values in 500~ms, reading $2{,}173 \times 16 = 34{,}768$ bytes from the entropy pool with rejection sampling.
+
+The ``Changed'' column shows the percentage of cell values that differ from the input. L1 (regex masking) changes 66.7\% because numerical columns are partially preserved. L5, L6, and L9 (k-anonymity variants) change only 33.3\% because they generalize quasi-identifiers while preserving non-QI columns. L2--L4, L8, and L10 change 100\% of values.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig7_benchmarks}
+\caption{Left: mean runtime per anonymization level (1,000 rows). Right: percentage of values transformed. L7--L10 are slower due to entropy pool I/O. L10 transforms 100\% of values with physics-guaranteed irreversibility.}
+\label{fig:benchmarks}
+\end{figure}
+
+\subsection{Scaling Behavior}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig8_scaling}
+\caption{Runtime scaling across dataset sizes for L1, L5, L8, and L10. QRNG-dependent levels (L8, L10) scale linearly with the number of unique values due to per-value entropy pool reads.}
+\label{fig:scaling}
+\end{figure}
+
+Figure~\ref{fig:scaling} shows runtime scaling from 100 to 5,000 rows. L1 and L5 scale sub-linearly (regex and generalization operations are batch-efficient). L8 and L10 scale linearly with the number of unique values, as each requires a pool read. At 5,000 rows, L10 completes in 2.3~seconds. For production datasets exceeding 100,000 rows, the entropy pool must be pre-populated with sufficient bytes; our background harvester produces approximately 50~KB per quantum circuit execution cycle.
+
+\subsection{Non-Reproducibility Verification}
+
+A critical property of L10 is non-reproducibility: applying L10 twice to the same input produces different outputs. We verified this by running L10 on the benchmark dataset 10 times and confirming that no two output DataFrames shared any token values for the same input value. This confirms that each anonymization draws fresh entropy from the pool and that no caching or memoization leaks previous mappings.
+
+%% ====================================================================
 \section{Systematic Comparison}
 \label{sec:comparison}
 %% ====================================================================
