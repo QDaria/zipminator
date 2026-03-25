@@ -41,7 +41,7 @@
 \maketitle
 
 \begin{abstract}
-We present, to our knowledge, the first data anonymization system whose irreversibility is guaranteed by the Born rule of quantum mechanics rather than by computational hardness assumptions. Existing anonymization techniques, including $k$-anonymity, $\ell$-diversity, differential privacy, and PRNG-based one-time pad masking, derive their security from the computational infeasibility of recovering the random seed used during the anonymization transformation. An adversary who captures the PRNG state through memory forensics, side-channel attacks, or insider access can reconstruct every ``random'' value and reverse the anonymization completely. We introduce \textsc{QRNG-OTP-Destroy}, a protocol that replaces each personally identifiable value with a token derived from quantum random numbers produced by measuring qubits in superposition, then irreversibly destroys the mapping. Because quantum measurement outcomes are governed by the Born rule and no deterministic seed exists, the anonymization is information-theoretically irreversible: no adversary, regardless of computational power (classical or quantum), can recover the original data. We formalize three tiers of irreversibility (computational, information-theoretic, and physics-guaranteed), prove that no classical PRNG-based method can achieve the strongest tier, and prove that \textsc{QRNG-OTP-Destroy} does. We report on an implementation with 10 progressive anonymization levels, backed by multi-provider quantum entropy from IBM Quantum (156-qubit processors), Rigetti, and qBraid, validated by 109 unit and integration tests. The system is, to our knowledge, the first to provide an auditable chain from quantum hardware provenance to GDPR Recital~26 compliance.
+We present, to our knowledge, the first data anonymization system whose irreversibility is guaranteed by the Born rule of quantum mechanics rather than by computational hardness assumptions. Existing anonymization techniques, including $k$-anonymity, $\ell$-diversity, differential privacy, and PRNG-based one-time pad masking, derive their security from the computational infeasibility of recovering the random seed used during the anonymization transformation. An adversary who captures the PRNG state through memory forensics, side-channel attacks, or insider access can reconstruct every ``random'' value and reverse the anonymization completely. We introduce \textsc{QRNG-OTP-Destroy}, a protocol that replaces each personally identifiable value with a token derived from quantum random numbers produced by measuring qubits in superposition, then irreversibly destroys the mapping. Because quantum measurement outcomes are governed by the Born rule and no deterministic seed exists, the anonymization is information-theoretically irreversible: no adversary, regardless of computational power (classical or quantum), can recover the original data. We formalize three tiers of irreversibility (computational, information-theoretic, and physics-guaranteed), prove that no classical PRNG-based method can achieve the strongest tier, and prove that \textsc{QRNG-OTP-Destroy} does. We report on an implementation with 10 progressive anonymization levels, backed by multi-provider quantum entropy from Rigetti (84-qubit Ankaa-3 processors), IBM Quantum, and qBraid, validated by 109 unit and integration tests. The system is, to our knowledge, the first to provide an auditable chain from quantum hardware provenance to GDPR Recital~26 compliance.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -74,7 +74,7 @@ Our contributions are:
 
 \item \textbf{Construction.} We specify the \textsc{QRNG-OTP-Destroy} protocol and prove it achieves physics-guaranteed irreversibility under the Born rule assumption (Theorem~\ref{thm:qrng_secure}).
 
-\item \textbf{Implementation.} We report on a production implementation with 10 progressive anonymization levels (L1 through L10), where L10 implements \textsc{QRNG-OTP-Destroy}. The system draws quantum entropy from IBM Quantum 156-qubit processors, Rigetti Ankaa, and qBraid, with automatic failover and provenance tracking.
+\item \textbf{Implementation.} We report on a production implementation with 10 progressive anonymization levels (L1 through L10), where L10 implements \textsc{QRNG-OTP-Destroy}. The system draws quantum entropy from Rigetti Ankaa-3 (84-qubit) processors, IBM Quantum, and qBraid, with automatic failover and provenance tracking.
 
 \item \textbf{Regulatory analysis.} We argue that L10 output satisfies GDPR Recital~26's definition of anonymous information under a strictly stronger guarantee than any prior system, and that the quantum provenance log provides auditable evidence for data protection authorities.
 \end{enumerate}
@@ -452,7 +452,7 @@ Classical anonymization methods derive irreversibility from computational hardne
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig5_protocol}
-\caption{The four steps of the QRNG-OTP-Destroy protocol. Step~1 acquires entropy from IBM Quantum hardware via the Born rule (no seed). Step~4 destroys the mapping via DoD 5220.22-M 3-pass overwrite, making the transformation physically irreversible.}
+\caption{The four steps of the QRNG-OTP-Destroy protocol. Step~1 acquires entropy from quantum hardware (Rigetti, IBM Quantum) via the Born rule (no seed). Step~4 destroys the mapping via DoD 5220.22-M 3-pass overwrite, making the transformation physically irreversible.}
 \label{fig:protocol}
 \end{figure}
 
@@ -500,7 +500,7 @@ The hierarchy is designed so that each level provides strictly stronger privacy 
 
 The implementation is structured in three layers:
 
-\textbf{Quantum entropy layer.} A background harvester service executes quantum circuits on IBM Quantum processors (156-qubit Fez and Marrakesh systems) via the qBraid gateway API. Each circuit prepares $N$ qubits in the state $|{+}\rangle^{\otimes N}$ and measures all qubits in the computational basis, yielding $N$ random bits per shot. The measurement outcomes are written to a binary entropy pool file (\texttt{quantum\_entropy\_pool.bin}). The harvester supports multiple providers with automatic failover, arranged in the priority chain shown in Table~\ref{tab:providers}.
+\textbf{Quantum entropy layer.} A background harvester service executes quantum circuits on Rigetti Ankaa-3 (84-qubit) and IBM Quantum processors (156-qubit Fez and Marrakesh systems) via the qBraid gateway API. Each circuit prepares $N$ qubits in the state $|{+}\rangle^{\otimes N}$ and measures all qubits in the computational basis, yielding $N$ random bits per shot. The measurement outcomes are written to a binary entropy pool file (\texttt{quantum\_entropy\_pool.bin}). The harvester supports multiple providers with automatic failover, arranged in the priority chain shown in Table~\ref{tab:providers}.
 
 \begin{table}[t]
 \caption{Entropy Provider Priority Chain}
@@ -511,9 +511,9 @@ The implementation is structured in three layers:
 \textbf{Priority} & \textbf{Provider} & \textbf{Type} & \textbf{Certified} \\
 \midrule
 1 & PoolProvider (pre-harvested) & QRNG & Yes \\
-2 & qBraid gateway & QRNG & Yes \\
-3 & IBM Quantum direct & QRNG & Yes \\
-4 & Rigetti Ankaa & QRNG & Yes \\
+2 & Rigetti Ankaa-3 (84Q) & QRNG & Yes \\
+3 & qBraid gateway & QRNG & Yes \\
+4 & IBM Quantum (156Q) & QRNG & Yes \\
 5 & API-based QRNG & QRNG & Yes \\
 6 & OS entropy (\texttt{/dev/urandom}) & CSPRNG & No \\
 \bottomrule
@@ -625,7 +625,7 @@ We compare Zipminator L10 against the principal open-source anonymization tools 
 \toprule
 \textbf{Tool} & \textbf{Technique} & \textbf{Entropy Source} & \textbf{Irreversibility} & \textbf{P=NP} & \textbf{GDPR Recital 26} \\
 \midrule
-\textbf{Zipminator L10} & QRNG-OTP + destroy & IBM Quantum (156Q) & Physics (Born rule) & Secure & Full: information-theoretic anonymization \\
+\textbf{Zipminator L10} & QRNG-OTP + destroy & Rigetti/IBM Quantum & Physics (Born rule) & Secure & Full: information-theoretic anonymization \\
 ARX~\cite{prasser2014arx} & $k$-anon, $\ell$-div, $t$-close, DP & Java \texttt{SecureRandom} & Computational & Broken & Partial: parameter-dependent \\
 sdcMicro~\cite{templ2017sdc} & $k$-anon, microaggregation, PRAM & R Mersenne Twister & Computational & Broken & Partial: linkable structure \\
 Google DP~\cite{wilson2020dpsql} & Laplace/Gaussian mechanism & \texttt{/dev/urandom} & Computational & Broken & Partial: noise addition only \\
