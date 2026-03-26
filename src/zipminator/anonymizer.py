@@ -19,6 +19,7 @@ Levels:
 
 from __future__ import annotations
 
+import ctypes
 import hashlib
 import math
 import os
@@ -26,6 +27,7 @@ import re
 import sqlite3
 import string
 import struct
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -271,6 +273,30 @@ def _entropy_random_string(length: int, pool_path: Optional[str] = None) -> str:
     return "".join(result)
 
 
+def _secure_clear_mapping(mapping: Dict[Any, str]) -> None:
+    """Overwrite and destroy an OTP mapping dict as thoroughly as CPython allows.
+
+    Python strings are immutable and may be interned, so we cannot guarantee
+    the interpreter will zero the underlying buffer. We do our best:
+
+    1. Overwrite every value with a null-byte string (breaks the old reference).
+    2. Attempt ctypes.memset on the old string object's buffer. This is
+       inherently fragile (CPython internals, compact-ASCII layout) and may
+       silently fail; the try/except ensures we never crash.
+    3. Clear the dict and let the GC reclaim the memory.
+    """
+    for k in list(mapping.keys()):
+        old_val = mapping[k]
+        mapping[k] = "\x00" * 16
+        # Best-effort: zero the old string's internal buffer via ctypes.
+        try:
+            buf_offset = sys.getsizeof(old_val) - len(old_val) - 1
+            ctypes.memset(id(old_val) + buf_offset, 0, len(old_val))
+        except Exception:
+            pass
+    mapping.clear()
+
+
 # ---------------------------------------------------------------------------
 # TokenStore: reversible tokenization backed by in-memory SQLite
 # ---------------------------------------------------------------------------
@@ -339,7 +365,7 @@ class LevelAnonymizer:
         7: "Quantum Noise Jitter",
         8: "Differential Privacy (Laplace)",
         9: "K-Anonymity + Differential Privacy",
-        10: "Quantum OTP Pseudoanonymization",
+        10: "QRNG-OTP-Destroy (irreversible)",
     }
 
     def __init__(
@@ -659,10 +685,7 @@ class LevelAnonymizer:
             # CRITICAL: Destroy the OTP mapping. This is the core security
             # property of L10. Without destruction, this is pseudonymization
             # (reversible), not anonymization (irreversible).
-            # Overwrite all values with zeros before releasing the dict.
-            for k in list(mapping.keys()):
-                mapping[k] = "\x00" * 16
-            mapping.clear()
+            _secure_clear_mapping(mapping)
             del mapping
         # Do NOT store mapping in self._otp_maps for L10.
         # The mapping is gone. That is the point.
