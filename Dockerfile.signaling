@@ -1,0 +1,33 @@
+FROM python:3.11-slim
+
+LABEL maintainer="mo@qdaria.com"
+LABEL description="Zipminator PQC Signaling Server"
+
+# Prevent Python from writing .pyc files and enable unbuffered output
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install only the dependencies needed for the signaling server
+RUN pip install --no-cache-dir \
+    fastapi==0.115.* \
+    uvicorn[standard]==0.34.* \
+    websockets==14.*
+
+# Create a minimal zipminator package stub (avoids importing crypto/core deps)
+RUN mkdir -p src/zipminator && \
+    echo '__version__ = "0.5.0b1"' > src/zipminator/__init__.py
+
+# Copy only the messenger package
+COPY src/zipminator/messenger/ src/zipminator/messenger/
+
+# Make the package importable
+ENV PYTHONPATH=/app/src
+
+EXPOSE 8765
+
+HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8765/health')" || exit 1
+
+CMD ["python", "-m", "zipminator.messenger.signaling_server", "--port", "8765"]
