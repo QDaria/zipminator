@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>zipminator</string>
+	<string>Zipminator</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -74,6 +74,20 @@
 	<string>Zipminator accesses contacts to find other users for encrypted messaging.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Zipminator uses Face ID to unlock the Quantum Vault and authenticate sensitive operations.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_zipminator._tcp</string>
+	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

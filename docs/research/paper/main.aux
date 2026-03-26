@@ -105,15 +105,14 @@
 \newlabel{subsec:perf}{{\mbox  {VI-E}}{10}{}{subsection.6.5}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {VII}Empirical Evaluation}{10}{}\protected@file@percent }
 \newlabel{sec:evaluation}{{VII}{10}{}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Runtime Performance}{10}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Runtime and transformation properties across all 10 anonymization levels (1,000 rows, 6 columns, 5 runs).}}{10}{}\protected@file@percent }
 \newlabel{tab:benchmarks}{{V}{10}{}{table.5}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Left: mean runtime per anonymization level (1,000 rows). Right: percentage of values transformed. L7--L10 are slower due to entropy pool I/O. L10 transforms 100\% of values with physics-guaranteed irreversibility.}}{10}{}\protected@file@percent }
 \newlabel{fig:benchmarks}{{5}{10}{}{figure.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Runtime Performance}{10}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Scaling Behavior}{10}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Hardware Demonstration: IBM Quantum}{10}{}\protected@file@percent }
 \citation{dua2019uci}
-\citation{nist2010sp80022}
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Runtime scaling across dataset sizes for L1, L5, L8, and L10. QRNG-dependent levels (L8, L10) scale linearly with the number of unique values due to per-value entropy pool reads.}}{11}{}\protected@file@percent }
 \newlabel{fig:scaling}{{6}{11}{}{figure.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-D}}Quantum Hardware Noise Considerations}{11}{}\protected@file@percent }
@@ -121,7 +120,7 @@
 \newlabel{tab:adult}{{VI}{11}{}{table.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-E}}Non-Reproducibility Verification}{11}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-F}}Standard Benchmark: UCI Adult Dataset}{11}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-G}}Entropy Pool Randomness Quality}{11}{}\protected@file@percent }
+\citation{nist2010sp80022}
 \citation{prasser2014arx}
 \citation{templ2017sdc}
 \citation{wilson2020dpsql}
@@ -135,12 +134,13 @@
 \newlabel{tab:beforeafter}{{VII}{12}{}{table.7}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces NIST SP 800-22 statistical randomness tests on the quantum entropy pool (1,000,000 bits, $\alpha = 0.01$). All 11 tests pass. Byte Distribution and Shannon Entropy are supplementary quality metrics, not part of the SP~800-22 suite.}}{12}{}\protected@file@percent }
 \newlabel{tab:nist}{{VIII}{12}{}{table.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-G}}Entropy Pool Randomness Quality}{12}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {VIII}Systematic Comparison}{12}{}\protected@file@percent }
 \newlabel{sec:comparison}{{VIII}{12}{}{section.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-A}}Entropy Sources}{12}{}\protected@file@percent }
-\newlabel{subsec:entropy_sources}{{\mbox  {VIII-A}}{12}{}{subsection.8.1}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Capability matrix comparing Zipminator L10 against seven widely used anonymization tools across four dimensions: technique, entropy source, irreversibility basis, and regulatory implications. L10 is the only tool offering physics-guaranteed irreversibility, P=NP resilience, and QRNG entropy.}}{12}{}\protected@file@percent }
 \newlabel{fig:comparison}{{7}{12}{}{figure.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-A}}Entropy Sources}{12}{}\protected@file@percent }
+\newlabel{subsec:entropy_sources}{{\mbox  {VIII-A}}{12}{}{subsection.8.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-B}}Irreversibility Analysis}{12}{}\protected@file@percent }
 \newlabel{subsec:irrev_analysis}{{\mbox  {VIII-B}}{12}{}{subsection.8.2}{}}
 \citation{amer2025certified}
@@ -179,13 +179,13 @@
 \newlabel{subsec:kanon}{{\mbox  {IX-B}}{14}{}{subsection.9.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-C}}QRNG in Cryptography}{14}{}\protected@file@percent }
 \newlabel{subsec:qrng_crypto}{{\mbox  {IX-C}}{14}{}{subsection.9.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-D}}Quantum Encryption with Certified Deletion}{14}{}\protected@file@percent }
 \citation{nist2023beacon}
 \citation{vazirani2012certifiable}
 \citation{amer2025certified}
 \citation{vernam1926cipher}
 \citation{shannon1949secrecy}
 \citation{hirche2022qdp}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-D}}Quantum Encryption with Certified Deletion}{15}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-E}}Randomness Beacons}{15}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-F}}Certified Randomness}{15}{}\protected@file@percent }
 \newlabel{subsec:certified}{{\mbox  {IX-F}}{15}{}{subsection.9.6}{}}
@@ -193,13 +193,13 @@
 \newlabel{subsec:it_security}{{\mbox  {IX-G}}{15}{}{subsection.9.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-H}}Quantum Differential Privacy}{15}{}\protected@file@percent }
 \newlabel{subsec:qdp}{{\mbox  {IX-H}}{15}{}{subsection.9.8}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {X}Discussion}{15}{}\protected@file@percent }
-\newlabel{sec:discussion}{{X}{15}{}{section.10}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-A}}The Privacy-Utility Spectrum}{15}{}\protected@file@percent }
-\newlabel{subsec:spectrum}{{\mbox  {X-A}}{15}{}{subsection.10.1}{}}
 \citation{hensen2015loophole}
 \@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Privacy-utility spectrum across the 10 anonymization levels. L1--L3 preserve high utility at the cost of weak privacy. L10 provides the maximum privacy guarantee (physics-guaranteed irreversibility) at zero utility. The dashed line marks the maximum irreversibility achievable with classical methods.}}{16}{}\protected@file@percent }
 \newlabel{fig:utility}{{8}{16}{}{figure.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {X}Discussion}{16}{}\protected@file@percent }
+\newlabel{sec:discussion}{{X}{16}{}{section.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-A}}The Privacy-Utility Spectrum}{16}{}\protected@file@percent }
+\newlabel{subsec:spectrum}{{\mbox  {X-A}}{16}{}{subsection.10.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-B}}Assumptions and Their Scope}{16}{}\protected@file@percent }
 \newlabel{subsec:assumptions}{{\mbox  {X-B}}{16}{}{subsection.10.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-C}}Implications for the HNDL Threat}{16}{}\protected@file@percent }
@@ -222,6 +222,9 @@
 \bibcite{aspect1982epr}{6}
 \bibcite{barak2007privacy}{7}
 \bibcite{bell1964epr}{8}
+\@writefile{toc}{\contentsline {section}{\numberline {XII}Conclusion}{18}{}\protected@file@percent }
+\newlabel{sec:conclusion}{{XII}{18}{}{section.12}{}}
+\@writefile{toc}{\contentsline {section}{References}{18}{}\protected@file@percent }
 \bibcite{bohm1952suggested}{9}
 \bibcite{broadbent2020certified}{10}
 \bibcite{clauser1969chsh}{11}
@@ -229,9 +232,6 @@
 \bibcite{desfontaines2020sok}{13}
 \bibcite{dinur2003revealing}{14}
 \bibcite{dua2019uci}{15}
-\@writefile{toc}{\contentsline {section}{\numberline {XII}Conclusion}{18}{}\protected@file@percent }
-\newlabel{sec:conclusion}{{XII}{18}{}{section.12}{}}
-\@writefile{toc}{\contentsline {section}{References}{18}{}\protected@file@percent }
 \bibcite{dwork2006dp}{16}
 \bibcite{dwork2006icalp}{17}
 \bibcite{dwork2014algfound}{18}
