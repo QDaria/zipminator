@@ -100,7 +100,7 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('About Zipminator'),
             subtitle: const Text(
               'World\'s first PQC super-app. '
-              '8 pillars of quantum-safe encryption.',
+              '9 pillars of quantum-safe encryption.',
             ),
           ),
 

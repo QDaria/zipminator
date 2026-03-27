@@ -295,7 +295,7 @@ void showDecryptedPreviewDialog(
               child: Image.file(
                 decryptedFile,
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => Padding(
+                errorBuilder: (_, e, st) => Padding(
                   padding: const EdgeInsets.all(32),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -447,9 +447,11 @@ class _FileActionsSheet extends ConsumerWidget {
                 showDecryptedPreviewDialog(context, decrypted, file);
               } else {
                 // Non-image: open share sheet for preview in external app.
-                await Share.shareXFiles(
-                  [XFile(decrypted.path)],
-                  text: 'Decrypted: ${file.name}',
+                await SharePlus.instance.share(
+                  ShareParams(
+                    files: [XFile(decrypted.path)],
+                    text: 'Decrypted: ${file.name}',
+                  ),
                 );
               }
             },
@@ -463,10 +465,12 @@ class _FileActionsSheet extends ConsumerWidget {
               final decrypted =
                   await ref.read(vaultProvider.notifier).decryptFile(file);
               if (decrypted == null || !context.mounted) return;
-              await Share.shareXFiles(
-                [XFile(decrypted.path)],
-                text:
-                    '${file.name} (decrypted from Zipminator Vault)',
+              await SharePlus.instance.share(
+                ShareParams(
+                  files: [XFile(decrypted.path)],
+                  text:
+                      '${file.name} (decrypted from Zipminator Vault)',
+                ),
               );
             },
           ),
@@ -476,9 +480,11 @@ class _FileActionsSheet extends ConsumerWidget {
             color: Colors.white.withValues(alpha: 0.6),
             onTap: () async {
               Navigator.of(context).pop();
-              await Share.shareXFiles(
-                [XFile(file.filePath)],
-                text: '${file.name}.pqc (ML-KEM-768 encrypted)',
+              await SharePlus.instance.share(
+                ShareParams(
+                  files: [XFile(file.filePath)],
+                  text: '${file.name}.pqc (ML-KEM-768 encrypted)',
+                ),
               );
             },
           ),

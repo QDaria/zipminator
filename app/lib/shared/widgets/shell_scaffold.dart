@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
 
-/// Persistent shell with navigation for all 8 pillars.
+/// Persistent shell with navigation for all 9 pillars.
 /// Desktop: NavigationRail with logo + settings.
-/// Mobile: NavigationBar (5 tabs) + "More" overflow bottom sheet.
+/// Mobile: NavigationBar (4 tabs + "More") with overflow bottom sheet.
 class ShellScaffold extends StatelessWidget {
   final Widget child;
 
