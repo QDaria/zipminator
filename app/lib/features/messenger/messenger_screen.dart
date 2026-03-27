@@ -150,7 +150,7 @@ class _ConversationListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final filtered = searchQuery.isEmpty
-        ? ratchet.conversations
+        ? List<Conversation>.from(ratchet.conversations)
         : ratchet.conversations.where((c) {
             final q = searchQuery.toLowerCase();
             return c.contactName.toLowerCase().contains(q) ||
@@ -304,16 +304,28 @@ class _EmptyConversations extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.chat_bubble_outline,
-              size: 64,
-              color: QuantumTheme.quantumPurple.withValues(alpha: 0.3),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: QuantumTheme.quantumGreen.withValues(alpha: 0.1),
+                border: Border.all(
+                  color: QuantumTheme.quantumGreen.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Icon(
+                Icons.lock_outline,
+                size: 36,
+                color: QuantumTheme.quantumGreen.withValues(alpha: 0.8),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
-              'Start a PQ-encrypted conversation',
+              'Start a quantum-safe conversation',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: QuantumTheme.textSecondary,
+                    color: QuantumTheme.textPrimary,
+                    fontWeight: FontWeight.w600,
                   ),
               textAlign: TextAlign.center,
             ),
@@ -668,22 +680,40 @@ class _ChatView extends StatelessWidget {
         // Typing indicator
         if (ratchet.isTyping)
           Padding(
-            padding: const EdgeInsets.only(left: 16, bottom: 4),
+            padding: const EdgeInsets.only(left: 12, bottom: 4, right: 12),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '${ratchet.activeContact?.name ?? "Contact"} is typing',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: QuantumTheme.textSecondary,
-                          fontStyle: FontStyle.italic,
-                        ),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: QuantumTheme.surfaceElevated,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color:
+                        QuantumTheme.quantumPurple.withValues(alpha: 0.15),
                   ),
-                  const SizedBox(width: 4),
-                  _TypingIndicator(),
-                ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.lock,
+                        size: 10,
+                        color: QuantumTheme.quantumGreen
+                            .withValues(alpha: 0.6)),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${ratchet.activeContact?.name ?? "Contact"} is typing',
+                      style:
+                          Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: QuantumTheme.textSecondary,
+                                fontStyle: FontStyle.italic,
+                              ),
+                    ),
+                    const SizedBox(width: 6),
+                    _TypingIndicator(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -862,6 +892,7 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMine = message.isMine;
+    final timeStr = _formatTime(message.timestamp);
 
     return Align(
       alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
@@ -888,21 +919,17 @@ class _MessageBubble extends StatelessWidget {
                         size: 10, color: QuantumTheme.quantumGreen),
                     const SizedBox(width: 4),
                     Text(
-                      'PQ-encrypted',
-                      style:
-                          Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: QuantumTheme.textSecondary,
-                              ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _formatTime(message.timestamp),
+                      timeStr,
                       style:
                           Theme.of(context).textTheme.labelSmall?.copyWith(
                                 color: QuantumTheme.textSecondary
                                     .withValues(alpha: 0.6),
                               ),
                     ),
+                    if (isMine) ...[
+                      const SizedBox(width: 6),
+                      _ReadReceipt(isRead: message.isRead),
+                    ],
                   ],
                 ),
               ],
@@ -917,6 +944,37 @@ class _MessageBubble extends StatelessWidget {
     final h = dt.hour.toString().padLeft(2, '0');
     final m = dt.minute.toString().padLeft(2, '0');
     return '$h:$m';
+  }
+}
+
+/// Double-checkmark read receipt indicator (Signal/WhatsApp style).
+class _ReadReceipt extends StatelessWidget {
+  final bool isRead;
+
+  const _ReadReceipt({required this.isRead});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isRead
+        ? QuantumTheme.quantumCyan
+        : QuantumTheme.textSecondary.withValues(alpha: 0.5);
+
+    return SizedBox(
+      width: 16,
+      height: 12,
+      child: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            child: Icon(Icons.check, size: 12, color: color),
+          ),
+          Positioned(
+            left: 5,
+            child: Icon(Icons.check, size: 12, color: color),
+          ),
+        ],
+      ),
+    );
   }
 }
 

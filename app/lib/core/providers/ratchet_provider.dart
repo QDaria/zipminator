@@ -75,9 +75,27 @@ class ChatMessage {
   final String text;
   final bool isMine;
   final DateTime timestamp;
+  final bool isRead;
 
-  ChatMessage({required this.text, required this.isMine, DateTime? timestamp})
-      : timestamp = timestamp ?? DateTime.now();
+  ChatMessage({
+    required this.text,
+    required this.isMine,
+    DateTime? timestamp,
+    this.isRead = false,
+  }) : timestamp = timestamp ?? DateTime.now();
+
+  ChatMessage copyWith({
+    String? text,
+    bool? isMine,
+    DateTime? timestamp,
+    bool? isRead,
+  }) =>
+      ChatMessage(
+        text: text ?? this.text,
+        isMine: isMine ?? this.isMine,
+        timestamp: timestamp ?? this.timestamp,
+        isRead: isRead ?? this.isRead,
+      );
 }
 
 /// State for a ratchet messaging session.
@@ -699,8 +717,14 @@ class RatchetNotifier extends Notifier<RatchetState> {
       final replyText = _demoReplies[_replyIndex % _demoReplies.length];
       _replyIndex++;
 
+      // Mark all our outgoing messages as read (simulated read receipt)
+      final readMessages = state.messages.map((m) {
+        if (m.isMine && !m.isRead) return m.copyWith(isRead: true);
+        return m;
+      }).toList();
+
       final msg = ChatMessage(text: replyText, isMine: false);
-      final updatedMessages = [...state.messages, msg];
+      final updatedMessages = [...readMessages, msg];
 
       final updatedConversations = state.conversations.map((c) {
         if (c.id == state.activeConversationId) {

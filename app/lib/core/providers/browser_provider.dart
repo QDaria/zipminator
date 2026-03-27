@@ -9,7 +9,7 @@ class BrowserState {
   final String? error;
 
   const BrowserState({
-    this.url = 'https://www.example.com',
+    this.url = 'https://zipminator.zip',
     this.isLoading = false,
     this.proxyActive = false,
     this.canGoBack = false,

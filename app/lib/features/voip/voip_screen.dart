@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/core/providers/crypto_provider.dart';
@@ -79,6 +80,7 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
     _ringTimer = Timer(const Duration(seconds: 2), () async {
       if (!mounted) return;
       await notifier.connectCall(enc.sharedSecret);
+      HapticFeedback.heavyImpact();
       _startCallTimer();
     });
   }
@@ -86,7 +88,32 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
   void _endCall() {
     _callTimer?.cancel();
     _ringTimer?.cancel();
+    final voip = ref.read(voipProvider);
+    final duration = voip.callDuration;
+    final contactName = voip.contact?.name;
     ref.read(voipProvider.notifier).endCall();
+
+    // Record to call history and show summary if the call was connected.
+    if (duration > Duration.zero && contactName != null) {
+      ref.read(callHistoryProvider.notifier).addEntry(
+            CallHistoryEntry(
+              contactName: contactName,
+              duration: duration,
+              timestamp: DateTime.now(),
+            ),
+          );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Call secured with PQ-SRTP  \u2022  ${_formatDuration(duration)}',
+            ),
+            backgroundColor: QuantumTheme.quantumGreen.withValues(alpha: 0.85),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -97,7 +124,10 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
       appBar: AppBar(),
       body: GradientBackground(
         child: switch (voip.phase) {
-          CallPhase.idle => _ContactListView(onCall: _callContact),
+          CallPhase.idle => _ContactListView(
+              onCall: _callContact,
+              formatDuration: _formatDuration,
+            ),
           CallPhase.ringing => _RingingView(
               contact: voip.contact!,
               onHangup: _endCall,
@@ -111,7 +141,10 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
               onToggleSpeaker: () =>
                   ref.read(voipProvider.notifier).toggleSpeaker(),
             ),
-          CallPhase.ended => _ContactListView(onCall: _callContact),
+          CallPhase.ended => _ContactListView(
+              onCall: _callContact,
+              formatDuration: _formatDuration,
+            ),
         },
       ),
     );
@@ -122,12 +155,18 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
 // Contact List (Idle state)
 // ═══════════════════════════════════════════════════════════════════════════
 
-class _ContactListView extends StatelessWidget {
+class _ContactListView extends ConsumerWidget {
   final void Function(VoipContact) onCall;
-  const _ContactListView({required this.onCall});
+  final String Function(Duration) formatDuration;
+  const _ContactListView({
+    required this.onCall,
+    required this.formatDuration,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final history = ref.watch(callHistoryProvider);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -163,6 +202,50 @@ class _ContactListView extends StatelessWidget {
                   .slideY(begin: 0.05),
             );
           }),
+
+          // Call history section
+          if (history.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Recent Calls',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: QuantumTheme.textSecondary,
+                    ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...history.map((entry) {
+              final time = '${entry.timestamp.hour.toString().padLeft(2, '0')}:'
+                  '${entry.timestamp.minute.toString().padLeft(2, '0')}';
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: QuantumCard(
+                  glowColor: QuantumTheme.quantumGreen.withValues(alpha: 0.3),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.call_made,
+                        color: QuantumTheme.quantumGreen, size: 20),
+                    title: Text(entry.contactName),
+                    subtitle: Text(
+                      'PQ-SRTP  \u2022  ${formatDuration(entry.duration)}',
+                      style: TextStyle(
+                        color: QuantumTheme.quantumGreen,
+                        fontSize: 12,
+                      ),
+                    ),
+                    trailing: Text(
+                      time,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: QuantumTheme.textSecondary,
+                          ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ],
 
           const SizedBox(height: 24),
 

@@ -94,6 +94,19 @@ class SettingsScreen extends ConsumerWidget {
 
           const Divider(),
 
+          // System Status
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Text('System Status',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: QuantumTheme.textSecondary,
+                    )),
+          ),
+
+          _SystemStatusCard(rustVersion: _rustVersion()),
+
+          const Divider(),
+
           // About
           ListTile(
             leading: Icon(Icons.shield, color: QuantumTheme.quantumCyan),
@@ -214,6 +227,90 @@ class _ProviderApiKeyTileState extends ConsumerState<_ProviderApiKeyTile> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SystemStatusCard extends StatelessWidget {
+  final String rustVersion;
+
+  const _SystemStatusCard({required this.rustVersion});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: QuantumTheme.surfaceElevated,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: QuantumTheme.quantumCyan.withValues(alpha: 0.15),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _StatusRow(
+              icon: Icons.memory,
+              label: 'Rust Crypto Engine',
+              value: rustVersion,
+              color: QuantumTheme.quantumGreen,
+            ),
+            const SizedBox(height: 10),
+            _StatusRow(
+              icon: Icons.cell_tower,
+              label: 'Signaling Server',
+              value: 'Offline',
+              color: QuantumTheme.quantumRed,
+            ),
+            const SizedBox(height: 10),
+            _StatusRow(
+              icon: Icons.shield,
+              label: 'Entropy Pool',
+              value: 'Ready (QRNG)',
+              color: QuantumTheme.quantumCyan,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatusRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: color),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: QuantumTheme.textSecondary,
+                  )),
+        ),
+        Text(value,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontFamily: 'JetBrains Mono',
+                  color: color,
+                  fontSize: 12,
+                )),
+      ],
     );
   }
 }

@@ -61,12 +61,50 @@ class _BrowserScreenState extends ConsumerState<BrowserScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            // PQC badge indicator
-            PqcBadge(
-              label: browser.proxyActive ? 'PQC' : 'STD',
-              color:
-                  browser.proxyActive ? QuantumTheme.quantumGreen : null,
-              isActive: browser.proxyActive,
+            // PQC proxy toggle
+            GestureDetector(
+              onTap: () =>
+                  ref.read(browserProvider.notifier).toggleProxy(),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: browser.proxyActive
+                      ? QuantumTheme.quantumGreen.withValues(alpha: 0.15)
+                      : QuantumTheme.surfaceElevated,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: browser.proxyActive
+                        ? QuantumTheme.quantumGreen
+                        : QuantumTheme.textSecondary.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      browser.proxyActive
+                          ? Icons.shield
+                          : Icons.shield_outlined,
+                      size: 14,
+                      color: browser.proxyActive
+                          ? QuantumTheme.quantumGreen
+                          : QuantumTheme.textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'PQC',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: browser.proxyActive
+                            ? QuantumTheme.quantumGreen
+                            : QuantumTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
             const SizedBox(width: 8),
             // URL bar
@@ -100,9 +138,34 @@ class _BrowserScreenState extends ConsumerState<BrowserScreen> {
                               ? QuantumTheme.quantumGreen
                               : QuantumTheme.textSecondary,
                         ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.arrow_forward, size: 18),
-                    onPressed: _navigate,
+                  // Green "PQC" badge next to URL when proxy active
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (browser.proxyActive)
+                        Container(
+                          margin: const EdgeInsets.only(right: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: QuantumTheme.quantumGreen
+                                .withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'PQC',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: QuantumTheme.quantumGreen,
+                            ),
+                          ),
+                        ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_forward, size: 18),
+                        onPressed: _navigate,
+                      ),
+                    ],
                   ),
                 ),
                 onSubmitted: (_) => _navigate(),
@@ -122,6 +185,32 @@ class _BrowserScreenState extends ConsumerState<BrowserScreen> {
             tooltip: 'Forward',
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(36),
+          child: Container(
+            height: 36,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                _BookmarkChip(
+                  label: 'zipminator.zip',
+                  onTap: () {
+                    _urlController.text = 'https://zipminator.zip';
+                    _navigate();
+                  },
+                ),
+                const SizedBox(width: 8),
+                _BookmarkChip(
+                  label: 'qdaria.com',
+                  onTap: () {
+                    _urlController.text = 'https://qdaria.com';
+                    _navigate();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: _supportsWebView
           ? Stack(
@@ -225,6 +314,42 @@ class _BrowserScreenState extends ConsumerState<BrowserScreen> {
                 ],
               ),
             ),
+    );
+  }
+}
+
+class _BookmarkChip extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _BookmarkChip({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: QuantumTheme.surfaceElevated,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.bookmark_outline,
+                size: 14, color: QuantumTheme.quantumCyan),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: QuantumTheme.quantumCyan,
+                    fontSize: 11,
+                  ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

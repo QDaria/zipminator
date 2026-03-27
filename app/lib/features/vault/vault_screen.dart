@@ -805,7 +805,10 @@ class _KeyManagementCardState extends ConsumerState<_KeyManagementCard> {
                   ElevatedButton.icon(
                     onPressed: crypto.isGenerating
                         ? null
-                        : () => notifier.generateKeypair(),
+                        : () {
+                            HapticFeedback.mediumImpact();
+                            notifier.generateKeypair();
+                          },
                     icon: crypto.isGenerating
                         ? const ShimmerPlaceholder(
                             width: 16, height: 16, borderRadius: 8)

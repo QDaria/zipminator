@@ -147,3 +147,32 @@ class VoipNotifier extends Notifier<VoipState> {
 
 final voipProvider =
     NotifierProvider<VoipNotifier, VoipState>(VoipNotifier.new);
+
+/// A single entry in the call history list.
+class CallHistoryEntry {
+  final String contactName;
+  final Duration duration;
+  final DateTime timestamp;
+
+  const CallHistoryEntry({
+    required this.contactName,
+    required this.duration,
+    required this.timestamp,
+  });
+}
+
+/// Manages the in-memory list of recent simulated calls.
+class CallHistoryNotifier extends Notifier<List<CallHistoryEntry>> {
+  @override
+  List<CallHistoryEntry> build() => [];
+
+  void addEntry(CallHistoryEntry entry) {
+    // Keep the 10 most recent calls, newest first.
+    state = [entry, ...state].take(10).toList();
+  }
+}
+
+final callHistoryProvider =
+    NotifierProvider<CallHistoryNotifier, List<CallHistoryEntry>>(
+  CallHistoryNotifier.new,
+);

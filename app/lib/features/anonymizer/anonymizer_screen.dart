@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,11 +20,11 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
       '555-0123, CC 4111-1111-1111-1111';
 
   final _controller = TextEditingController();
+  String? _uploadedFileName;
 
   @override
   void initState() {
     super.initState();
-    // Pre-fill with example so the user sees something immediately.
     _controller.text = _exampleText;
   }
 
@@ -33,332 +34,672 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final pii = ref.watch(piiProvider);
-    final notifier = ref.read(piiProvider.notifier);
+  // ── Level metadata ───────────────────────────────────────────────────
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-      appBar: AppBar(
-        title: const Text('Anonymizer'),
-        actions: [
-          if (pii.matches.isNotEmpty)
-            Chip(
-              label: Text('${pii.matches.length} found'),
-              backgroundColor:
-                  QuantumTheme.quantumOrange.withValues(alpha: 0.2),
-            ),
-        ],
-      ),
-      body: GradientBackground(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const PillarStatusBanner(
-                description: 'Find & redact personal data in text',
-                status: PillarStatus.ready,
-              ),
+  static const _levelDescriptions = <int, String>{
+    1: 'Names only',
+    2: 'Names + emails',
+    3: 'Names + emails + phones',
+    4: 'All contact info + addresses',
+    5: 'All PII including SSN/ID numbers',
+    6: 'All PII + financial data',
+    7: 'All PII + IP addresses + devices',
+    8: 'All PII + biometrics + medical',
+    9: 'All PII + behavioral patterns',
+    10: 'Quantum OTP — irreversible anonymization powered by Born rule entropy',
+  };
 
-              // Onboarding instruction text
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Text(
-                  'Paste text containing personal data (names, emails, SSNs, etc.) '
-                  'and tap Scan to detect PII, or tap Redact to automatically mask it.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: QuantumTheme.textSecondary,
-                      ),
-                ),
-              ),
+  static const _useCaseExamples = [
+    ('Check email draft', Icons.email_outlined),
+    ('Audit CSV export', Icons.table_chart_outlined),
+    ('Scan medical records', Icons.local_hospital_outlined),
+    ('Review legal docs', Icons.gavel_outlined),
+    ('Clean chat logs', Icons.chat_outlined),
+  ];
 
-              PillarHeader(
-                icon: Icons.visibility_off_outlined,
-                title: 'Anonymizer',
-                subtitle: 'PII Scanner & Redactor',
-                iconColor: QuantumTheme.quantumOrange,
-                badges: [
-                  PqcBadge(
-                    label: '166+ patterns',
-                    color: QuantumTheme.quantumOrange,
-                    isActive: true,
-                  ),
-                ],
-              ),
-
-              // 10-Level Anonymization Selector
-              QuantumCard(
-                glowColor: QuantumTheme.quantumOrange,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Anonymization Level',
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Level ${pii.selectedLevel}: ${_levelDescription(pii.selectedLevel)}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(height: 8),
-                    SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        activeTrackColor: _levelColor(pii.selectedLevel),
-                        thumbColor: _levelColor(pii.selectedLevel),
-                        inactiveTrackColor:
-                            _levelColor(pii.selectedLevel).withValues(alpha: 0.2),
-                        overlayColor:
-                            _levelColor(pii.selectedLevel).withValues(alpha: 0.1),
-                      ),
-                      child: Slider(
-                        value: pii.selectedLevel.toDouble(),
-                        min: 1,
-                        max: 10,
-                        divisions: 9,
-                        label: 'L${pii.selectedLevel}',
-                        onChanged: (v) => notifier.setLevel(v.round()),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('L1 Basic',
-                            style: Theme.of(context).textTheme.labelSmall),
-                        Text('L10 Maximum',
-                            style: Theme.of(context).textTheme.labelSmall),
-                      ],
-                    ),
-                  ],
-                ),
-              ).animate().fadeIn(delay: 200.ms, duration: 300.ms),
-              const SizedBox(height: 12),
-
-              // Redact button + output
-              if (pii.redactedText != null) ...[
-                QuantumCard(
-                  glowColor: QuantumTheme.quantumGreen,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.check_circle,
-                              color: QuantumTheme.quantumGreen, size: 20),
-                          const SizedBox(width: 8),
-                          Text('Redacted Output (L${pii.selectedLevel})',
-                              style: Theme.of(context).textTheme.titleSmall),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      SelectableText(
-                        pii.redactedText!,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontFamily: 'JetBrains Mono',
-                            ),
-                      ),
-                    ],
-                  ),
-                ).animate().fadeIn(duration: 300.ms),
-                const SizedBox(height: 12),
-              ],
-
-              // PII Scanner card
-              QuantumCard(
-                glowColor: QuantumTheme.quantumOrange,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('PII Scanner',
-                        style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 4),
-                    Text('Powered by Rust regex engine (166+ patterns)',
-                        style: Theme.of(context).textTheme.bodySmall),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _controller,
-                      maxLines: 5,
-                      decoration: const InputDecoration(
-                        hintText:
-                            'Paste text to scan for PII...\ne.g. "My SSN is 123-45-6789, email me at test@example.com"',
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: ActionChip(
-                        avatar: const Icon(Icons.science_outlined, size: 16),
-                        label: const Text('Try Example'),
-                        onPressed: () {
-                          _controller.text = _exampleText;
-                          setState(() {});
-                          // Auto-scan so results appear immediately.
-                          notifier.scan(_controller.text);
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // Primary action: Scan (large, prominent)
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: FilledButton.icon(
-                        onPressed: () {
-                          notifier.scan(_controller.text);
-                        },
-                        icon: const Icon(Icons.search, size: 22),
-                        label: const Text('Scan for PII',
-                            style: TextStyle(fontSize: 16)),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: QuantumTheme.quantumCyan,
-                          foregroundColor: Colors.black,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: _controller.text.isNotEmpty
-                                ? () => notifier.redact(_controller.text)
-                                : null,
-                            icon: const Icon(Icons.shield),
-                            label: const Text('Redact'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: QuantumTheme.quantumOrange,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        OutlinedButton(
-                          onPressed: () {
-                            _controller.clear();
-                            notifier.clear();
-                          },
-                          child: const Text('Clear'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
-              const SizedBox(height: 16),
-
-              // Results
-              if (pii.matches.isNotEmpty) ...[
-                // Summary card
-                QuantumCard(
-                  glowColor: pii.highSensitivityCount > 0
-                      ? QuantumTheme.quantumRed
-                      : QuantumTheme.quantumGreen,
-                  child: Row(
-                    children: [
-                      Icon(
-                        pii.highSensitivityCount > 0
-                            ? Icons.warning_amber
-                            : Icons.check_circle_outline,
-                        color: pii.highSensitivityCount > 0
-                            ? QuantumTheme.quantumRed
-                            : QuantumTheme.quantumGreen,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          '${pii.matches.length} PII items detected '
-                          '(${pii.highSensitivityCount} high sensitivity)',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-                    .animate()
-                    .fadeIn(duration: 300.ms)
-                    .scale(
-                      begin: const Offset(0.95, 0.95),
-                      end: const Offset(1, 1),
-                    ),
-                const SizedBox(height: 8),
-
-                // Individual matches with staggered animation
-                ...pii.matches.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final m = entry.value;
-                  final glowColor = m.sensitivity >= 4
-                      ? QuantumTheme.quantumRed
-                      : m.sensitivity >= 3
-                          ? QuantumTheme.quantumOrange
-                          : QuantumTheme.quantumGreen;
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: QuantumCard(
-                      glowColor: glowColor,
-                      padding: EdgeInsets.zero,
-                      child: ListTile(
-                        leading: _sensitivityBadge(m.sensitivity)
-                            .animate()
-                            .fadeIn(delay: (index * 100).ms),
-                        title: Text(m.patternName),
-                        subtitle: Text(
-                          '${m.category} | "${m.matchedText}" | ${m.countryCode.toUpperCase()}',
-                        ),
-                        trailing: Text('L${m.sensitivity}',
-                            style: Theme.of(context).textTheme.labelLarge),
-                      ),
-                    ),
-                  )
-                      .animate()
-                      .fadeIn(delay: (index * 100).ms, duration: 300.ms)
-                      .slideY(begin: 0.1);
-                }),
-              ],
-
-              if (pii.matches.isEmpty && pii.inputText.isNotEmpty)
-                QuantumCard(
-                  glowColor: QuantumTheme.quantumGreen,
-                  child: const Row(
-                    children: [
-                      Icon(Icons.check_circle,
-                          color: QuantumTheme.quantumGreen),
-                      SizedBox(width: 12),
-                      Text('No PII detected'),
-                    ],
-                  ),
-                )
-                    .animate()
-                    .fadeIn(duration: 400.ms)
-                    .scale(
-                      begin: const Offset(0.95, 0.95),
-                      end: const Offset(1, 1),
-                    ),
-            ],
-          ),
-        ),
-      ),
-    ));
-  }
-
-  String _levelDescription(int level) => switch (level) {
-        1 => 'Names only',
-        2 => 'Names + emails',
-        3 => 'Names + emails + phones',
-        4 => 'All contact info + addresses',
-        5 => 'All PII including SSN/ID numbers',
-        6 => 'All PII + financial data',
-        7 => 'All PII + IP addresses + devices',
-        8 => 'All PII + biometrics + medical',
-        9 => 'All PII + behavioral patterns',
-        10 => 'Maximum: all detectable PII',
-        _ => 'Unknown',
-      };
+  static const _complianceBadges = ['GDPR', 'HIPAA', 'DORA', 'CCPA'];
 
   Color _levelColor(int level) {
     if (level <= 3) return QuantumTheme.quantumGreen;
     if (level <= 6) return QuantumTheme.quantumOrange;
+    if (level <= 8) return const Color(0xFFFF6E40); // deep orange
     return QuantumTheme.quantumRed;
+  }
+
+  // ── File picker ──────────────────────────────────────────────────────
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt', 'csv', 'json', 'md', 'log'],
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty) return;
+    final file = result.files.first;
+    final bytes = file.bytes;
+    if (bytes == null) return;
+
+    final text = String.fromCharCodes(bytes);
+    setState(() {
+      _controller.text = text;
+      _uploadedFileName = file.name;
+    });
+  }
+
+  // ── Build ────────────────────────────────────────────────────────────
+
+  @override
+  Widget build(BuildContext context) {
+    final pii = ref.watch(piiProvider);
+    final notifier = ref.read(piiProvider.notifier);
+    final level = pii.selectedLevel;
+    final color = _levelColor(level);
+
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Anonymizer'),
+          actions: [
+            if (pii.matches.isNotEmpty)
+              Chip(
+                label: Text('${pii.matches.length} found'),
+                backgroundColor:
+                    QuantumTheme.quantumOrange.withValues(alpha: 0.2),
+              ),
+          ],
+        ),
+        body: GradientBackground(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const PillarStatusBanner(
+                  description: 'Find & redact personal data in text',
+                  status: PillarStatus.ready,
+                ),
+
+                PillarHeader(
+                  icon: Icons.visibility_off_outlined,
+                  title: 'Anonymizer',
+                  subtitle: 'PII Scanner & Redactor',
+                  iconColor: QuantumTheme.quantumOrange,
+                  badges: const [
+                    PqcBadge(
+                      label: '166+ patterns',
+                      color: QuantumTheme.quantumOrange,
+                      isActive: true,
+                    ),
+                  ],
+                ),
+
+                // ── 1. 10-Level Slider ─────────────────────────────────
+                _buildLevelSlider(context, pii, notifier, level, color),
+                const SizedBox(height: 12),
+
+                // ── 2. Use-case chips ──────────────────────────────────
+                _buildUseCaseChips(notifier),
+                const SizedBox(height: 12),
+
+                // ── 3. Compliance badges row ───────────────────────────
+                _buildComplianceBadges(context),
+                const SizedBox(height: 16),
+
+                // ── 4. PII Scanner card + file upload ──────────────────
+                _buildScannerCard(context, pii, notifier),
+                const SizedBox(height: 16),
+
+                // ── 5. Before/after split view ─────────────────────────
+                if (pii.redactedText != null) ...[
+                  _buildBeforeAfterSplit(context, pii),
+                  const SizedBox(height: 16),
+                ],
+
+                // ── 6. Results ─────────────────────────────────────────
+                if (pii.matches.isNotEmpty) ...[
+                  _buildResultsSummary(context, pii),
+                  const SizedBox(height: 8),
+                  ..._buildMatchCards(context, pii),
+                ],
+
+                if (pii.matches.isEmpty && pii.inputText.isNotEmpty)
+                  QuantumCard(
+                    glowColor: QuantumTheme.quantumGreen,
+                    child: const Row(
+                      children: [
+                        Icon(Icons.check_circle,
+                            color: QuantumTheme.quantumGreen),
+                        SizedBox(width: 12),
+                        Text('No PII detected'),
+                      ],
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 400.ms)
+                      .scale(
+                        begin: const Offset(0.95, 0.95),
+                        end: const Offset(1, 1),
+                      ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── 1. Level slider card ─────────────────────────────────────────────
+
+  Widget _buildLevelSlider(
+    BuildContext context,
+    PiiScanState pii,
+    PiiNotifier notifier,
+    int level,
+    Color color,
+  ) {
+    return QuantumCard(
+      glowColor: color,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title row
+          Row(
+            children: [
+              Text('Anonymization Level',
+                  style: Theme.of(context).textTheme.titleMedium),
+              const Spacer(),
+              // Level badge
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: color.withValues(alpha: 0.4)),
+                ),
+                child: Text(
+                  'L$level',
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // Description
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: Row(
+              key: ValueKey(level),
+              children: [
+                Icon(
+                  level == 10 ? Icons.bolt : Icons.info_outline,
+                  size: 16,
+                  color: color.withValues(alpha: 0.8),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    _levelDescriptions[level] ?? '',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: color,
+                          fontWeight:
+                              level == 10 ? FontWeight.w600 : FontWeight.w400,
+                        ),
+                  ),
+                ),
+                // Patent pending badge for L10
+                if (level == 10)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          QuantumTheme.quantumRed.withValues(alpha: 0.25),
+                          QuantumTheme.quantumOrange.withValues(alpha: 0.15),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color:
+                            QuantumTheme.quantumRed.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.verified,
+                            size: 12, color: QuantumTheme.quantumRed),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Patent Pending',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: QuantumTheme.quantumRed,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Gradient track slider
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: color,
+              thumbColor: color,
+              inactiveTrackColor: color.withValues(alpha: 0.15),
+              overlayColor: color.withValues(alpha: 0.1),
+              trackHeight: 6,
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
+            ),
+            child: Slider(
+              value: level.toDouble(),
+              min: 1,
+              max: 10,
+              divisions: 9,
+              label: 'L$level',
+              onChanged: (v) => notifier.setLevel(v.round()),
+            ),
+          ),
+
+          // Level tick labels
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(10, (i) {
+                final l = i + 1;
+                final isSelected = l == level;
+                return Text(
+                  '$l',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                    color: isSelected
+                        ? _levelColor(l)
+                        : QuantumTheme.textSecondary,
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(delay: 200.ms, duration: 300.ms);
+  }
+
+  // ── 2. Use-case chips ────────────────────────────────────────────────
+
+  Widget _buildUseCaseChips(PiiNotifier notifier) {
+    return SizedBox(
+      height: 40,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _useCaseExamples.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final (label, icon) = _useCaseExamples[index];
+          return ActionChip(
+            avatar: Icon(icon, size: 16),
+            label: Text(label, style: const TextStyle(fontSize: 12)),
+            onPressed: () {
+              _controller.text = _exampleForUseCase(label);
+              setState(() => _uploadedFileName = null);
+              notifier.scan(_controller.text);
+            },
+          );
+        },
+      ),
+    ).animate().fadeIn(delay: 300.ms, duration: 300.ms);
+  }
+
+  String _exampleForUseCase(String label) => switch (label) {
+        'Check email draft' =>
+          'Hi Sarah, please send the report to john.doe@acme.com '
+              'or call me at 555-867-5309. My SSN is 078-05-1120.',
+        'Audit CSV export' =>
+          'name,email,phone,ssn\n'
+              'Jane Doe,jane@corp.io,212-555-0198,321-54-9876\n'
+              'Bob Lee,bob@example.com,415-555-0147,654-32-1098',
+        'Scan medical records' =>
+          'Patient: Maria Garcia, DOB: 03/15/1985, MRN: 12345678\n'
+              'Diagnosis: Type 2 Diabetes. Provider: Dr. James Wilson\n'
+              'SSN: 456-78-9012, Insurance ID: XYZ-9876543',
+        'Review legal docs' =>
+          'AGREEMENT between Acme Corp (EIN 12-3456789) and '
+              'John Smith (SSN 234-56-7890), residing at '
+              '742 Evergreen Terrace, Springfield IL 62704.',
+        'Clean chat logs' =>
+          '[10:23] alice: hey, my new number is 650-555-0142\n'
+              '[10:24] bob: cool, email me at bob.smith@gmail.com\n'
+              '[10:25] alice: sure, also my CC is 5500-0000-0000-0004',
+        _ => _exampleText,
+      };
+
+  // ── 3. Compliance badges ─────────────────────────────────────────────
+
+  Widget _buildComplianceBadges(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 6,
+      children: _complianceBadges.map((badge) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: QuantumTheme.quantumCyan.withValues(alpha: 0.3),
+            ),
+            color: QuantumTheme.quantumCyan.withValues(alpha: 0.06),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.verified_outlined,
+                  size: 14,
+                  color: QuantumTheme.quantumCyan.withValues(alpha: 0.7)),
+              const SizedBox(width: 4),
+              Text(
+                badge,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: QuantumTheme.quantumCyan.withValues(alpha: 0.8),
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    ).animate().fadeIn(delay: 350.ms, duration: 300.ms);
+  }
+
+  // ── 4. Scanner card + file picker ────────────────────────────────────
+
+  Widget _buildScannerCard(
+    BuildContext context,
+    PiiScanState pii,
+    PiiNotifier notifier,
+  ) {
+    return QuantumCard(
+      glowColor: QuantumTheme.quantumOrange,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('PII Scanner',
+              style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 4),
+          Text('Powered by Rust regex engine (166+ patterns)',
+              style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 12),
+
+          // Text field
+          TextField(
+            controller: _controller,
+            maxLines: 5,
+            decoration: const InputDecoration(
+              hintText:
+                  'Paste text to scan for PII...\n'
+                  'e.g. "My SSN is 123-45-6789, email me at test@example.com"',
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Upload + Try Example row
+          Row(
+            children: [
+              ActionChip(
+                avatar: const Icon(Icons.upload_file, size: 16),
+                label: Text(
+                  _uploadedFileName ?? 'Upload file',
+                  style: const TextStyle(fontSize: 12),
+                ),
+                onPressed: _pickFile,
+              ),
+              const SizedBox(width: 8),
+              ActionChip(
+                avatar: const Icon(Icons.science_outlined, size: 16),
+                label: const Text('Try Example'),
+                onPressed: () {
+                  _controller.text = _exampleText;
+                  setState(() => _uploadedFileName = null);
+                  notifier.scan(_controller.text);
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Primary action: Scan
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: FilledButton.icon(
+              onPressed: () => notifier.scan(_controller.text),
+              icon: const Icon(Icons.search, size: 22),
+              label: const Text('Scan for PII',
+                  style: TextStyle(fontSize: 16)),
+              style: FilledButton.styleFrom(
+                backgroundColor: QuantumTheme.quantumCyan,
+                foregroundColor: Colors.black,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Redact + Clear
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _controller.text.isNotEmpty
+                      ? () => notifier.redact(_controller.text)
+                      : null,
+                  icon: const Icon(Icons.shield),
+                  label: Text('Redact (L${pii.selectedLevel})'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: QuantumTheme.quantumOrange,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton(
+                onPressed: () {
+                  _controller.clear();
+                  notifier.clear();
+                  setState(() => _uploadedFileName = null);
+                },
+                child: const Text('Clear'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1);
+  }
+
+  // ── 5. Before/after split view ───────────────────────────────────────
+
+  Widget _buildBeforeAfterSplit(BuildContext context, PiiScanState pii) {
+    return QuantumCard(
+      glowColor: QuantumTheme.quantumGreen,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.compare_arrows,
+                  color: QuantumTheme.quantumGreen, size: 20),
+              const SizedBox(width: 8),
+              Text('Before / After (L${pii.selectedLevel})',
+                  style: Theme.of(context).textTheme.titleSmall),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Original
+          _splitPane(
+            context,
+            label: 'ORIGINAL',
+            color: QuantumTheme.quantumOrange,
+            text: pii.inputText,
+          ),
+          const SizedBox(height: 10),
+
+          // Divider
+          Row(
+            children: [
+              const Expanded(child: Divider()),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(Icons.arrow_downward,
+                    size: 16, color: QuantumTheme.quantumGreen),
+              ),
+              const Expanded(child: Divider()),
+            ],
+          ),
+          const SizedBox(height: 10),
+
+          // Redacted
+          _splitPane(
+            context,
+            label: 'REDACTED',
+            color: QuantumTheme.quantumGreen,
+            text: pii.redactedText ?? '',
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 300.ms);
+  }
+
+  Widget _splitPane(
+    BuildContext context, {
+    required String label,
+    required Color color,
+    required String text,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: color,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: QuantumTheme.surfaceElevated.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: SelectableText(
+            text,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontFamily: 'JetBrains Mono',
+                  height: 1.5,
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── 6. Results summary card ──────────────────────────────────────────
+
+  Widget _buildResultsSummary(BuildContext context, PiiScanState pii) {
+    return QuantumCard(
+      glowColor: pii.highSensitivityCount > 0
+          ? QuantumTheme.quantumRed
+          : QuantumTheme.quantumGreen,
+      child: Row(
+        children: [
+          Icon(
+            pii.highSensitivityCount > 0
+                ? Icons.warning_amber
+                : Icons.check_circle_outline,
+            color: pii.highSensitivityCount > 0
+                ? QuantumTheme.quantumRed
+                : QuantumTheme.quantumGreen,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              '${pii.matches.length} PII items detected '
+              '(${pii.highSensitivityCount} high sensitivity)',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+          ),
+        ],
+      ),
+    )
+        .animate()
+        .fadeIn(duration: 300.ms)
+        .scale(
+          begin: const Offset(0.95, 0.95),
+          end: const Offset(1, 1),
+        );
+  }
+
+  // ── 7. Individual match cards ────────────────────────────────────────
+
+  List<Widget> _buildMatchCards(BuildContext context, PiiScanState pii) {
+    return pii.matches.asMap().entries.map((entry) {
+      final index = entry.key;
+      final m = entry.value;
+      final glowColor = m.sensitivity >= 4
+          ? QuantumTheme.quantumRed
+          : m.sensitivity >= 3
+              ? QuantumTheme.quantumOrange
+              : QuantumTheme.quantumGreen;
+
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: QuantumCard(
+          glowColor: glowColor,
+          padding: EdgeInsets.zero,
+          child: ListTile(
+            leading: _sensitivityBadge(m.sensitivity)
+                .animate()
+                .fadeIn(delay: (index * 100).ms),
+            title: Text(m.patternName),
+            subtitle: Text(
+              '${m.category} | "${m.matchedText}" | ${m.countryCode.toUpperCase()}',
+            ),
+            trailing: Text('L${m.sensitivity}',
+                style: Theme.of(context).textTheme.labelLarge),
+          ),
+        ),
+      )
+          .animate()
+          .fadeIn(delay: (index * 100).ms, duration: 300.ms)
+          .slideY(begin: 0.1);
+    }).toList();
   }
 
   Widget _sensitivityBadge(int level) {
