@@ -29,7 +29,7 @@ class MessengerService {
 
   /// Connect to the WebSocket signaling server.
   Future<void> connect() async {
-    final uri = '$wsBaseUrl/ws/signal?token=$token';
+    final uri = '$wsBaseUrl/ws/$token';
     _socket = await WebSocket.connect(uri);
 
     _socket!.listen(
