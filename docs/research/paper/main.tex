@@ -880,6 +880,13 @@ The one-time pad was originally described by Vernam~\cite{vernam1926cipher} for 
 
 Our contribution applies the same class of guarantee to a different problem. Rather than securing a communication channel, we secure a data transformation. The OTP mapping in L10 functions as a one-time pad applied to data values rather than to ciphertext. The critical distinction from classical OTP encryption is twofold: (1)~the ``key'' (mapping) is derived from QRNG rather than a shared secret, ensuring no seed can be captured; and (2)~the key is destroyed rather than shared with a recipient, ensuring no copy persists after the anonymization completes. The combination of quantum randomness and key destruction yields a guarantee that is strictly stronger than Shannon's OTP: not only is the ``ciphertext'' (anonymized data) information-theoretically independent of the ``plaintext'' (original data), but the ``key'' (mapping) is physically irrecoverable.
 
+\subsection{Synthetic Data Generation}
+\label{subsec:synth}
+
+Synthetic data generation offers an alternative approach to privacy-preserving data release. Tools such as DataSynthesizer, the Synthetic Data Vault (SDV), and CTGAN use generative models to produce artificial datasets that preserve statistical properties of the original data without containing any real records. Unlike anonymization, which transforms existing records, synthetic data creates new records from learned distributions.
+
+Synthetic data and QRNG-OTP-Destroy address fundamentally different use cases. Synthetic data aims to preserve analytical utility (aggregate statistics, correlations, ML training value) while eliminating direct linkage to individuals. L10 aims to eliminate all information content, producing tokens with zero analytical utility. The two approaches are complementary: synthetic data for analysis workflows where utility matters, L10 for regulatory compliance workflows where provable irreversibility matters (e.g., satisfying GDPR Article~17 deletion requests while preserving table structure for downstream systems).
+
 \subsection{Quantum Differential Privacy}
 \label{subsec:qdp}
 
@@ -1219,5 +1226,17 @@ By reduction to the Born rule assumption. After the protocol completes, $\mathca
 \begin{remark}
 The game $\mathsf{ANON}_{\mathcal{A}}(\lambda)$ captures \emph{mapping-recovery} security: the adversary's inability to reconstruct the original PII value from its replacement token. Domain-knowledge attacks, where an adversary exploits a small value domain (e.g., binary sex, two-letter state codes) to guess the original value without inverting the token, fall outside this game's scope. Such attacks are addressed in the system design by combining L10 tokenization with the structural anonymization techniques of levels L5--L9 (generalization, suppression, micro-aggregation), which enlarge the effective domain before tokenization. A composition theorem formalizing the joint guarantee of structural anonymization followed by \textsc{QRNG-OTP-Destroy} is left for future work.
 \end{remark}
+
+\begin{proposition}[Domain-Aware Recovery Bound]
+\label{prop:domain}
+For a column $C_j$ with domain $\mathcal{D}_j$ containing $|\mathcal{D}_j|$ distinct values, the probability that any adversary $\mathcal{A}$ correctly identifies the original value of a given cell is bounded by:
+\begin{equation}
+\Pr[\mathcal{A} \text{ recovers } D[i,j]] \leq \max\bigl(62^{-16},\; |\mathcal{D}_j|^{-1}\bigr).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The adversary has two attack strategies: (a)~guess the QRNG mapping, succeeding with probability $62^{-16} \approx 2^{-95.3}$ (Proposition~\ref{prop:pervalue}); or (b)~ignore the token and guess the original value from domain knowledge, succeeding with probability at most $|\mathcal{D}_j|^{-1}$ (uniform prior over the domain). The adversary's optimal strategy is the maximum of these two. For columns with $|\mathcal{D}_j| > 62^{16}$ (more than ${\approx}2^{95}$ distinct values), the QRNG bound dominates. For low-cardinality columns ($|\mathcal{D}_j| \leq 62^{16}$, which includes all practical cases), domain guessing dominates. This formalizes the observation that L10 protects the \emph{mapping} unconditionally, but does not prevent domain-knowledge inference on small domains. For columns where $|\mathcal{D}_j|$ is small (e.g., binary attributes), combining L10 with structural anonymization (L5--L9) before token replacement provides defense in depth.
+\end{proof}
 
 \end{document}
