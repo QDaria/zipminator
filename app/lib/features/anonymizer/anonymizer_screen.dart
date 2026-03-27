@@ -14,7 +14,18 @@ class AnonymizerScreen extends ConsumerStatefulWidget {
 }
 
 class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
+  static const _exampleText =
+      'John Smith, SSN 123-45-6789, john@acme.com, '
+      '555-0123, CC 4111-1111-1111-1111';
+
   final _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill with example so the user sees something immediately.
+    _controller.text = _exampleText;
+  }
 
   @override
   void dispose() {
@@ -50,6 +61,18 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
               const PillarStatusBanner(
                 description: 'Find & redact personal data in text',
                 status: PillarStatus.ready,
+              ),
+
+              // Onboarding instruction text
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  'Paste text containing personal data (names, emails, SSNs, etc.) '
+                  'and tap Scan to detect PII, or tap Redact to automatically mask it.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: QuantumTheme.textSecondary,
+                      ),
+                ),
               ),
 
               PillarHeader(
@@ -168,26 +191,34 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                         avatar: const Icon(Icons.science_outlined, size: 16),
                         label: const Text('Try Example'),
                         onPressed: () {
-                          _controller.text =
-                              'John Smith, SSN 123-45-6789, john@acme.com, '
-                              '555-0123, CC 4111-1111-1111-1111';
+                          _controller.text = _exampleText;
                           setState(() {});
+                          // Auto-scan so results appear immediately.
+                          notifier.scan(_controller.text);
                         },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Primary action: Scan (large, prominent)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          notifier.scan(_controller.text);
+                        },
+                        icon: const Icon(Icons.search, size: 22),
+                        label: const Text('Scan for PII',
+                            style: TextStyle(fontSize: 16)),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: QuantumTheme.quantumCyan,
+                          foregroundColor: Colors.black,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              notifier.scan(_controller.text);
-                            },
-                            icon: const Icon(Icons.search),
-                            label: const Text('Scan'),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
                         Expanded(
                           child: ElevatedButton.icon(
                             onPressed: _controller.text.isNotEmpty

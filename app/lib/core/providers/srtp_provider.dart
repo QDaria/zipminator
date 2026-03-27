@@ -2,9 +2,50 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/src/rust/api/simple.dart' as rust;
 
+/// Call lifecycle phases for the VoIP demo.
+enum CallPhase { idle, ringing, connected, ended }
+
+/// A VoIP contact (reuses the same demo cast as the messenger).
+class VoipContact {
+  final String id;
+  final String name;
+  final String email;
+  final bool isOnline;
+
+  const VoipContact({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.isOnline,
+  });
+}
+
+/// Demo contacts shared with ratchet_provider.
+const demoVoipContacts = [
+  VoipContact(
+    id: 'alice-q',
+    name: 'Alice Quantum',
+    email: 'alice@qdaria.com',
+    isOnline: true,
+  ),
+  VoipContact(
+    id: 'bob-c',
+    name: 'Bob Cipher',
+    email: 'bob@qdaria.com',
+    isOnline: true,
+  ),
+  VoipContact(
+    id: 'charlie-m',
+    name: 'Charlie Mesh',
+    email: 'charlie@qdaria.com',
+    isOnline: false,
+  ),
+];
+
 /// State for a VoIP call with PQ-SRTP.
 class VoipState {
-  final bool inCall;
+  final CallPhase phase;
+  final VoipContact? contact;
   final bool isPqSecured;
   final Uint8List? srtpMasterKey;
   final Uint8List? srtpMasterSalt;
@@ -14,7 +55,8 @@ class VoipState {
   final String? error;
 
   const VoipState({
-    this.inCall = false,
+    this.phase = CallPhase.idle,
+    this.contact,
     this.isPqSecured = false,
     this.srtpMasterKey,
     this.srtpMasterSalt,
@@ -24,8 +66,15 @@ class VoipState {
     this.error,
   });
 
+  /// Convenience getters for backward compatibility.
+  bool get inCall => phase == CallPhase.connected;
+  bool get isRinging => phase == CallPhase.ringing;
+  bool get isEnded => phase == CallPhase.ended;
+  bool get isIdle => phase == CallPhase.idle;
+
   VoipState copyWith({
-    bool? inCall,
+    CallPhase? phase,
+    VoipContact? contact,
     bool? isPqSecured,
     Uint8List? srtpMasterKey,
     Uint8List? srtpMasterSalt,
@@ -33,9 +82,11 @@ class VoipState {
     bool? isMuted,
     bool? isSpeaker,
     String? error,
+    bool clearContact = false,
   }) =>
       VoipState(
-        inCall: inCall ?? this.inCall,
+        phase: phase ?? this.phase,
+        contact: clearContact ? null : (contact ?? this.contact),
         isPqSecured: isPqSecured ?? this.isPqSecured,
         srtpMasterKey: srtpMasterKey ?? this.srtpMasterKey,
         srtpMasterSalt: srtpMasterSalt ?? this.srtpMasterSalt,
@@ -51,12 +102,20 @@ class VoipNotifier extends Notifier<VoipState> {
   @override
   VoipState build() => const VoipState();
 
-  /// Derive SRTP keys from a Kyber shared secret and start a call.
-  Future<void> startCall(Uint8List sharedSecret) async {
+  /// Transition to ringing state for a given contact.
+  void startRinging(VoipContact contact) {
+    state = VoipState(
+      phase: CallPhase.ringing,
+      contact: contact,
+    );
+  }
+
+  /// Derive SRTP keys from a Kyber shared secret and move to connected.
+  Future<void> connectCall(Uint8List sharedSecret) async {
     try {
       final keys = await rust.deriveSrtpKeys(sharedSecret: sharedSecret);
-      state = VoipState(
-        inCall: true,
+      state = state.copyWith(
+        phase: CallPhase.connected,
         isPqSecured: true,
         srtpMasterKey: Uint8List.fromList(keys.masterKey),
         srtpMasterSalt: Uint8List.fromList(keys.masterSalt),
@@ -65,6 +124,9 @@ class VoipNotifier extends Notifier<VoipState> {
       state = state.copyWith(error: e.toString());
     }
   }
+
+  /// Legacy alias kept for compatibility with other code.
+  Future<void> startCall(Uint8List sharedSecret) => connectCall(sharedSecret);
 
   void endCall() {
     state = const VoipState();

@@ -10,6 +10,7 @@ import 'package:zipminator/features/anonymizer/anonymizer_screen.dart';
 import 'package:zipminator/features/qai/qai_screen.dart';
 import 'package:zipminator/features/email/email_screen.dart';
 import 'package:zipminator/features/browser/browser_screen.dart';
+import 'package:zipminator/features/mesh/mesh_screen.dart';
 import 'package:zipminator/features/settings/settings_screen.dart';
 import 'package:zipminator/shared/widgets/shell_scaffold.dart';
 
@@ -88,6 +89,11 @@ final GoRouter appRouter = GoRouter(
           path: '/browser',
           name: 'browser',
           builder: (context, state) => const BrowserScreen(),
+        ),
+        GoRoute(
+          path: '/mesh',
+          name: 'mesh',
+          builder: (context, state) => const MeshScreen(),
         ),
         GoRoute(
           path: '/settings',

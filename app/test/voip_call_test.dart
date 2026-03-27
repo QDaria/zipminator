@@ -13,20 +13,20 @@ void main() {
     });
 
     test('copyWith toggles mute', () {
-      const state = VoipState(inCall: true, isMuted: false);
+      const state = VoipState(phase: CallPhase.connected, isMuted: false);
       final toggled = state.copyWith(isMuted: true);
       expect(toggled.isMuted, true);
       expect(toggled.inCall, true);
     });
 
     test('copyWith toggles speaker', () {
-      const state = VoipState(inCall: true, isSpeaker: false);
+      const state = VoipState(phase: CallPhase.connected, isSpeaker: false);
       final toggled = state.copyWith(isSpeaker: true);
       expect(toggled.isSpeaker, true);
     });
 
     test('copyWith updates call duration', () {
-      const state = VoipState(inCall: true);
+      const state = VoipState(phase: CallPhase.connected);
       final updated =
           state.copyWith(callDuration: const Duration(seconds: 30));
       expect(updated.callDuration.inSeconds, 30);

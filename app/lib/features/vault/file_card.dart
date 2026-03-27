@@ -7,11 +7,15 @@ import 'package:zipminator/shared/widgets/widgets.dart';
 class FileCard extends StatelessWidget {
   final VaultFile file;
   final VoidCallback? onTap;
+  final VoidCallback? onShare;
+  final VoidCallback? onDecrypt;
 
   const FileCard({
     super.key,
     required this.file,
     this.onTap,
+    this.onShare,
+    this.onDecrypt,
   });
 
   @override
@@ -68,43 +72,41 @@ class FileCard extends StatelessWidget {
               ),
             ),
 
-            // PQC lock badge
+            // Quick-action buttons
+            _QuickActionButton(
+              icon: Icons.lock_open,
+              color: QuantumTheme.quantumCyan,
+              tooltip: 'Decrypt',
+              onTap: onDecrypt,
+            ),
+            const SizedBox(width: 4),
+            _QuickActionButton(
+              icon: Icons.share,
+              color: QuantumTheme.quantumPurple,
+              tooltip: 'Share',
+              onTap: onShare,
+            ),
+            const SizedBox(width: 4),
+
+            // PQC badge (compact)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
               decoration: BoxDecoration(
                 color: QuantumTheme.quantumGreen.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(5),
                 border: Border.all(
                   color: QuantumTheme.quantumGreen.withValues(alpha: 0.3),
                 ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.lock,
-                    size: 12,
-                    color: QuantumTheme.quantumGreen,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'PQC',
-                    style: TextStyle(
-                      color: QuantumTheme.quantumGreen,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
+              child: Text(
+                'PQC',
+                style: TextStyle(
+                  color: QuantumTheme.quantumGreen,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
               ),
-            ),
-            const SizedBox(width: 4),
-
-            Icon(
-              Icons.chevron_right,
-              color: Colors.white.withValues(alpha: 0.3),
-              size: 20,
             ),
           ],
         ),
@@ -217,6 +219,12 @@ class FileCard extends StatelessWidget {
     }
   }
 
+  /// Whether [filename] is a raster image format suitable for inline preview.
+  static bool isPreviewableImage(String filename) {
+    const exts = {'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'};
+    return exts.contains(_extension(filename));
+  }
+
   static String _relativeDate(DateTime dt) {
     final diff = DateTime.now().difference(dt);
     if (diff.inSeconds < 60) return 'just now';
@@ -224,6 +232,41 @@ class FileCard extends StatelessWidget {
     if (diff.inHours < 24) return '${diff.inHours}h ago';
     if (diff.inDays < 7) return '${diff.inDays}d ago';
     return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+  }
+}
+
+/// Small icon button used as a quick action on a [FileCard].
+class _QuickActionButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String tooltip;
+  final VoidCallback? onTap;
+
+  const _QuickActionButton({
+    required this.icon,
+    required this.color,
+    required this.tooltip,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: onTap,
+          child: SizedBox(
+            width: 32,
+            height: 32,
+            child: Icon(icon, color: color, size: 16),
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -13,14 +13,15 @@ class ShellScaffold extends StatelessWidget {
   const ShellScaffold({super.key, required this.child});
 
   static const _tabs = [
-    _NavTab('/vault', Icons.lock_outline, Icons.lock, 'Vault'),
-    _NavTab('/messenger', Icons.chat_bubble_outline, Icons.chat_bubble, 'Messenger'),
-    _NavTab('/voip', Icons.phone_outlined, Icons.phone, 'VoIP'),
-    _NavTab('/vpn', Icons.vpn_key_outlined, Icons.vpn_key, 'VPN'),
-    _NavTab('/anonymizer', Icons.visibility_off_outlined, Icons.visibility_off, 'Anonymizer'),
-    _NavTab('/ai', Icons.psychology_outlined, Icons.psychology, 'Q-AI'),
-    _NavTab('/email', Icons.email_outlined, Icons.email, 'Email'),
-    _NavTab('/browser', Icons.language_outlined, Icons.language, 'Browser'),
+    _NavTab('/vault', Icons.lock_outline, Icons.lock, 'Vault', 'Encrypted storage'),
+    _NavTab('/messenger', Icons.chat_bubble_outline, Icons.chat_bubble, 'Messenger', 'PQC messaging'),
+    _NavTab('/voip', Icons.phone_outlined, Icons.phone, 'VoIP', 'Quantum-safe calls'),
+    _NavTab('/vpn', Icons.vpn_key_outlined, Icons.vpn_key, 'VPN', 'PQC tunnel'),
+    _NavTab('/anonymizer', Icons.visibility_off_outlined, Icons.visibility_off, 'Anonymizer', 'PII scanner'),
+    _NavTab('/ai', Icons.psychology_outlined, Icons.psychology, 'Q-AI', 'Quantum AI assistant'),
+    _NavTab('/email', Icons.email_outlined, Icons.email, 'Email', 'PQC-encrypted mail'),
+    _NavTab('/browser', Icons.language_outlined, Icons.language, 'Browser', 'Privacy browser'),
+    _NavTab('/mesh', Icons.hub_outlined, Icons.hub, 'Q-Mesh', 'Mesh networking'),
   ];
 
   /// Number of primary tabs shown in mobile bottom nav (5th is "More").
@@ -145,12 +146,14 @@ class ShellScaffold extends StatelessWidget {
 
     showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
       builder: (ctx) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Drag handle
               Container(
                 width: 36,
                 height: 4,
@@ -159,32 +162,55 @@ class ShellScaffold extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(height: 20),
-              GridView.count(
-                crossAxisCount: 4,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  ...overflowTabs.map(
-                    (t) => _OverflowTile(
-                      icon: t.icon,
-                      label: t.label,
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        context.go(t.path);
-                      },
-                    ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'More Pillars',
+                    style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
-                  _OverflowTile(
-                    icon: Icons.settings_outlined,
-                    label: 'Settings',
-                    onTap: () {
-                      Navigator.pop(ctx);
-                      context.go('/settings');
-                    },
-                  ),
-                ],
+                ),
               ),
+              const SizedBox(height: 4),
+              // Pillar list tiles with icon, title, and subtitle
+              ...overflowTabs.map(
+                (t) => ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor:
+                        QuantumTheme.quantumCyan.withValues(alpha: 0.15),
+                    child: Icon(t.icon, color: QuantumTheme.quantumCyan),
+                  ),
+                  title: Text(t.label),
+                  subtitle: Text(t.subtitle),
+                  trailing: const Icon(Icons.chevron_right, size: 20),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    context.go(t.path);
+                  },
+                ),
+              ),
+              const Divider(height: 1),
+              // Settings at the bottom
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor:
+                      QuantumTheme.textSecondary.withValues(alpha: 0.1),
+                  child:
+                      Icon(Icons.settings_outlined, color: QuantumTheme.textSecondary),
+                ),
+                title: const Text('Settings'),
+                subtitle: const Text('Theme, API keys, about'),
+                trailing: const Icon(Icons.chevron_right, size: 20),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  context.go('/settings');
+                },
+              ),
+              const SizedBox(height: 8),
             ],
           ),
         ),
@@ -193,43 +219,13 @@ class ShellScaffold extends StatelessWidget {
   }
 }
 
-class _OverflowTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _OverflowTile({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 28, color: QuantumTheme.quantumCyan),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall,
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _NavTab {
   final String path;
   final IconData icon;
   final IconData selectedIcon;
   final String label;
+  final String subtitle;
 
-  const _NavTab(this.path, this.icon, this.selectedIcon, this.label);
+  const _NavTab(this.path, this.icon, this.selectedIcon, this.label, this.subtitle);
 }

@@ -134,6 +134,8 @@ class VaultScreen extends ConsumerWidget {
                     return FileCard(
                       file: file,
                       onTap: () => _showFileActions(context, ref, file),
+                      onDecrypt: () => _decryptAndPreview(context, ref, file),
+                      onShare: () => _decryptAndShare(context, ref, file),
                     ).animate().fadeIn(
                           duration: 200.ms,
                           delay: (index * 50).ms,
@@ -203,6 +205,169 @@ class VaultScreen extends ConsumerWidget {
       builder: (ctx) => _FileActionsSheet(file: file),
     );
   }
+
+  /// Decrypt the file and show an inline preview (image) or share sheet.
+  Future<void> _decryptAndPreview(
+      BuildContext context, WidgetRef ref, VaultFile file) async {
+    final decrypted =
+        await ref.read(vaultProvider.notifier).decryptFile(file);
+    if (decrypted == null || !context.mounted) return;
+
+    if (FileCard.isPreviewableImage(file.name)) {
+      showDecryptedPreviewDialog(context, decrypted, file);
+    } else {
+      // Non-image: open share sheet so the user can preview in another app.
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(decrypted.path)],
+          text: 'Decrypted: ${file.name}',
+        ),
+      );
+    }
+  }
+
+  /// Decrypt the file and immediately open the system share sheet.
+  Future<void> _decryptAndShare(
+      BuildContext context, WidgetRef ref, VaultFile file) async {
+    final decrypted =
+        await ref.read(vaultProvider.notifier).decryptFile(file);
+    if (decrypted == null || !context.mounted) return;
+
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(decrypted.path)],
+        text: '${file.name} (decrypted from Zipminator Vault)',
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Top-level helper: decrypted image preview dialog
+// ---------------------------------------------------------------------------
+
+/// Shows a dialog with an inline image preview and Share/Save buttons.
+/// Used by both [VaultScreen] and [_FileActionsSheet].
+void showDecryptedPreviewDialog(
+    BuildContext context, File decryptedFile, VaultFile meta) {
+  showDialog(
+    context: context,
+    builder: (ctx) => Dialog(
+      backgroundColor: QuantumTheme.surfaceCard,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      insetPadding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 8, 8),
+            child: Row(
+              children: [
+                Icon(Icons.image, color: QuantumTheme.quantumCyan, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    meta.name,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 20),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                ),
+              ],
+            ),
+          ),
+
+          // Image preview
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.55,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.file(
+                decryptedFile,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.broken_image,
+                          color: QuantumTheme.quantumRed, size: 40),
+                      const SizedBox(height: 8),
+                      const Text('Unable to display image'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Action row
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      Navigator.of(ctx).pop();
+                      await SharePlus.instance.share(
+                        ShareParams(
+                          files: [XFile(decryptedFile.path)],
+                          text:
+                              '${meta.name} (decrypted from Zipminator Vault)',
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.share, size: 18),
+                    label: const Text('Share'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: QuantumTheme.quantumCyan,
+                      side: BorderSide(
+                        color:
+                            QuantumTheme.quantumCyan.withValues(alpha: 0.4),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      Navigator.of(ctx).pop();
+                      await SharePlus.instance.share(
+                        ShareParams(
+                          files: [XFile(decryptedFile.path)],
+                          text: 'Save to Files',
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.save_alt, size: 18),
+                    label: const Text('Save'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: QuantumTheme.quantumCyan,
+                      foregroundColor: QuantumTheme.surfaceDark,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -275,20 +440,40 @@ class _FileActionsSheet extends ConsumerWidget {
               Navigator.of(context).pop();
               final decrypted =
                   await ref.read(vaultProvider.notifier).decryptFile(file);
-              if (decrypted != null && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Decrypted to ${decrypted.path}'),
-                    backgroundColor: QuantumTheme.quantumGreen,
-                  ),
+              if (decrypted == null || !context.mounted) return;
+
+              if (FileCard.isPreviewableImage(file.name)) {
+                // Show inline image preview with share/save buttons.
+                showDecryptedPreviewDialog(context, decrypted, file);
+              } else {
+                // Non-image: open share sheet for preview in external app.
+                await Share.shareXFiles(
+                  [XFile(decrypted.path)],
+                  text: 'Decrypted: ${file.name}',
                 );
               }
             },
           ),
           _ActionTile(
             icon: Icons.share,
-            label: 'Share Encrypted File',
+            label: 'Decrypt & Share',
             color: QuantumTheme.quantumPurple,
+            onTap: () async {
+              Navigator.of(context).pop();
+              final decrypted =
+                  await ref.read(vaultProvider.notifier).decryptFile(file);
+              if (decrypted == null || !context.mounted) return;
+              await Share.shareXFiles(
+                [XFile(decrypted.path)],
+                text:
+                    '${file.name} (decrypted from Zipminator Vault)',
+              );
+            },
+          ),
+          _ActionTile(
+            icon: Icons.share_outlined,
+            label: 'Share Encrypted (.pqc)',
+            color: Colors.white.withValues(alpha: 0.6),
             onTap: () async {
               Navigator.of(context).pop();
               await Share.shareXFiles(

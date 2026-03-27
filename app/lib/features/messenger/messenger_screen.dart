@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/core/providers/ratchet_provider.dart';
+import 'package:zipminator/core/services/messenger_service.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
 
@@ -20,10 +21,21 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
   String _searchQuery = '';
 
   @override
+  void initState() {
+    super.initState();
+    // Auto-connect to signaling server when the messenger screen opens.
+    Future.microtask(() {
+      ref.read(ratchetProvider.notifier).connectToSignaling();
+    });
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     _scrollController.dispose();
     _searchController.dispose();
+    // Disconnect when leaving the messenger screen.
+    ref.read(ratchetProvider.notifier).disconnectFromSignaling();
     super.dispose();
   }
 
@@ -52,6 +64,9 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
                 onSearchChanged: (q) => setState(() => _searchQuery = q),
                 onSelectConversation: _selectConversation,
                 onNewConversation: _showNewConversationSheet,
+                onReconnect: () {
+                  ref.read(ratchetProvider.notifier).connectToSignaling();
+                },
               ),
       ),
       floatingActionButton: hasActiveConversation
@@ -120,6 +135,7 @@ class _ConversationListView extends StatelessWidget {
   final ValueChanged<String> onSearchChanged;
   final ValueChanged<String> onSelectConversation;
   final VoidCallback onNewConversation;
+  final VoidCallback onReconnect;
 
   const _ConversationListView({
     required this.ratchet,
@@ -128,6 +144,7 @@ class _ConversationListView extends StatelessWidget {
     required this.onSearchChanged,
     required this.onSelectConversation,
     required this.onNewConversation,
+    required this.onReconnect,
   });
 
   @override
@@ -165,9 +182,10 @@ class _ConversationListView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                PqcBadge(
-                  label: 'Double Ratchet',
-                  color: QuantumTheme.quantumPurple,
+                _SignalingBadge(
+                  signalingState: ratchet.signalingState,
+                  isLive: ratchet.isLive,
+                  onReconnect: onReconnect,
                 ),
               ],
             ),
@@ -586,7 +604,9 @@ class _ChatView extends StatelessWidget {
                                 ),
                       ),
                       Text(
-                        isOnline ? 'Online' : 'Offline',
+                        ratchet.isLive
+                            ? (isOnline ? 'Online (Live)' : 'Offline (Live)')
+                            : (isOnline ? 'Online (Demo)' : 'Offline (Demo)'),
                         style:
                             Theme.of(context).textTheme.labelSmall?.copyWith(
                                   color: isOnline
@@ -598,9 +618,11 @@ class _ChatView extends StatelessWidget {
                   ),
                 ),
                 PqcBadge(
-                  label: 'PQ-Ratchet',
-                  isActive: ratchet.isConnected,
-                  color: QuantumTheme.quantumGreen,
+                  label: ratchet.isLive ? 'Live' : 'Demo',
+                  isActive: ratchet.isLive,
+                  color: ratchet.isLive
+                      ? QuantumTheme.quantumGreen
+                      : QuantumTheme.quantumOrange,
                 ),
               ],
             ),
@@ -895,6 +917,72 @@ class _MessageBubble extends StatelessWidget {
     final h = dt.hour.toString().padLeft(2, '0');
     final m = dt.minute.toString().padLeft(2, '0');
     return '$h:$m';
+  }
+}
+
+/// Badge that shows Live / Connecting / Demo based on signaling server state.
+class _SignalingBadge extends StatelessWidget {
+  final SignalingConnectionState signalingState;
+  final bool isLive;
+  final VoidCallback onReconnect;
+
+  const _SignalingBadge({
+    required this.signalingState,
+    required this.isLive,
+    required this.onReconnect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final String label;
+    final Color color;
+    final IconData icon;
+
+    switch (signalingState) {
+      case SignalingConnectionState.connected:
+        label = 'Live';
+        color = QuantumTheme.quantumGreen;
+        icon = Icons.wifi;
+      case SignalingConnectionState.connecting:
+        label = 'Connecting...';
+        color = QuantumTheme.quantumOrange;
+        icon = Icons.sync;
+      case SignalingConnectionState.error:
+        label = 'Demo';
+        color = QuantumTheme.quantumOrange;
+        icon = Icons.wifi_off;
+      case SignalingConnectionState.disconnected:
+        label = 'Demo';
+        color = QuantumTheme.textSecondary;
+        icon = Icons.wifi_off;
+    }
+
+    return GestureDetector(
+      onTap: isLive ? null : onReconnect,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: color.withValues(alpha: 0.15),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 12, color: color),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

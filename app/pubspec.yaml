@@ -53,6 +53,7 @@ dependencies:
   open_file: ^3.5.10
   uuid: ^4.5.1
   intl: ^0.20.2
+  web_socket_channel: ^3.0.2
   rust_lib_zipminator:
     path: rust_builder
 
