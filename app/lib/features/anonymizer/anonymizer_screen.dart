@@ -27,7 +27,9 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
     final pii = ref.watch(piiProvider);
     final notifier = ref.read(piiProvider.notifier);
 
-    return Scaffold(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
       appBar: AppBar(
         title: const Text('Anonymizer'),
         actions: [
@@ -305,7 +307,7 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   String _levelDescription(int level) => switch (level) {

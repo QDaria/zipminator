@@ -32,7 +32,9 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
     final ratchet = ref.watch(ratchetProvider);
     final hasActiveConversation = ratchet.activeConversationId != null;
 
-    return Scaffold(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
       resizeToAvoidBottomInset: true,
       body: GradientBackground(
         child: hasActiveConversation
@@ -59,7 +61,7 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
               backgroundColor: QuantumTheme.quantumPurple,
               child: const Icon(Icons.edit, color: Colors.white),
             ),
-    );
+    ));
   }
 
   void _sendMessage() {

@@ -27,7 +27,7 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final qai = ref.watch(qaiProvider);
 
-    return Scaffold(
+    return GestureDetector(onTap: () => FocusScope.of(context).unfocus(), child: Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
@@ -116,7 +116,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 
   String _rustVersion() {

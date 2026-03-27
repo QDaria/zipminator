@@ -85,7 +85,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
     final providerColor =
         _providerColors[qai.selectedProvider] ?? QuantumTheme.quantumPurple;
 
-    return Scaffold(
+    return GestureDetector(onTap: () => FocusScope.of(context).unfocus(), child: Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Q-AI Assistant'),
@@ -312,7 +312,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   IconData _providerIcon(LLMProvider provider) => switch (provider) {

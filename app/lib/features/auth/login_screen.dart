@@ -52,7 +52,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final size = MediaQuery.sizeOf(context);
     final isWide = size.width > 600;
 
-    return Scaffold(
+    return GestureDetector(onTap: () => FocusScope.of(context).unfocus(), child: Scaffold(
       body: GradientBackground(
         child: SafeArea(
           child: Center(
@@ -281,7 +281,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 

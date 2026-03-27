@@ -63,7 +63,7 @@ class _EmailScreenState extends ConsumerState<EmailScreen>
     final emailState = ref.watch(emailCryptoProvider);
     final crypto = ref.watch(cryptoProvider);
 
-    return Scaffold(
+    return GestureDetector(onTap: () => FocusScope.of(context).unfocus(), child: Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: GlassAppBar(
         title: 'Quantum Mail',
@@ -105,7 +105,7 @@ class _EmailScreenState extends ConsumerState<EmailScreen>
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildKeyStatusCard(BuildContext context, KeypairState crypto) {
