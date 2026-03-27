@@ -65,3 +65,4 @@
 {"timestamp": "2026-03-26T01:08:56.001172Z", "source": "ibm_quantum/ibm_fez", "job_id": "d728e76v3u3c73eiaar0", "shots": 1024, "entropy_bytes": 2048, "min_entropy": 9.0, "shannon_entropy": 9.9766}
 {"timestamp": "2026-03-26T02:46:04.552454+00:00", "backend": "os.urandom", "bytes_harvested": 512000, "sha256": "9834921f69706dd147c7927bdcb339c7c1342e7eb13c27fc01cc224ca3082eb1", "pool_before": 6454272, "pool_after": 6966272}
 {"timestamp": "2026-03-26T21:41:29.269737+00:00", "backend": "os.urandom", "bytes_harvested": 512000, "sha256": "a54bdf43053bb3a08634432e772363faa3f069df6ce732ee872014cbab54204c", "pool_before": 6966272, "pool_after": 7478272}
+{"timestamp": "2026-03-27T04:16:59.879865+00:00", "backend": "os.urandom", "bytes_harvested": 512000, "sha256": "e4a6093f12f6885d019f98862c019067bea534ed31b8b33eef225348c423f425", "pool_before": 7478272, "pool_after": 7990272}
