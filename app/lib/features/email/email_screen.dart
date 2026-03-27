@@ -26,6 +26,9 @@ class _EmailScreenState extends ConsumerState<EmailScreen>
   String _selfDestructValue = 'never';
   bool _sendSuccess = false;
 
+  /// Anonymization level for outgoing attachments: 0 = off, 1-10 = active.
+  int _attachmentAnonymizationLevel = 0;
+
   static const _selfDestructOptions = <String, String>{
     '1h': '1 hour',
     '24h': '24 hours',
@@ -312,6 +315,77 @@ class _EmailScreenState extends ConsumerState<EmailScreen>
               ],
             ),
           ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
+          const SizedBox(height: 12),
+
+          // Attachment anonymization level chip
+          QuantumCard(
+            glowColor: _attachmentAnonymizationLevel > 0
+                ? QuantumTheme.quantumOrange.withValues(alpha: 0.6)
+                : QuantumTheme.textSecondary.withValues(alpha: 0.3),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.visibility_off_outlined,
+                  color: _attachmentAnonymizationLevel > 0
+                      ? QuantumTheme.quantumOrange
+                      : QuantumTheme.textSecondary,
+                  size: 20,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Attachment Anonymization',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      Text(
+                        _attachmentAnonymizationLevel == 0
+                            ? 'Disabled'
+                            : 'Scan & redact outgoing attachments at L$_attachmentAnonymizationLevel',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: _attachmentAnonymizationLevel > 0
+                                  ? QuantumTheme.quantumOrange
+                                  : QuantumTheme.textSecondary,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    value: _attachmentAnonymizationLevel,
+                    isDense: true,
+                    dropdownColor: QuantumTheme.surfaceCard,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: QuantumTheme.quantumOrange,
+                          fontWeight: FontWeight.w600,
+                        ),
+                    items: [
+                      const DropdownMenuItem(
+                        value: 0,
+                        child: Text('Off'),
+                      ),
+                      ...List.generate(10, (i) {
+                        final level = i + 1;
+                        return DropdownMenuItem(
+                          value: level,
+                          child: Text('L$level'),
+                        );
+                      }),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _attachmentAnonymizationLevel = v);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ).animate().fadeIn(delay: 250.ms, duration: 400.ms),
           const SizedBox(height: 16),
 
           // Encrypt & Send button

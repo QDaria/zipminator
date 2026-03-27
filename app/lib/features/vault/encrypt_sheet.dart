@@ -21,6 +21,9 @@ class _EncryptSheetState extends ConsumerState<EncryptSheet> {
   bool _done = false;
   String? _error;
 
+  /// Anonymization level: 0 = disabled (no scan), 1-10 = scan + redact.
+  int _anonymizationLevel = 0;
+
   String get _fileName => widget.file.uri.pathSegments.last;
 
   int get _fileSize => widget.file.lengthSync();
@@ -167,7 +170,79 @@ class _EncryptSheetState extends ConsumerState<EncryptSheet> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+
+          // Anonymization level picker
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: QuantumTheme.quantumOrange.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: QuantumTheme.quantumOrange.withValues(alpha: 0.2),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.visibility_off_outlined,
+                    size: 18, color: QuantumTheme.quantumOrange),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'PII Anonymization',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
+                      ),
+                      Text(
+                        _anonymizationLevel == 0
+                            ? 'Disabled'
+                            : 'Scan & redact at L$_anonymizationLevel before encrypting',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: QuantumTheme.quantumOrange.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    value: _anonymizationLevel,
+                    isDense: true,
+                    dropdownColor: QuantumTheme.surfaceCard,
+                    style: TextStyle(
+                      color: QuantumTheme.quantumOrange,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    items: [
+                      const DropdownMenuItem(
+                        value: 0,
+                        child: Text('Off'),
+                      ),
+                      ...List.generate(10, (i) {
+                        final level = i + 1;
+                        return DropdownMenuItem(
+                          value: level,
+                          child: Text('L$level'),
+                        );
+                      }),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) setState(() => _anonymizationLevel = v);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
 
           // Error
           if (_error != null) ...[

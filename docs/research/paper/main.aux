@@ -31,9 +31,6 @@
 \citation{dwork2006dp}
 \citation{dwork2014algfound}
 \citation{mironov2012significance}
-\citation{art29wp2014anonymisation}
-\citation{edpb2020guidelines}
-\citation{cohen2020singling}
 \@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Known Attack Vectors for CSPRNG Seed Extraction}}{3}{}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{tab:prng_attacks}{{I}{3}{}{table.1}{}}
@@ -43,8 +40,11 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-D}}Classical Anonymization Techniques}{3}{}\protected@file@percent }
 \newlabel{subsec:classical_anon}{{\mbox  {II-D}}{3}{}{subsection.2.4}{}}
 \newlabel{eq:dp}{{6}{3}{}{equation.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-E}}Regulatory Framework: GDPR and DORA}{3}{}\protected@file@percent }
-\newlabel{subsec:gdpr}{{\mbox  {II-E}}{3}{}{subsection.2.5}{}}
+\citation{art29wp2014anonymisation}
+\citation{edpb2020guidelines}
+\citation{cohen2020singling}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-E}}Regulatory Framework: GDPR and DORA}{4}{}\protected@file@percent }
+\newlabel{subsec:gdpr}{{\mbox  {II-E}}{4}{}{subsection.2.5}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {III}Threat Model}{4}{}\protected@file@percent }
 \newlabel{sec:threat}{{III}{4}{}{section.3}{}}
 \citation{hensen2015loophole}
@@ -59,40 +59,41 @@
 \newlabel{def:it}{{2}{5}{}{definition.2}{}}
 \newlabel{eq:it_irrev}{{8}{5}{}{equation.8}{}}
 \newlabel{def:phys}{{3}{5}{}{definition.3}{}}
-\newlabel{lem:hierarchy}{{1}{5}{}{theorem.1}{}}
 \citation{hensen2015loophole}
 \citation{bohm1952suggested}
+\newlabel{lem:hierarchy}{{1}{6}{}{theorem.1}{}}
 \newlabel{thm:prng_impossible}{{2}{6}{}{theorem.2}{}}
 \newlabel{thm:qrng_secure}{{3}{6}{}{theorem.3}{}}
 \newlabel{cor:pvsnp}{{4}{6}{}{theorem.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}The QRNG-OTP-Destroy Protocol}{6}{}\protected@file@percent }
-\newlabel{sec:protocol}{{V}{6}{}{section.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Protocol Specification}{6}{}\protected@file@percent }
-\newlabel{subsec:spec}{{\mbox  {V-A}}{6}{}{subsection.5.1}{}}
 \citation{gutmann1996secure}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Security under four adversary models. Classical PRNG anonymization is secure only against computationally bounded external adversaries ($\mathcal  {A}_1$). QRNG-OTP-Destroy remains secure against all four adversary classes, including insiders with memory access ($\mathcal  {A}_4$).}}{7}{}\protected@file@percent }
 \newlabel{fig:adversary}{{2}{7}{}{figure.2}{}}
 \@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces QRNG-OTP-Destroy}}{7}{}\protected@file@percent }
 \newlabel{alg:qrng_otp}{{1}{7}{}{algorithm.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}The QRNG-OTP-Destroy Protocol}{7}{}\protected@file@percent }
+\newlabel{sec:protocol}{{V}{7}{}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Protocol Specification}{7}{}\protected@file@percent }
+\newlabel{subsec:spec}{{\mbox  {V-A}}{7}{}{subsection.5.1}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Entropy Consumption for Representative Datasets}}{7}{}\protected@file@percent }
 \newlabel{tab:entropy_budget}{{III}{7}{}{table.3}{}}
 \newlabel{eq:entropy_consumption}{{9}{7}{}{equation.9}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Security Analysis}{7}{}\protected@file@percent }
 \newlabel{subsec:security}{{\mbox  {V-B}}{7}{}{subsection.5.2}{}}
-\newlabel{prop:pervalue}{{5}{7}{}{theorem.5}{}}
 \citation{bell1964epr}
+\newlabel{prop:pervalue}{{5}{8}{}{theorem.5}{}}
+\newlabel{prop:mi}{{6}{8}{}{theorem.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}The Mapping Destruction Requirement}{8}{}\protected@file@percent }
 \newlabel{subsec:destruction}{{\mbox  {V-C}}{8}{}{subsection.5.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Security Under P = NP}{8}{}\protected@file@percent }
-\newlabel{subsec:pnp}{{\mbox  {V-D}}{8}{}{subsection.5.4}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The four steps of the QRNG-OTP-Destroy protocol. Step~1 acquires entropy from quantum hardware (e.g., Rigetti, IBM Quantum) or OS fallback; physics-guaranteed irreversibility requires a QRNG source (no seed). Step~4 destroys the mapping via DoD 5220.22-M 3-pass overwrite.}}{8}{}\protected@file@percent }
 \newlabel{fig:protocol}{{3}{8}{}{figure.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Entropy consumption as a function of dataset size and column count, assuming 70\% unique values per column and 16 bytes per unique value. A single quantum harvest cycle produces approximately 50~KB; the entropy pool bootstrap provides 4~MB.}}{8}{}\protected@file@percent }
-\newlabel{fig:entropy}{{4}{8}{}{figure.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Security Under P = NP}{8}{}\protected@file@percent }
+\newlabel{subsec:pnp}{{\mbox  {V-D}}{8}{}{subsection.5.4}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {VI}Implementation}{8}{}\protected@file@percent }
 \newlabel{sec:implementation}{{VI}{8}{}{section.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}System Architecture}{8}{}\protected@file@percent }
 \newlabel{subsec:arch}{{\mbox  {VI-A}}{8}{}{subsection.6.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Entropy consumption as a function of dataset size and column count, assuming 70\% unique values per column and 16 bytes per unique value. A single quantum harvest cycle produces approximately 50~KB; the entropy pool bootstrap provides 4~MB.}}{9}{}\protected@file@percent }
+\newlabel{fig:entropy}{{4}{9}{}{figure.4}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Zipminator Anonymization Levels}}{9}{}\protected@file@percent }
 \newlabel{tab:levels}{{IV}{9}{}{table.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}The LevelAnonymizer API}{9}{}\protected@file@percent }
@@ -103,24 +104,22 @@
 \newlabel{subsec:tests}{{\mbox  {VI-D}}{10}{}{subsection.6.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-E}}Performance}{10}{}\protected@file@percent }
 \newlabel{subsec:perf}{{\mbox  {VI-E}}{10}{}{subsection.6.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Empirical Evaluation}{10}{}\protected@file@percent }
-\newlabel{sec:evaluation}{{VII}{10}{}{section.7}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Runtime and transformation properties across all 10 anonymization levels (1,000 rows, 6 columns, 5 runs).}}{10}{}\protected@file@percent }
 \newlabel{tab:benchmarks}{{V}{10}{}{table.5}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Left: mean runtime per anonymization level (1,000 rows). Right: percentage of values transformed. L7--L10 are slower due to entropy pool I/O. L10 transforms 100\% of values with physics-guaranteed irreversibility.}}{10}{}\protected@file@percent }
 \newlabel{fig:benchmarks}{{5}{10}{}{figure.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Empirical Evaluation}{10}{}\protected@file@percent }
+\newlabel{sec:evaluation}{{VII}{10}{}{section.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Runtime Performance}{10}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Scaling Behavior}{10}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Hardware Demonstration: IBM Quantum}{10}{}\protected@file@percent }
 \citation{dua2019uci}
+\citation{nist2010sp80022}
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Runtime scaling across dataset sizes for L1, L5, L8, and L10. QRNG-dependent levels (L8, L10) scale linearly with the number of unique values due to per-value entropy pool reads.}}{11}{}\protected@file@percent }
 \newlabel{fig:scaling}{{6}{11}{}{figure.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Hardware Demonstration: IBM Quantum}{11}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-D}}Quantum Hardware Noise Considerations}{11}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces L10 on UCI Adult dataset (32,561 rows, 15 columns). L10 processes the full dataset in 1.3~seconds, consuming 346~KB of quantum entropy (16 bytes $\times $ 22,146 unique values).}}{11}{}\protected@file@percent }
-\newlabel{tab:adult}{{VI}{11}{}{table.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-E}}Non-Reproducibility Verification}{11}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-F}}Standard Benchmark: UCI Adult Dataset}{11}{}\protected@file@percent }
-\citation{nist2010sp80022}
 \citation{prasser2014arx}
 \citation{templ2017sdc}
 \citation{wilson2020dpsql}
@@ -130,30 +129,30 @@
 \citation{holohan2019diffprivlib}
 \citation{elemam2008kanon}
 \citation{machanavajjhala2007ldiv,li2007tcloseness}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces L10 on UCI Adult dataset (32,561 rows, 15 columns). L10 processes the full dataset in 1.3~seconds, consuming 346~KB of quantum entropy (16 bytes $\times $ 22,146 unique values).}}{12}{}\protected@file@percent }
+\newlabel{tab:adult}{{VI}{12}{}{table.6}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Before and after L10 anonymization (UCI Adult dataset, 5 rows, selected columns). Every value is replaced; the mapping is destroyed.}}{12}{}\protected@file@percent }
 \newlabel{tab:beforeafter}{{VII}{12}{}{table.7}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces NIST SP 800-22 statistical randomness tests on the quantum entropy pool (1,000,000 bits, $\alpha = 0.01$). All 11 tests pass. Byte Distribution and Shannon Entropy are supplementary quality metrics, not part of the SP~800-22 suite.}}{12}{}\protected@file@percent }
-\newlabel{tab:nist}{{VIII}{12}{}{table.8}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-G}}Entropy Pool Randomness Quality}{12}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {VIII}Systematic Comparison}{12}{}\protected@file@percent }
 \newlabel{sec:comparison}{{VIII}{12}{}{section.8}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Capability matrix comparing Zipminator L10 against seven widely used anonymization tools across four dimensions: technique, entropy source, irreversibility basis, and regulatory implications. L10 is the only tool offering physics-guaranteed irreversibility, P=NP resilience, and QRNG entropy.}}{12}{}\protected@file@percent }
-\newlabel{fig:comparison}{{7}{12}{}{figure.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-A}}Entropy Sources}{12}{}\protected@file@percent }
 \newlabel{subsec:entropy_sources}{{\mbox  {VIII-A}}{12}{}{subsection.8.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces NIST SP 800-22 statistical randomness tests on the quantum entropy pool (1,000,000 bits, $\alpha = 0.01$). All 11 tests pass. Byte Distribution and Shannon Entropy are supplementary quality metrics, not part of the SP~800-22 suite.}}{12}{}\protected@file@percent }
+\newlabel{tab:nist}{{VIII}{12}{}{table.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Capability matrix comparing Zipminator L10 against seven widely used anonymization tools across four dimensions: technique, entropy source, irreversibility basis, and regulatory implications. L10 is the only tool offering physics-guaranteed irreversibility, P=NP resilience, and QRNG entropy.}}{12}{}\protected@file@percent }
+\newlabel{fig:comparison}{{7}{12}{}{figure.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-B}}Irreversibility Analysis}{12}{}\protected@file@percent }
 \newlabel{subsec:irrev_analysis}{{\mbox  {VIII-B}}{12}{}{subsection.8.2}{}}
 \citation{amer2025certified}
-\citation{georgiou2020gdpr}
-\citation{elliot2018functional}
 \@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Comparison of Anonymization Tools. $^\dagger $Physics-guaranteed irreversibility requires QRNG-sourced entropy; the benchmarks in this paper used OS entropy (computational irreversibility only). The system architecture supports upgrading to QRNG without pipeline changes.}}{13}{}\protected@file@percent }
 \newlabel{tab:comparison}{{IX}{13}{}{table.9}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-C}}Why This Has Not Been Done Before}{13}{}\protected@file@percent }
 \newlabel{subsec:gap}{{\mbox  {VIII-C}}{13}{}{subsection.8.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-D}}QRNG Retrofitting Feasibility}{13}{}\protected@file@percent }
 \newlabel{subsec:retrofit}{{\mbox  {VIII-D}}{13}{}{subsection.8.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-E}}Regulatory Implications}{13}{}\protected@file@percent }
-\newlabel{subsec:regulatory}{{\mbox  {VIII-E}}{13}{}{subsection.8.5}{}}
+\citation{georgiou2020gdpr}
+\citation{elliot2018functional}
 \citation{dwork2006icalp}
 \citation{dwork2006dp}
 \citation{mcsherry2007mechanism}
@@ -169,8 +168,8 @@
 \citation{kifer2011nofree}
 \citation{ma2016qrng}
 \citation{herrero2017qrng}
-\citation{unruh2015revocable}
-\citation{broadbent2020certified}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-E}}Regulatory Implications}{14}{}\protected@file@percent }
+\newlabel{subsec:regulatory}{{\mbox  {VIII-E}}{14}{}{subsection.8.5}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {IX}Related Work}{14}{}\protected@file@percent }
 \newlabel{sec:related}{{IX}{14}{}{section.9}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-A}}Differential Privacy}{14}{}\protected@file@percent }
@@ -179,23 +178,25 @@
 \newlabel{subsec:kanon}{{\mbox  {IX-B}}{14}{}{subsection.9.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-C}}QRNG in Cryptography}{14}{}\protected@file@percent }
 \newlabel{subsec:qrng_crypto}{{\mbox  {IX-C}}{14}{}{subsection.9.3}{}}
+\citation{unruh2015revocable}
+\citation{broadbent2020certified}
 \citation{nist2023beacon}
 \citation{vazirani2012certifiable}
 \citation{amer2025certified}
 \citation{vernam1926cipher}
 \citation{shannon1949secrecy}
-\citation{hirche2022qdp}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-D}}Quantum Encryption with Certified Deletion}{15}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-E}}Randomness Beacons}{15}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-F}}Certified Randomness}{15}{}\protected@file@percent }
 \newlabel{subsec:certified}{{\mbox  {IX-F}}{15}{}{subsection.9.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-G}}Information-Theoretic Security: Shannon's OTP}{15}{}\protected@file@percent }
 \newlabel{subsec:it_security}{{\mbox  {IX-G}}{15}{}{subsection.9.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-H}}Quantum Differential Privacy}{15}{}\protected@file@percent }
-\newlabel{subsec:qdp}{{\mbox  {IX-H}}{15}{}{subsection.9.8}{}}
+\citation{hirche2022qdp}
 \citation{hensen2015loophole}
 \@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Privacy-utility spectrum across the 10 anonymization levels. L1--L3 preserve high utility at the cost of weak privacy. L10 provides the maximum privacy guarantee (physics-guaranteed irreversibility) at zero utility. The dashed line marks the maximum irreversibility achievable with classical methods.}}{16}{}\protected@file@percent }
 \newlabel{fig:utility}{{8}{16}{}{figure.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-H}}Quantum Differential Privacy}{16}{}\protected@file@percent }
+\newlabel{subsec:qdp}{{\mbox  {IX-H}}{16}{}{subsection.9.8}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {X}Discussion}{16}{}\protected@file@percent }
 \newlabel{sec:discussion}{{X}{16}{}{section.10}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-A}}The Privacy-Utility Spectrum}{16}{}\protected@file@percent }
@@ -204,17 +205,19 @@
 \newlabel{subsec:assumptions}{{\mbox  {X-B}}{16}{}{subsection.10.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-C}}Implications for the HNDL Threat}{16}{}\protected@file@percent }
 \newlabel{subsec:hndl}{{\mbox  {X-C}}{16}{}{subsection.10.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-D}}Comparison with Quantum Key Distribution}{16}{}\protected@file@percent }
-\newlabel{subsec:qkd_comparison}{{\mbox  {X-D}}{16}{}{subsection.10.4}{}}
 \citation{arute2019supremacy}
-\citation{amer2025certified}
 \@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Comparison: QKD vs.\ QRNG-OTP-Destroy}}{17}{}\protected@file@percent }
 \newlabel{tab:qkd_vs_l10}{{X}{17}{}{table.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-D}}Comparison with Quantum Key Distribution}{17}{}\protected@file@percent }
+\newlabel{subsec:qkd_comparison}{{\mbox  {X-D}}{17}{}{subsection.10.4}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {XI}Limitations}{17}{}\protected@file@percent }
 \newlabel{sec:limitations}{{XI}{17}{}{section.11}{}}
+\citation{amer2025certified}
 \citation{bell1964epr,hensen2015loophole}
 \citation{amer2025certified}
 \bibcite{acin2016certified}{1}
+\@writefile{toc}{\contentsline {section}{\numberline {XII}Conclusion}{18}{}\protected@file@percent }
+\newlabel{sec:conclusion}{{XII}{18}{}{section.12}{}}
 \bibcite{amer2025certified}{2}
 \bibcite{apple2017dp}{3}
 \bibcite{art29wp2014anonymisation}{4}
@@ -222,9 +225,6 @@
 \bibcite{aspect1982epr}{6}
 \bibcite{barak2007privacy}{7}
 \bibcite{bell1964epr}{8}
-\@writefile{toc}{\contentsline {section}{\numberline {XII}Conclusion}{18}{}\protected@file@percent }
-\newlabel{sec:conclusion}{{XII}{18}{}{section.12}{}}
-\@writefile{toc}{\contentsline {section}{References}{18}{}\protected@file@percent }
 \bibcite{bohm1952suggested}{9}
 \bibcite{broadbent2020certified}{10}
 \bibcite{clauser1969chsh}{11}
@@ -264,10 +264,11 @@
 \bibcite{vazirani2012certifiable}{45}
 \bibcite{vernam1926cipher}{46}
 \bibcite{wilson2020dpsql}{47}
+\@writefile{toc}{\contentsline {section}{References}{19}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{Appendix}{19}{}\protected@file@percent }
 \newlabel{app:security-game}{{A}{19}{}{section.Appendix.A}{}}
 \newlabel{def:anon-game}{{4}{19}{}{definition.4}{}}
-\newlabel{eq:adv-anon}{{10}{19}{}{equation.10}{}}
-\newlabel{thm:game-security}{{6}{19}{}{theorem.6}{}}
-\newlabel{eq:adv-bound}{{11}{19}{}{equation.11}{}}
+\newlabel{eq:adv-anon}{{10}{20}{}{equation.10}{}}
+\newlabel{thm:game-security}{{7}{20}{}{theorem.7}{}}
+\newlabel{eq:adv-bound}{{11}{20}{}{equation.11}{}}
 \gdef \@abspage@last{20}

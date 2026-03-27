@@ -21,21 +21,10 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
   String _searchQuery = '';
 
   @override
-  void initState() {
-    super.initState();
-    // Auto-connect to signaling server when the messenger screen opens.
-    Future.microtask(() {
-      ref.read(ratchetProvider.notifier).connectToSignaling();
-    });
-  }
-
-  @override
   void dispose() {
     _controller.dispose();
     _scrollController.dispose();
     _searchController.dispose();
-    // Disconnect when leaving the messenger screen.
-    ref.read(ratchetProvider.notifier).disconnectFromSignaling();
     super.dispose();
   }
 
@@ -408,18 +397,25 @@ class _ConversationTile extends StatelessWidget {
                     ),
                     if (isOnline)
                       Positioned(
-                        right: 0,
-                        bottom: 0,
+                        right: -2,
+                        bottom: -2,
                         child: Container(
-                          width: 14,
-                          height: 14,
+                          width: 16,
+                          height: 16,
                           decoration: BoxDecoration(
-                            color: QuantumTheme.quantumGreen,
+                            color: const Color(0xFF00E676),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: QuantumTheme.surfaceCard,
-                              width: 2,
+                              color: Colors.white,
+                              width: 2.5,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF00E676).withValues(alpha: 0.6),
+                                blurRadius: 4,
+                                spreadRadius: 1,
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -585,18 +581,25 @@ class _ChatView extends StatelessWidget {
                     ),
                     if (isOnline)
                       Positioned(
-                        right: 0,
-                        bottom: 0,
+                        right: -1,
+                        bottom: -1,
                         child: Container(
-                          width: 10,
-                          height: 10,
+                          width: 12,
+                          height: 12,
                           decoration: BoxDecoration(
-                            color: QuantumTheme.quantumGreen,
+                            color: const Color(0xFF00E676),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: QuantumTheme.surfaceDark,
+                              color: Colors.white,
                               width: 2,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF00E676).withValues(alpha: 0.6),
+                                blurRadius: 4,
+                                spreadRadius: 1,
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -844,18 +847,25 @@ class _ContactTile extends StatelessWidget {
           ),
           if (contact.isOnline)
             Positioned(
-              right: 0,
-              bottom: 0,
+              right: -1,
+              bottom: -1,
               child: Container(
-                width: 12,
-                height: 12,
+                width: 14,
+                height: 14,
                 decoration: BoxDecoration(
-                  color: QuantumTheme.quantumGreen,
+                  color: const Color(0xFF00E676),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: QuantumTheme.surfaceCard,
+                    color: Colors.white,
                     width: 2,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF00E676).withValues(alpha: 0.6),
+                      blurRadius: 4,
+                      spreadRadius: 1,
+                    ),
+                  ],
                 ),
               ),
             ),

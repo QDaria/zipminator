@@ -11,7 +11,7 @@ class BrowserState {
   const BrowserState({
     this.url = 'https://zipminator.zip',
     this.isLoading = false,
-    this.proxyActive = false,
+    this.proxyActive = true,
     this.canGoBack = false,
     this.canGoForward = false,
     this.error,

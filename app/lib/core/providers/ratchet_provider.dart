@@ -787,3 +787,15 @@ class RatchetNotifier extends Notifier<RatchetState> {
 
 final ratchetProvider =
     NotifierProvider<RatchetNotifier, RatchetState>(RatchetNotifier.new);
+
+/// Provider that auto-connects to the signaling server when the app starts.
+/// Watch this from the root app widget to keep signaling alive app-wide.
+final signalingInitProvider = Provider<void>((ref) {
+  final auth = ref.watch(authProvider);
+  if (auth.isAuthenticated) {
+    // Connect signaling after auth is confirmed.
+    Future.microtask(() {
+      ref.read(ratchetProvider.notifier).connectToSignaling();
+    });
+  }
+});

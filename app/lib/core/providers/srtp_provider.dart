@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zipminator/core/providers/ratchet_provider.dart';
 import 'package:zipminator/src/rust/api/simple.dart' as rust;
 
 /// Call lifecycle phases for the VoIP demo.
@@ -18,29 +19,23 @@ class VoipContact {
     required this.email,
     required this.isOnline,
   });
+
+  /// Create a VoIP contact from a Messenger contact.
+  factory VoipContact.fromContact(Contact contact) => VoipContact(
+        id: contact.id,
+        name: contact.name,
+        email: contact.email,
+        isOnline: contact.isOnline,
+      );
 }
 
-/// Demo contacts shared with ratchet_provider.
-const demoVoipContacts = [
-  VoipContact(
-    id: 'alice-q',
-    name: 'Alice Quantum',
-    email: 'alice@qdaria.com',
-    isOnline: true,
-  ),
-  VoipContact(
-    id: 'bob-c',
-    name: 'Bob Cipher',
-    email: 'bob@qdaria.com',
-    isOnline: true,
-  ),
-  VoipContact(
-    id: 'charlie-m',
-    name: 'Charlie Mesh',
-    email: 'charlie@qdaria.com',
-    isOnline: false,
-  ),
-];
+/// Provider that exposes the shared contacts from ratchet_provider as VoipContacts.
+final voipContactsProvider = Provider<List<VoipContact>>((ref) {
+  final ratchetState = ref.watch(ratchetProvider);
+  return ratchetState.contacts
+      .map((c) => VoipContact.fromContact(c))
+      .toList();
+});
 
 /// State for a VoIP call with PQ-SRTP.
 class VoipState {

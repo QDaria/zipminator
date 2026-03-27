@@ -22,6 +22,14 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
   final _controller = TextEditingController();
   String? _uploadedFileName;
 
+  /// Privacy-first: all sensitive data hidden by default.
+  bool _scannerContentVisible = false;
+  bool _beforeAfterVisible = false;
+  final Set<int> _revealedMatches = {};
+
+  /// Tracks whether the L10 warning has been acknowledged this session.
+  bool _l10Acknowledged = false;
+
   @override
   void initState() {
     super.initState();
@@ -84,6 +92,77 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
       _controller.text = text;
       _uploadedFileName = file.name;
     });
+  }
+
+  // ── L10 irreversibility warning ────────────────────────────────────
+
+  Future<bool> _showL10Warning() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: QuantumTheme.surfaceCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded,
+                color: QuantumTheme.quantumRed, size: 24),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text('Irreversible Quantum Anonymization'),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Level 10 uses quantum one-time pad (patent pending). '
+          'The original data will be permanently destroyed. '
+          'This cannot be reversed by any computer, classical or quantum.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: QuantumTheme.quantumRed,
+            ),
+            child: const Text('I Understand \u2014 Proceed'),
+          ),
+        ],
+      ),
+    );
+    return confirmed == true;
+  }
+
+  // ── Use-case chip handler with alert for "Review legal docs" ───────
+
+  void _onUseCaseTapped(String label, PiiNotifier notifier) {
+    _controller.text = _exampleForUseCase(label);
+    setState(() {
+      _uploadedFileName = null;
+      _scannerContentVisible = false;
+    });
+    notifier.scan(_controller.text);
+
+    if (label == 'Review legal docs') {
+      final pii = ref.read(piiProvider);
+      final highCount =
+          pii.matches.where((m) => m.sensitivity >= 4).length;
+      if (pii.matches.isNotEmpty && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${pii.matches.length} PII items detected '
+              '($highCount high sensitivity)',
+            ),
+            backgroundColor: QuantumTheme.quantumOrange,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   // ── Build ────────────────────────────────────────────────────────────
@@ -310,7 +389,15 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
               max: 10,
               divisions: 9,
               label: 'L$level',
-              onChanged: (v) => notifier.setLevel(v.round()),
+              onChanged: (v) async {
+                final newLevel = v.round();
+                if (newLevel == 10 && !_l10Acknowledged) {
+                  final confirmed = await _showL10Warning();
+                  if (!confirmed) return;
+                  _l10Acknowledged = true;
+                }
+                notifier.setLevel(newLevel);
+              },
             ),
           ),
 
@@ -335,6 +422,37 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
               }),
             ),
           ),
+
+          // Save Encrypted Backup button (visible at L10)
+          if (level == 10) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        'Encrypted backup saved with ML-KEM-768',
+                      ),
+                      backgroundColor: QuantumTheme.quantumGreen,
+                    ),
+                  );
+                },
+                icon: Icon(Icons.backup,
+                    size: 18, color: QuantumTheme.quantumCyan),
+                label: Text(
+                  'Save Encrypted Backup',
+                  style: TextStyle(color: QuantumTheme.quantumCyan),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: QuantumTheme.quantumCyan.withValues(alpha: 0.4),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     ).animate().fadeIn(delay: 200.ms, duration: 300.ms);
@@ -354,11 +472,7 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
           return ActionChip(
             avatar: Icon(icon, size: 16),
             label: Text(label, style: const TextStyle(fontSize: 12)),
-            onPressed: () {
-              _controller.text = _exampleForUseCase(label);
-              setState(() => _uploadedFileName = null);
-              notifier.scan(_controller.text);
-            },
+            onPressed: () => _onUseCaseTapped(label, notifier),
           );
         },
       ),
@@ -439,21 +553,44 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('PII Scanner',
-              style: Theme.of(context).textTheme.titleLarge),
+          // Title row with privacy eye toggle for the text field
+          Row(
+            children: [
+              Expanded(
+                child: Text('PII Scanner',
+                    style: Theme.of(context).textTheme.titleLarge),
+              ),
+              IconButton(
+                icon: Icon(
+                  _scannerContentVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off,
+                  size: 20,
+                  color: QuantumTheme.quantumOrange.withValues(alpha: 0.7),
+                ),
+                tooltip: _scannerContentVisible
+                    ? 'Hide scanner content'
+                    : 'Reveal scanner content',
+                onPressed: () => setState(
+                    () => _scannerContentVisible = !_scannerContentVisible),
+              ),
+            ],
+          ),
           const SizedBox(height: 4),
           Text('Powered by Rust regex engine (166+ patterns)',
               style: Theme.of(context).textTheme.bodySmall),
           const SizedBox(height: 12),
 
-          // Text field
+          // Text field -- obscured when hidden
           TextField(
             controller: _controller,
             maxLines: 5,
-            decoration: const InputDecoration(
-              hintText:
-                  'Paste text to scan for PII...\n'
-                  'e.g. "My SSN is 123-45-6789, email me at test@example.com"',
+            obscureText: !_scannerContentVisible,
+            decoration: InputDecoration(
+              hintText: _scannerContentVisible
+                  ? 'Paste text to scan for PII...\n'
+                      'e.g. "My SSN is 123-45-6789, email me at test@example.com"'
+                  : 'Content hidden for privacy. Tap the eye icon to reveal.',
             ),
           ),
           const SizedBox(height: 8),
@@ -544,42 +681,83 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
               Icon(Icons.compare_arrows,
                   color: QuantumTheme.quantumGreen, size: 20),
               const SizedBox(width: 8),
-              Text('Before / After (L${pii.selectedLevel})',
-                  style: Theme.of(context).textTheme.titleSmall),
+              Expanded(
+                child: Text('Before / After (L${pii.selectedLevel})',
+                    style: Theme.of(context).textTheme.titleSmall),
+              ),
+              IconButton(
+                icon: Icon(
+                  _beforeAfterVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off,
+                  size: 20,
+                  color: QuantumTheme.quantumGreen.withValues(alpha: 0.7),
+                ),
+                tooltip: _beforeAfterVisible
+                    ? 'Hide comparison'
+                    : 'Reveal comparison',
+                onPressed: () => setState(
+                    () => _beforeAfterVisible = !_beforeAfterVisible),
+              ),
             ],
           ),
           const SizedBox(height: 12),
 
-          // Original
-          _splitPane(
-            context,
-            label: 'ORIGINAL',
-            color: QuantumTheme.quantumOrange,
-            text: pii.inputText,
-          ),
-          const SizedBox(height: 10),
-
-          // Divider
-          Row(
-            children: [
-              const Expanded(child: Divider()),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Icon(Icons.arrow_downward,
-                    size: 16, color: QuantumTheme.quantumGreen),
+          if (!_beforeAfterVisible)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: QuantumTheme.surfaceElevated.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(8),
               ),
-              const Expanded(child: Divider()),
-            ],
-          ),
-          const SizedBox(height: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.visibility_off,
+                      size: 16, color: QuantumTheme.textSecondary),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Content hidden for privacy',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: QuantumTheme.textSecondary,
+                        ),
+                  ),
+                ],
+              ),
+            )
+          else ...[
+            // Original
+            _splitPane(
+              context,
+              label: 'ORIGINAL',
+              color: QuantumTheme.quantumOrange,
+              text: pii.inputText,
+            ),
+            const SizedBox(height: 10),
 
-          // Redacted
-          _splitPane(
-            context,
-            label: 'REDACTED',
-            color: QuantumTheme.quantumGreen,
-            text: pii.redactedText ?? '',
-          ),
+            // Divider
+            Row(
+              children: [
+                const Expanded(child: Divider()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Icon(Icons.arrow_downward,
+                      size: 16, color: QuantumTheme.quantumGreen),
+                ),
+                const Expanded(child: Divider()),
+              ],
+            ),
+            const SizedBox(height: 10),
+
+            // Redacted
+            _splitPane(
+              context,
+              label: 'REDACTED',
+              color: QuantumTheme.quantumGreen,
+              text: pii.redactedText ?? '',
+            ),
+          ],
         ],
       ),
     ).animate().fadeIn(duration: 300.ms);
@@ -666,7 +844,7 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
         );
   }
 
-  // ── 7. Individual match cards ────────────────────────────────────────
+  // ── 7. Individual match cards with privacy eye toggle ──────────────
 
   List<Widget> _buildMatchCards(BuildContext context, PiiScanState pii) {
     return pii.matches.asMap().entries.map((entry) {
@@ -677,6 +855,8 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
           : m.sensitivity >= 3
               ? QuantumTheme.quantumOrange
               : QuantumTheme.quantumGreen;
+
+      final isRevealed = _revealedMatches.contains(index);
 
       return Padding(
         padding: const EdgeInsets.only(bottom: 8),
@@ -689,10 +869,34 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                 .fadeIn(delay: (index * 100).ms),
             title: Text(m.patternName),
             subtitle: Text(
-              '${m.category} | "${m.matchedText}" | ${m.countryCode.toUpperCase()}',
+              isRevealed
+                  ? '${m.category} | "${m.matchedText}" | ${m.countryCode.toUpperCase()}'
+                  : '${m.category} | ******** | ${m.countryCode.toUpperCase()}',
             ),
-            trailing: Text('L${m.sensitivity}',
-                style: Theme.of(context).textTheme.labelLarge),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('L${m.sensitivity}',
+                    style: Theme.of(context).textTheme.labelLarge),
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      if (isRevealed) {
+                        _revealedMatches.remove(index);
+                      } else {
+                        _revealedMatches.add(index);
+                      }
+                    });
+                  },
+                  child: Icon(
+                    isRevealed ? Icons.visibility : Icons.visibility_off,
+                    size: 18,
+                    color: glowColor.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       )

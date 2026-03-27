@@ -191,7 +191,7 @@ class _ContactListView extends ConsumerWidget {
           const SizedBox(height: 16),
 
           // Contact cards
-          ...demoVoipContacts.asMap().entries.map((entry) {
+          ...ref.watch(voipContactsProvider).asMap().entries.map((entry) {
             final i = entry.key;
             final c = entry.value;
             return Padding(
@@ -318,20 +318,29 @@ class _ContactCard extends StatelessWidget {
               ),
             ),
             Positioned(
-              right: 0,
-              bottom: 0,
+              right: -1,
+              bottom: -1,
               child: Container(
-                width: 12,
-                height: 12,
+                width: 14,
+                height: 14,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: contact.isOnline
-                      ? QuantumTheme.quantumGreen
+                      ? const Color(0xFF00E676)
                       : QuantumTheme.textSecondary,
                   border: Border.all(
-                    color: QuantumTheme.surfaceCard,
+                    color: Colors.white,
                     width: 2,
                   ),
+                  boxShadow: contact.isOnline
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFF00E676).withValues(alpha: 0.6),
+                            blurRadius: 4,
+                            spreadRadius: 1,
+                          ),
+                        ]
+                      : [],
                 ),
               ),
             ),

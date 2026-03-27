@@ -274,3 +274,41 @@ The paper assumes that qubits prepared in |+> and measured in the computational 
 The paper has a strong core idea that fills a real gap. The three-tier irreversibility framework and the QRNG-OTP-Destroy protocol are novel contributions to the anonymization literature.
 
 **Status after Mar 25 revision**: All 8 "Must Fix" items resolved. 9 of 11 "Should Fix" items resolved. Remaining: formalize security as cryptographic game (deferred to appendix/follow-up), justify Fig 3 caption numbers in text (minor). The implementation now matches the specification (mapping destruction with `ctypes.memset`), security bounds are corrected (62^{-16} ≈ 2^{-95.3}), Bohmian mechanics addressed, hardware noise discussed, related work expanded, GDPR claims reframed, and all citations verified. Paper compiles clean at 17 pages. 109 anonymizer tests pass.
+
+---
+
+## Iteration Log (Mar 25-27 2026)
+
+### Score Trajectory
+- Original peer review (Mar 25): **0.45/1.0** — MAJOR REVISION
+- After RALPH loops 1-3 (Mar 25): **0.79** — mapping destruction, empirical eval, 30 new refs
+- After zero-hallucination audit (Mar 26): **0.80** — fabricated Rigetti claim removed, test counts fixed
+- After 10-iteration polish (Mar 26): **0.80** — overfull warnings fixed, tables consolidated, prose tightened, Appendix A, IBM Quantum demo
+- Current (Mar 27): targeting **0.90+** with MI proof, footnotes, synthetic data related work
+
+### Completed Iterations (10 total)
+| # | Task | Impact |
+|---|------|--------|
+| 1 | Fix 28 overfull hbox warnings | 0 warnings |
+| 2 | Retitle hardware demo, OS-entropy disclosure | Zero fabricated claims |
+| 3 | Consolidate 13 to 10 tables | Cleaner layout |
+| 4 | Prose tightening (24 edits, abstract 260 to 185 words) | Sharper writing |
+| 5 | Formal security game (Appendix A) | Closes peer review gap |
+| 6 | IBM Quantum ibm_fez execution (2,048 bytes) | Real hardware demo |
+| 7 | Figure files renamed to match compiled order | Source consistency |
+| 8 | Presidio citation, DORA claim, Broadbent venue | Claim accuracy |
+| 9 | Adversarial self-review (0.80 score) | 6 items identified |
+| 10 | DORA softened, provider priority, ID Quantique date | Verification pass |
+
+### Remaining for 0.90+
+- [ ] MI(D;D')=0 proof (Proposition)
+- [ ] Superdeterminism footnote
+- [ ] Hardware TRNG footnote
+- [ ] Synthetic data related work
+- [ ] Domain-knowledge attack proposition
+- [ ] End-to-end QRNG benchmark (needs qBraid key refresh)
+
+### Paper Strategy
+1. Paper 1 (PoPETs): Current paper, target submit Aug 2026
+2. Paper 2 (Nature Comms): 2,500-word letter, target Jul 2026
+3. Paper 3 (Nature Physics): Device-independent anonymization, target 2027

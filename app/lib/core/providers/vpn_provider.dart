@@ -1,7 +1,44 @@
+import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// VPN connection states.
 enum VpnStatus { disconnected, connecting, connected, disconnecting, error }
+
+/// Auto-rotation intervals for location anonymization.
+enum RotationInterval {
+  everyMinute('Every 1 min', Duration(minutes: 1)),
+  everyHour('Every 1 hour', Duration(hours: 1)),
+  everyDay('Every 24 hours', Duration(hours: 24)),
+  everyWeek('Every week', Duration(days: 7)),
+  off('Off', Duration.zero);
+
+  final String label;
+  final Duration duration;
+  const RotationInterval(this.label, this.duration);
+}
+
+/// Cities used for simulated location rotation.
+const _rotationCities = [
+  'Oslo, Norway',
+  'Stockholm, Sweden',
+  'Frankfurt, Germany',
+  'Amsterdam, Netherlands',
+  'London, UK',
+  'Zurich, Switzerland',
+  'New York, US',
+  'Los Angeles, US',
+  'Tokyo, Japan',
+  'Singapore',
+  'Sydney, Australia',
+  'Toronto, Canada',
+  'Reykjavik, Iceland',
+  'Helsinki, Finland',
+  'Bucharest, Romania',
+  'Warsaw, Poland',
+  'Prague, Czech Republic',
+  'Mumbai, India',
+];
 
 /// Geographic regions for VPN server selection.
 enum VpnRegion {
@@ -118,6 +155,12 @@ class VpnState {
   final VpnRegion selectedRegion;
   final String? error;
 
+  // Location anonymization fields
+  final bool locationAnonymization;
+  final RotationInterval rotationInterval;
+  final bool locationHidden;
+  final String currentLocation;
+
   const VpnState({
     this.status = VpnStatus.disconnected,
     this.serverAddress,
@@ -128,6 +171,10 @@ class VpnState {
     this.selectedLocation,
     this.selectedRegion = VpnRegion.europe,
     this.error,
+    this.locationAnonymization = false,
+    this.rotationInterval = RotationInterval.everyHour,
+    this.locationHidden = false,
+    this.currentLocation = 'Oslo, Norway',
   });
 
   VpnState copyWith({
@@ -140,6 +187,10 @@ class VpnState {
     VpnLocation? selectedLocation,
     VpnRegion? selectedRegion,
     String? error,
+    bool? locationAnonymization,
+    RotationInterval? rotationInterval,
+    bool? locationHidden,
+    String? currentLocation,
   }) =>
       VpnState(
         status: status ?? this.status,
@@ -151,6 +202,11 @@ class VpnState {
         selectedLocation: selectedLocation ?? this.selectedLocation,
         selectedRegion: selectedRegion ?? this.selectedRegion,
         error: error,
+        locationAnonymization:
+            locationAnonymization ?? this.locationAnonymization,
+        rotationInterval: rotationInterval ?? this.rotationInterval,
+        locationHidden: locationHidden ?? this.locationHidden,
+        currentLocation: currentLocation ?? this.currentLocation,
       );
 
   bool get isActive =>
@@ -159,6 +215,11 @@ class VpnState {
   /// Locations filtered by selected region.
   List<VpnLocation> get regionLocations =>
       kVpnLocations.where((l) => l.region == selectedRegion).toList();
+
+  /// Display string for location (respects hidden state).
+  String get displayLocation => locationHidden
+      ? 'Unknown \u2014 Your location is hidden even from you'
+      : currentLocation;
 }
 
 /// Manages VPN connection state.
@@ -212,6 +273,35 @@ class VpnNotifier extends Notifier<VpnState> {
 
   void toggleKillSwitch() {
     state = state.copyWith(killSwitchEnabled: !state.killSwitchEnabled);
+  }
+
+  // --- Location Anonymization ---
+
+  void toggleLocationAnonymization() {
+    final enabled = !state.locationAnonymization;
+    state = state.copyWith(
+      locationAnonymization: enabled,
+      // When disabling, also unhide location
+      locationHidden: enabled ? state.locationHidden : false,
+    );
+  }
+
+  void setRotationInterval(RotationInterval interval) {
+    state = state.copyWith(rotationInterval: interval);
+  }
+
+  void toggleLocationVisibility() {
+    state = state.copyWith(locationHidden: !state.locationHidden);
+  }
+
+  /// Rotate to a random city (simulated).
+  void rotateLocation() {
+    final rng = Random();
+    String next;
+    do {
+      next = _rotationCities[rng.nextInt(_rotationCities.length)];
+    } while (next == state.currentLocation && _rotationCities.length > 1);
+    state = state.copyWith(currentLocation: next);
   }
 }
 

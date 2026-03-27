@@ -17,10 +17,10 @@ class ShellScaffold extends StatelessWidget {
     _NavTab('/messenger', Icons.chat_bubble_outline, Icons.chat_bubble, 'Messenger', 'PQC messaging'),
     _NavTab('/voip', Icons.phone_outlined, Icons.phone, 'VoIP', 'Quantum-safe calls'),
     _NavTab('/vpn', Icons.vpn_key_outlined, Icons.vpn_key, 'VPN', 'PQC tunnel'),
-    _NavTab('/anonymizer', Icons.visibility_off_outlined, Icons.visibility_off, 'Anonymizer', 'PII scanner'),
-    _NavTab('/ai', Icons.psychology_outlined, Icons.psychology, 'Q-AI', 'Quantum AI assistant'),
-    _NavTab('/email', Icons.email_outlined, Icons.email, 'Email', 'PQC-encrypted mail'),
     _NavTab('/browser', Icons.language_outlined, Icons.language, 'Browser', 'Privacy browser'),
+    _NavTab('/email', Icons.email_outlined, Icons.email, 'Email', 'PQC-encrypted mail'),
+    _NavTab('/ai', Icons.psychology_outlined, Icons.psychology, 'Q-AI', 'Quantum AI assistant'),
+    _NavTab('/anonymizer', Icons.visibility_off_outlined, Icons.visibility_off, 'Anonymizer', 'PII scanner'),
     _NavTab('/mesh', Icons.hub_outlined, Icons.hub, 'Q-Mesh', 'Mesh networking'),
   ];
 
