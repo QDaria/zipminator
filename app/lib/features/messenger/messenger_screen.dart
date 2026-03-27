@@ -806,13 +806,77 @@ class _NewConversationSheet extends StatelessWidget {
                   color: QuantumTheme.textSecondary,
                 ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+          // Add contact by username
+          _AddContactField(onAdd: onSelect),
+          const Divider(height: 24),
+          Text('Contacts', style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: 8),
           ...contacts.map((contact) => _ContactTile(
                 contact: contact,
                 onTap: () => onSelect(contact),
               )),
         ],
       ),
+    );
+  }
+}
+
+class _AddContactField extends StatefulWidget {
+  final ValueChanged<Contact> onAdd;
+  const _AddContactField({required this.onAdd});
+  @override
+  State<_AddContactField> createState() => _AddContactFieldState();
+}
+
+class _AddContactFieldState extends State<_AddContactField> {
+  final _ctrl = TextEditingController();
+
+  void _add() {
+    final input = _ctrl.text.trim();
+    if (input.isEmpty) return;
+    // Derive username from email (before @) or use as-is
+    final username = input.contains('@') ? input.split('@').first : input;
+    final contact = Contact(
+      id: 'live-$username',
+      name: username,
+      email: input.contains('@') ? input : '$input@zipminator.zip',
+      isOnline: true,
+    );
+    widget.onAdd(contact);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _ctrl,
+            decoration: const InputDecoration(
+              hintText: 'Enter email or username...',
+              prefixIcon: Icon(Icons.person_add, size: 20),
+              isDense: true,
+            ),
+            onSubmitted: (_) => _add(),
+          ),
+        ),
+        const SizedBox(width: 8),
+        IconButton.filled(
+          onPressed: _add,
+          icon: const Icon(Icons.send, size: 18),
+          style: IconButton.styleFrom(
+            backgroundColor: QuantumTheme.quantumCyan,
+            foregroundColor: Colors.black,
+          ),
+        ),
+      ],
     );
   }
 }
