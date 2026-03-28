@@ -528,7 +528,14 @@ class RatchetNotifier extends Notifier<RatchetState> {
       'bob-c': 'bob',
       'charlie-m': 'charlie',
     };
-    return contactIdToUsername[contactId] ?? contactId;
+    if (contactIdToUsername.containsKey(contactId)) {
+      return contactIdToUsername[contactId]!;
+    }
+    // Strip 'live-' prefix for user-added contacts
+    if (contactId.startsWith('live-')) {
+      return contactId.substring(5);
+    }
+    return contactId;
   }
 
   // ── Conversation management ──────────────────────────────────────────
