@@ -657,15 +657,13 @@ class RatchetNotifier extends Notifier<RatchetState> {
     _addOutgoingMessage(text);
 
     // Route through live signaling if connected.
-    if (state.isLive && _messengerService != null) {
-      final contact = state.activeContact;
-      if (contact != null) {
-        final targetUsername = _contactIdToUsername(contact.id);
-        _messengerService!.sendMessageToPeer(
-          target: targetUsername,
-          plaintext: text,
-        );
-      }
+    final contact = state.activeContact;
+    if (_messengerService != null && _messengerService!.isConnected && contact != null) {
+      final targetUsername = _contactIdToUsername(contact.id);
+      _messengerService!.sendMessageToPeer(
+        target: targetUsername,
+        plaintext: text,
+      );
       // No auto-reply in live mode; real messages come through WebSocket.
       return null;
     }
