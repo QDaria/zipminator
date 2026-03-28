@@ -674,22 +674,8 @@ class RatchetNotifier extends Notifier<RatchetState> {
         target: targetUsername,
         plaintext: text,
       );
-      // Show debug confirmation as a system message
-      final debugMsg = ChatMessage(
-        text: '[DEBUG] Sent via signaling to "$targetUsername"',
-        isMine: false,
-      );
-      state = state.copyWith(messages: [...state.messages, debugMsg]);
       return null;
     }
-
-    // Show why it fell through to demo mode
-    final reason = !svcExists ? 'no service' : !svcConnected ? 'not connected' : 'no contact';
-    final debugMsg = ChatMessage(
-      text: '[DEBUG] Demo mode: $reason (svc=$svcExists, conn=$svcConnected, contact=$hasContact)',
-      isMine: false,
-    );
-    state = state.copyWith(messages: [...state.messages, debugMsg]);
 
     // Offline / demo fallback: schedule auto-reply.
     _scheduleAutoReply();

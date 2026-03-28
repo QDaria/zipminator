@@ -27,9 +27,10 @@ class MessengerService {
   WebSocketChannel? _channel;
   StreamSubscription<dynamic>? _subscription;
   Timer? _reconnectTimer;
+  Timer? _keepAliveTimer;
   int _reconnectAttempts = 0;
-  static const _maxReconnectAttempts = 5;
-  static const _reconnectBaseDelay = Duration(seconds: 2);
+  static const _maxReconnectAttempts = 10;
+  static const _reconnectBaseDelay = Duration(seconds: 1);
 
   final _messageController =
       StreamController<Map<String, dynamic>>.broadcast();
@@ -78,6 +79,14 @@ class MessengerService {
 
       _setState(SignalingConnectionState.connected);
       _reconnectAttempts = 0;
+
+      // Keep-alive: send ping every 15 seconds to prevent idle disconnect.
+      _keepAliveTimer?.cancel();
+      _keepAliveTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+        if (_channel != null && _state == SignalingConnectionState.connected) {
+          _channel!.sink.add('{"action":"ping"}');
+        }
+      });
 
       _subscription = _channel!.stream.listen(
         (data) {
@@ -170,6 +179,7 @@ class MessengerService {
   /// Disconnect from the signaling server.
   void disconnect() {
     _reconnectTimer?.cancel();
+    _keepAliveTimer?.cancel();
     _subscription?.cancel();
     _subscription = null;
     _channel?.sink.close();
