@@ -84,7 +84,7 @@ class MessengerService {
       _keepAliveTimer?.cancel();
       _keepAliveTimer = Timer.periodic(const Duration(seconds: 15), (_) {
         if (_channel != null && _state == SignalingConnectionState.connected) {
-          _channel!.sink.add('{"action":"ping"}');
+          _channel!.sink.add('ping');
         }
       });
 

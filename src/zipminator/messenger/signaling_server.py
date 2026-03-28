@@ -287,12 +287,17 @@ def create_app() -> FastAPI:
                 try:
                     msg = json.loads(raw)
                 except json.JSONDecodeError:
+                    # Handle plain text pings
+                    if raw.strip() == "ping":
+                        continue
                     await websocket.send_text(
                         json.dumps({"type": "error", "detail": "invalid JSON"})
                     )
                     continue
 
                 action = msg.get("action", "")
+                if action == "ping":
+                    continue
                 await _handle_action(peer, msg, action, websocket)
 
         except WebSocketDisconnect:
