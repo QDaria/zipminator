@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// VPN connection states.
@@ -222,12 +223,13 @@ class VpnState {
       : currentLocation;
 }
 
-/// Manages VPN connection state.
+/// Platform channel for iOS/macOS VPN via NEVPNManager.
+const _vpnChannel = MethodChannel('com.qdaria.zipminator/vpn');
+
+/// Manages VPN connection state with native iOS integration.
 ///
-/// Actual tunnel creation requires platform channels:
-/// - iOS/macOS: Swift NEPacketTunnelProvider
-/// - Android: Kotlin VpnService
-/// - Linux: Rust tun/tap
+/// Uses NEVPNManager with IKEv2 on iOS/macOS.
+/// Falls back to UI-only simulation on unsupported platforms.
 class VpnNotifier extends Notifier<VpnState> {
   @override
   VpnState build() => VpnState(
@@ -256,15 +258,62 @@ class VpnNotifier extends Notifier<VpnState> {
       serverAddress: location.server,
       error: null,
     );
-    // TODO: Platform channel to native VPN implementation
-    // For now, simulate connection for UI development
-    await Future.delayed(const Duration(seconds: 1));
-    state = state.copyWith(status: VpnStatus.connected);
+
+    try {
+      final result = await _vpnChannel.invokeMethod<String>('connect', {
+        'server': location.server,
+        'location': location.displayName,
+      });
+      if (result == 'connecting') {
+        // Poll for connected state (NEVPNManager notifies asynchronously).
+        await _pollUntilConnected();
+      }
+    } on PlatformException catch (e) {
+      state = state.copyWith(
+        status: VpnStatus.error,
+        error: e.message ?? 'VPN connection failed',
+      );
+    } on MissingPluginException {
+      // Platform doesn't support native VPN (web, Linux).
+      // Simulate for UI development.
+      await Future.delayed(const Duration(seconds: 1));
+      state = state.copyWith(status: VpnStatus.connected);
+    }
+  }
+
+  Future<void> _pollUntilConnected() async {
+    for (var i = 0; i < 30; i++) {
+      await Future.delayed(const Duration(seconds: 1));
+      try {
+        final status = await _vpnChannel.invokeMethod<String>('getStatus');
+        if (status == 'connected') {
+          state = state.copyWith(status: VpnStatus.connected);
+          return;
+        } else if (status == 'disconnected') {
+          state = state.copyWith(
+            status: VpnStatus.error,
+            error: 'Connection failed — server may be unreachable',
+          );
+          return;
+        }
+      } catch (_) {
+        break;
+      }
+    }
+    state = state.copyWith(
+      status: VpnStatus.error,
+      error: 'Connection timed out',
+    );
   }
 
   Future<void> disconnect() async {
     state = state.copyWith(status: VpnStatus.disconnecting);
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      await _vpnChannel.invokeMethod<String>('disconnect');
+    } on MissingPluginException {
+      // Fallback for unsupported platforms.
+    }
+    await Future.delayed(const Duration(milliseconds: 300));
     state = state.copyWith(
       status: VpnStatus.disconnected,
       serverAddress: null,
