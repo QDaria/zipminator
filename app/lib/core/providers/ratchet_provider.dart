@@ -208,6 +208,12 @@ class RatchetNotifier extends Notifier<RatchetState> {
   StreamSubscription<Map<String, dynamic>>? _messageSubscription;
   StreamSubscription<SignalingConnectionState>? _connectionSubscription;
 
+  /// Stream of incoming call signals for VoIP.
+  final _callSignalController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  Stream<Map<String, dynamic>> get callSignals =>
+      _callSignalController.stream;
+
   @override
   RatchetState build() {
     ref.onDispose(() {
@@ -215,6 +221,7 @@ class RatchetNotifier extends Notifier<RatchetState> {
       _messageSubscription?.cancel();
       _connectionSubscription?.cancel();
       _messengerService?.dispose();
+      _callSignalController.close();
     });
 
     // Seed demo contacts
@@ -364,6 +371,9 @@ class RatchetNotifier extends Notifier<RatchetState> {
     switch (type) {
       case 'message':
         _handleIncomingMessage(msg);
+      case 'signal':
+        // Forward call signals (call_offer, call_accept, call_end) to VoIP.
+        _callSignalController.add(msg);
       case 'peer_joined':
         _handlePeerJoined(msg);
       case 'peer_left':
@@ -545,6 +555,26 @@ class RatchetNotifier extends Notifier<RatchetState> {
       return contactId.substring(5);
     }
     return contactId;
+  }
+
+  // ── Call signaling (used by VoIP) ────────────────────────────────────
+
+  /// Send a call offer to a peer through the signaling server.
+  void sendCallOffer(String contactId) {
+    final target = _contactIdToUsername(contactId);
+    _messengerService?.sendSignal(target: target, type: 'call_offer');
+  }
+
+  /// Accept an incoming call from a peer.
+  void sendCallAccept(String contactId) {
+    final target = _contactIdToUsername(contactId);
+    _messengerService?.sendSignal(target: target, type: 'call_accept');
+  }
+
+  /// End a call with a peer.
+  void sendCallEnd(String contactId) {
+    final target = _contactIdToUsername(contactId);
+    _messengerService?.sendSignal(target: target, type: 'call_end');
   }
 
   // ── Conversation management ──────────────────────────────────────────

@@ -92,17 +92,27 @@ class VoipState {
       );
 }
 
-/// Manages VoIP call state with PQ-SRTP key derivation.
+/// Manages VoIP call state with PQ-SRTP key derivation and live signaling.
 class VoipNotifier extends Notifier<VoipState> {
   @override
   VoipState build() => const VoipState();
 
-  /// Transition to ringing state for a given contact.
+  /// Transition to ringing state and send call offer through signaling.
   void startRinging(VoipContact contact) {
     state = VoipState(
       phase: CallPhase.ringing,
       contact: contact,
     );
+    // Send call offer via signaling server if connected.
+    ref.read(ratchetProvider.notifier).sendCallOffer(contact.id);
+  }
+
+  /// Handle an incoming call_accept signal from the peer.
+  /// Called by the VoIP screen when it receives a call_accept signal.
+  void onCallAccepted() {
+    // The call acceptance means the peer is ready; KEM exchange
+    // is handled by the screen's _callContact flow which proceeds
+    // to connectCall after ringing.
   }
 
   /// Derive SRTP keys from a Kyber shared secret and move to connected.
@@ -124,6 +134,11 @@ class VoipNotifier extends Notifier<VoipState> {
   Future<void> startCall(Uint8List sharedSecret) => connectCall(sharedSecret);
 
   void endCall() {
+    // Notify peer via signaling if we have a contact.
+    final contact = state.contact;
+    if (contact != null) {
+      ref.read(ratchetProvider.notifier).sendCallEnd(contact.id);
+    }
     state = const VoipState();
   }
 

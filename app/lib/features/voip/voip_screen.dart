@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/core/providers/crypto_provider.dart';
+import 'package:zipminator/core/providers/ratchet_provider.dart';
 import 'package:zipminator/core/providers/srtp_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
@@ -171,24 +172,32 @@ class _ContactListView extends ConsumerWidget {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          const PillarStatusBanner(
+          PillarStatusBanner(
             description: 'Quantum-safe voice & video calls',
-            status: PillarStatus.demo,
+            status: ref.watch(ratchetProvider).isLive
+                ? PillarStatus.ready
+                : PillarStatus.demo,
           ),
           PillarHeader(
             icon: Icons.phone_outlined,
             title: 'Quantum VoIP',
-            subtitle: 'Select a contact to start a PQ-SRTP call',
+            subtitle: ref.watch(ratchetProvider).isLive
+                ? 'Call any peer via live signaling'
+                : 'Select a contact to start a PQ-SRTP call',
             iconColor: QuantumTheme.quantumCyan,
-            badges: const [
+            badges: [
               PqcBadge(
                 label: 'PQ-SRTP',
-                isActive: false,
+                isActive: ref.watch(ratchetProvider).isLive,
                 color: QuantumTheme.quantumGreen,
               ),
             ],
           ),
           const SizedBox(height: 16),
+
+          // Call by username (when Live)
+          if (ref.watch(ratchetProvider).isLive)
+            _CallByUsernameField(onCall: onCall),
 
           // Contact cards
           ...ref.watch(voipContactsProvider).asMap().entries.map((entry) {
@@ -394,8 +403,8 @@ class _RingingView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const PillarStatusBanner(
-            description: 'Quantum-safe voice & video calls',
-            status: PillarStatus.demo,
+            description: 'PQ-SRTP call in progress',
+            status: PillarStatus.ready,
           ),
           const SizedBox(height: 32),
 
@@ -583,8 +592,8 @@ class _ConnectedView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const PillarStatusBanner(
-              description: 'Quantum-safe voice & video calls',
-              status: PillarStatus.demo,
+              description: 'PQ-SRTP secured call',
+              status: PillarStatus.ready,
             ),
             PillarHeader(
               icon: Icons.phone_in_talk,
@@ -809,6 +818,73 @@ class _KeyInfo extends StatelessWidget {
                   fontFamily: 'JetBrains Mono',
                 )),
       ],
+    );
+  }
+}
+
+/// Field for calling a peer by username (like messenger's add contact).
+class _CallByUsernameField extends StatefulWidget {
+  final void Function(VoipContact) onCall;
+  const _CallByUsernameField({required this.onCall});
+  @override
+  State<_CallByUsernameField> createState() => _CallByUsernameFieldState();
+}
+
+class _CallByUsernameFieldState extends State<_CallByUsernameField> {
+  final _ctrl = TextEditingController();
+
+  void _call() {
+    final input = _ctrl.text.trim();
+    if (input.isEmpty) return;
+    final username = input.contains('@') ? input.split('@').first : input;
+    final contact = VoipContact(
+      id: 'live-$username',
+      name: username,
+      email: '$username@zipminator.zip',
+      isOnline: true,
+    );
+    widget.onCall(contact);
+    _ctrl.clear();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: QuantumCard(
+        glowColor: QuantumTheme.quantumGreen,
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _ctrl,
+                decoration: const InputDecoration(
+                  hintText: 'Call by username...',
+                  prefixIcon: Icon(Icons.person_add, size: 20),
+                  isDense: true,
+                  border: InputBorder.none,
+                ),
+                onSubmitted: (_) => _call(),
+              ),
+            ),
+            const SizedBox(width: 8),
+            IconButton.filled(
+              onPressed: _call,
+              icon: const Icon(Icons.call, size: 18),
+              style: IconButton.styleFrom(
+                backgroundColor: QuantumTheme.quantumGreen,
+                foregroundColor: Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
