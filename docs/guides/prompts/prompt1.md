@@ -4,9 +4,8 @@ automate and sophisticated approach with parallelised agent  teams, ruflo v3 pro
 Use these; 
 
 ## Default Skills
-
-/Users/mos/dev/qdaria/zipminator/.claude/skills/agentic-jujutsu/SKILL.md
 /Users/mos/dev/qdaria/zipminator/.claude/skills/hive-mind-advanced/SKILL.md
+/Users/mos/dev/qdaria/zipminator/.claude/skills/agentic-jujutsu/SKILL.md
 /Users/mos/dev/qdaria/zipminator/.claude/skills/pair-programming/SKILL.md
 /Users/mos/dev/qdaria/zipminator/.claude/skills/quantum-hive-mind-therese-helen/SKILL.md
 /Users/mos/dev/qdaria/zipminator/.claude/skills/agentdb-advanced
@@ -149,7 +148,7 @@ to spawn a combination the following distributed on task/subtasks each with its 
 
 
 ## Coockboks;
-
+And follow the coocbooks and or a combo for the given task appropriate;
 https://github.com/anthropics/claude-cookbooks/blob/main/tool_evaluation/tool_evaluation.ipynb
 https://github.com/anthropics/claude-cookbooks/blob/main/third_party/ElevenLabs/low_latency_stt_claude_tts.ipynb
 https://github.com/anthropics/claude-cookbooks/blob/main/misc/session_memory_compaction.ipynb
@@ -221,4 +220,3 @@ https://github.com/anthropics/claude-cookbooks/blob/main/misc/using_citations.ip
 https://github.com/anthropics/claude-cookbooks/blob/main/tool_use/extracting_structured_json.ipynb
 https://github.com/anthropics/claude-cookbooks/blob/main/misc/metaprompt.ipynb
 https://github.com/anthropics/claude-cookbooks/blob/main/tool_use/parallel_tools.ipynb
-
