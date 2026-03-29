@@ -468,8 +468,9 @@ class RatchetNotifier extends Notifier<RatchetState> {
   }
 
   /// Map a signaling username to a contact ID.
-  /// For demo contacts, we use a simple mapping. For unknown users,
-  /// the username itself becomes the contact ID.
+  /// For demo contacts, we use a simple mapping. For user-added contacts
+  /// (which have a 'live-' prefix), check the contacts list. For unknown
+  /// users, the username itself becomes the contact ID.
   String _findContactIdByUsername(String username) {
     // Demo contact mapping.
     const usernameToContactId = {
@@ -477,7 +478,15 @@ class RatchetNotifier extends Notifier<RatchetState> {
       'bob': 'bob-c',
       'charlie': 'charlie-m',
     };
-    return usernameToContactId[username.toLowerCase()] ?? username;
+    if (usernameToContactId.containsKey(username.toLowerCase())) {
+      return usernameToContactId[username.toLowerCase()]!;
+    }
+    // Check for live-prefixed contacts (user-added via add-contact field).
+    final liveId = 'live-$username';
+    if (state.contacts.any((c) => c.id == liveId)) {
+      return liveId;
+    }
+    return username;
   }
 
   String? _findConversationIdByContactId(String contactId) {
