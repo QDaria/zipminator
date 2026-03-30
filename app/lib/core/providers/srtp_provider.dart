@@ -1,10 +1,12 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/core/providers/ratchet_provider.dart';
+import 'package:zipminator/core/services/conference_service.dart';
 import 'package:zipminator/src/rust/api/simple.dart' as rust;
 
-/// Call lifecycle phases for the VoIP demo.
-enum CallPhase { idle, ringing, connected, ended }
+/// Call lifecycle phases.
+enum CallPhase { idle, ringing, connected, conferencing, ended }
 
 /// A VoIP contact (reuses the same demo cast as the messenger).
 class VoipContact {
@@ -49,6 +51,12 @@ class VoipState {
   final bool isSpeaker;
   final String? error;
 
+  /// Conference room ID (null for 1:1 calls).
+  final String? roomId;
+
+  /// Peer usernames currently in the conference.
+  final List<String> participants;
+
   const VoipState({
     this.phase = CallPhase.idle,
     this.contact,
@@ -59,13 +67,17 @@ class VoipState {
     this.isMuted = false,
     this.isSpeaker = false,
     this.error,
+    this.roomId,
+    this.participants = const [],
   });
 
   /// Convenience getters for backward compatibility.
-  bool get inCall => phase == CallPhase.connected;
+  bool get inCall =>
+      phase == CallPhase.connected || phase == CallPhase.conferencing;
   bool get isRinging => phase == CallPhase.ringing;
   bool get isEnded => phase == CallPhase.ended;
   bool get isIdle => phase == CallPhase.idle;
+  bool get isConference => phase == CallPhase.conferencing;
 
   VoipState copyWith({
     CallPhase? phase,
@@ -77,7 +89,10 @@ class VoipState {
     bool? isMuted,
     bool? isSpeaker,
     String? error,
+    String? roomId,
+    List<String>? participants,
     bool clearContact = false,
+    bool clearRoom = false,
   }) =>
       VoipState(
         phase: phase ?? this.phase,
@@ -89,13 +104,27 @@ class VoipState {
         isMuted: isMuted ?? this.isMuted,
         isSpeaker: isSpeaker ?? this.isSpeaker,
         error: error,
+        roomId: clearRoom ? null : (roomId ?? this.roomId),
+        participants: participants ?? this.participants,
       );
 }
 
-/// Manages VoIP call state with PQ-SRTP key derivation and live signaling.
+/// Manages VoIP call state with PQ-SRTP key derivation, live signaling,
+/// and WebRTC conference support.
 class VoipNotifier extends Notifier<VoipState> {
+  ConferenceService? _conference;
+  StreamSubscription<Map<String, dynamic>>? _signalSub;
+
   @override
-  VoipState build() => const VoipState();
+  VoipState build() {
+    ref.onDispose(() {
+      _signalSub?.cancel();
+      _conference?.dispose();
+    });
+    return const VoipState();
+  }
+
+  // ── 1:1 calls ─────────────────────────────────────────────────────
 
   /// Transition to ringing state and send call offer through signaling.
   void startRinging(VoipContact contact) {
@@ -103,16 +132,7 @@ class VoipNotifier extends Notifier<VoipState> {
       phase: CallPhase.ringing,
       contact: contact,
     );
-    // Send call offer via signaling server if connected.
     ref.read(ratchetProvider.notifier).sendCallOffer(contact.id);
-  }
-
-  /// Handle an incoming call_accept signal from the peer.
-  /// Called by the VoIP screen when it receives a call_accept signal.
-  void onCallAccepted() {
-    // The call acceptance means the peer is ready; KEM exchange
-    // is handled by the screen's _callContact flow which proceeds
-    // to connectCall after ringing.
   }
 
   /// Derive SRTP keys from a Kyber shared secret and move to connected.
@@ -130,24 +150,108 @@ class VoipNotifier extends Notifier<VoipState> {
     }
   }
 
-  /// Legacy alias kept for compatibility with other code.
   Future<void> startCall(Uint8List sharedSecret) => connectCall(sharedSecret);
 
   void endCall() {
-    // Notify peer via signaling if we have a contact.
     final contact = state.contact;
     if (contact != null) {
       ref.read(ratchetProvider.notifier).sendCallEnd(contact.id);
     }
+    if (state.roomId != null) {
+      ref.read(ratchetProvider.notifier).leaveRoom();
+    }
+    _signalSub?.cancel();
+    _conference?.dispose();
+    _conference = null;
     state = const VoipState();
   }
 
+  // ── Conference calls ──────────────────────────────────────────────
+
+  /// Create a conference room and start local media.
+  Future<void> createConference(String roomId) async {
+    final ratchet = ref.read(ratchetProvider.notifier);
+    _conference = ConferenceService(
+      sendSignal: (target, type, payload) {
+        ratchet.sendWebRtcSignal(target, type, payload);
+      },
+    );
+
+    await _conference!.startLocalMedia();
+    ratchet.createRoom(roomId);
+    ratchet.joinRoom(roomId);
+    _listenToSignals();
+
+    state = state.copyWith(
+      phase: CallPhase.conferencing,
+      roomId: roomId,
+      isPqSecured: true,
+    );
+  }
+
+  /// Join an existing conference room.
+  Future<void> joinConference(String roomId) async {
+    final ratchet = ref.read(ratchetProvider.notifier);
+    _conference = ConferenceService(
+      sendSignal: (target, type, payload) {
+        ratchet.sendWebRtcSignal(target, type, payload);
+      },
+    );
+
+    await _conference!.startLocalMedia();
+    ratchet.joinRoom(roomId);
+    _listenToSignals();
+
+    state = state.copyWith(
+      phase: CallPhase.conferencing,
+      roomId: roomId,
+      isPqSecured: true,
+    );
+  }
+
+  void _listenToSignals() {
+    _signalSub?.cancel();
+    _signalSub =
+        ref.read(ratchetProvider.notifier).callSignals.listen((msg) {
+      final from = msg['from'] as String? ?? '';
+      final type = msg['type'] as String? ?? '';
+
+      if (type == 'peer_joined') {
+        final peerId = msg['peer_id'] as String? ?? '';
+        if (peerId.isNotEmpty) {
+          _conference?.onPeerJoined(peerId);
+          final updated = [...state.participants, peerId];
+          state = state.copyWith(participants: updated);
+        }
+      } else if (type == 'peer_left') {
+        final peerId = msg['peer_id'] as String? ?? '';
+        if (peerId.isNotEmpty) {
+          _conference?.onPeerLeft(peerId);
+          final updated = state.participants.where((p) => p != peerId).toList();
+          state = state.copyWith(participants: updated);
+        }
+      } else if (['offer', 'answer', 'ice-candidate'].contains(type)) {
+        _conference?.handleSignal(from, type, msg);
+      }
+    });
+  }
+
+  /// The conference service (for accessing local/remote streams in UI).
+  ConferenceService? get conference => _conference;
+
+  // ── Controls ──────────────────────────────────────────────────────
+
   void toggleMute() {
+    _conference?.toggleMute();
     state = state.copyWith(isMuted: !state.isMuted);
   }
 
   void toggleSpeaker() {
     state = state.copyWith(isSpeaker: !state.isSpeaker);
+  }
+
+  void toggleVideo() {
+    _conference?.toggleVideo();
   }
 
   void updateCallDuration(Duration duration) {

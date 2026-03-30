@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:zipminator/core/providers/crypto_provider.dart';
 import 'package:zipminator/core/providers/ratchet_provider.dart';
 import 'package:zipminator/core/providers/srtp_provider.dart';
@@ -125,7 +126,7 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
       appBar: AppBar(),
       body: GradientBackground(
         child: switch (voip.phase) {
-          CallPhase.idle => _ContactListView(
+          CallPhase.idle || CallPhase.ended => _ContactListView(
               onCall: _callContact,
               formatDuration: _formatDuration,
             ),
@@ -142,9 +143,14 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
               onToggleSpeaker: () =>
                   ref.read(voipProvider.notifier).toggleSpeaker(),
             ),
-          CallPhase.ended => _ContactListView(
-              onCall: _callContact,
+          CallPhase.conferencing => _ConferenceView(
+              voip: voip,
               formatDuration: _formatDuration,
+              onEndCall: _endCall,
+              onToggleMute: () =>
+                  ref.read(voipProvider.notifier).toggleMute(),
+              onToggleVideo: () =>
+                  ref.read(voipProvider.notifier).toggleVideo(),
             ),
         },
       ),
@@ -198,6 +204,10 @@ class _ContactListView extends ConsumerWidget {
           // Call by username (when Live)
           if (ref.watch(ratchetProvider).isLive)
             _CallByUsernameField(onCall: onCall),
+
+          // Conference buttons (when Live)
+          if (ref.watch(ratchetProvider).isLive)
+            _ConferenceButtons(),
 
           // Contact cards
           ...ref.watch(voipContactsProvider).asMap().entries.map((entry) {
@@ -885,6 +895,446 @@ class _CallByUsernameFieldState extends State<_CallByUsernameField> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Conference Buttons (Start / Join)
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _ConferenceButtons extends ConsumerStatefulWidget {
+  @override
+  ConsumerState<_ConferenceButtons> createState() => _ConferenceButtonsState();
+}
+
+class _ConferenceButtonsState extends ConsumerState<_ConferenceButtons> {
+  final _roomCtrl = TextEditingController();
+  bool _showJoinField = false;
+
+  @override
+  void dispose() {
+    _roomCtrl.dispose();
+    super.dispose();
+  }
+
+  void _startConference() {
+    final roomId = 'zip-${DateTime.now().millisecondsSinceEpoch % 100000}';
+    ref.read(voipProvider.notifier).createConference(roomId);
+  }
+
+  void _joinConference() {
+    final roomId = _roomCtrl.text.trim();
+    if (roomId.isEmpty) return;
+    ref.read(voipProvider.notifier).joinConference(roomId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: QuantumCard(
+        glowColor: QuantumTheme.quantumPurple,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.video_call, color: QuantumTheme.quantumPurple, size: 20),
+                const SizedBox(width: 8),
+                Text('Conference', style: Theme.of(context).textTheme.titleSmall),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: _startConference,
+                    icon: const Icon(Icons.add_call, size: 16),
+                    label: const Text('Start'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: QuantumTheme.quantumPurple,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => setState(() => _showJoinField = !_showJoinField),
+                    icon: const Icon(Icons.login, size: 16),
+                    label: const Text('Join'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: QuantumTheme.quantumPurple,
+                      side: BorderSide(color: QuantumTheme.quantumPurple.withValues(alpha: 0.5)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (_showJoinField) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _roomCtrl,
+                      decoration: const InputDecoration(
+                        hintText: 'Room ID...',
+                        isDense: true,
+                        border: InputBorder.none,
+                      ),
+                      onSubmitted: (_) => _joinConference(),
+                    ),
+                  ),
+                  IconButton.filled(
+                    onPressed: _joinConference,
+                    icon: const Icon(Icons.arrow_forward, size: 16),
+                    style: IconButton.styleFrom(
+                      backgroundColor: QuantumTheme.quantumPurple,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Conference View (multi-peer video grid)
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _ConferenceView extends ConsumerStatefulWidget {
+  final VoipState voip;
+  final String Function(Duration) formatDuration;
+  final VoidCallback onEndCall;
+  final VoidCallback onToggleMute;
+  final VoidCallback onToggleVideo;
+
+  const _ConferenceView({
+    required this.voip,
+    required this.formatDuration,
+    required this.onEndCall,
+    required this.onToggleMute,
+    required this.onToggleVideo,
+  });
+
+  @override
+  ConsumerState<_ConferenceView> createState() => _ConferenceViewState();
+}
+
+class _ConferenceViewState extends ConsumerState<_ConferenceView> {
+  Timer? _durationTimer;
+  final _localRenderer = RTCVideoRenderer();
+  final Map<String, RTCVideoRenderer> _remoteRenderers = {};
+  StreamSubscription<Map<String, MediaStream>>? _streamsSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _localRenderer.initialize();
+    _startDurationTimer();
+    _setupStreams();
+  }
+
+  void _startDurationTimer() {
+    _durationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      final current = ref.read(voipProvider).callDuration;
+      ref.read(voipProvider.notifier).updateCallDuration(
+            current + const Duration(seconds: 1),
+          );
+    });
+  }
+
+  void _setupStreams() {
+    final conference = ref.read(voipProvider.notifier).conference;
+    if (conference == null) return;
+
+    // Set up local video.
+    if (conference.localStream != null) {
+      _localRenderer.srcObject = conference.localStream;
+    }
+
+    // Listen for remote stream changes.
+    _streamsSub = conference.remoteStreams.listen((streams) {
+      _updateRemoteRenderers(streams);
+    });
+  }
+
+  void _updateRemoteRenderers(Map<String, MediaStream> streams) async {
+    // Remove renderers for peers who left.
+    final gone = _remoteRenderers.keys
+        .where((id) => !streams.containsKey(id))
+        .toList();
+    for (final id in gone) {
+      await _remoteRenderers[id]!.dispose();
+      _remoteRenderers.remove(id);
+    }
+
+    // Add renderers for new peers.
+    for (final entry in streams.entries) {
+      if (!_remoteRenderers.containsKey(entry.key)) {
+        final renderer = RTCVideoRenderer();
+        await renderer.initialize();
+        renderer.srcObject = entry.value;
+        _remoteRenderers[entry.key] = renderer;
+      }
+    }
+
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _durationTimer?.cancel();
+    _streamsSub?.cancel();
+    _localRenderer.dispose();
+    for (final r in _remoteRenderers.values) {
+      r.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final voip = ref.watch(voipProvider);
+    final participantCount = _remoteRenderers.length + 1; // +1 for local
+
+    return Column(
+      children: [
+        // Header
+        SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: Row(
+              children: [
+                PqcBadge(
+                  label: 'PQ-SRTP',
+                  isActive: true,
+                  color: QuantumTheme.quantumGreen,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Room: ${voip.roomId ?? ""}',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: QuantumTheme.quantumGreen.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '$participantCount participant${participantCount != 1 ? 's' : ''}',
+                    style: TextStyle(
+                      color: QuantumTheme.quantumGreen,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // Video grid
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: _buildVideoGrid(),
+          ),
+        ),
+
+        // Duration
+        Text(
+          widget.formatDuration(voip.callDuration),
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontFamily: 'JetBrains Mono',
+                color: QuantumTheme.quantumGreen,
+              ),
+        ),
+        const SizedBox(height: 16),
+
+        // Controls
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _ControlButton(
+                  icon: voip.isMuted ? Icons.mic_off : Icons.mic,
+                  label: voip.isMuted ? 'Unmute' : 'Mute',
+                  color: voip.isMuted
+                      ? QuantumTheme.quantumRed
+                      : QuantumTheme.quantumCyan,
+                  onTap: widget.onToggleMute,
+                ),
+                const SizedBox(width: 24),
+                _ControlButton(
+                  icon: Icons.videocam_off,
+                  label: 'Video',
+                  color: QuantumTheme.quantumCyan,
+                  onTap: widget.onToggleVideo,
+                ),
+                const SizedBox(width: 24),
+                _ControlButton(
+                  icon: Icons.call_end,
+                  label: 'Leave',
+                  color: QuantumTheme.quantumRed,
+                  onTap: widget.onEndCall,
+                  filled: true,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVideoGrid() {
+    final tiles = <Widget>[
+      // Local video (always first)
+      _VideoTile(
+        renderer: _localRenderer,
+        label: 'You',
+        isMuted: ref.watch(voipProvider).isMuted,
+        isLocal: true,
+      ),
+      // Remote videos
+      ..._remoteRenderers.entries.map((e) => _VideoTile(
+            renderer: e.value,
+            label: e.key,
+            isMuted: false,
+            isLocal: false,
+          )),
+    ];
+
+    if (tiles.length <= 2) {
+      // 1-2 participants: column layout
+      return Column(
+        children: tiles.map((t) => Expanded(child: t)).toList(),
+      );
+    }
+    // 3+ participants: 2-column grid
+    return GridView.count(
+      crossAxisCount: 2,
+      childAspectRatio: 4 / 3,
+      mainAxisSpacing: 8,
+      crossAxisSpacing: 8,
+      children: tiles,
+    );
+  }
+}
+
+class _VideoTile extends StatelessWidget {
+  final RTCVideoRenderer renderer;
+  final String label;
+  final bool isMuted;
+  final bool isLocal;
+
+  const _VideoTile({
+    required this.renderer,
+    required this.label,
+    required this.isMuted,
+    required this.isLocal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            color: QuantumTheme.surfaceElevated,
+            child: RTCVideoView(
+              renderer,
+              mirror: isLocal,
+              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+            ),
+          ),
+          // Name label
+          Positioned(
+            left: 8,
+            bottom: 8,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isMuted) ...[
+                    Icon(Icons.mic_off, size: 12, color: QuantumTheme.quantumRed),
+                    const SizedBox(width: 4),
+                  ],
+                  Icon(Icons.lock, size: 10, color: QuantumTheme.quantumGreen),
+                  const SizedBox(width: 4),
+                  Text(
+                    label,
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ControlButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  final bool filled;
+
+  const _ControlButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+    this.filled = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: filled ? color : color.withValues(alpha: 0.15),
+              border: Border.all(color: color.withValues(alpha: 0.4)),
+            ),
+            child: Icon(icon, color: filled ? Colors.white : color),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(color: color, fontSize: 11)),
+      ],
     );
   }
 }

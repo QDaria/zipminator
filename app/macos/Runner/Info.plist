@@ -39,5 +39,11 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Zipminator uses the camera for quantum-secure video calls.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Zipminator uses the microphone for quantum-secure voice and video calls.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Zipminator uses the local network for Q-Mesh device discovery.</string>
 </dict>
 </plist>

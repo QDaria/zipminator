@@ -577,6 +577,33 @@ class RatchetNotifier extends Notifier<RatchetState> {
     _messengerService?.sendSignal(target: target, type: 'call_end');
   }
 
+  // ── Room management (conference calls) ──────────────────────────────
+
+  /// Create a conference room on the signaling server.
+  void createRoom(String roomId) {
+    _messengerService?.createRoom(roomId);
+  }
+
+  /// Join an existing conference room.
+  void joinRoom(String roomId) {
+    _messengerService?.joinRoom(roomId);
+  }
+
+  /// Leave the current conference room.
+  void leaveRoom() {
+    _messengerService?.leaveRoom();
+  }
+
+  /// Send a WebRTC signaling message (offer, answer, ICE candidate).
+  void sendWebRtcSignal(
+      String targetUsername, String type, Map<String, dynamic> payload) {
+    _messengerService?.sendSignal(
+      target: targetUsername,
+      type: type,
+      payload: payload,
+    );
+  }
+
   // ── Conversation management ──────────────────────────────────────────
 
   /// Select a conversation and load its messages.
