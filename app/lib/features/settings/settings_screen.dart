@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zipminator/core/providers/auth_provider.dart';
 import 'package:zipminator/core/providers/qai_provider.dart';
+import 'package:zipminator/core/providers/ratchet_provider.dart';
+import 'package:zipminator/core/services/messenger_service.dart';
 import 'package:zipminator/core/providers/theme_provider.dart';
 import 'package:zipminator/core/services/llm_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
@@ -156,14 +159,20 @@ class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   static const _providerColors = {
-    LLMProvider.claude: QuantumTheme.quantumPurple,
     LLMProvider.gemini: QuantumTheme.quantumBlue,
-    LLMProvider.openRouter: QuantumTheme.quantumOrange,
+    LLMProvider.groq: QuantumTheme.quantumGreen,
+    LLMProvider.deepSeek: QuantumTheme.quantumCyan,
+    LLMProvider.mistral: QuantumTheme.quantumOrange,
+    LLMProvider.claude: QuantumTheme.quantumPurple,
+    LLMProvider.openRouter: Color(0xFFFF6D00),
   };
 
   static const _providerHints = {
-    LLMProvider.claude: 'sk-ant-...',
     LLMProvider.gemini: 'AIza...',
+    LLMProvider.groq: 'gsk_...',
+    LLMProvider.deepSeek: 'sk-...',
+    LLMProvider.mistral: '...',
+    LLMProvider.claude: 'sk-ant-...',
     LLMProvider.openRouter: 'sk-or-...',
   };
 
@@ -177,10 +186,55 @@ class SettingsScreen extends ConsumerWidget {
     final browserDestructNotifier =
         ref.read(browserDestructProvider.notifier);
 
+    final auth = ref.watch(authProvider);
+    final signalingState = ref.watch(ratchetProvider).signalingState;
+
     return GestureDetector(onTap: () => FocusScope.of(context).unfocus(), child: Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
+          // ---- ACCOUNT SECTION ----
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Text('Account',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: QuantumTheme.quantumCyan,
+                    )),
+          ),
+          ListTile(
+            leading: CircleAvatar(
+              backgroundColor: QuantumTheme.quantumCyan.withValues(alpha: 0.2),
+              child: Icon(Icons.person, color: QuantumTheme.quantumCyan),
+            ),
+            title: Text(auth.user?.email ?? 'Not signed in'),
+            subtitle: Text(
+              signalingState == SignalingConnectionState.connected
+                  ? 'Signaling: Connected'
+                  : 'Signaling: ${signalingState.name}',
+              style: TextStyle(
+                color: signalingState == SignalingConnectionState.connected
+                    ? QuantumTheme.quantumGreen
+                    : QuantumTheme.quantumRed,
+                fontSize: 12,
+              ),
+            ),
+            trailing: auth.isAuthenticated
+                ? TextButton(
+                    onPressed: () {
+                      ref.read(ratchetProvider.notifier).disconnectFromSignaling();
+                      ref.read(authProvider.notifier).signOut();
+                    },
+                    child: const Text('Sign Out',
+                        style: TextStyle(color: QuantumTheme.quantumRed)),
+                  )
+                : TextButton(
+                    onPressed: () =>
+                        Navigator.of(context).pushReplacementNamed('/login'),
+                    child: const Text('Sign In'),
+                  ),
+          ),
+          const Divider(),
+
           // Theme
           ListTile(
             leading: Icon(

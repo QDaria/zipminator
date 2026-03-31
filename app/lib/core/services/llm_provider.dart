@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'openai_compatible_service.dart';
 
 /// Supported LLM providers.
 enum LLMProvider {
-  claude('Claude', 'Anthropic'),
   gemini('Gemini', 'Google'),
+  groq('Groq', 'Groq'),
+  deepSeek('DeepSeek', 'DeepSeek'),
+  mistral('Mistral', 'Mistral AI'),
+  claude('Claude', 'Anthropic'),
   openRouter('OpenRouter', 'OpenRouter');
 
   final String displayName;
@@ -17,17 +21,68 @@ class LLMModel {
   final String id;
   final String displayName;
   final LLMProvider provider;
+  final bool freeTier;
 
   const LLMModel({
     required this.id,
     required this.displayName,
     required this.provider,
+    this.freeTier = false,
   });
 }
 
-/// All available models grouped by provider.
+/// All available models grouped by provider. Free-tier models listed first.
 const kAvailableModels = <LLMModel>[
-  // Claude
+  // Gemini (free tier, very capable)
+  LLMModel(
+      id: 'gemini-2.5-flash',
+      displayName: 'Gemini 2.5 Flash',
+      provider: LLMProvider.gemini,
+      freeTier: true),
+  LLMModel(
+      id: 'gemini-2.5-pro',
+      displayName: 'Gemini 2.5 Pro',
+      provider: LLMProvider.gemini,
+      freeTier: true),
+  // Groq (free tier, fastest inference)
+  LLMModel(
+      id: 'llama-3.3-70b-versatile',
+      displayName: 'Llama 3.3 70B',
+      provider: LLMProvider.groq,
+      freeTier: true),
+  LLMModel(
+      id: 'llama-3.1-8b-instant',
+      displayName: 'Llama 3.1 8B',
+      provider: LLMProvider.groq,
+      freeTier: true),
+  LLMModel(
+      id: 'mixtral-8x7b-32768',
+      displayName: 'Mixtral 8x7B',
+      provider: LLMProvider.groq,
+      freeTier: true),
+  // DeepSeek (free tier, strong reasoning + code)
+  LLMModel(
+      id: 'deepseek-chat',
+      displayName: 'DeepSeek V3',
+      provider: LLMProvider.deepSeek,
+      freeTier: true),
+  LLMModel(
+      id: 'deepseek-reasoner',
+      displayName: 'DeepSeek R1',
+      provider: LLMProvider.deepSeek,
+      freeTier: true),
+  // Mistral (free tier, multilingual)
+  LLMModel(
+      id: 'mistral-small-latest',
+      displayName: 'Mistral Small',
+      provider: LLMProvider.mistral,
+      freeTier: true),
+  LLMModel(
+      id: 'pixtral-12b-2409',
+      displayName: 'Pixtral 12B',
+      provider: LLMProvider.mistral,
+      freeTier: true),
+  // Claude (paid)
   LLMModel(
       id: 'claude-opus-4-6',
       displayName: 'Claude Opus 4.6',
@@ -40,16 +95,7 @@ const kAvailableModels = <LLMModel>[
       id: 'claude-haiku-4-5-20251001',
       displayName: 'Claude Haiku 4.5',
       provider: LLMProvider.claude),
-  // Gemini (free tier available)
-  LLMModel(
-      id: 'gemini-2.5-flash',
-      displayName: 'Gemini 2.5 Flash',
-      provider: LLMProvider.gemini),
-  LLMModel(
-      id: 'gemini-2.5-pro',
-      displayName: 'Gemini 2.5 Pro',
-      provider: LLMProvider.gemini),
-  // OpenRouter (routes to any model)
+  // OpenRouter (routes to any model, paid)
   LLMModel(
       id: 'openai/gpt-4o',
       displayName: 'GPT-4o',
@@ -196,56 +242,9 @@ class GeminiService implements LLMService {
 }
 
 /// OpenRouter (OpenAI-compatible, routes to any model).
-class OpenRouterService implements LLMService {
-  static const _baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
-  final String apiKey;
-  final http.Client _client;
-
-  OpenRouterService({required this.apiKey, http.Client? client})
-      : _client = client ?? http.Client();
-
-  @override
-  Future<String> sendMessage({
-    required String model,
-    required List<Map<String, String>> messages,
-    String? systemPrompt,
-    int maxTokens = 1024,
-  }) async {
-    final allMessages = <Map<String, String>>[];
-    if (systemPrompt != null) {
-      allMessages.add({'role': 'system', 'content': systemPrompt});
-    }
-    allMessages.addAll(messages);
-
-    final response = await _client.post(
-      Uri.parse(_baseUrl),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $apiKey',
-      },
-      body: jsonEncode({
-        'model': model,
-        'max_tokens': maxTokens,
-        'messages': allMessages,
-      }),
-    );
-
-    if (response.statusCode != 200) {
-      final parsed = jsonDecode(response.body);
-      throw LLMException(
-          parsed['error']?['message'] ?? 'HTTP ${response.statusCode}');
-    }
-
-    final parsed = jsonDecode(response.body);
-    final choices = parsed['choices'] as List<dynamic>?;
-    if (choices == null || choices.isEmpty) {
-      throw LLMException('No response from OpenRouter');
-    }
-    return choices[0]['message']?['content'] ?? '';
-  }
-
-  @override
-  void dispose() => _client.close();
+class OpenRouterService extends OpenAICompatibleService {
+  OpenRouterService({required super.apiKey, super.client})
+      : super(baseUrl: 'https://openrouter.ai/api/v1/chat/completions');
 }
 
 /// Factory to create the right service for a provider.
@@ -253,6 +252,9 @@ LLMService createLLMService(LLMProvider provider, String apiKey) =>
     switch (provider) {
       LLMProvider.claude => ClaudeService(apiKey: apiKey),
       LLMProvider.gemini => GeminiService(apiKey: apiKey),
+      LLMProvider.groq => GroqService(apiKey: apiKey),
+      LLMProvider.deepSeek => DeepSeekService(apiKey: apiKey),
+      LLMProvider.mistral => MistralService(apiKey: apiKey),
       LLMProvider.openRouter => OpenRouterService(apiKey: apiKey),
     };
 

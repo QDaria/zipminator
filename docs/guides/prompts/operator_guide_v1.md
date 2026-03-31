@@ -348,29 +348,66 @@ SessionStart — When a session begins (restore context, update ruflo)
 
 ---
 
-## 2.8 Extended Thinking (think / megathink / ultrathink)
+## 2.8 Extended Thinking / Effort Control (v2.1.88)
 
-**What**: Three tiers of reasoning depth for Opus 4.6. Controlled by keywords in prompts or environment variables.
+**What**: Four effort levels for Opus 4.6. Controlled via CLI flag `--effort` or `/effort` slash command. The old "ultrathink" keyword is deprecated; use `--effort max` instead.
 
-| Tier | Tokens | When to use | Trigger |
-|------|--------|-------------|---------|
-| think | ~4K | Routine debugging, quick fixes, config | Default for simple tasks |
-| megathink | ~10K | API design, performance optimization | "think carefully about..." |
-| ultrathink | ~32K+ | System architecture, crypto code, security audits, formal proofs | "ultrathink" keyword in prompt |
+| Level | Tokens | When to use | Invocation |
+|-------|--------|-------------|------------|
+| low | ~4K | Typo, rename, config change | `--effort low` |
+| medium | ~16K | Feature work, API design | Default for Opus 4.6 |
+| high | ~32K | Architecture, cross-file refactors | `--effort high` or `Tab` key |
+| max | ~128K | Crypto, security audits, formal proofs, research papers | `--effort max` or `/effort max` |
 
-**Environment control**:
+**CLI flag** (per-session):
 ```bash
-export CLAUDE_REASONING_EFFORT=high    # Force high for all tasks
-export MAX_THINKING_TOKENS=127999      # True maximum for Opus 4.6
+claude --effort max    # Maximum reasoning for entire session
 ```
 
-**Example**:
+**In-conversation**:
 ```
-ultrathink
+/effort max
 
 This is security-critical code in crates/zipminator-core/. Review the
 constant-time guarantees in the ML-KEM-768 decapsulation path.
 Verify no timing side-channels exist.
+```
+
+**Environment variable** (persistent):
+```bash
+export CLAUDE_REASONING_EFFORT=max    # Force max for all tasks
+```
+
+## 2.8b Ralph Loop Plugin (persistent iteration)
+
+**What**: The `/ralph-loop` plugin implements persistent iteration via a Stop hook. When active, Claude cannot exit the session; instead, the hook re-feeds the prompt, creating a self-referential improvement loop. Each iteration sees files modified by previous iterations.
+
+**Invocation**:
+```
+/ralph-loop "Build and test the entropy pool dashboard" \
+  --completion-promise "ALL_TESTS_PASS" \
+  --max-iterations 20
+```
+
+**Cancel**: `/ralph-loop:cancel-ralph`
+**Help**: `/ralph-loop:help`
+
+This is separate from the RALPH methodology (Research-Architecture-Logic-Polish-Harden). The ralph-loop plugin provides the iteration mechanism; RALPH provides the methodology within each iteration.
+
+## 2.8c Recurring Tasks (`/loop`) and Scheduled Agents (`/schedule`)
+
+**`/loop`**: Run a command on a recurring interval in the current session.
+```
+/loop 5m /batch-tdd           # Run parallel TDD every 5 minutes
+/loop 10m /improve code       # Improve code every 10 minutes
+/loop 30s "check build status"  # Quick status poll
+```
+
+**`/schedule`**: Create cron-triggered remote agents that run unattended.
+```
+/schedule create "nightly-tests" --cron "0 2 * * *" --prompt "Run cargo test + pytest, commit fixes"
+/schedule list                 # View all scheduled agents
+/schedule delete "nightly-tests"
 ```
 
 ---
@@ -601,6 +638,47 @@ ruflo hooks model-route "fix typo in README"           # → Haiku
 | `/sparc:workflow-manager` | Workflow orchestration |
 | `/sparc:swarm-coordinator` | Swarm coordination |
 
+## 2.17 Installed Plugins (v2.1.88)
+
+**What**: Claude Code plugins extend capabilities via marketplaces. Installed plugins provide additional skills, hooks, and agent types.
+
+**Active plugins** (from `~/.claude/plugins/`):
+
+| Plugin | Skills | Purpose |
+|--------|--------|---------|
+| **ralph-loop** | `/ralph-loop:ralph-loop`, `/ralph-loop:cancel-ralph`, `/ralph-loop:help` | Persistent iteration via Stop hook; session never exits until completion |
+| **superpowers** | `/superpowers:brainstorming`, `/superpowers:writing-plans`, `/superpowers:executing-plans`, `/superpowers:test-driven-development`, `/superpowers:systematic-debugging`, `/superpowers:dispatching-parallel-agents`, `/superpowers:verification-before-completion`, +more | 14 structured development workflows |
+| **episodic-memory** | `/episodic-memory:search-conversations`, `/episodic-memory:remembering-conversations` | Cross-session conversation search via semantic indexing |
+| **code-review** | `/code-review:code-review` | Pull request code review |
+| **pr-review-toolkit** | `/pr-review-toolkit:review-pr` | Comprehensive PR review with specialized agents |
+| **commit-commands** | `/commit-commands:commit`, `/commit-commands:commit-push-pr`, `/commit-commands:clean_gone` | Git workflow automation |
+| **hookify** | `/hookify:hookify`, `/hookify:list`, `/hookify:configure` | Create hooks from conversation behaviors |
+| **claude-md-management** | `/claude-md-management:revise-claude-md`, `/claude-md-management:claude-md-improver` | CLAUDE.md auditing and improvement |
+| **coderabbit** | `/coderabbit:review`, `/coderabbit:autofix` | AI code review and auto-fix |
+| **feature-dev** | `/feature-dev:feature-dev` | Guided feature development with codebase understanding |
+
+**Superpowers workflows** (most useful for orchestration):
+- `/superpowers:brainstorming` -- creative ideation before any major task
+- `/superpowers:writing-plans` -- structured plan creation from specs
+- `/superpowers:executing-plans` -- execute plans with subagent-driven development
+- `/superpowers:dispatching-parallel-agents` -- parallel agent execution for independent tasks
+- `/superpowers:verification-before-completion` -- validate work before declaring done
+
+## 2.18 Cross-Session Memory (Episodic Memory + Auto-Memory)
+
+**What**: Two systems for remembering across sessions.
+
+**Auto-Memory** (built-in, v2.1.59+): Claude automatically persists useful patterns to `~/.claude/projects/<path>/memory/MEMORY.md`. Always loaded. Managed via `/memory`.
+
+**Episodic Memory** (plugin v1.0.15): Indexes all past conversations for semantic search. Retrieves relevant context from previous sessions.
+
+**Usage**:
+```
+/episodic-memory:search-conversations "how did we fix the entropy pool race condition?"
+```
+
+Returns matching conversation snippets with timestamps, enabling you to recover decisions, code patterns, and lessons learned from any past session.
+
 ---
 
 <!-- SECTION: PART 3 -->
@@ -643,7 +721,7 @@ Implement QRNG entropy status indicator in the Flutter dashboard.
 ## Pattern 3: Mega Task (Hours-Days)
 
 **When**: Multi-domain, security-critical, touches 5+ directories.
-**Tools**: `/mega-task` + hive-mind + agent teams + agentic-jujutsu + ultrathink.
+**Tools**: `/mega-task` + hive-mind + agent teams + agentic-jujutsu + /effort max.
 
 ```
 /mega-task
@@ -654,7 +732,7 @@ web dashboard widget, and FIPS documentation.
 This touches: crates/ (Rust crypto), browser/src-tauri/ (Tauri),
 mobile/ (React Native), web/ (Next.js), docs/ (FIPS).
 
-ultrathink — this is security-critical code.
+/effort max — this is security-critical code.
 Interview me about requirements first using AskUserQuestion.
 ```
 
@@ -747,7 +825,7 @@ This runs:
 Security audit of crates/zipminator-core/.
 Spawn attacker/defender/auditor agents.
 
-ultrathink — this is PQC crypto code.
+/effort max — this is PQC crypto code.
 
 Attacker: Find timing side-channels, memory leaks, key material exposure
 Defender: Verify constant-time guarantees, zeroize on drop, no unsafe blocks
@@ -777,17 +855,56 @@ See Part 6 for the full mechanism design.
 
 ---
 
+## Pattern 9: Persistent Ralph Loop (hours-days, unattended)
+
+**When**: Multi-hour task that should run autonomously until completion.
+**Tools**: `/ralph-loop` plugin + RALPH methodology + `/improve` per iteration.
+
+```
+/ralph-loop "Implement all missing tests for crates/zipminator-core. \
+  Run cargo test after each addition. Continue until all public functions \
+  have test coverage >= 90%." \
+  --completion-promise "COVERAGE_TARGET_MET" \
+  --max-iterations 30
+```
+
+The Stop hook prevents session exit. Each iteration sees the test files from previous iterations. Combine with `/improve code` inside the prompt for progressive quality enhancement.
+
+**Cancel**: `/ralph-loop:cancel-ralph`
+
+---
+
+## Pattern 10: Scheduled Continuous Improvement (overnight, unattended)
+
+**When**: Long-running improvement that should happen while you sleep.
+**Tools**: `/schedule` + `/loop` + `/improve`.
+
+```
+# Schedule a nightly paper improvement agent
+/schedule create "paper-polish" \
+  --cron "0 2 * * *" \
+  --prompt "/effort max\nRun /improve paper on docs/research/paper/main.tex. \
+    Focus on the lowest-scoring dimension. Commit if score improves by 0.05+."
+
+# Or use /loop for in-session recurring checks
+/loop 15m /improve code    # Continuous code quality improvement
+```
+
+---
+
 ## Composition Decision Matrix
 
 | Task Complexity | Files | Security? | Pattern | Time |
 |----------------|-------|-----------|---------|------|
 | Typo, rename | 1 | No | Quick Fix | < 15 min |
 | Single feature | 1-3 | No | Sprint Task | 30-180 min |
-| Single feature | 1-3 | Yes | Sprint + ultrathink | 1-3 hours |
+| Single feature | 1-3 | Yes | Sprint + `--effort max` | 1-3 hours |
 | Multi-domain | 4-10 | No | Mega Task (Sonnet team) | 4-8 hours |
 | Multi-domain | 4-10 | Yes | Mega Task (Opus lead) | 1-2 days |
 | Research paper | N/A | N/A | Research Pipeline | 2-8 hours |
 | Product launch | All | Mixed | Product Launch | Multi-day |
+| Unattended iteration | Varies | Varies | Persistent Ralph Loop | Hours-days |
+| Overnight automation | Varies | No | Scheduled Improvement | Overnight |
 | End of session | N/A | N/A | Self-Learning Loop | 15 min |
 | Any time | N/A | N/A | One-Push Improve | 2-5 min |
 
@@ -947,7 +1064,7 @@ ruflo hooks post-task --task-id "paper-improve-nature"
 ## Copy-Paste Starter Prompt
 
 ```
-ultrathink
+/effort max
 
 Improve docs/research/paper/main.tex from score 0.80 to 0.995 for Nature Physics.
 
@@ -1264,7 +1381,7 @@ Message 2: Task("Web UI", "...", "coder")    # breaks coordination
 
 **Thresholds**:
 - Standard code: `/verification-quality` with 0.95 threshold
-- Crypto code: `/verification-quality` with 0.99 threshold + ultrathink + cargo fuzz
+- Crypto code: `/verification-quality` with 0.99 threshold + /effort max + cargo fuzz
 - Research paper: 0.995 threshold with adversarial review
 
 **Visual verification**: For any UI change, take a Playwright screenshot as proof.
@@ -1408,13 +1525,13 @@ Max 12 iterations.
 ```
 /mega-task
 [Mission description]. This touches [domains].
-ultrathink -- [security/architecture justification].
+/effort max -- [security/architecture justification].
 Interview me about requirements first.
 ```
 
 ### Paper Improvement
 ```
-ultrathink
+/effort max
 Improve [paper path] to score [threshold] for [venue].
 Load: /quantum-scientific-writer, /verification-quality
 Use /hive-mind-advanced with [N] workstreams.

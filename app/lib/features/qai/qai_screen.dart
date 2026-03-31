@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zipminator/core/providers/comparison_provider.dart';
 import 'package:zipminator/core/providers/pii_provider.dart';
 import 'package:zipminator/core/providers/qai_provider.dart';
+import 'package:zipminator/core/providers/voice_provider.dart';
 import 'package:zipminator/core/services/llm_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
+import 'package:zipminator/features/qai/comparison_view.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
 
 /// Pillar 6: Q-AI Assistant — AI chat with multi-provider model routing and PII guard.
@@ -20,9 +23,12 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
   final _scrollController = ScrollController();
 
   static const _providerColors = {
-    LLMProvider.claude: QuantumTheme.quantumPurple,
     LLMProvider.gemini: QuantumTheme.quantumBlue,
-    LLMProvider.openRouter: QuantumTheme.quantumOrange,
+    LLMProvider.groq: QuantumTheme.quantumGreen,
+    LLMProvider.deepSeek: QuantumTheme.quantumCyan,
+    LLMProvider.mistral: QuantumTheme.quantumOrange,
+    LLMProvider.claude: QuantumTheme.quantumPurple,
+    LLMProvider.openRouter: Color(0xFFFF6D00),
   };
 
   @override
@@ -90,6 +96,17 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
       appBar: AppBar(
         title: const Text('Q-AI Assistant'),
         actions: [
+          IconButton(
+            icon: Icon(
+              ref.watch(comparisonProvider).isActive
+                  ? Icons.compare
+                  : Icons.compare_arrows,
+              size: 20,
+            ),
+            onPressed: () =>
+                ref.read(comparisonProvider.notifier).toggleActive(),
+            tooltip: 'Compare models',
+          ),
           IconButton(
             icon: const Icon(Icons.delete_outline, size: 20),
             onPressed: qai.messages.isEmpty
@@ -199,7 +216,11 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
               ),
             ),
 
-            // Messages
+            // Comparison mode or Messages
+            if (ref.watch(comparisonProvider).isActive)
+              const Expanded(child: ComparisonView()),
+
+            if (!ref.watch(comparisonProvider).isActive)
             Expanded(
               child: qai.messages.isEmpty
                   ? Center(
@@ -220,7 +241,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                               iconColor: providerColor,
                             ),
                             Text(
-                              'Claude / Gemini / OpenRouter — select provider above',
+                              '6 providers, 14 models — select above',
                               style: Theme.of(context).textTheme.bodySmall,
                             )
                                 .animate()
@@ -280,13 +301,29 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                 ),
               ),
 
-            // Input
+            // Input (hidden in comparison mode)
+            if (!ref.watch(comparisonProvider).isActive)
             QuantumCard(
               borderRadius: 0,
               padding: const EdgeInsets.all(8),
               glowColor: providerColor,
               child: Row(
                 children: [
+                  // Mic button (STT)
+                  IconButton(
+                    icon: Icon(
+                      ref.watch(voiceProvider).isListening
+                          ? Icons.mic
+                          : Icons.mic_none,
+                      color: ref.watch(voiceProvider).isListening
+                          ? QuantumTheme.quantumRed
+                          : providerColor,
+                    ),
+                    onPressed: () => ref
+                        .read(voiceProvider.notifier)
+                        .toggleListening(_controller),
+                    tooltip: 'Voice input',
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _controller,
@@ -316,8 +353,11 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
   }
 
   IconData _providerIcon(LLMProvider provider) => switch (provider) {
-        LLMProvider.claude => Icons.diamond_outlined,
         LLMProvider.gemini => Icons.auto_awesome,
+        LLMProvider.groq => Icons.bolt,
+        LLMProvider.deepSeek => Icons.psychology,
+        LLMProvider.mistral => Icons.air,
+        LLMProvider.claude => Icons.diamond_outlined,
         LLMProvider.openRouter => Icons.router_outlined,
       };
 }

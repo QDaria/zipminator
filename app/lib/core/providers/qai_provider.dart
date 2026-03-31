@@ -24,8 +24,8 @@ class QaiState {
 
   const QaiState({
     this.messages = const [],
-    this.selectedModel = 'claude-sonnet-4-6',
-    this.selectedProvider = LLMProvider.claude,
+    this.selectedModel = 'gemini-2.5-flash',
+    this.selectedProvider = LLMProvider.gemini,
     this.isLoading = false,
     this.apiKeys = const {},
     this.error,

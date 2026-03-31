@@ -301,11 +301,11 @@ The paper has a strong core idea that fills a real gap. The three-tier irreversi
 | 10 | DORA softened, provider priority, ID Quantique date | Verification pass |
 
 ### Remaining for 0.90+
-- [ ] MI(D;D')=0 proof (Proposition)
+- [x] MI(D;D')=0 proof (Proposition) -- DONE (Mar 31): 4-part rigorous proof (a-d) with Born rule invocation, factorization, and domain-cardinality Note
 - [ ] Superdeterminism footnote
-- [ ] Hardware TRNG footnote
+- [x] Hardware TRNG footnote -- DONE (Mar 31): footnote on priority chain item 6, distinguishes OS CSPRNG (deterministic replay) from quantum TRNG (Born rule, no replay)
 - [ ] Synthetic data related work
-- [ ] Domain-knowledge attack proposition
+- [x] Domain-knowledge attack proposition -- DONE (Mar 31): Proposition 7 in main body Section 5.2, cross-refs Appendix Proposition 9, encryption analogy
 - [ ] End-to-end QRNG benchmark (needs qBraid key refresh)
 
 ### Paper Strategy

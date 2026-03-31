@@ -376,18 +376,20 @@ class RatchetNotifier extends Notifier<RatchetState> {
     switch (type) {
       case 'message':
         _handleIncomingMessage(msg);
-      case 'signal':
-        // Forward call signals (call_offer, call_accept, call_end) to VoIP.
+      case 'signal' || 'call_offer' || 'call_accept' || 'call_end':
         _callSignalController.add(msg);
       case 'peer_joined':
         _handlePeerJoined(msg);
+        _callSignalController.add(msg);
       case 'peer_left':
         _handlePeerLeft(msg);
+        _callSignalController.add(msg);
+      case 'offer' || 'answer' || 'ice-candidate':
+        _callSignalController.add(msg);
       case 'error':
         final detail = msg['detail'] as String? ?? 'Unknown signaling error';
         state = state.copyWith(error: detail);
       default:
-        // Ignore other types (room_created, joined, left, room_list, etc.)
         break;
     }
   }

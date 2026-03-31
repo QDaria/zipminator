@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 /// Connection state for the signaling server.
@@ -74,7 +75,10 @@ class MessengerService {
 
     try {
       final uri = Uri.parse('$signalingUrl/ws/$username');
-      _channel = WebSocketChannel.connect(uri);
+      _channel = IOWebSocketChannel.connect(
+        uri,
+        pingInterval: const Duration(seconds: 10),
+      );
 
       // Wait for the connection to be ready.
       await _channel!.ready;

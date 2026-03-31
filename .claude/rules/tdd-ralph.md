@@ -25,7 +25,7 @@ Every code modification follows Red/Green/Refactor. No exceptions.
 - No private keys in code, constant-time crypto ops verified
 
 ## Crypto Code (crates/, browser/src-tauri/src/vpn/, browser/src-tauri/src/proxy/)
-- Always use ultrathink reasoning tier
+- Always use `--effort max` reasoning tier
 - Verify constant-time operations
 - Run cargo fuzz if touching keygen/encapsulate/decapsulate
 

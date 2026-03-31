@@ -438,7 +438,41 @@ After protocol execution, the mutual information between the original dataset $D
 \end{proposition}
 
 \begin{proof}
-Each replacement token $D'[i,j]$ is determined entirely by QRNG bytes drawn independently of $D$. After mapping destruction, no artifact correlates $D$ with $D'$. The joint distribution factorizes: $P(D, D') = P(D) \cdot P(D')$. By definition, $I(D; D') = H(D) - H(D \mid D') = 0$ when $D$ and $D'$ are independent.
+We establish independence between $D$ and $D'$ cell-by-cell, then extend to the full datasets.
+
+\emph{(a) Token generation is physically independent of~$D$.}
+For each unique value $v_k$ in column~$C_j$, the replacement token $t_k$ is produced by measuring qubits prepared in $|{+}\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$. By the Born rule~\eqref{eq:born}, each measurement outcome is an independent fair bit; the joint outcome is a uniformly random string over $\Sigma^{16}$ (with $|\Sigma|=62$) via rejection sampling. No input to the measurement depends on $v_k$ or on any element of~$D$. Therefore the conditional distribution of the token given the original value equals the marginal:
+\begin{align*}
+  P(D'[i,j] {=} t \mid D[i,j] {=} v) &= P(D'[i,j] {=} t) = |\Sigma|^{-16}\\
+  &\quad \forall\; t \in \Sigma^{16},\; \forall\; v.
+\end{align*}
+
+\emph{(b) Mapping destruction eliminates the only classical correlation.}
+During protocol execution, the mapping $M_j$ is the sole artifact linking $D$ and $D'$. After Step~4 of Algorithm~\ref{alg:qrng_otp}, every mapping is overwritten and released. No physical record correlating any $v_k$ with its token $t_k$ persists.
+
+\emph{(c) Joint distribution factorizes.}
+Since each $D'[i,j]$ is generated independently of $D[i,j]$ (by part~(a)) and no side information survives (by part~(b)), the joint distribution over all cells factorizes:
+\[
+  P(D, D') \;=\; P(D) \cdot P(D').
+\]
+
+\emph{(d) Mutual information vanishes.}
+By definition, $I(D; D') = H(D) - H(D \mid D')$. Independence implies $H(D \mid D') = H(D)$, so $I(D; D') = 0$.
+
+\medskip\noindent\emph{Note.}
+This result holds regardless of domain cardinality~$|\mathcal{D}_j|$. Even when $|\mathcal{D}_j|$ is small (e.g., a binary column), the tokens carry zero information about which original value they replaced. An adversary who knows the domain may guess the original value with probability $|\mathcal{D}_j|^{-1}$ (see Proposition~\ref{prop:domainlimit} and Appendix~\ref{app:security-game}, Proposition~\ref{prop:domain}), but this probability derives entirely from domain knowledge, not from any information in~$D'$. The mutual information remains zero.
+\end{proof}
+
+\begin{proposition}[Domain-Knowledge Limitation]
+\label{prop:domainlimit}
+Propositions~\ref{prop:pervalue} and~\ref{prop:mi} bound the adversary's ability to invert the \emph{mapping} between $D$ and $D'$. They do not bound the adversary's ability to guess an original value from domain knowledge alone. For a column $C_j$ whose values are drawn from a domain $\mathcal{D}_j$, an adversary who knows $\mathcal{D}_j$ can guess any cell's original value with probability at least $|\mathcal{D}_j|^{-1}$, regardless of the anonymization method applied.
+\end{proposition}
+
+\begin{proof}
+The adversary ignores $D'$ entirely and guesses uniformly at random from $\mathcal{D}_j$, succeeding with probability $|\mathcal{D}_j|^{-1}$. This attack requires no information from the anonymized dataset and is therefore independent of the protocol. For columns with small domains (e.g., $|\mathcal{D}_j| = 2$ for binary sex), the domain-guessing probability $1/2$ dominates the mapping-recovery probability $62^{-16} \approx 2^{-95.3}$ by a factor of~$2^{94}$. Appendix~\ref{app:security-game}, Proposition~\ref{prop:domain} formalizes the combined bound as $\max(62^{-16},\; |\mathcal{D}_j|^{-1})$.
+
+\medskip\noindent
+\textsc{QRNG-OTP-Destroy} is designed to make the mapping irrecoverable, not to enlarge the effective domain. For datasets where domain-knowledge inference is a concern, the recommended deployment combines structural anonymization (L5--L9: generalization, suppression, micro-aggregation) to enlarge $|\mathcal{D}_j|$ before applying L10 tokenization, providing defense in depth. This two-phase approach is analogous to applying semantic security measures before encryption: the cipher protects the bits, but the plaintext must first be made resistant to frequency analysis.
 \end{proof}
 
 \subsection{The Mapping Destruction Requirement}
@@ -521,7 +555,7 @@ The implementation is structured in three layers:
 \item IBM Quantum, 156-qubit (QRNG, certified)
 \item Rigetti Ankaa-3, 84-qubit (QRNG, certified)
 \item API-based QRNG (certified)
-\item OS entropy, \texttt{/dev/urandom} (CSPRNG, \emph{not} certified)
+\item OS entropy, \texttt{/dev/urandom} (CSPRNG, \emph{not} certified)\footnote{The distinction is physical, not algorithmic. OS entropy sources (Intel RDRAND, \texttt{/dev/urandom}, timing jitter) are deterministic processes that exploit computational unpredictability; an adversary who captures the internal state can replay the output. Quantum TRNGs certified by loophole-free Bell tests~\cite{hensen2015loophole} produce bits that are fundamentally random per the Born rule: no seed exists, no state determines the outcome, and no replay is possible even in principle.}
 \end{enumerate}
 
 When the OS fallback (priority~6) is used, the system marks the output as ``classically anonymized'' rather than ``quantum-certified,'' preserving the integrity of the physics-guaranteed claim. Each harvesting cycle appends approximately \SI{50}{\kilo\byte} of quantum random bytes. The pool supports concurrent reads with per-consumer offset tracking; consumed bytes are never re-read.

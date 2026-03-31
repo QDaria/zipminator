@@ -9,7 +9,7 @@
 - Preserve Mo's voice when editing his writing. Don't sanitize or AI-ify it.
 
 ## Thinking
-- Use extended thinking (ultrathink budget) for: architecture decisions, cross-file refactors,
+- Use maximum effort (`--effort max`) for: architecture decisions, cross-file refactors,
   complex algorithm design, anything touching PQC/cryptography.
 - For simple tasks (fix typo, rename variable): no extended thinking, just do it.
 - Think systematically but don't over-narrate obvious steps.
