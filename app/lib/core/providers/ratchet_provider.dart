@@ -308,6 +308,11 @@ class RatchetNotifier extends Notifier<RatchetState> {
 
   /// Connect to the live signaling server. Call when messenger screen opens.
   Future<void> connectToSignaling() async {
+    // Skip if already connected or in the process of connecting.
+    final current = _messengerService?.currentState;
+    if (current == SignalingConnectionState.connected ||
+        current == SignalingConnectionState.connecting) return;
+
     // Derive username from Supabase auth or fall back to a random guest ID.
     final authState = ref.read(authProvider);
     final user = authState.user;
@@ -872,6 +877,7 @@ final ratchetProvider =
 /// Watch this from the root app widget to keep signaling alive app-wide.
 final signalingInitProvider = Provider<void>((ref) {
   final auth = ref.watch(authProvider);
+  // ignore: avoid_print
   if (auth.isAuthenticated) {
     // Connect signaling after auth is confirmed.
     Future.microtask(() {

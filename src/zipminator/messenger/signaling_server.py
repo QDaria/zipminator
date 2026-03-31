@@ -287,8 +287,9 @@ def create_app() -> FastAPI:
                 try:
                     msg = json.loads(raw)
                 except json.JSONDecodeError:
-                    # Handle plain text pings
+                    # Handle plain text pings — respond with pong to keep Fly.io proxy alive.
                     if raw.strip() == "ping":
+                        await websocket.send_text("pong")
                         continue
                     await websocket.send_text(
                         json.dumps({"type": "error", "detail": "invalid JSON"})
@@ -297,6 +298,7 @@ def create_app() -> FastAPI:
 
                 action = msg.get("action", "")
                 if action == "ping":
+                    await websocket.send_text('{"type":"pong"}')
                     continue
                 await _handle_action(peer, msg, action, websocket)
 

@@ -1038,9 +1038,15 @@ class _ConferenceViewState extends ConsumerState<_ConferenceView> {
   @override
   void initState() {
     super.initState();
-    _localRenderer.initialize();
+    _initRendererAndStreams();
     _startDurationTimer();
+  }
+
+  Future<void> _initRendererAndStreams() async {
+    await _localRenderer.initialize();
+    if (!mounted) return;
     _setupStreams();
+    setState(() {});
   }
 
   void _startDurationTimer() {

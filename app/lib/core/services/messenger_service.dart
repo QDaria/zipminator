@@ -38,6 +38,7 @@ class MessengerService {
       StreamController<SignalingConnectionState>.broadcast();
 
   SignalingConnectionState _state = SignalingConnectionState.disconnected;
+  bool _disposed = false;
 
   /// Stream of incoming messages from signaling server.
   Stream<Map<String, dynamic>> get messages => _messageController.stream;
@@ -57,6 +58,7 @@ class MessengerService {
   });
 
   void _setState(SignalingConnectionState newState) {
+    if (_disposed) return;
     _state = newState;
     _connectionStateController.add(newState);
   }
@@ -90,6 +92,7 @@ class MessengerService {
 
       _subscription = _channel!.stream.listen(
         (data) {
+          if (_disposed) return;
           try {
             final msg = jsonDecode(data as String) as Map<String, dynamic>;
             _messageController.add(msg);
@@ -189,6 +192,7 @@ class MessengerService {
 
   /// Clean up all resources.
   void dispose() {
+    _disposed = true;
     disconnect();
     _messageController.close();
     _connectionStateController.close();
