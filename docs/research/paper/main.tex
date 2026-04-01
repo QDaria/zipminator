@@ -441,7 +441,9 @@ After protocol execution, the mutual information between the original dataset $D
 We establish independence between $D$ and $D'$ cell-by-cell, then extend to the full datasets.
 
 \emph{(a) Token generation is physically independent of~$D$.}
-For each unique value $v_k$ in column~$C_j$, the replacement token $t_k$ is produced by measuring qubits prepared in $|{+}\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$. By the Born rule~\eqref{eq:born}, each measurement outcome is an independent fair bit; the joint outcome is a uniformly random string over $\Sigma^{16}$ (with $|\Sigma|=62$) via rejection sampling. No input to the measurement depends on $v_k$ or on any element of~$D$. Therefore the conditional distribution of the token given the original value equals the marginal:
+For each unique value $v_k$ in column~$C_j$, the replacement token $t_k$ is produced by measuring qubits prepared in $|{+}\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$. By the Born rule~\eqref{eq:born}, each measurement outcome is an independent fair bit; the joint outcome is a uniformly random string over $\Sigma^{16}$ (with $|\Sigma|=62$) via rejection sampling.
+
+No input to the measurement depends on $v_k$ or on any element of~$D$. Therefore the conditional distribution of the token given the original value equals the marginal:
 \begin{align*}
   P(D'[i,j] {=} t \mid D[i,j] {=} v) &= P(D'[i,j] {=} t) = |\Sigma|^{-16}\\
   &\quad \forall\; t \in \Sigma^{16},\; \forall\; v.
@@ -469,7 +471,7 @@ Propositions~\ref{prop:pervalue} and~\ref{prop:mi} bound the adversary's ability
 \end{proposition}
 
 \begin{proof}
-The adversary ignores $D'$ entirely and guesses uniformly at random from $\mathcal{D}_j$, succeeding with probability $|\mathcal{D}_j|^{-1}$. This attack requires no information from the anonymized dataset and is therefore independent of the protocol. For columns with small domains (e.g., $|\mathcal{D}_j| = 2$ for binary sex), the domain-guessing probability $1/2$ dominates the mapping-recovery probability $62^{-16} \approx 2^{-95.3}$ by a factor of~$2^{94}$. Appendix~\ref{app:security-game}, Proposition~\ref{prop:domain} formalizes the combined bound as $\max(62^{-16},\; |\mathcal{D}_j|^{-1})$.
+The adversary ignores $D'$ entirely and guesses uniformly at random from $\mathcal{D}_j$, succeeding with probability $|\mathcal{D}_j|^{-1}$. This is a well-known observation: the homogeneity attack of Machanavajjhala et al.~\cite{machanavajjhala2007ldiv} exploits exactly this property. The attack requires no information from the anonymized dataset and is therefore independent of the protocol. For columns with small domains (e.g., $|\mathcal{D}_j| = 2$ for binary sex), the domain-guessing probability $1/2$ dominates the mapping-recovery probability $62^{-16} \approx 2^{-95.3}$ by a factor of~$2^{94}$. Appendix~\ref{app:security-game}, Proposition~\ref{prop:domain} formalizes the combined bound as $\max(62^{-16},\; |\mathcal{D}_j|^{-1})$.
 
 \medskip\noindent
 \textsc{QRNG-OTP-Destroy} is designed to make the mapping irrecoverable, not to enlarge the effective domain. For datasets where domain-knowledge inference is a concern, the recommended deployment combines structural anonymization (L5--L9: generalization, suppression, micro-aggregation) to enlarge $|\mathcal{D}_j|$ before applying L10 tokenization, providing defense in depth. This two-phase approach is analogous to applying semantic security measures before encryption: the cipher protects the bits, but the plaintext must first be made resistant to frequency analysis.
@@ -917,9 +919,11 @@ Our contribution applies the same class of guarantee to a different problem. Rat
 \subsection{Synthetic Data Generation}
 \label{subsec:synth}
 
-Synthetic data generation offers an alternative approach to privacy-preserving data release. Tools such as DataSynthesizer, the Synthetic Data Vault (SDV), and CTGAN use generative models to produce artificial datasets that preserve statistical properties of the original data without containing any real records. Unlike anonymization, which transforms existing records, synthetic data creates new records from learned distributions.
+Synthetic data generation offers an alternative approach to privacy-preserving data release. Tools such as DataSynthesizer~\cite{ping2017datasynthesizer}, the Synthetic Data Vault (SDV), and CTGAN~\cite{xu2019ctgan} use generative models to produce artificial datasets that preserve statistical properties of the original data without containing any real records. Unlike anonymization, which transforms existing records, synthetic data creates new records from learned distributions.
 
-Synthetic data and QRNG-OTP-Destroy address fundamentally different use cases. Synthetic data aims to preserve analytical utility (aggregate statistics, correlations, ML training value) while eliminating direct linkage to individuals. L10 aims to eliminate all information content, producing tokens with zero analytical utility. The two approaches are complementary: synthetic data for analysis workflows where utility matters, L10 for regulatory compliance workflows where provable irreversibility matters (e.g., satisfying GDPR Article~17 deletion requests while preserving table structure for downstream systems).
+However, Stadler, Oprisanu, and Troncoso~\cite{stadler2022synthetic} demonstrated that synthetic data generation does not provide the privacy guarantees it promises: across a range of state-of-the-art generative models, synthetic datasets either remain vulnerable to membership inference attacks (an adversary determines whether a specific individual was in the training set) or lose the statistical utility that motivated their creation. This trade-off is inherent because the generative model must learn enough about the original distribution to produce useful synthetic records, and that learned information can leak through the model's outputs.
+
+\textsc{QRNG-OTP-Destroy} sidesteps this trade-off entirely by abandoning utility preservation. L10 does not learn or reproduce any statistical property of the original data; it replaces every value with an independently drawn quantum-random token. The result has zero analytical utility but is provably immune to membership inference: the mutual information between the original and anonymized datasets is zero (Proposition~\ref{prop:mi}), so no function of $D'$ reveals whether any individual was in~$D$. The two approaches are complementary: synthetic data for analysis workflows where utility matters, L10 for regulatory compliance workflows where provable irreversibility matters (e.g., satisfying GDPR Article~17 deletion requests while preserving table structure for downstream systems).
 
 \subsection{Quantum Differential Privacy}
 \label{subsec:qdp}
@@ -1176,6 +1180,9 @@ A.~Rukhin, J.~Soto, J.~Nechvatal, \emph{et al.}, ``A statistical test suite for 
 \bibitem{pironio2010certified}
 S.~Pironio, A.~Ac\'{i}n, S.~Massar, A.~Boyer de~la~Giroday, D.~N. Matsukevich, P.~Maunz, S.~Olmschenk, D.~Hayes, L.~Luo, T.~A. Manning, and C.~Monroe, ``Random numbers certified by Bell's theorem,'' \emph{Nature}, vol.~464, pp.~1021--1024, 2010.
 
+\bibitem{ping2017datasynthesizer}
+H.~Ping, J.~Stoyanovich, and B.~Howe, ``{DataSynthesizer}: Privacy-preserving synthetic datasets,'' in \emph{Proc.\ 29th Int.\ Conf.\ Scientific and Statistical Database Management (SSDBM)}, 2017, Art.~42.
+
 \bibitem{prasser2014arx}
 F.~Prasser, F.~Kohlmayer, R.~Lautenschl\"{a}ger, and K.~A. Kuhn, ``{ARX}---A comprehensive tool for anonymizing biomedical data,'' \emph{AMIA Annual Symposium Proceedings}, pp.~984--993, 2014.
 
@@ -1184,6 +1191,9 @@ P.~Samarati, ``Protecting respondents' identities in microdata release,'' \emph{
 
 \bibitem{shannon1949secrecy}
 C.~E. Shannon, ``Communication theory of secrecy systems,'' \emph{Bell System Technical Journal}, vol.~28, no.~4, pp.~656--715, 1949.
+
+\bibitem{stadler2022synthetic}
+T.~Stadler, B.~Oprisanu, and C.~Troncoso, ``Synthetic data---Anonymisation groundhog day,'' in \emph{Proc.\ 31st USENIX Security Symposium}, 2022, pp.~1451--1468.
 
 \bibitem{sweeney2002kanon}
 L.~Sweeney, ``$k$-Anonymity: A model for protecting privacy,'' \emph{International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems}, vol.~10, no.~5, pp.~557--570, 2002.
@@ -1202,6 +1212,9 @@ G.~S. Vernam, ``Cipher printing telegraph systems for secret wire and radio tele
 
 \bibitem{wilson2020dpsql}
 R.~J. Wilson, C.~Y. Zhang, W.~Lam, D.~Desfontaines, D.~Simmons-Marengo, and B.~Gipson, ``Differentially private {SQL} with bounded user contribution,'' \emph{Proceedings on Privacy Enhancing Technologies}, vol.~2020, no.~2, pp.~230--250, 2020.
+
+\bibitem{xu2019ctgan}
+L.~Xu, M.~Skoularidou, A.~Cuesta-Infante, and K.~Veeramachaneni, ``Modeling tabular data using conditional {GAN},'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, vol.~32, 2019.
 
 \end{thebibliography}
 
@@ -1258,7 +1271,7 @@ By reduction to the Born rule assumption. After the protocol completes, $\mathca
 \end{proof}
 
 \begin{remark}
-The game $\mathsf{ANON}_{\mathcal{A}}(\lambda)$ captures \emph{mapping-recovery} security: the adversary's inability to reconstruct the original PII value from its replacement token. Domain-knowledge attacks, where an adversary exploits a small value domain (e.g., binary sex, two-letter state codes) to guess the original value without inverting the token, fall outside this game's scope. Such attacks are addressed in the system design by combining L10 tokenization with the structural anonymization techniques of levels L5--L9 (generalization, suppression, micro-aggregation), which enlarge the effective domain before tokenization. A composition theorem formalizing the joint guarantee of structural anonymization followed by \textsc{QRNG-OTP-Destroy} is left for future work.
+The game $\mathsf{ANON}_{\mathcal{A}}(\lambda)$ captures \emph{mapping-recovery} security: the adversary's inability to reconstruct the original PII value from its replacement token. Domain-knowledge attacks, where an adversary exploits a small value domain to guess the original value without inverting the token, fall outside this game's scope and are analyzed in Proposition~\ref{prop:domainlimit}. Defense in depth combines L5--L9 structural anonymization with L10 tokenization; a composition theorem formalizing the joint guarantee is left for future work.
 \end{remark}
 
 \begin{proposition}[Domain-Aware Recovery Bound]

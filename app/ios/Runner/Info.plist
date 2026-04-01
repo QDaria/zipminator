@@ -66,6 +66,8 @@
 	<string>Zipminator uses the camera for quantum-secure video calls (VoIP).</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Zipminator uses the microphone for quantum-secure voice and video calls.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Zipminator uses speech recognition for voice-to-text input in Q-AI assistant.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Zipminator accesses photos to import files into the Quantum Vault for encryption.</string>
 	<key>NSLocalNetworkUsageDescription</key>

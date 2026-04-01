@@ -8,6 +8,7 @@ from .rigetti import RigettiProvider
 from .qbraid import QBraidProvider
 from .api import APIProxyProvider
 from .pool_provider import PoolProvider
+from .csi_pool_provider import CsiPoolProvider
 from .base import QuantumProvider
 
 logger = logging.getLogger(__name__)
@@ -60,16 +61,23 @@ def get_provider(pool_path: Optional[str] = None) -> QuantumProvider:
 create_provider = get_provider
 
 
-def _collect_providers(pool_path: Optional[str] = None) -> List[QuantumProvider]:
+def _collect_providers(
+    pool_path: Optional[str] = None,
+    csi_pool_path: Optional[str] = None,
+) -> List[QuantumProvider]:
     """Collect all available providers for multi-source composition.
 
     Returns every provider that can be instantiated, not just the
     highest-priority one. This enables the compositor to XOR-fuse
     entropy from multiple independent sources.
+
+    Args:
+        pool_path: Override path to quantum entropy pool.
+        csi_pool_path: Override path to CSI entropy pool.
     """
     providers: List[QuantumProvider] = []
 
-    # 1. Pool provider
+    # 1. Quantum pool provider
     pool = Path(pool_path) if pool_path else None
     if pool is None:
         pp = PoolProvider()
@@ -79,7 +87,17 @@ def _collect_providers(pool_path: Optional[str] = None) -> List[QuantumProvider]
         if pool.exists() and pool.stat().st_size > 0:
             providers.append(PoolProvider(pool_path=str(pool)))
 
-    # 2. Cloud providers keyed on environment variables
+    # 2. CSI entropy pool (classical physical entropy, separate provenance)
+    csi = Path(csi_pool_path) if csi_pool_path else None
+    if csi is None:
+        csi_pp = CsiPoolProvider()
+        if csi_pp.bytes_remaining() > 0:
+            providers.append(csi_pp)
+    else:
+        if csi.exists() and csi.stat().st_size > 0:
+            providers.append(CsiPoolProvider(pool_path=str(csi)))
+
+    # 3. Cloud providers keyed on environment variables
     qbraid_key = os.getenv("QBRAID_API_KEY")
     ibm_token = os.getenv("IBM_QUANTUM_TOKEN")
     rigetti_key = os.getenv("RIGETTI_API_KEY")
@@ -111,6 +129,7 @@ def _collect_providers(pool_path: Optional[str] = None) -> List[QuantumProvider]
 
 def get_compositor(
     pool_path: Optional[str] = None,
+    csi_pool_path: Optional[str] = None,
     min_sources: int = 1,
 ) -> "EntropyCompositor":
     """Return an EntropyCompositor wrapping all available providers.
@@ -123,7 +142,8 @@ def get_compositor(
     backward compatibility.
 
     Args:
-        pool_path: Override path to the entropy pool binary file.
+        pool_path: Override path to the quantum entropy pool binary file.
+        csi_pool_path: Override path to the CSI entropy pool binary file.
         min_sources: Minimum number of healthy sources required.
 
     Returns:
@@ -131,6 +151,6 @@ def get_compositor(
     """
     from .compositor import EntropyCompositor, QuantumProviderAdapter
 
-    raw_providers = _collect_providers(pool_path)
+    raw_providers = _collect_providers(pool_path, csi_pool_path=csi_pool_path)
     sources = [QuantumProviderAdapter(p) for p in raw_providers]
     return EntropyCompositor(sources, min_sources=min_sources)

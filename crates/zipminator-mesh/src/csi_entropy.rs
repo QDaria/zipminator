@@ -177,6 +177,33 @@ impl CsiEntropySource {
             self.ingest_frame(frame);
         }
     }
+
+    /// Flush buffered CSI entropy to a pool file on disk.
+    ///
+    /// Appends all buffered entropy bytes to the specified file,
+    /// creating it if it doesn't exist. This enables the Python
+    /// `CsiPoolProvider` to consume CSI entropy from a separate
+    /// file (`csi_entropy_pool.bin`) with full provenance tracking.
+    pub fn flush_to_file(&mut self, path: &std::path::Path) -> Result<usize, EntropyBridgeError> {
+        use std::io::Write;
+
+        if self.entropy_buffer.is_empty() {
+            return Ok(0);
+        }
+
+        let mut file = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)
+            .map_err(|e| EntropyBridgeError::Io(e))?;
+
+        let bytes_written = self.entropy_buffer.len();
+        file.write_all(&self.entropy_buffer)
+            .map_err(|e| EntropyBridgeError::Io(e))?;
+
+        self.entropy_buffer.clear();
+        Ok(bytes_written)
+    }
 }
 
 impl PoolEntropySource for CsiEntropySource {
@@ -325,5 +352,55 @@ mod tests {
         // Should have a mix of true and false (not all same)
         let true_count = bits.iter().filter(|&&b| b).count();
         assert!(true_count > 0 && true_count < CSI_SUBCARRIERS, "phase LSBs should not be uniform");
+    }
+
+    #[test]
+    fn test_flush_to_file() {
+        let mut source = CsiEntropySource::new();
+        for seed in 0..200 {
+            source.ingest_frame(&make_test_frame(seed));
+        }
+        let available_before = source.available().unwrap();
+        assert!(available_before > 0);
+
+        let dir = tempfile::tempdir().unwrap();
+        let pool_path = dir.path().join("csi_entropy_pool.bin");
+
+        let written = source.flush_to_file(&pool_path).unwrap();
+        assert_eq!(written, available_before);
+        assert_eq!(source.available().unwrap(), 0, "buffer should be empty after flush");
+
+        // File should contain exactly what was flushed
+        let file_data = std::fs::read(&pool_path).unwrap();
+        assert_eq!(file_data.len(), written);
+    }
+
+    #[test]
+    fn test_flush_to_file_appends() {
+        let dir = tempfile::tempdir().unwrap();
+        let pool_path = dir.path().join("csi_entropy_pool.bin");
+
+        let mut source = CsiEntropySource::new();
+        for seed in 0..100 {
+            source.ingest_frame(&make_test_frame(seed));
+        }
+        let first_write = source.flush_to_file(&pool_path).unwrap();
+
+        for seed in 100..200 {
+            source.ingest_frame(&make_test_frame(seed));
+        }
+        let second_write = source.flush_to_file(&pool_path).unwrap();
+
+        // File should contain both flushes concatenated
+        let file_data = std::fs::read(&pool_path).unwrap();
+        assert_eq!(file_data.len(), first_write + second_write);
+    }
+
+    #[test]
+    fn test_flush_empty_buffer_returns_zero() {
+        let mut source = CsiEntropySource::new();
+        let dir = tempfile::tempdir().unwrap();
+        let pool_path = dir.path().join("csi_entropy_pool.bin");
+        assert_eq!(source.flush_to_file(&pool_path).unwrap(), 0);
     }
 }

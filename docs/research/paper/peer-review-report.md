@@ -304,7 +304,7 @@ The paper has a strong core idea that fills a real gap. The three-tier irreversi
 - [x] MI(D;D')=0 proof (Proposition) -- DONE (Mar 31): 4-part rigorous proof (a-d) with Born rule invocation, factorization, and domain-cardinality Note
 - [ ] Superdeterminism footnote
 - [x] Hardware TRNG footnote -- DONE (Mar 31): footnote on priority chain item 6, distinguishes OS CSPRNG (deterministic replay) from quantum TRNG (Born rule, no replay)
-- [ ] Synthetic data related work
+- [x] Synthetic data related work -- DONE (Apr 1): 3 new citations (Ping 2017, Xu 2019, Stadler 2022), membership inference contrast, MI=0 cross-ref
 - [x] Domain-knowledge attack proposition -- DONE (Mar 31): Proposition 7 in main body Section 5.2, cross-refs Appendix Proposition 9, encryption analogy
 - [ ] End-to-end QRNG benchmark (needs qBraid key refresh)
 
