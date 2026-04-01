@@ -86,20 +86,9 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
-  /// Native Google Sign-In (no browser redirect).
+  /// Google Sign-In via in-app browser OAuth.
   Future<void> signInWithGoogle() async {
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      final response = await SupabaseService.signInWithGoogle();
-      state = state.copyWith(user: response.user, isLoading: false);
-    } catch (e) {
-      final msg = e.toString();
-      if (msg.contains('cancelled') || msg.contains('canceled')) {
-        state = state.copyWith(isLoading: false);
-      } else {
-        state = state.copyWith(isLoading: false, error: msg);
-      }
-    }
+    await signInWithOAuth(OAuthProvider.google);
   }
 
   /// Native Apple Sign-In (system sheet, no browser redirect).

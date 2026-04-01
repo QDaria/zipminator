@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,13 +13,6 @@ class SupabaseService {
   static SupabaseClient get client => Supabase.instance.client;
 
   static const _redirectTo = 'com.qdaria.zipminator://login-callback';
-
-  // Google OAuth client IDs (from Google Cloud Console).
-  // iOS client ID is the reversed bundle ID style.
-  static const _googleWebClientId =
-      ''; // Set if using web-based Google auth
-  static const _googleIosClientId =
-      ''; // Set for iOS-specific Google auth
 
   static Future<void> initialize() async {
     await dotenv.load(fileName: '.env');
@@ -51,41 +43,18 @@ class SupabaseService {
   ) =>
       client.auth.signUp(email: email, password: password);
 
-  /// Browser-based OAuth for GitHub and LinkedIn.
+  /// OAuth via in-app browser. On iOS uses SFSafariViewController which
+  /// handles the redirect internally (no external Safari needed).
   static Future<bool> signInWithOAuth(OAuthProvider provider) =>
       client.auth.signInWithOAuth(
         provider,
         redirectTo: _redirectTo,
-        authScreenLaunchMode: LaunchMode.externalApplication,
+        authScreenLaunchMode: LaunchMode.inAppBrowserView,
       );
 
-  /// Native Google Sign-In (no browser redirect needed).
-  static Future<AuthResponse> signInWithGoogle() async {
-    final googleSignIn = GoogleSignIn(
-      clientId: _googleIosClientId.isNotEmpty ? _googleIosClientId : null,
-      serverClientId:
-          _googleWebClientId.isNotEmpty ? _googleWebClientId : null,
-    );
-
-    final googleUser = await googleSignIn.signIn();
-    if (googleUser == null) {
-      throw const AuthException('Google Sign In was cancelled');
-    }
-
-    final googleAuth = await googleUser.authentication;
-    final idToken = googleAuth.idToken;
-    final accessToken = googleAuth.accessToken;
-
-    if (idToken == null) {
-      throw const AuthException('Google Sign In failed: no ID token');
-    }
-
-    return client.auth.signInWithIdToken(
-      provider: OAuthProvider.google,
-      idToken: idToken,
-      accessToken: accessToken,
-    );
-  }
+  /// Google Sign-In via in-app browser OAuth.
+  static Future<bool> signInWithGoogle() =>
+      signInWithOAuth(OAuthProvider.google);
 
   /// Native Apple Sign-In (system sheet, no browser redirect).
   static Future<AuthResponse> signInWithApple() async {

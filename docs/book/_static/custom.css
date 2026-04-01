@@ -172,13 +172,8 @@ table.docutils tr:hover td {
   font-weight: 600;
 }
 
-.sd-card .sd-card-body {
-  color: var(--zm-text);
-}
-
-.sd-card .sd-card-title {
-  color: var(--zm-text-bright);
-}
+.sd-card .sd-card-body { color: var(--zm-text); }
+.sd-card .sd-card-title { color: var(--zm-text-bright); }
 
 /* ── ADMONITIONS ──────────────────────────────────────────── */
 .admonition {
@@ -187,46 +182,31 @@ table.docutils tr:hover td {
   margin: 1.5rem 0;
 }
 
-.admonition.tip {
-  border-left: 4px solid var(--zm-emerald);
-}
-
+.admonition.tip { border-left: 4px solid var(--zm-emerald); }
 .admonition.tip .admonition-title {
   background-color: rgba(52, 211, 153, 0.1);
   color: var(--zm-emerald);
 }
 
-.admonition.warning {
-  border-left: 4px solid var(--zm-amber);
-}
-
+.admonition.warning { border-left: 4px solid var(--zm-amber); }
 .admonition.warning .admonition-title {
   background-color: rgba(245, 158, 11, 0.1);
   color: var(--zm-amber);
 }
 
-.admonition.note {
-  border-left: 4px solid var(--zm-cyan);
-}
-
+.admonition.note { border-left: 4px solid var(--zm-cyan); }
 .admonition.note .admonition-title {
   background-color: rgba(34, 211, 238, 0.1);
   color: var(--zm-cyan);
 }
 
-.admonition.important {
-  border-left: 4px solid var(--zm-violet);
-}
-
+.admonition.important { border-left: 4px solid var(--zm-violet); }
 .admonition.important .admonition-title {
   background-color: rgba(167, 139, 250, 0.1);
   color: var(--zm-violet);
 }
 
-.admonition.danger {
-  border-left: 4px solid var(--zm-rose);
-}
-
+.admonition.danger { border-left: 4px solid var(--zm-rose); }
 .admonition.danger .admonition-title {
   background-color: rgba(251, 113, 133, 0.1);
   color: var(--zm-rose);
@@ -263,11 +243,9 @@ details.sd-dropdown[open] summary {
   padding: 0.5rem 1rem;
 }
 
-.sd-tab-set > label:hover {
-  color: var(--zm-text-bright);
-}
+.sd-tab-set > label:hover { color: var(--zm-text-bright); }
 
-/* ── AUTODOC API reference (blue header boxes) ────────────── */
+/* ── AUTODOC API reference ────────────────────────────────── */
 dl.py dt,
 dl.class dt,
 dl.method dt,
@@ -291,10 +269,7 @@ dl.method dd {
 }
 
 /* ── MATH EQUATIONS ───────────────────────────────────────── */
-.math {
-  color: var(--zm-text-bright);
-  font-size: 1.1em;
-}
+.math { color: var(--zm-text-bright); font-size: 1.1em; }
 
 div.math {
   padding: 1rem;
@@ -305,20 +280,11 @@ div.math {
 }
 
 /* ── COPY BUTTON ──────────────────────────────────────────── */
-button.copybtn {
-  opacity: 0.3;
-  background: transparent;
-}
-
-button.copybtn:hover {
-  opacity: 1;
-  color: var(--zm-cyan);
-}
+button.copybtn { opacity: 0.3; background: transparent; }
+button.copybtn:hover { opacity: 1; color: var(--zm-cyan); }
 
 /* ── HEADINGS ─────────────────────────────────────────────── */
-h1, h2, h3 {
-  color: var(--zm-text-bright);
-}
+h1, h2, h3 { color: var(--zm-text-bright); }
 
 h1 {
   border-bottom: 2px solid rgba(34, 211, 238, 0.2);
@@ -331,43 +297,22 @@ h2 {
 }
 
 /* ── LINKS ────────────────────────────────────────────────── */
-a {
-  color: var(--zm-cyan);
-  text-decoration: none;
-}
-
-a:hover {
-  color: var(--zm-text-bright);
-  text-decoration: underline;
-}
+a { color: var(--zm-cyan); text-decoration: none; }
+a:hover { color: var(--zm-text-bright); text-decoration: underline; }
 
 /* ── BADGES ───────────────────────────────────────────────── */
-.badge-free {
-  background: rgba(52, 211, 153, 0.15);
-  color: var(--zm-emerald);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.8em;
-  font-weight: 600;
-}
-
-.badge-pro {
-  background: rgba(167, 139, 250, 0.15);
-  color: var(--zm-violet);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.8em;
-  font-weight: 600;
-}
-
+.badge-free,
+.badge-pro,
 .badge-enterprise {
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--zm-amber);
   padding: 2px 8px;
   border-radius: 4px;
   font-size: 0.8em;
   font-weight: 600;
 }
+
+.badge-free       { background: rgba(52, 211, 153, 0.15); color: var(--zm-emerald); }
+.badge-pro        { background: rgba(167, 139, 250, 0.15); color: var(--zm-violet); }
+.badge-enterprise { background: rgba(245, 158, 11, 0.15);  color: var(--zm-amber); }
 
 /* ── PLOTLY CHARTS ─────────────────────────────────────────── */
 .js-plotly-plot,
@@ -376,14 +321,8 @@ a:hover {
   margin: 1rem 0;
 }
 
-.js-plotly-plot .modebar {
-  opacity: 0.4;
-  transition: opacity 0.2s;
-}
-
-.js-plotly-plot:hover .modebar {
-  opacity: 1;
-}
+.js-plotly-plot .modebar { opacity: 0.4; transition: opacity 0.2s; }
+.js-plotly-plot:hover .modebar { opacity: 1; }
 
 /* ── DOWNLOAD BARS ────────────────────────────────────────── */
 .zm-download-bar {
@@ -426,9 +365,7 @@ a:hover {
   transition: opacity 0.2s;
 }
 
-div.highlight:hover .zm-code-dl {
-  opacity: 1;
-}
+div.highlight:hover .zm-code-dl { opacity: 1; }
 
 /* ── GLOBAL TOGGLE BAR ────────────────────────────────────── */
 .zm-global-toggle {
@@ -452,11 +389,9 @@ div.highlight:hover .zm-code-dl {
   transition: background 0.15s;
 }
 
-.zm-toggle-btn:hover {
-  background: rgba(167, 139, 250, 0.25);
-}
+.zm-toggle-btn:hover { background: rgba(167, 139, 250, 0.25); }
 
-/* ── CELL TAG: hide-input (code collapsed by default) ─────── */
+/* ── CELL TAG: hide-input ─────────────────────────────────── */
 .tag_hide-input .cell_input {
   border: 1px dashed rgba(34, 211, 238, 0.15);
   border-radius: 6px;
@@ -470,22 +405,82 @@ div.highlight:hover .zm-code-dl {
   cursor: pointer;
 }
 
+/* ── GLOW EFFECTS ─────────────────────────────────────────── */
+.zm-glow {
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.15), 0 0 30px rgba(34, 211, 238, 0.05);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.zm-glow:hover {
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.3), 0 0 40px rgba(34, 211, 238, 0.1);
+}
+
+.zm-card-violet {
+  box-shadow: 0 0 15px rgba(167, 139, 250, 0.15), 0 0 30px rgba(167, 139, 250, 0.05);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.zm-card-violet:hover {
+  box-shadow: 0 0 20px rgba(167, 139, 250, 0.3), 0 0 40px rgba(167, 139, 250, 0.1);
+}
+
+.zm-card-emerald {
+  box-shadow: 0 0 15px rgba(52, 211, 153, 0.15), 0 0 30px rgba(52, 211, 153, 0.05);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.zm-card-emerald:hover {
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.3), 0 0 40px rgba(52, 211, 153, 0.1);
+}
+
+.zm-card-amber {
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.15), 0 0 30px rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.zm-card-amber:hover {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3), 0 0 40px rgba(245, 158, 11, 0.1);
+}
+
+/* Glow pulse animation */
+@keyframes zm-glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(34, 211, 238, 0.15), 0 0 30px rgba(34, 211, 238, 0.05); }
+  50%       { box-shadow: 0 0 20px rgba(34, 211, 238, 0.28), 0 0 40px rgba(34, 211, 238, 0.10); }
+}
+
+.zm-glow-animated { animation: zm-glow-pulse 3s ease-in-out infinite; }
+
+/* ── DASHBOARD LAYOUTS ────────────────────────────────────── */
+.zm-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.zm-chart-container {
+  border-radius: 8px;
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.08);
+  padding: 0.5rem;
+  background: var(--zm-bg-card);
+}
+
+.zm-dashboard-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 768px) {
-  div.highlight pre {
-    font-size: 0.82rem;
-  }
-
-  .sd-card {
-    margin-bottom: 1rem;
-  }
-
-  .zm-download-bar {
-    flex-wrap: wrap;
-  }
-
-  .zm-global-toggle {
-    flex-direction: column;
-    align-items: stretch;
-  }
+  div.highlight pre { font-size: 0.82rem; }
+  .sd-card { margin-bottom: 1rem; }
+  .zm-download-bar { flex-wrap: wrap; }
+  .zm-global-toggle { flex-direction: column; align-items: stretch; }
+  .zm-dashboard-row { flex-direction: column; }
 }

@@ -53,7 +53,12 @@ parts:
       - file: notebooks/07_vault_workflow
       - file: notebooks/08_qmesh_physical_crypto
 
-  - caption: "Part VIII: CLI Reference"
+  - caption: "Part VIII: Advanced Topics"
+    chapters:
+      - file: notebooks/07_monte_carlo_prng_vs_qrng
+      - file: notebooks/10_quantum_anonymization
+
+  - caption: "Part IX: CLI Reference"
     chapters:
       - file: content/cli
       - file: content/cli_reference

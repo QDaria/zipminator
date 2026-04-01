@@ -157,13 +157,13 @@ claude mcp add ruv-swarm -- npx ruv-swarm mcp start
 ### Daily Auto-Update (runs on session start)
 
 ```bash
-# Update ruflo to latest (currently v3.5.14)
+# Update ruflo to latest (currently v3.5.48)
 npx ruflo@latest update check && npx ruflo@latest update apply
 # Update claude-flow alias too
 npm update -g ruflo claude-flow 2>/dev/null || true
 ```
 
-### Ruflo v3.5 Key Features (changelog v3.0 -> v3.5.14)
+### Ruflo v3.5 Key Features (changelog v3.0 -> v3.5.48)
 
 - 215 MCP tools via FastMCP 3.x
 - 60+ specialized agent types

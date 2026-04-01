@@ -8,7 +8,13 @@
     "CLAUDE_FLOW_CHECKPOINTS_ENABLED": "true",
     "RUFLO_INTELLIGENCE_PIPELINE": "true",
     "RUFLO_AGENT_BOOSTER": "true",
-    "RUFLO_MODEL_ROUTING": "auto"
+    "RUFLO_MODEL_ROUTING": "auto",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "8000",
+    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
+    "DISABLE_COST_WARNINGS": "1",
+    "USE_BUILTIN_RIPGREP": "1",
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
+    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "0"
   },
   "includeCoAuthoredBy": true,
   "permissions": {
@@ -94,6 +100,15 @@
           {
             "type": "command",
             "command": "cat | jq -r '.tool_input.file_path // .tool_input.path // empty' | tr '\\n' '\\0' | xargs -0 -I {} npx ruflo@latest hooks post-edit --file '{}' --format true --update-memory true"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v semgrep >/dev/null 2>&1; then semgrep --config=auto \"$CLAUDE_TOOL_FILE_PATH\" 2>/dev/null || true; fi; if command -v bandit >/dev/null 2>&1 && [[ \"$CLAUDE_TOOL_FILE_PATH\" == *.py ]]; then bandit \"$CLAUDE_TOOL_FILE_PATH\" 2>/dev/null || true; fi; if command -v gitleaks >/dev/null 2>&1; then gitleaks detect --source=\"$CLAUDE_TOOL_FILE_PATH\" --no-git 2>/dev/null || true; fi; if grep -qE '(password|secret|key|token)\\s*=\\s*[\"\\x27][^\"\\x27]{8,}' \"$CLAUDE_TOOL_FILE_PATH\" 2>/dev/null; then echo \"Warning: Potential hardcoded secrets detected in $CLAUDE_TOOL_FILE_PATH\" >&2; fi"
           }
         ]
       }

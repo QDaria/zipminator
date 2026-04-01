@@ -12,8 +12,9 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Budget: 8 min = 480 seconds. Stop at 420s (7 min) for safety.
-MAX_EXECUTION_SECONDS = 420
+# Budget: ~5.5 min remaining (used ~54s from parsing-fail attempts).
+# Stop at 330s to stay safely under 8 min total.
+MAX_EXECUTION_SECONDS = 330
 QUBITS = 156
 SHOTS = 4096
 POOL_PATH = Path(__file__).parent.parent / "quantum_entropy" / "quantum_entropy_pool.bin"
@@ -21,6 +22,7 @@ LOG_PATH = Path(__file__).parent.parent / "quantum_entropy" / "harvest_log.jsonl
 
 def main():
     from qiskit import QuantumCircuit
+    from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
     from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2
 
     # Sharareh's API key
@@ -64,10 +66,16 @@ def main():
     print(f"Selected: {backend.name} ({backend.num_qubits}q, "
           f"queue={backend.status().pending_jobs})")
 
-    # Build circuit
+    # Build circuit and transpile to backend's native gate set
     qc = QuantumCircuit(actual_qubits, actual_qubits)
     qc.h(range(actual_qubits))
     qc.measure(range(actual_qubits), range(actual_qubits))
+
+    print(f"Transpiling to {backend.name} native gates...")
+    pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
+    isa_circuit = pm.run(qc)
+    print(f"Transpiled: depth={isa_circuit.depth()}, "
+          f"gates={dict(isa_circuit.count_ops())}")
 
     bytes_per_job = actual_qubits * SHOTS // 8
     print(f"Bytes per job: {bytes_per_job:,}")
@@ -92,7 +100,7 @@ def main():
 
         try:
             t0 = time.time()
-            job = sampler.run([qc], shots=SHOTS)
+            job = sampler.run([isa_circuit], shots=SHOTS)
             result = job.result()
             wall_time = time.time() - t0
 
@@ -100,19 +108,12 @@ def main():
             est_exec = min(wall_time, 30.0)
             total_execution_time += est_exec
 
-            # Extract entropy bytes from measurement results
+            # Extract entropy bytes directly from BitArray
             pub_result = result[0]
-            counts = pub_result.data.meas.get_counts()
-
-            entropy_bytes = bytearray()
-            for bitstring, count in counts.items():
-                bits = bitstring.replace(" ", "")
-                for _ in range(count):
-                    byte_count = len(bits) // 8
-                    val = int(bits, 2)
-                    entropy_bytes.extend(val.to_bytes(byte_count, "big"))
-
-            entropy_bytes = bytes(entropy_bytes[:bytes_per_job])
+            bit_array = pub_result.data.c
+            # .array is numpy uint8, shape (shots, ceil(qubits/8))
+            raw = bit_array.array.tobytes()
+            entropy_bytes = bytes(raw[:bytes_per_job])
             total_bytes += len(entropy_bytes)
 
             with open(POOL_PATH, "ab") as f:
@@ -145,7 +146,14 @@ def main():
             if "runtime limit" in str(e).lower() or "exceeded" in str(e).lower():
                 print("  Runtime limit reached. Stopping.")
                 break
+            consecutive_failures = getattr(main, '_failures', 0) + 1
+            main._failures = consecutive_failures
+            if consecutive_failures >= 3:
+                print(f"  {consecutive_failures} consecutive failures. Stopping.")
+                break
             continue
+        else:
+            main._failures = 0  # reset on success
 
     print(f"\n{'=' * 60}")
     print(f"DONE: {job_count} jobs, {total_bytes:,} bytes harvested")

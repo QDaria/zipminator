@@ -277,3 +277,6 @@ def zm_gauge(value, title="", max_val=100, suffix="%"):
     ))
     fig.update_layout(height=300)
     return fig
+
+
+from _helpers.viz_extended import *  # noqa: F401,F403 — Extended chart types
