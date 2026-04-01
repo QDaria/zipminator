@@ -55,13 +55,17 @@ def check_cell_tags():
 
 
 def check_no_matplotlib():
-    """No matplotlib imports in notebooks."""
-    print("\n--- No Matplotlib ---")
+    """No matplotlib imports in code cells."""
+    print("\n--- No Matplotlib (code cells only) ---")
     for nb_path in sorted(NOTEBOOKS_DIR.glob("*.ipynb")):
         with open(nb_path) as f:
-            content = f.read()
-        has_mpl = "matplotlib" in content
-        check(nb_path.name, not has_mpl, "contains matplotlib import")
+            nb = json.load(f)
+        has_mpl = any(
+            "matplotlib" in "".join(c.get("source", []))
+            for c in nb.get("cells", [])
+            if c.get("cell_type") == "code"
+        )
+        check(nb_path.name, not has_mpl, "code cell imports matplotlib")
 
 
 def check_no_raw_plotly():

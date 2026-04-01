@@ -10,6 +10,13 @@ Zipminator Extended Chart Types
 
 from _helpers.viz import ZM_COLORS, ZM_CYCLE, ZM_TEMPLATE, go, make_subplots, np
 
+def _hex_to_rgba(hex_color, alpha=0.4):
+    """Convert hex color like '#22d3ee' to 'rgba(34,211,238,0.4)'."""
+    h = hex_color.lstrip("#")
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f"rgba({r},{g},{b},{alpha})"
+
+
 __all__ = [
     "zm_radar",
     "zm_area",
@@ -36,13 +43,14 @@ def zm_radar(categories, values_dict, title="", **kwargs):
     fig = go.Figure()
     cats = list(categories) + [categories[0]]  # close the polygon
     for i, (name, vals) in enumerate(values_dict.items()):
+        color = ZM_CYCLE[i % len(ZM_CYCLE)]
         fig.add_trace(go.Scatterpolar(
             r=list(vals) + [vals[0]],
             theta=cats,
             name=name,
             fill="toself",
-            fillcolor=ZM_CYCLE[i % len(ZM_CYCLE)].replace(")", ",0.15)").replace("rgb", "rgba").replace("#", "#"),
-            line=dict(color=ZM_CYCLE[i % len(ZM_CYCLE)], width=2),
+            fillcolor=_hex_to_rgba(color, 0.15),
+            line=dict(color=color, width=2),
             **kwargs,
         ))
     fig.update_layout(
@@ -148,10 +156,7 @@ def zm_treemap(labels, parents, values, title="", **kwargs):
 
 def zm_sankey(labels, sources, targets, values, title="", **kwargs):
     """Sankey diagram with quantum-colored links."""
-    link_colors = [ZM_CYCLE[s % len(ZM_CYCLE)].replace(")", ",0.4)").replace("rgb", "rgba")
-                   if ZM_CYCLE[s % len(ZM_CYCLE)].startswith("rgb") else
-                   ZM_CYCLE[s % len(ZM_CYCLE)] + "66"
-                   for s in sources]
+    link_colors = [_hex_to_rgba(ZM_CYCLE[s % len(ZM_CYCLE)], 0.4) for s in sources]
     fig = go.Figure(go.Sankey(
         node=dict(
             label=labels,
@@ -207,11 +212,11 @@ def zm_violin(data_dict, title="", show_box=True, **kwargs):
     """Violin plot. data_dict maps series name -> array of values."""
     fig = go.Figure()
     for i, (name, vals) in enumerate(data_dict.items()):
+        color = ZM_CYCLE[i % len(ZM_CYCLE)]
         fig.add_trace(go.Violin(
             y=vals, name=name, box_visible=show_box,
-            line_color=ZM_CYCLE[i % len(ZM_CYCLE)],
-            fillcolor=ZM_CYCLE[i % len(ZM_CYCLE)].replace(")", ",0.2)").replace("rgb", "rgba")
-            if ZM_CYCLE[i % len(ZM_CYCLE)].startswith("rgb") else ZM_CYCLE[i % len(ZM_CYCLE)] + "33",
+            line_color=color,
+            fillcolor=_hex_to_rgba(color, 0.2),
             meanline_visible=True,
             **kwargs,
         ))
