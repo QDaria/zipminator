@@ -62,6 +62,7 @@ dependencies:
   flutter_tts: ^4.2.5
   sign_in_with_apple: ^7.0.1
   crypto: ^3.0.7
+  google_sign_in: ^7.2.0
 
 dependency_overrides:
   # Pin to avoid objective_c native asset crash on iOS 26.3

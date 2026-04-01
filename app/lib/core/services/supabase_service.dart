@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,12 +15,19 @@ class SupabaseService {
 
   static const _redirectTo = 'com.qdaria.zipminator://login-callback';
 
+  // Google OAuth client IDs (from Google Cloud Console).
+  // iOS client ID is the reversed bundle ID style.
+  static const _googleWebClientId =
+      ''; // Set if using web-based Google auth
+  static const _googleIosClientId =
+      ''; // Set for iOS-specific Google auth
+
   static Future<void> initialize() async {
     await dotenv.load(fileName: '.env');
     await Supabase.initialize(
       url: dotenv.env['SUPABASE_URL']!,
       anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-      authOptions: FlutterAuthClientOptions(
+      authOptions: const FlutterAuthClientOptions(
         authFlowType: AuthFlowType.pkce,
       ),
       debug: false,
@@ -43,6 +51,7 @@ class SupabaseService {
   ) =>
       client.auth.signUp(email: email, password: password);
 
+  /// Browser-based OAuth for GitHub and LinkedIn.
   static Future<bool> signInWithOAuth(OAuthProvider provider) =>
       client.auth.signInWithOAuth(
         provider,
@@ -50,10 +59,36 @@ class SupabaseService {
         authScreenLaunchMode: LaunchMode.externalApplication,
       );
 
-  /// Native Sign in with Apple (iOS/macOS). Uses system auth sheet,
-  /// no browser redirect needed. Returns the Supabase AuthResponse.
+  /// Native Google Sign-In (no browser redirect needed).
+  static Future<AuthResponse> signInWithGoogle() async {
+    final googleSignIn = GoogleSignIn(
+      clientId: _googleIosClientId.isNotEmpty ? _googleIosClientId : null,
+      serverClientId:
+          _googleWebClientId.isNotEmpty ? _googleWebClientId : null,
+    );
+
+    final googleUser = await googleSignIn.signIn();
+    if (googleUser == null) {
+      throw const AuthException('Google Sign In was cancelled');
+    }
+
+    final googleAuth = await googleUser.authentication;
+    final idToken = googleAuth.idToken;
+    final accessToken = googleAuth.accessToken;
+
+    if (idToken == null) {
+      throw const AuthException('Google Sign In failed: no ID token');
+    }
+
+    return client.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: accessToken,
+    );
+  }
+
+  /// Native Apple Sign-In (system sheet, no browser redirect).
   static Future<AuthResponse> signInWithApple() async {
-    // Generate nonce for security.
     final rawNonce = _generateNonce();
     final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
@@ -78,11 +113,13 @@ class SupabaseService {
   }
 
   static String _generateNonce([int length = 32]) {
-    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    const chars =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
     final rng = Random.secure();
     return List.generate(length, (_) => chars[rng.nextInt(chars.length)]).join();
   }
 
+  /// Sign out and clear all local session data.
   static Future<void> signOut() async {
     try {
       await client.auth.signOut(scope: SignOutScope.local);

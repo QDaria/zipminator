@@ -43,31 +43,32 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   void _listenToAuthChanges() {
+    _sub?.cancel();
     _sub = SupabaseService.authStateChanges.listen((data) {
       final user = data.session?.user;
       if (user != null) {
         state = state.copyWith(user: user, isLoading: false);
       } else {
-        state = state.copyWith(clearUser: true, isLoading: false);
+        state = const AuthState(); // Fully reset on sign-out.
       }
     });
   }
 
+  /// Email + password sign in.
   Future<void> signInWithEmail(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final response = await SupabaseService.signInWithEmail(email, password);
-      if (response.session == null) {
-        state = state.copyWith(isLoading: false, error: 'Sign in failed. Check email and password.');
-      } else {
-        // Success: onAuthStateChange will set user, but ensure loading stops.
-        state = state.copyWith(user: response.user, isLoading: false);
-      }
+      state = state.copyWith(
+        user: response.user,
+        isLoading: false,
+      );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
+  /// Email + password sign up.
   Future<void> signUpWithEmail(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -77,30 +78,31 @@ class AuthNotifier extends Notifier<AuthState> {
           isLoading: false,
           error: 'Account may already exist. Try Sign In instead.',
         );
+      } else {
+        state = state.copyWith(user: response.user, isLoading: false);
       }
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
-  Future<void> signInWithOAuth(OAuthProvider provider) async {
+  /// Native Google Sign-In (no browser redirect).
+  Future<void> signInWithGoogle() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final ok = await SupabaseService.signInWithOAuth(provider);
-      if (!ok) {
-        state = state.copyWith(isLoading: false, error: 'OAuth flow was cancelled.');
-      }
-      Future.delayed(const Duration(seconds: 15), () {
-        if (state.isLoading) {
-          state = state.copyWith(isLoading: false, error: 'OAuth timed out. Try email or Apple login.');
-        }
-      });
+      final response = await SupabaseService.signInWithGoogle();
+      state = state.copyWith(user: response.user, isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      final msg = e.toString();
+      if (msg.contains('cancelled') || msg.contains('canceled')) {
+        state = state.copyWith(isLoading: false);
+      } else {
+        state = state.copyWith(isLoading: false, error: msg);
+      }
     }
   }
 
-  /// Native Apple Sign In (iOS/macOS system sheet, no browser).
+  /// Native Apple Sign-In (system sheet, no browser redirect).
   Future<void> signInWithApple() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -108,7 +110,6 @@ class AuthNotifier extends Notifier<AuthState> {
       state = state.copyWith(user: response.user, isLoading: false);
     } catch (e) {
       final msg = e.toString();
-      // User cancelled the Apple Sign In sheet.
       if (msg.contains('canceled') || msg.contains('1001')) {
         state = state.copyWith(isLoading: false);
       } else {
@@ -117,6 +118,31 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  /// Browser-based OAuth (GitHub, LinkedIn).
+  Future<void> signInWithOAuth(OAuthProvider provider) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final ok = await SupabaseService.signInWithOAuth(provider);
+      if (!ok) {
+        state = state.copyWith(isLoading: false, error: 'OAuth was cancelled.');
+        return;
+      }
+      // Browser opened; wait for deep-link callback via onAuthStateChange.
+      // Timeout after 30s in case redirect fails.
+      Future.delayed(const Duration(seconds: 30), () {
+        if (state.isLoading) {
+          state = state.copyWith(
+            isLoading: false,
+            error: 'OAuth timed out. Use Google or Apple native sign-in.',
+          );
+        }
+      });
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  /// Sign out completely. Clears all local session data.
   Future<void> signOut() async {
     await SupabaseService.signOut();
     state = const AuthState();

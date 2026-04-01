@@ -259,34 +259,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     spacing: 12,
                     runSpacing: 8,
                     children: [
+                      // Native Google Sign-In (no browser redirect).
                       _OAuthButton(
                         icon: Icons.g_mobiledata,
                         label: 'Google',
-                        onPressed: () => _oauthSignIn(OAuthProvider.google),
+                        onPressed: () =>
+                            ref.read(authProvider.notifier).signInWithGoogle(),
                       ),
+                      // Native Apple Sign-In (system sheet).
+                      _OAuthButton(
+                        icon: Icons.apple,
+                        label: 'Apple',
+                        onPressed: () =>
+                            ref.read(authProvider.notifier).signInWithApple(),
+                      ),
+                      // Browser OAuth for GitHub.
                       _OAuthButton(
                         icon: Icons.code,
                         label: 'GitHub',
                         onPressed: () => _oauthSignIn(OAuthProvider.github),
                       ),
+                      // Browser OAuth for LinkedIn.
                       _OAuthButton(
                         icon: Icons.business,
                         label: 'LinkedIn',
                         onPressed: () =>
                             _oauthSignIn(OAuthProvider.linkedinOidc),
-                      ),
-                      _OAuthButton(
-                        icon: Icons.apple,
-                        label: 'Apple',
-                        onPressed: () {
-                          if (Platform.isIOS || Platform.isMacOS) {
-                            // Native Apple Sign In (system sheet).
-                            ref.read(authProvider.notifier).signInWithApple();
-                          } else {
-                            // Fallback to OAuth redirect.
-                            _oauthSignIn(OAuthProvider.apple);
-                          }
-                        },
                       ),
                     ],
                   ),

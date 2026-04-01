@@ -22,6 +22,10 @@ import plotly.io as pio
 from plotly.subplots import make_subplots
 import numpy as np
 
+# Force Plotly to output full HTML (not just JSON MIME) for Jupyter Book compatibility.
+# myst-nb does not render application/vnd.plotly.v1+json, but it DOES render text/html.
+pio.renderers.default = "notebook_connected"
+
 # ── Quantum Color Palette ────────────────────────────────────
 ZM_COLORS = {
     "cyan":    "#22d3ee",
