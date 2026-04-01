@@ -369,6 +369,107 @@ a:hover {
   font-weight: 600;
 }
 
+/* ── PLOTLY CHARTS ─────────────────────────────────────────── */
+.js-plotly-plot,
+.plotly-graph-div {
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.js-plotly-plot .modebar {
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.js-plotly-plot:hover .modebar {
+  opacity: 1;
+}
+
+/* ── DOWNLOAD BARS ────────────────────────────────────────── */
+.zm-download-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+  justify-content: flex-end;
+}
+
+.zm-dl-btn {
+  background: rgba(34, 211, 238, 0.1);
+  color: var(--zm-cyan);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.zm-dl-btn:hover {
+  background: rgba(34, 211, 238, 0.25);
+  border-color: var(--zm-cyan);
+}
+
+/* Code cell download button */
+.zm-code-dl {
+  position: absolute;
+  top: 6px;
+  right: 40px;
+  background: rgba(34, 211, 238, 0.1);
+  color: var(--zm-cyan);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+}
+
+div.highlight:hover .zm-code-dl {
+  opacity: 1;
+}
+
+/* ── GLOBAL TOGGLE BAR ────────────────────────────────────── */
+.zm-global-toggle {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.1);
+}
+
+.zm-toggle-btn {
+  background: rgba(167, 139, 250, 0.1);
+  color: var(--zm-violet);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 6px;
+  padding: 4px 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.zm-toggle-btn:hover {
+  background: rgba(167, 139, 250, 0.25);
+}
+
+/* ── CELL TAG: hide-input (code collapsed by default) ─────── */
+.tag_hide-input .cell_input {
+  border: 1px dashed rgba(34, 211, 238, 0.15);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.tag_hide-input .cell_input summary {
+  color: var(--zm-text-dim);
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 768px) {
   div.highlight pre {
@@ -377,5 +478,14 @@ a:hover {
 
   .sd-card {
     margin-bottom: 1rem;
+  }
+
+  .zm-download-bar {
+    flex-wrap: wrap;
+  }
+
+  .zm-global-toggle {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

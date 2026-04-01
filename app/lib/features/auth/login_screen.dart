@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -272,6 +274,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         label: 'LinkedIn',
                         onPressed: () =>
                             _oauthSignIn(OAuthProvider.linkedinOidc),
+                      ),
+                      _OAuthButton(
+                        icon: Icons.apple,
+                        label: 'Apple',
+                        onPressed: () {
+                          if (Platform.isIOS || Platform.isMacOS) {
+                            // Native Apple Sign In (system sheet).
+                            ref.read(authProvider.notifier).signInWithApple();
+                          } else {
+                            // Fallback to OAuth redirect.
+                            _oauthSignIn(OAuthProvider.apple);
+                          }
+                        },
                       ),
                     ],
                   ),

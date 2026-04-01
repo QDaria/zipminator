@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Singleton wrapper around Supabase client for auth and data access.
@@ -45,11 +50,42 @@ class SupabaseService {
         authScreenLaunchMode: LaunchMode.externalApplication,
       );
 
+  /// Native Sign in with Apple (iOS/macOS). Uses system auth sheet,
+  /// no browser redirect needed. Returns the Supabase AuthResponse.
+  static Future<AuthResponse> signInWithApple() async {
+    // Generate nonce for security.
+    final rawNonce = _generateNonce();
+    final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      nonce: hashedNonce,
+    );
+
+    final idToken = credential.identityToken;
+    if (idToken == null) {
+      throw const AuthException('Apple Sign In failed: no ID token');
+    }
+
+    return client.auth.signInWithIdToken(
+      provider: OAuthProvider.apple,
+      idToken: idToken,
+      nonce: rawNonce,
+    );
+  }
+
+  static String _generateNonce([int length = 32]) {
+    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final rng = Random.secure();
+    return List.generate(length, (_) => chars[rng.nextInt(chars.length)]).join();
+  }
+
   static Future<void> signOut() async {
     try {
       await client.auth.signOut(scope: SignOutScope.local);
-    } catch (_) {
-      // Ignore errors on sign-out (e.g. expired session)
-    }
+    } catch (_) {}
   }
 }

@@ -2,25 +2,25 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Keychain sharing for secure credential storage across app extensions -->
-	<key>keychain-access-groups</key>
+	<key>com.apple.developer.applesignin</key>
 	<array>
-		<string>$(AppIdentifierPrefix)com.qdaria.zipminator</string>
+		<string>Default</string>
 	</array>
-	<!-- Personal VPN capability for Q-VPN pillar -->
-	<key>com.apple.developer.networking.vpn.api</key>
-	<array>
-		<string>allow-vpn</string>
-	</array>
-	<!-- Network Extensions for VPN tunnel provider -->
 	<key>com.apple.developer.networking.networkextension</key>
 	<array>
 		<string>packet-tunnel-provider</string>
 	</array>
-	<!-- App Groups for shared data between main app and VPN extension -->
+	<key>com.apple.developer.networking.vpn.api</key>
+	<array>
+		<string>allow-vpn</string>
+	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.qdaria.zipminator</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.qdaria.zipminator</string>
 	</array>
 </dict>
 </plist>

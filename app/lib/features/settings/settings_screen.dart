@@ -221,9 +221,10 @@ class SettingsScreen extends ConsumerWidget {
             ),
             trailing: auth.isAuthenticated
                 ? TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       ref.read(ratchetProvider.notifier).disconnectFromSignaling();
-                      ref.read(authProvider.notifier).signOut();
+                      await ref.read(authProvider.notifier).signOut();
+                      if (context.mounted) context.go('/login');
                     },
                     child: const Text('Sign Out',
                         style: TextStyle(color: QuantumTheme.quantumRed)),

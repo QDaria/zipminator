@@ -42,7 +42,7 @@ parts:
       - file: content/use_cases/ecommerce
       - file: content/use_cases/defense
 
-  - caption: "Part VII: Notebooks"
+  - caption: "Part VII: Interactive Notebooks"
     chapters:
       - file: notebooks/01_quickstart
       - file: notebooks/02_anonymization
@@ -52,7 +52,6 @@ parts:
       - file: notebooks/06_quantum_capabilities
       - file: notebooks/07_vault_workflow
       - file: notebooks/08_qmesh_physical_crypto
-      - file: notebooks/09_monte_carlo_prng_vs_qrng
 
   - caption: "Part VIII: CLI Reference"
     chapters:

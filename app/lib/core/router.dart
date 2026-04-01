@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zipminator/core/services/supabase_service.dart';
 import 'package:zipminator/features/auth/login_screen.dart';
@@ -14,12 +17,23 @@ import 'package:zipminator/features/mesh/mesh_screen.dart';
 import 'package:zipminator/features/settings/settings_screen.dart';
 import 'package:zipminator/shared/widgets/shell_scaffold.dart';
 
-/// App-wide GoRouter configuration.
-///
-/// Uses ShellRoute for persistent bottom navigation across all 8 pillars.
-/// Unauthenticated users are redirected to /login.
+/// Converts a Stream into a Listenable for GoRouter.refreshListenable.
+class _StreamNotifier extends ChangeNotifier {
+  late final StreamSubscription<dynamic> _sub;
+  _StreamNotifier(Stream<dynamic> stream) {
+    _sub = stream.listen((_) => notifyListeners());
+  }
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
+
+/// Auth-reactive GoRouter. Re-evaluates redirect on every auth state change.
 final GoRouter appRouter = GoRouter(
   initialLocation: '/vault',
+  refreshListenable: _StreamNotifier(SupabaseService.authStateChanges),
   redirect: (context, state) {
     final isLoginRoute = state.matchedLocation == '/login';
     // Guard against Supabase not being initialized (e.g. in tests)

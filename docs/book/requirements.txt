@@ -2,6 +2,8 @@ jupyter-book>=0.15,<1.0
 matplotlib
 numpy
 pandas
+plotly>=5.18
+kaleido>=0.2.1
 sphinx-book-theme
 myst-nb>=0.17,<0.18
 sphinx>=5,<6

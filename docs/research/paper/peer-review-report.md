@@ -308,7 +308,7 @@ The paper has a strong core idea that fills a real gap. The three-tier irreversi
 - [x] Hardware TRNG footnote -- DONE (Mar 31): footnote on priority chain item 6, distinguishes OS CSPRNG (deterministic replay) from quantum TRNG (Born rule, no replay)
 - [x] Synthetic data related work -- DONE (Apr 1): 3 new citations (Ping 2017, Xu 2019, Stadler 2022), membership inference contrast, MI=0 cross-ref
 - [x] Domain-knowledge attack proposition -- DONE (Mar 31): Proposition 7 in main body Section 5.2, cross-refs Appendix Proposition 9, encryption analogy
-- [ ] End-to-end QRNG benchmark (needs qBraid key refresh)
+- [x] End-to-end QRNG benchmark -- DONE (Apr 1): second IBM ibm_fez harvest (job d76hr068faus73f1ah20), reproducibility paragraph added, two independent jobs spanning 6 days
 
 ### Paper Strategy
 1. Paper 1 (PoPETs): Current paper, target submit Aug 2026

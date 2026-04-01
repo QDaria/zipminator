@@ -90,15 +90,30 @@ class AuthNotifier extends Notifier<AuthState> {
       if (!ok) {
         state = state.copyWith(isLoading: false, error: 'OAuth flow was cancelled.');
       }
-      // On macOS, OAuth opens browser. Reset loading after a delay
-      // since the callback may never arrive if redirect fails.
       Future.delayed(const Duration(seconds: 15), () {
         if (state.isLoading) {
-          state = state.copyWith(isLoading: false, error: 'OAuth timed out. Try email login instead.');
+          state = state.copyWith(isLoading: false, error: 'OAuth timed out. Try email or Apple login.');
         }
       });
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  /// Native Apple Sign In (iOS/macOS system sheet, no browser).
+  Future<void> signInWithApple() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final response = await SupabaseService.signInWithApple();
+      state = state.copyWith(user: response.user, isLoading: false);
+    } catch (e) {
+      final msg = e.toString();
+      // User cancelled the Apple Sign In sheet.
+      if (msg.contains('canceled') || msg.contains('1001')) {
+        state = state.copyWith(isLoading: false);
+      } else {
+        state = state.copyWith(isLoading: false, error: msg);
+      }
     }
   }
 

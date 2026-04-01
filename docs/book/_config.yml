@@ -9,12 +9,9 @@ exclude_patterns:
   - "content/appendix.md"
 execute:
   execute_notebooks: "auto"
-  timeout: 120
+  timeout: 180
   exclude_patterns:
     - "notebooks/05_shor_demo*"
-    - "notebooks/07_monte_carlo*"
-    - "notebooks/08_qmesh*"
-    - "notebooks/09_monte_carlo*"
     - "notebooks/10_*"
     - "notebooks/Untitled*"
 parse:
@@ -34,6 +31,10 @@ sphinx:
     - sphinx.ext.napoleon
     - sphinx.ext.viewcode
   config:
+    nb_render_image_options:
+      width: "100%"
+    nb_mime_priority_overrides:
+      - ["application/vnd.plotly.v1+json", "text/html", 0]
     html_theme: sphinx_book_theme
     html_favicon: _static/Z.svg
     html_theme_options:
@@ -49,6 +50,8 @@ sphinx:
         colab_url: https://colab.research.google.com
     html_css_files:
       - custom.css
+    html_js_files:
+      - custom.js
     copybutton_prompt_text: "$ "
     copybutton_prompt_is_regexp: false
     # Napoleon settings for Google/NumPy docstrings
