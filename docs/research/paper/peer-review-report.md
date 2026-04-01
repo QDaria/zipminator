@@ -284,7 +284,9 @@ The paper has a strong core idea that fills a real gap. The three-tier irreversi
 - After RALPH loops 1-3 (Mar 25): **0.79** — mapping destruction, empirical eval, 30 new refs
 - After zero-hallucination audit (Mar 26): **0.80** — fabricated Rigetti claim removed, test counts fixed
 - After 10-iteration polish (Mar 26): **0.80** — overfull warnings fixed, tables consolidated, prose tightened, Appendix A, IBM Quantum demo
-- Current (Mar 27): targeting **0.90+** with MI proof, footnotes, synthetic data related work
+- After MI/domain/TRNG chain (Mar 31): **0.93** — MI proof rigorous 4-part, domain-knowledge Prop 7, TRNG footnote, /improve polish
+- After synthetic data expansion (Apr 1): **0.94** — 3 new citations (Ping, Xu, Stadler), membership inference contrast, Appendix remark updated
+- Current (Apr 1): targeting **0.995** with superdeterminism footnote + end-to-end QRNG benchmark
 
 ### Completed Iterations (10 total)
 | # | Task | Impact |
@@ -302,7 +304,7 @@ The paper has a strong core idea that fills a real gap. The three-tier irreversi
 
 ### Remaining for 0.90+
 - [x] MI(D;D')=0 proof (Proposition) -- DONE (Mar 31): 4-part rigorous proof (a-d) with Born rule invocation, factorization, and domain-cardinality Note
-- [ ] Superdeterminism footnote
+- [x] Superdeterminism footnote -- DONE (Apr 1): footnote on Bell's theorem invocation in Theorem 2 proof, distinguishes from Bohmian mechanics, notes unfalsifiability
 - [x] Hardware TRNG footnote -- DONE (Mar 31): footnote on priority chain item 6, distinguishes OS CSPRNG (deterministic replay) from quantum TRNG (Born rule, no replay)
 - [x] Synthetic data related work -- DONE (Apr 1): 3 new citations (Ping 2017, Xu 2019, Stadler 2022), membership inference contrast, MI=0 cross-ref
 - [x] Domain-knowledge attack proposition -- DONE (Mar 31): Proposition 7 in main body Section 5.2, cross-refs Appendix Proposition 9, encryption analogy

@@ -548,7 +548,7 @@ class RatchetNotifier extends Notifier<RatchetState> {
   }
 
   /// Resolve a contact ID to the signaling server username.
-  String _contactIdToUsername(String contactId) {
+  String resolveUsername(String contactId) {
     const contactIdToUsername = {
       'alice-q': 'alice',
       'bob-c': 'bob',
@@ -568,19 +568,19 @@ class RatchetNotifier extends Notifier<RatchetState> {
 
   /// Send a call offer to a peer through the signaling server.
   void sendCallOffer(String contactId) {
-    final target = _contactIdToUsername(contactId);
+    final target = resolveUsername(contactId);
     _messengerService?.sendSignal(target: target, type: 'call_offer');
   }
 
   /// Accept an incoming call from a peer.
   void sendCallAccept(String contactId) {
-    final target = _contactIdToUsername(contactId);
+    final target = resolveUsername(contactId);
     _messengerService?.sendSignal(target: target, type: 'call_accept');
   }
 
   /// End a call with a peer.
   void sendCallEnd(String contactId) {
-    final target = _contactIdToUsername(contactId);
+    final target = resolveUsername(contactId);
     _messengerService?.sendSignal(target: target, type: 'call_end');
   }
 
@@ -742,7 +742,7 @@ class RatchetNotifier extends Notifier<RatchetState> {
     final hasContact = contact != null;
 
     if (svcConnected && hasContact) {
-      final targetUsername = _contactIdToUsername(contact.id);
+      final targetUsername = resolveUsername(contact.id);
       _messengerService!.sendMessageToPeer(
         target: targetUsername,
         plaintext: text,

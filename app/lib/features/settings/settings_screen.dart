@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zipminator/core/providers/auth_provider.dart';
 import 'package:zipminator/core/providers/qai_provider.dart';
 import 'package:zipminator/core/providers/ratchet_provider.dart';
@@ -228,8 +229,7 @@ class SettingsScreen extends ConsumerWidget {
                         style: TextStyle(color: QuantumTheme.quantumRed)),
                   )
                 : TextButton(
-                    onPressed: () =>
-                        Navigator.of(context).pushReplacementNamed('/login'),
+                    onPressed: () => context.go('/login'),
                     child: const Text('Sign In'),
                   ),
           ),

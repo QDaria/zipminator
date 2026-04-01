@@ -7,11 +7,17 @@ class SupabaseService {
 
   static SupabaseClient get client => Supabase.instance.client;
 
+  static const _redirectTo = 'com.qdaria.zipminator://login-callback';
+
   static Future<void> initialize() async {
     await dotenv.load(fileName: '.env');
     await Supabase.initialize(
       url: dotenv.env['SUPABASE_URL']!,
       anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+      authOptions: FlutterAuthClientOptions(
+        authFlowType: AuthFlowType.pkce,
+      ),
+      debug: false,
     );
   }
 
@@ -32,13 +38,18 @@ class SupabaseService {
   ) =>
       client.auth.signUp(email: email, password: password);
 
-  static const _redirectTo = 'com.qdaria.zipminator://login-callback';
-
   static Future<bool> signInWithOAuth(OAuthProvider provider) =>
       client.auth.signInWithOAuth(
         provider,
         redirectTo: _redirectTo,
+        authScreenLaunchMode: LaunchMode.externalApplication,
       );
 
-  static Future<void> signOut() => client.auth.signOut();
+  static Future<void> signOut() async {
+    try {
+      await client.auth.signOut(scope: SignOutScope.local);
+    } catch (_) {
+      // Ignore errors on sign-out (e.g. expired session)
+    }
+  }
 }

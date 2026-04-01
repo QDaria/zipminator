@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:zipminator/core/providers/ratchet_provider.dart';
 import 'package:zipminator/core/services/conference_service.dart';
 import 'package:zipminator/src/rust/api/simple.dart' as rust;
@@ -121,6 +122,7 @@ class VoipNotifier extends Notifier<VoipState> {
       _signalSub?.cancel();
       _conference?.dispose();
     });
+    _startSignalListener();
     return const VoipState();
   }
 
@@ -135,13 +137,20 @@ class VoipNotifier extends Notifier<VoipState> {
     ref.read(ratchetProvider.notifier).sendCallOffer(contact.id);
   }
 
-  /// Derive SRTP keys from a Kyber shared secret and move to connected.
+  /// Derive SRTP keys from a Kyber shared secret, set up WebRTC audio, and
+  /// move to connected.
   Future<void> connectCall(Uint8List sharedSecret) async {
     try {
       final keys = await rust.deriveSrtpKeys(sharedSecret: sharedSecret);
+
+      // Set up WebRTC for real audio
+      await _ensureConference(audioOnly: true);
+      Helper.setSpeakerphoneOn(true);
+
       state = state.copyWith(
         phase: CallPhase.connected,
         isPqSecured: true,
+        isSpeaker: true,
         srtpMasterKey: Uint8List.fromList(keys.masterKey),
         srtpMasterSalt: Uint8List.fromList(keys.masterSalt),
       );
@@ -160,10 +169,10 @@ class VoipNotifier extends Notifier<VoipState> {
     if (state.roomId != null) {
       ref.read(ratchetProvider.notifier).leaveRoom();
     }
-    _signalSub?.cancel();
     _conference?.dispose();
     _conference = null;
     state = const VoipState();
+    // Signal listener stays active for incoming call detection.
   }
 
   // ── Conference calls ──────────────────────────────────────────────
@@ -171,16 +180,9 @@ class VoipNotifier extends Notifier<VoipState> {
   /// Create a conference room and start local media.
   Future<void> createConference(String roomId) async {
     final ratchet = ref.read(ratchetProvider.notifier);
-    _conference = ConferenceService(
-      sendSignal: (target, type, payload) {
-        ratchet.sendWebRtcSignal(target, type, payload);
-      },
-    );
-
-    await _conference!.startLocalMedia();
+    await _ensureConference();
     ratchet.createRoom(roomId);
     ratchet.joinRoom(roomId);
-    _listenToSignals();
 
     state = state.copyWith(
       phase: CallPhase.conferencing,
@@ -192,15 +194,8 @@ class VoipNotifier extends Notifier<VoipState> {
   /// Join an existing conference room.
   Future<void> joinConference(String roomId) async {
     final ratchet = ref.read(ratchetProvider.notifier);
-    _conference = ConferenceService(
-      sendSignal: (target, type, payload) {
-        ratchet.sendWebRtcSignal(target, type, payload);
-      },
-    );
-
-    await _conference!.startLocalMedia();
+    await _ensureConference();
     ratchet.joinRoom(roomId);
-    _listenToSignals();
 
     state = state.copyWith(
       phase: CallPhase.conferencing,
@@ -209,31 +204,89 @@ class VoipNotifier extends Notifier<VoipState> {
     );
   }
 
-  void _listenToSignals() {
+  void _startSignalListener() {
     _signalSub?.cancel();
     _signalSub =
-        ref.read(ratchetProvider.notifier).callSignals.listen((msg) {
-      final from = msg['from'] as String? ?? '';
-      final type = msg['type'] as String? ?? '';
+        ref.read(ratchetProvider.notifier).callSignals.listen(_handleSignal);
+  }
 
-      if (type == 'peer_joined') {
+  void _handleSignal(Map<String, dynamic> msg) {
+    final from = msg['from'] as String? ?? '';
+    final type = msg['type'] as String? ?? '';
+
+    switch (type) {
+      case 'call_offer':
+        if (state.isIdle && from.isNotEmpty) {
+          _handleIncomingCall(from);
+        }
+      case 'call_accept':
+        // Remote peer accepted our call — initiate WebRTC offer.
+        if (state.phase == CallPhase.connected && _conference != null) {
+          _conference!.onPeerJoined(from);
+        }
+      case 'call_end':
+        if (state.inCall) {
+          _conference?.dispose();
+          _conference = null;
+          state = const VoipState();
+        }
+      case 'peer_joined':
         final peerId = msg['peer_id'] as String? ?? '';
-        if (peerId.isNotEmpty) {
-          _conference?.onPeerJoined(peerId);
+        if (peerId.isNotEmpty && _conference != null) {
+          _conference!.onPeerJoined(peerId);
           final updated = [...state.participants, peerId];
           state = state.copyWith(participants: updated);
         }
-      } else if (type == 'peer_left') {
+      case 'peer_left':
         final peerId = msg['peer_id'] as String? ?? '';
-        if (peerId.isNotEmpty) {
-          _conference?.onPeerLeft(peerId);
-          final updated = state.participants.where((p) => p != peerId).toList();
+        if (peerId.isNotEmpty && _conference != null) {
+          _conference!.onPeerLeft(peerId);
+          final updated =
+              state.participants.where((p) => p != peerId).toList();
           state = state.copyWith(participants: updated);
         }
-      } else if (['offer', 'answer', 'ice-candidate'].contains(type)) {
+      case 'offer' || 'answer' || 'ice-candidate':
         _conference?.handleSignal(from, type, msg);
-      }
-    });
+    }
+  }
+
+  /// Handle an incoming call: set up WebRTC audio and auto-accept.
+  // TODO(mo): Replace auto-accept with incoming call UI (accept/decline).
+  Future<void> _handleIncomingCall(String callerUsername) async {
+    final ratchet = ref.read(ratchetProvider.notifier);
+
+    await _ensureConference(audioOnly: true);
+    Helper.setSpeakerphoneOn(true);
+
+    // Accept the call — caller will then send a WebRTC offer.
+    ratchet.sendCallAccept(callerUsername);
+
+    state = state.copyWith(
+      phase: CallPhase.connected,
+      isPqSecured: true,
+      isSpeaker: true,
+      contact: VoipContact(
+        id: 'live-$callerUsername',
+        name: callerUsername,
+        email: '',
+        isOnline: true,
+      ),
+    );
+  }
+
+  /// Create a [ConferenceService] if one doesn't already exist.
+  Future<void> _ensureConference({bool audioOnly = false}) async {
+    if (_conference != null) return;
+    final ratchet = ref.read(ratchetProvider.notifier);
+    _conference = ConferenceService(
+      sendSignal: (target, type, payload) {
+        ratchet.sendWebRtcSignal(target, type, payload);
+      },
+    );
+    await _conference!.startLocalMedia(
+      video: !audioOnly,
+      audio: true,
+    );
   }
 
   /// The conference service (for accessing local/remote streams in UI).
@@ -247,7 +300,9 @@ class VoipNotifier extends Notifier<VoipState> {
   }
 
   void toggleSpeaker() {
-    state = state.copyWith(isSpeaker: !state.isSpeaker);
+    final newValue = !state.isSpeaker;
+    Helper.setSpeakerphoneOn(newValue);
+    state = state.copyWith(isSpeaker: newValue);
   }
 
   void toggleVideo() {

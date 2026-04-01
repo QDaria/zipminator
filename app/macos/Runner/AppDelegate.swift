@@ -12,6 +12,7 @@ class AppDelegate: FlutterAppDelegate {
     return true
   }
 
+
   override func applicationDidFinishLaunching(_ notification: Notification) {
     // Set up VPN MethodChannel
     if let controller = mainFlutterWindow?.contentViewController as? FlutterViewController {

@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:io';
 
 /// Connection state for the signaling server.
 enum SignalingConnectionState {
@@ -14,24 +12,17 @@ enum SignalingConnectionState {
 
 /// Service connecting the Flutter messenger to the live signaling server.
 ///
-/// Protocol (matches signaling_server.py):
-///   Connect: ws://host/ws/USERNAME
-///   Send message: {"action": "message", "target": "bob", "ciphertext": "...", "nonce": "..."}
-///   Receive:      {"type": "message", "from": "alice", "ciphertext": "...", "nonce": "..."}
-///   Signal:       {"action": "signal", "target": "bob", "type": "offer", ...}
-///   Create room:  {"action": "create_room", "room_id": "room-name"}
-///   Join room:    {"action": "join", "room_id": "room-name"}
+/// Uses raw dart:io WebSocket for reliable ping/pong and reconnection.
 class MessengerService {
   final String signalingUrl;
   final String username;
 
-  WebSocketChannel? _channel;
-  StreamSubscription<dynamic>? _subscription;
+  WebSocket? _ws;
   Timer? _reconnectTimer;
   Timer? _keepAliveTimer;
   int _reconnectAttempts = 0;
-  static const _maxReconnectAttempts = 10;
-  static const _reconnectBaseDelay = Duration(seconds: 1);
+  static const _maxReconnectAttempts = 50;
+  static const _reconnectDelay = Duration(seconds: 2);
 
   final _messageController =
       StreamController<Map<String, dynamic>>.broadcast();
@@ -41,16 +32,10 @@ class MessengerService {
   SignalingConnectionState _state = SignalingConnectionState.disconnected;
   bool _disposed = false;
 
-  /// Stream of incoming messages from signaling server.
   Stream<Map<String, dynamic>> get messages => _messageController.stream;
-
-  /// Stream of connection state changes.
   Stream<SignalingConnectionState> get connectionState =>
       _connectionStateController.stream;
-
-  /// Current connection state.
   SignalingConnectionState get currentState => _state;
-
   bool get isConnected => _state == SignalingConnectionState.connected;
 
   MessengerService({
@@ -66,45 +51,48 @@ class MessengerService {
 
   /// Connect to the WebSocket signaling server.
   Future<void> connect() async {
+    if (_disposed) return;
+    // Synchronous guard against double-connect race condition.
     if (_state == SignalingConnectionState.connecting ||
         _state == SignalingConnectionState.connected) {
       return;
     }
-
-    _setState(SignalingConnectionState.connecting);
+    _state = SignalingConnectionState.connecting;
+    _connectionStateController.add(_state);
 
     try {
-      final uri = Uri.parse('$signalingUrl/ws/$username');
-      _channel = IOWebSocketChannel.connect(
-        uri,
-        pingInterval: const Duration(seconds: 10),
-      );
+      // Close any stale WebSocket before creating a new one.
+      _ws?.close();
+      _ws = null;
 
-      // Wait for the connection to be ready.
-      await _channel!.ready;
+      final uri = '$signalingUrl/ws/$username';
+      _ws = await WebSocket.connect(uri);
+      _ws!.pingInterval = const Duration(seconds: 5);
 
       _setState(SignalingConnectionState.connected);
       _reconnectAttempts = 0;
 
-      // Keep-alive: send ping every 15 seconds to prevent idle disconnect.
+      // Application-level keep-alive every 10 seconds.
       _keepAliveTimer?.cancel();
-      _keepAliveTimer = Timer.periodic(const Duration(seconds: 15), (_) {
-        if (_channel != null && _state == SignalingConnectionState.connected) {
-          _channel!.sink.add('ping');
+      _keepAliveTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+        if (_ws != null && _ws!.readyState == WebSocket.open) {
+          _ws!.add('ping');
         }
       });
 
-      _subscription = _channel!.stream.listen(
+      _ws!.listen(
         (data) {
           if (_disposed) return;
+          if (data is! String) return;
+          // Skip pong responses.
+          if (data == 'pong') return;
           try {
-            final msg = jsonDecode(data as String) as Map<String, dynamic>;
+            final msg = jsonDecode(data) as Map<String, dynamic>;
+            if (msg['type'] == 'pong') return;
             _messageController.add(msg);
-          } catch (_) {
-            // Ignore malformed messages.
-          }
+          } catch (_) {}
         },
-        onError: (error) {
+        onError: (_) {
           _setState(SignalingConnectionState.error);
           _scheduleReconnect();
         },
@@ -112,6 +100,7 @@ class MessengerService {
           _setState(SignalingConnectionState.disconnected);
           _scheduleReconnect();
         },
+        cancelOnError: false,
       );
     } catch (e) {
       _setState(SignalingConnectionState.error);
@@ -119,7 +108,6 @@ class MessengerService {
     }
   }
 
-  /// Send a direct message to a specific peer through the signaling server.
   void sendMessageToPeer({
     required String target,
     required String plaintext,
@@ -131,7 +119,6 @@ class MessengerService {
     });
   }
 
-  /// Send a signaling message (offer, answer, ICE candidates).
   void sendSignal({
     required String target,
     required String type,
@@ -145,56 +132,51 @@ class MessengerService {
     });
   }
 
-  /// Create a room on the signaling server.
   void createRoom(String roomId) {
     _send({'action': 'create_room', 'room_id': roomId});
   }
 
-  /// Join a room on the signaling server.
   void joinRoom(String roomId) {
     _send({'action': 'join', 'room_id': roomId});
   }
 
-  /// Leave the current room.
   void leaveRoom() {
     _send({'action': 'leave'});
   }
 
-  /// List available rooms.
   void listRooms() {
     _send({'action': 'list_rooms'});
   }
 
   void _send(Map<String, dynamic> message) {
-    if (_channel != null && _state == SignalingConnectionState.connected) {
-      _channel!.sink.add(jsonEncode(message));
+    if (_ws != null && _ws!.readyState == WebSocket.open) {
+      _ws!.add(jsonEncode(message));
     }
   }
 
   void _scheduleReconnect() {
+    if (_disposed) return;
     _reconnectTimer?.cancel();
     if (_reconnectAttempts >= _maxReconnectAttempts) {
       _setState(SignalingConnectionState.error);
       return;
     }
 
-    final delay = _reconnectBaseDelay * (1 << _reconnectAttempts);
     _reconnectAttempts++;
-    _reconnectTimer = Timer(delay, () => connect());
+    _reconnectTimer = Timer(_reconnectDelay, () {
+      _state = SignalingConnectionState.disconnected;
+      connect();
+    });
   }
 
-  /// Disconnect from the signaling server.
   void disconnect() {
     _reconnectTimer?.cancel();
     _keepAliveTimer?.cancel();
-    _subscription?.cancel();
-    _subscription = null;
-    _channel?.sink.close();
-    _channel = null;
+    _ws?.close();
+    _ws = null;
     _setState(SignalingConnectionState.disconnected);
   }
 
-  /// Clean up all resources.
   void dispose() {
     _disposed = true;
     disconnect();

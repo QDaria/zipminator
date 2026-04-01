@@ -15,8 +15,14 @@ class AuthState {
 
   const AuthState({this.user, this.isLoading = false, this.error});
 
-  AuthState copyWith({User? user, bool? isLoading, String? error}) => AuthState(
-        user: user ?? this.user,
+  AuthState copyWith({
+    User? user,
+    bool? isLoading,
+    String? error,
+    bool clearUser = false,
+  }) =>
+      AuthState(
+        user: clearUser ? null : (user ?? this.user),
         isLoading: isLoading ?? this.isLoading,
         error: error,
       );
@@ -38,14 +44,25 @@ class AuthNotifier extends Notifier<AuthState> {
 
   void _listenToAuthChanges() {
     _sub = SupabaseService.authStateChanges.listen((data) {
-      state = state.copyWith(user: data.session?.user, isLoading: false);
+      final user = data.session?.user;
+      if (user != null) {
+        state = state.copyWith(user: user, isLoading: false);
+      } else {
+        state = state.copyWith(clearUser: true, isLoading: false);
+      }
     });
   }
 
   Future<void> signInWithEmail(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      await SupabaseService.signInWithEmail(email, password);
+      final response = await SupabaseService.signInWithEmail(email, password);
+      if (response.session == null) {
+        state = state.copyWith(isLoading: false, error: 'Sign in failed. Check email and password.');
+      } else {
+        // Success: onAuthStateChange will set user, but ensure loading stops.
+        state = state.copyWith(user: response.user, isLoading: false);
+      }
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
@@ -54,7 +71,13 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<void> signUpWithEmail(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      await SupabaseService.signUpWithEmail(email, password);
+      final response = await SupabaseService.signUpWithEmail(email, password);
+      if (response.session == null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: 'Account may already exist. Try Sign In instead.',
+        );
+      }
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
@@ -63,7 +86,17 @@ class AuthNotifier extends Notifier<AuthState> {
   Future<void> signInWithOAuth(OAuthProvider provider) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      await SupabaseService.signInWithOAuth(provider);
+      final ok = await SupabaseService.signInWithOAuth(provider);
+      if (!ok) {
+        state = state.copyWith(isLoading: false, error: 'OAuth flow was cancelled.');
+      }
+      // On macOS, OAuth opens browser. Reset loading after a delay
+      // since the callback may never arrive if redirect fails.
+      Future.delayed(const Duration(seconds: 15), () {
+        if (state.isLoading) {
+          state = state.copyWith(isLoading: false, error: 'OAuth timed out. Try email login instead.');
+        }
+      });
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
