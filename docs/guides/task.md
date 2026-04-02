@@ -1,14 +1,15 @@
-# Task Checklist: Phase 3 & 4 Execution
+# Task Checklist: Phase 5 & 6 Execution
 
-## Phase 3: BMAD Gamification & Engagement
-- [x] Implement a global state or generic wrapper to track "Anonymization Tasks Completed" (BMAD progression).
-- [x] Add an achievement/progress tracker overlay to the `Hero.tsx` that visually reacts to state changes (using the mapped `bmad` Tailwind colors).
+## Phase 5: The DropZone Architecture
+- [ ] Create `/web/components/DropZone.tsx` utilizing Framer Motion for Drag & Drop UI states.
+- [ ] Implement shimmering border / dynamic fluid effects upon `onDragEnter`.
+- [ ] Add loading/progress visualizer simulating state calculation upon drop.
 
-## Phase 4: The Quantum Visual Engine (Animations)
-- [x] Enhance `QuantumBackground.tsx` to support **Entanglement Visualizations** (pulsing bright lines showing linked data nodes).
-- [x] Enhance `QuantumBackground.tsx` to support **Superposition Effects** (ghosting/opacity scaling on particles) via `react-three-fiber`.
-- [x] Bind BMAD progression state to the Quantum Background intensity (higher security = more intense visual quantum mesh).
+## Phase 6: PQC Python Interop API
+- [ ] Create an API route handler (e.g., `/web/app/api/encrypt/route.ts`) bridging Next.js to the python layer.
+- [ ] Design the subprocess execution logic (or API fetch stub) targeting `zip-pqc` micromamba environment context.
+- [ ] Expose robust error boundaries for when Python dependencies or encryption layers fail via BMAD UI.
 
 ## Post-Phase Verification
-- [x] Verify `react-three-fiber` and Gamification states do not cause unneeded re-renders.
-- [x] Update `/docs/guides/FINAL_WALKTHROUGH.md` for Iteration 3 & 4.
+- [ ] Verify Drag & Drop state management handles bad file inputs safely.
+- [ ] Update `/docs/guides/FINAL_WALKTHROUGH.md` for Iteration 5 & 6.

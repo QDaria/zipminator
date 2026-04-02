@@ -1,10 +1,9 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight, Shield, Zap, Book, Cpu, Lock, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 import QuantumBackground from './QuantumBackground'
+import DropZone from './DropZone'
 
 const Hero = () => {
   const [securityLevel, setSecurityLevel] = useState(1);
