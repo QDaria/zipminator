@@ -224,6 +224,11 @@ const Hero = () => {
               </div>
             </motion.div>
           </motion.div>
+
+          {/* Core PQC DropZone Entry */}
+          <motion.div variants={itemVariants} className="mt-16 w-full relative z-20">
+            <DropZone />
+          </motion.div>
         </motion.div>
       </div>
 
