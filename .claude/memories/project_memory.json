@@ -22,23 +22,17 @@
     },
     {
       "type": "correction",
-      "content": "Do NOT prompt user for permission when writing project_memory.json during cleanup hooks. User was frustrated by repeated overwrite prompts. Write silently.",
+      "content": "Do NOT prompt user for permission when writing project_memory.json during cleanup hooks. Write silently.",
       "added_at": "2026-04-02T16:58:15.970736",
       "source": "consolidated"
     },
     {
-      "type": "claude_response",
-      "content": "API Error: Claude's response exceeded the 8000 output token maximum. To configure this behavior, set the CLAUDE_CODE_MAX_OUTPUT_TOKENS environment variable.",
-      "added_at": "2026-04-02T17:19:01.928548",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "message",
-      "content": "how do i maximise CLAUDE_CODE_MAX_OUTPUT_TOKENS to 127999?",
-      "added_at": "2026-04-02T17:19:01.928563",
-      "source": "realtime_capture"
+      "type": "tech_choice",
+      "content": "CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 set in ~/.zshrc. Restart Claude Code to pick up. Needed for writing full papers in one shot.",
+      "added_at": "2026-04-02T17:20:14.763635",
+      "source": "consolidated"
     }
   ],
   "created_at": "2026-04-02T10:01:47.584108",
-  "updated_at": "2026-04-02T17:19:01.928564"
+  "updated_at": "2026-04-02T17:22:03.407734"
 }
