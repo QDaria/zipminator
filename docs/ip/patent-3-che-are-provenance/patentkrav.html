@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>patentkrav</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h1 id="claims-patentkrav">CLAIMS / PATENTKRAV</h1>
+<h2 id="independent-claims">Independent Claims</h2>
+<p><strong>Claim 1.</strong> A computer-implemented method for extracting randomness from input data using algebraic programs, comprising:</p>
+<ol type="a">
+<li><p>generating an algebraic program from a cryptographic seed using SHAKE-256 deterministic expansion, wherein the program comprises a sequence of steps, each step specifying a number domain selected from Natural numbers, Integers, Rationals, Reals, and Complex numbers, an arithmetic value, and an arithmetic operation selected from addition, subtraction, multiplication, division, modular reduction, and exponentiation;</p></li>
+<li><p>applying the algebraic program to input data by sequentially executing each step&rsquo;s operation on an accumulator in the specified domain, wherein each domain implements bounded arithmetic with domain-specific projection rules;</p></li>
+<li><p>reducing the final accumulator value modulo a prime to produce the extracted output;</p></li>
+<li><p>for multi-byte output, using SHA-256 in counter mode to expand the algebraic extraction into uniformly distributed output bytes;</p></li>
+</ol>
+<p>wherein the algebraic program constitutes a new family of randomness extractors distinct from hash-based extractors including universal hash functions, Trevisan extractors, and leftover hash lemma applications.</p>
+
+<p><strong>Claim 2.</strong> A computer-implemented method for producing certified entropy from multiple heterogeneous sources, comprising:</p>
+<ol type="a">
+<li><p>maintaining a registry of entropy sources, each source satisfying a protocol interface specifying a name, a read method returning entropy bytes, an estimated min-entropy in bits per byte, and a health status classified as HEALTHY, DEGRADED, or FAILED;</p></li>
+<li><p>for each composition request, identifying active sources by excluding sources with FAILED health status;</p></li>
+<li><p>reading the requested number of bytes from each active source;</p></li>
+<li><p>XOR-combining the bytes from all active sources into a single output buffer;</p></li>
+<li><p>recording per-source provenance metadata comprising source name, estimated min-entropy, health status, bytes contributed, and timestamp;</p></li>
+<li><p>constructing a Merkle-tree provenance certificate from the provenance records, wherein each record is serialized with pipe-separated canonical encoding and hashed as a leaf node using SHA-256, pairs of leaf hashes are recursively combined via SHA-256, and odd-numbered nodes are duplicated;</p></li>
+<li><p>returning the composed entropy bytes together with the provenance certificate and a conservative min-entropy estimate equal to the maximum individual source min-entropy;</p></li>
+</ol>
+<p>wherein the certificate provides cryptographic proof of which sources contributed to the entropy output, verifiable by recomputing the Merkle root from the stored records.</p>
+
+<p><strong>Claim 3.</strong> A computer-implemented method for entropy composition with graceful degradation, comprising:</p>
+<ol type="a">
+<li><p>monitoring each entropy source using NIST SP 800-90B health tests including a configurable failure rate threshold;</p></li>
+<li><p>classifying each source as HEALTHY if tests pass, DEGRADED if anomalies are detected, or FAILED if the failure rate exceeds the configured threshold;</p></li>
+<li><p>automatically excluding FAILED sources from composition while continuing to include DEGRADED sources with a logged warning;</p></li>
+<li><p>adjusting the reported min-entropy bound to reflect only the entropy of sources that actually contributed to the composition;</p></li>
+<li><p>raising an error if fewer than a configurable minimum number of non-FAILED sources are available;</p></li>
+</ol>
+<p>wherein the system continues to produce certified entropy even when individual sources fail, with honest min-entropy bounds that decrease as sources drop out, and wherein no silent fallback to weaker entropy sources occurs without explicit reporting in the provenance certificate.</p>
+
+<h2 id="dependent-claims">Dependent Claims</h2>
+<p><strong>Claim 4.</strong> The method of Claim 1, wherein the SHAKE-256 expansion produces 34 bytes per algebraic step, comprising 1 byte for domain selection modulo 5, 16 bytes for a signed 128-bit value, 16 bytes for a signed 128-bit imaginary component, and 1 byte for operation selection modulo 6.</p>
+
+<p><strong>Claim 5.</strong> The method of Claim 1, wherein the Natural number domain performs arithmetic modulo n with wrapping, the Integer domain projects results into the range {-(n-1), ..., n-1}, and exponentiation is capped at exponent 64 to prevent computational explosion.</p>
+
+<p><strong>Claim 6.</strong> The method of Claim 1, wherein the Rational domain embeds the accumulator as acc/1 and the step value as num/den, performs scaled integer arithmetic to avoid floating-point computation, and extracts the integer part after the operation.</p>
+
+<p><strong>Claim 7.</strong> The method of Claim 1, wherein the Complex domain treats the accumulator as a purely real complex number, performs complex arithmetic with the step value (re + im*i), and takes the real part of the result projected back to the integer range.</p>
+
+<p><strong>Claim 8.</strong> The method of Claim 2, wherein the provenance record canonical serialization uses pipe separators between fields in the order: source_name, min_entropy formatted to 6 decimal places, health_status, bytes_contributed, timestamp formatted to 6 decimal places, and sha256_hash.</p>
+
+<p><strong>Claim 9.</strong> The method of Claim 2, wherein the Merkle tree handles an odd number of leaf nodes by duplicating the last node before combining pairs.</p>
+
+<p><strong>Claim 10.</strong> The method of Claim 2, further comprising adapting legacy quantum entropy providers to the composition protocol via an adapter that runs NIST SP 800-90B health tests and min-entropy estimation on every byte read from the legacy provider.</p>
+
+<p><strong>Claim 11.</strong> The method of Claim 3, wherein the failure rate threshold for classifying a source as FAILED is 1%.</p>
+
+<p><strong>Claim 12.</strong> The method of Claim 2, wherein the certified entropy result comprises: composed entropy bytes, a Merkle-tree provenance certificate with a verifiable root hash, a conservative min-entropy estimate in bits, and a list of source names that contributed to the composition.</p>
+</body>
+</html>

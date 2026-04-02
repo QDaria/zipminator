@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>patentkrav</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<h1 id="claims-patentkrav">CLAIMS / PATENTKRAV</h1>
+<h2 id="independent-claims">Independent Claims</h2>
+
+<p><strong>Claim 1.</strong> A computer-implemented method for unilateral entropy harvesting from wireless channel state information, comprising:</p>
+<ol type="a">
+<li><p>receiving WiFi Channel State Information (CSI) frames from a wireless interface, each frame comprising complex-valued subcarrier measurements;</p></li>
+<li><p>for each subcarrier measurement, computing the phase angle and quantizing said phase to a discrete level;</p></li>
+<li><p>extracting the least-significant bit (LSB) of each quantized phase value to produce a raw bit stream;</p></li>
+<li><p>applying Von Neumann debiasing to the raw bit stream, wherein consecutive bit pairs are processed such that differing pairs produce an output bit and identical pairs are discarded;</p></li>
+<li><p>accumulating debiased output bits into entropy bytes;</p></li>
+</ol>
+<p>wherein the method operates on a single device without requiring a second wireless endpoint, and the output bytes constitute general-purpose entropy suitable for any cryptographic application, distinct from bilateral key agreement protocols that require two cooperating endpoints.</p>
+
+<p><strong>Claim 2.</strong> A method for deriving location-locked encryption keys from wireless channel eigenstructure, comprising:</p>
+<ol type="a">
+<li><p>capturing CSI magnitude data across multiple frames from a WiFi interface at an enrollment location;</p></li>
+<li><p>computing a covariance matrix from the centered CSI magnitude data;</p></li>
+<li><p>performing Singular Value Decomposition (SVD) on said covariance matrix to obtain eigenvalues sorted in descending order;</p></li>
+<li><p>storing the top-K eigenvalues as an enrollment profile together with a configurable similarity threshold;</p></li>
+<li><p>at key-derivation time, capturing fresh CSI magnitude data from the same physical location;</p></li>
+<li><p>computing fresh eigenvalues via SVD of the fresh CSI covariance matrix;</p></li>
+<li><p>computing cosine similarity between the enrolled and fresh eigenvalue vectors;</p></li>
+<li><p>if the cosine similarity meets or exceeds the threshold, deriving a cryptographic key from the enrolled eigenmodes using HKDF-SHA256 with a purpose-specific info string;</p></li>
+<li><p>if the cosine similarity falls below the threshold, rejecting the key derivation request;</p></li>
+</ol>
+<p>wherein the derived key is cryptographically bound to the physical RF environment of the enrollment location and cannot be derived from a different physical location, and wherein the method fingerprints the environment rather than the hardware device.</p>
+
+<p><strong>Claim 3.</strong> A method for generating post-quantum mesh encryption keys from composed entropy, comprising:</p>
+<ol type="a">
+<li><p>obtaining CSI entropy bytes via the method of Claim 1;</p></li>
+<li><p>obtaining quantum random bytes from a quantum random number generator (QRNG);</p></li>
+<li><p>XOR-combining the CSI entropy bytes with the QRNG bytes to produce composed entropy, wherein the composed output has min-entropy at least as high as the stronger individual source;</p></li>
+<li><p>deriving mesh authentication keys using HKDF-SHA256 with the composed entropy as input keying material and distinct purpose-specific info strings for each key type;</p></li>
+</ol>
+<p>wherein the derived keys are suitable for use with ML-KEM-768 (NIST FIPS 203) key encapsulation in a wireless mesh network, and wherein compromise of either individual entropy source does not reduce the security of the composed output below the entropy of the uncompromised source.</p>
+
+<h2 id="dependent-claims">Dependent Claims</h2>
+
+<p><strong>Claim 4.</strong> The method of Claim 1, wherein the CSI frames comprise 56 complex-valued subcarrier measurements conforming to the IEEE 802.11n HT20 frame structure.</p>
+
+<p><strong>Claim 5.</strong> The method of Claim 1, wherein the Von Neumann debiasing processes consecutive bit pairs such that a pair (0, 1) produces output bit 0, a pair (1, 0) produces output bit 1, and pairs (0, 0) and (1, 1) are discarded.</p>
+
+<p><strong>Claim 6.</strong> The method of Claim 1, wherein the wireless interface is an ESP32-S3 microcontroller configured to capture raw CSI data from WiFi frames.</p>
+
+<p><strong>Claim 7.</strong> The method of Claim 1, further comprising writing the accumulated entropy bytes to a persistent pool file in append mode, enabling offline consumption by a separate process with position tracking.</p>
+
+<p><strong>Claim 8.</strong> The method of Claim 2, wherein the configurable similarity threshold is selected from preset security profiles comprising: SCIF (0.98), Office (0.85), Home (0.75), or a custom value in the range [0.0, 1.0].</p>
+
+<p><strong>Claim 9.</strong> The method of Claim 2, wherein the HKDF-SHA256 key derivation uses a fixed info string for domain separation and an optional salt parameter for network-specific binding.</p>
+
+<p><strong>Claim 10.</strong> The method of Claim 3, wherein the XOR combination provides defense-in-depth such that even if the CSI data is fully compromised by an adversary, the composed output retains the full entropy of the QRNG source.</p>
+
+<p><strong>Claim 11.</strong> The method of Claim 3, further comprising deriving a SipHash-2-4 frame integrity key from the composed entropy using HKDF-SHA256 with a distinct info string separate from the mesh authentication key.</p>
+
+<p><strong>Claim 12.</strong> The method of Claim 3, further comprising deriving a MeshKey for HMAC-SHA256 beacon authentication from the composed entropy using HKDF-SHA256.</p>
+
+<p><strong>Claim 13.</strong> The method of Claim 1, wherein a CSI pool provider raises a runtime error when the pool file is exhausted rather than falling back to operating system entropy, thereby preserving the provenance integrity of CSI-derived entropy.</p>
+</body>
+</html>

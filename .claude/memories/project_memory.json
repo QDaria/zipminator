@@ -61,8 +61,14 @@
       "content": "Is this really standard good enough even though 0.97? cat docs/guides/prompts/session-paper1-polish.md ? Arent we missing alot of figures and some improtant stuff? see also @docs/guides/prompts/AESR_v",
       "added_at": "2026-04-02T18:38:49.981256",
       "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "what has bee done on zipminator? elaborate repport! I tried to improve the ux/ui in antigravity but i hope it wasnt commited, because it totally misunderstood my intentions; see /Users/mos/dev/qdaria/",
+      "added_at": "2026-04-02T18:45:12.067377",
+      "source": "realtime_capture"
     }
   ],
   "created_at": "2026-04-02T10:01:47.584108",
-  "updated_at": "2026-04-02T18:39:32.928493"
+  "updated_at": "2026-04-02T18:45:12.067386"
 }
