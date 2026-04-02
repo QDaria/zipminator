@@ -1,6 +1,6 @@
 ---
 name: pr-manager
-description: Comprehensive pull request management with swarm coordination for automated reviews, testing, and merge workflows
+description: "Pull request lifecycle management and GitHub workflow coordination"
 type: development
 color: "#4ECDC4"
 tools:

@@ -25,8 +25,14 @@
       "content": "still ➜ zipminator git:(main) ✗ claude --dangerously-skip-permissions --effort max Claude Code v2.1.90 ▐▛███▜▌ Opus 4.6 (1M context) with max effort ▝▜█████▛▘ Claude Max ▘▘ ▝▝ ~/dev/qdaria/zipminator ",
       "added_at": "2026-04-02T11:23:50.962601",
       "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "still LLarge cumulative agent descriptions will impact performance (~15.9k tokens > 15.0k) · / agents to manage Pleas fix",
+      "added_at": "2026-04-02T16:35:51.300143",
+      "source": "realtime_capture"
     }
   ],
   "created_at": "2026-04-02T10:01:47.584108",
-  "updated_at": "2026-04-02T11:23:50.962603"
+  "updated_at": "2026-04-02T16:35:51.300156"
 }
