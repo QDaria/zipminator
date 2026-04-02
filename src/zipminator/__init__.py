@@ -9,7 +9,7 @@ Example:
     >>> zipper.zipit(df)
 """
 
-__version__ = "0.5.0b1"
+__version__ = "0.5.0"
 
 # Lightweight imports (no heavy deps like pandas)
 from zipminator.crypto.quantum_random import QuantumRandom

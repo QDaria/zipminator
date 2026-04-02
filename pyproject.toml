@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "zipminator"
-version = "0.5.0b1"
+version = "0.5.0"
 description = "Post-quantum cryptography with quantum entropy - CRYSTALS-Kyber-768 implementation"
 readme = "README.md"
 authors = [
@@ -90,6 +90,8 @@ features = ["pyo3"]
 compatibility = "manylinux2014"
 # Strip symbols in release builds
 strip = true
+# Include license and readme in sdist
+include = ["LICENSE", "README.md", "CHANGELOG.md"]
 
 [tool.pytest.ini_options]
 minversion = "7.0"
