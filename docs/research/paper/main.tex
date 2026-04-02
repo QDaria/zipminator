@@ -509,7 +509,7 @@ Classical anonymization methods derive irreversibility from computational hardne
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig4_entropy}
-\caption{Entropy consumption as a function of dataset size and column count, assuming 70\% unique values per column and 16 bytes per unique value. A single quantum harvest cycle produces approximately 50~KB; the entropy pool bootstrap provides 4~MB.}
+\caption{Entropy consumption as a function of dataset size and column count, assuming 70\% unique values per column and 16 bytes per unique value. A single quantum harvest cycle produces approximately \SI{80}{\kilo\byte} ($156 \times 4{,}096 / 8$); the OS-sourced entropy pool used for benchmarking contains \SI{5.9}{\mega\byte} (Table~\ref{tab:nist}).}
 \label{fig:entropy}
 \end{figure}
 
@@ -560,7 +560,7 @@ The implementation is structured in three layers:
 \item OS entropy, \texttt{/dev/urandom} (CSPRNG, \emph{not} certified)\footnote{The distinction is physical, not algorithmic. OS entropy sources (Intel RDRAND, \texttt{/dev/urandom}, timing jitter) are deterministic processes that exploit computational unpredictability; an adversary who captures the internal state can replay the output. Quantum TRNGs certified by loophole-free Bell tests~\cite{hensen2015loophole} produce bits that are fundamentally random per the Born rule: no seed exists, no state determines the outcome, and no replay is possible even in principle.}
 \end{enumerate}
 
-When the OS fallback (priority~6) is used, the system marks the output as ``classically anonymized'' rather than ``quantum-certified,'' preserving the integrity of the physics-guaranteed claim. Each harvesting cycle appends approximately \SI{50}{\kilo\byte} of quantum random bytes. The pool supports concurrent reads with per-consumer offset tracking; consumed bytes are never re-read.
+When the OS fallback (priority~6) is used, the system marks the output as ``classically anonymized'' rather than ``quantum-certified,'' preserving the integrity of the physics-guaranteed claim. Each harvesting cycle appends approximately \SI{80}{\kilo\byte} of quantum random bytes (156~qubits $\times$ 4{,}096~shots $/$ 8 on current IBM Quantum hardware). The pool supports concurrent reads with per-consumer offset tracking; consumed bytes are never re-read.
 
 \textbf{Anonymization engine.} The \texttt{LevelAnonymizer} class in Python exposes the method \texttt{apply(df, level=10)}, which accepts a Pandas DataFrame and an anonymization level. For L10, the engine iterates over each column, reads 16 bytes from the entropy pool for each unique value, constructs the OTP mapping in a Python dictionary (volatile memory), performs the substitution, and discards the mapping when the function returns.
 
@@ -663,6 +663,7 @@ The ``Changed'' column shows the percentage of cell values that differ from the 
 \end{figure}
 
 \subsection{Scaling Behavior}
+\label{subsec:scaling}
 
 \begin{figure}[t]
 \centering
@@ -671,9 +672,10 @@ The ``Changed'' column shows the percentage of cell values that differ from the 
 \label{fig:scaling}
 \end{figure}
 
-Figure~\ref{fig:scaling} shows runtime scaling from 100 to 5,000 rows. L1 and L5 scale sub-linearly (regex and generalization operations are batch-efficient). L8 and L10 scale linearly with the number of unique values, as each requires a pool read. At 5,000 rows, L10 completes in 2.3~seconds. For production datasets exceeding 100,000 rows, the entropy pool must be pre-populated with sufficient bytes; the background harvester is designed to produce approximately \SI{50}{\kilo\byte} per quantum circuit execution cycle when connected to quantum hardware.
+Figure~\ref{fig:scaling} shows runtime scaling from 100 to 5,000 rows. L1 and L5 scale sub-linearly (regex and generalization operations are batch-efficient). L8 and L10 scale linearly with the number of unique values, as each requires a pool read. At 5,000 rows, L10 completes in 2.3~seconds. For production datasets exceeding 100,000 rows, the entropy pool must be pre-populated with sufficient bytes; the background harvester produces approximately \SI{80}{\kilo\byte} per quantum circuit execution cycle on 156-qubit processors ($156 \times 4{,}096 / 8 = 79{,}872$~bytes; see Section~\ref{subsec:hardware}).
 
 \subsection{Hardware Demonstration: IBM Quantum}
+\label{subsec:hardware}
 
 To validate the end-to-end system on real quantum hardware, we executed a 16-qubit Hadamard circuit ($H^{\otimes 16}$) on IBM's \texttt{ibm\_fez} processor, a 156-qubit Heron~r2 superconducting system, via the Qiskit Runtime API on March~26, 2026. The circuit measured all 16 qubits in the computational basis for 1,024 shots, harvesting 2,048 bytes (16,384 bits) of quantum entropy. The job identifier \texttt{d728e76v3u3c73eiaar0} is independently verifiable through the IBM Quantum platform.
 
@@ -1039,6 +1041,12 @@ This trust assumption can be partially mitigated through three mechanisms:
 \textbf{Formal verification gap.} Our mapping destruction implementation overwrites all mapping values with null bytes, clears the dictionary, and deletes the reference. Python's garbage collector and memory allocator may retain copies of string objects in internal pools or free lists. While our overwrite targets the primary data structures, we cannot guarantee with mathematical certainty that no copy of any mapping entry persists in interpreter-managed memory. A formally verified implementation in Rust or C, executed within a hardware security enclave (Intel SGX, ARM TrustZone), would close this gap. This is planned for a future release.
 
 \textbf{Column structure preservation.} L10 replaces all values but preserves the dataset's schema (column names, column count, row count). An adversary who knows the schema and has access to auxiliary information about the original dataset's structure (e.g., the number of unique values per column) may be able to infer column semantics. For example, a column with exactly 2 unique tokens likely corresponds to a binary attribute. This structural leakage is inherent to any anonymization method that preserves schema. For datasets where schema information is sensitive, column names should be anonymized separately, and dummy columns or rows may be added to obscure the structure.
+
+\textbf{Ethical considerations.} This work does not involve human subjects. The UCI Adult dataset is a publicly available, de-identified census extract maintained by the UCI Machine Learning Repository. We acknowledge that irreversible anonymization can be misused to destroy accountability trails; the provenance logging system described in Section~\ref{subsec:arch} provides an audit mechanism that records which dataset was anonymized, at which level, and from which entropy source, without storing the mapping itself. This audit trail allows organizations to demonstrate compliance with data protection obligations while maintaining the irreversibility guarantee. The authors have no conflicts of interest. QDaria~AS is the sole institutional affiliation.
+
+\textbf{Data and code availability.} The anonymization engine, entropy pool infrastructure, and all benchmark scripts are open-source under the Apache-2.0 license at \url{https://github.com/QDaria/zipminator}. The Python SDK is available via PyPI (\texttt{pip install zipminator}, version~0.5.0). The UCI Adult dataset is publicly available at the UCI Machine Learning Repository~\cite{dua2019uci}. The IBM Quantum entropy pool (\SI{2.72}{\mega\byte}, 35 jobs from \texttt{ibm\_fez} and \texttt{ibm\_kingston}) is included in the supplementary materials with full provenance metadata (job identifiers, timestamps, qubit counts, shot counts). All benchmark scripts, including both the synthetic-data benchmarks (Tables~\ref{tab:benchmarks}--\ref{tab:adult}) and the NIST SP~800-22 validation, are included in the repository under \texttt{docs/research/paper/}.
+
+\textbf{Reproducibility.} The runtime benchmarks in Tables~\ref{tab:benchmarks}--\ref{tab:adult} were obtained on an Apple M3~Pro (macOS~14, 18~GB~RAM) with Python~3.11 and the Rust-backed entropy pool compiled via Maturin. OS-entropy benchmarks are fully reproducible with the published Python package and scripts. Quantum-entropy benchmarks require an IBM Quantum API key (free tier available at \url{https://quantum.ibm.com}); OS-entropy fallback enables full pipeline testing without quantum hardware. The system does not use PRNG seeds; each execution draws fresh entropy from the pool, so exact numerical outputs will differ between runs while statistical properties (unique counts, transformation rates) remain stable.
 
 %% ====================================================================
 \section{Conclusion}

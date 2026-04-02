@@ -94,7 +94,7 @@
 \newlabel{sec:implementation}{{VI}{9}{}{section.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}System Architecture}{9}{}\protected@file@percent }
 \newlabel{subsec:arch}{{\mbox  {VI-A}}{9}{}{subsection.6.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Entropy consumption as a function of dataset size and column count, assuming 70\% unique values per column and 16 bytes per unique value. A single quantum harvest cycle produces approximately 50~KB; the entropy pool bootstrap provides 4~MB.}}{9}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Entropy consumption as a function of dataset size and column count, assuming 70\% unique values per column and 16 bytes per unique value. A single quantum harvest cycle produces approximately \SI {80}{\kilo \byte } ($156 \times 4{,}096 / 8$); the OS-sourced entropy pool used for benchmarking contains \SI {5.9}{\mega \byte } (Table~\ref {tab:nist}).}}{9}{}\protected@file@percent }
 \newlabel{fig:entropy}{{4}{9}{}{figure.4}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Zipminator Anonymization Levels}}{9}{}\protected@file@percent }
 \newlabel{tab:levels}{{IV}{9}{}{table.4}{}}
@@ -117,7 +117,9 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Runtime scaling across dataset sizes for L1, L5, L8, and L10. QRNG-dependent levels (L8, L10) scale linearly with the number of unique values due to per-value entropy pool reads.}}{11}{}\protected@file@percent }
 \newlabel{fig:scaling}{{6}{11}{}{figure.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Scaling Behavior}{11}{}\protected@file@percent }
+\newlabel{subsec:scaling}{{\mbox  {VII-B}}{11}{}{subsection.7.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Hardware Demonstration: IBM Quantum}{11}{}\protected@file@percent }
+\newlabel{subsec:hardware}{{\mbox  {VII-C}}{11}{}{subsection.7.3}{}}
 \citation{dua2019uci}
 \citation{nist2010sp80022}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-D}}Quantum Hardware Noise Considerations}{12}{}\protected@file@percent }
@@ -221,6 +223,7 @@
 \@writefile{toc}{\contentsline {section}{\numberline {XI}Limitations}{18}{}\protected@file@percent }
 \newlabel{sec:limitations}{{XI}{18}{}{section.11}{}}
 \citation{amer2025certified}
+\citation{dua2019uci}
 \citation{bell1964epr,hensen2015loophole}
 \citation{amer2025certified}
 \@writefile{toc}{\contentsline {section}{\numberline {XII}Conclusion}{19}{}\protected@file@percent }
@@ -253,6 +256,7 @@
 \bibcite{herrero2017qrng}{26}
 \bibcite{hirche2022qdp}{27}
 \bibcite{holohan2019diffprivlib}{28}
+\@writefile{toc}{\contentsline {section}{References}{20}{}\protected@file@percent }
 \bibcite{kifer2011nofree}{29}
 \bibcite{li2007tcloseness}{30}
 \bibcite{ma2016qrng}{31}
@@ -272,7 +276,6 @@
 \bibcite{templ2017sdc}{45}
 \bibcite{unruh2015revocable}{46}
 \bibcite{vazirani2012certifiable}{47}
-\@writefile{toc}{\contentsline {section}{References}{20}{}\protected@file@percent }
 \bibcite{vernam1926cipher}{48}
 \bibcite{wilson2020dpsql}{49}
 \bibcite{xu2019ctgan}{50}
@@ -283,4 +286,4 @@
 \newlabel{thm:game-security}{{8}{21}{}{theorem.8}{}}
 \newlabel{eq:adv-bound}{{11}{21}{}{equation.11}{}}
 \newlabel{prop:domain}{{9}{21}{}{theorem.9}{}}
-\gdef \@abspage@last{21}
+\gdef \@abspage@last{22}

@@ -14,6 +14,7 @@ Reference values from main.tex lines 710-718:
   L10  QRNG-OTP-Destroy     1,303 ms   22,146 unique  100%
 """
 
+import logging
 import os
 import sys
 import time
@@ -21,6 +22,12 @@ import urllib.request
 
 import numpy as np
 import pandas as pd
+
+# Suppress noisy entropy pool exhaustion warnings during benchmarking.
+# The pool falls back to os.urandom which is fine for timing/property tests.
+logging.getLogger("zipminator.entropy").setLevel(logging.CRITICAL)
+logging.getLogger("zipminator.entropy.pool_provider").setLevel(logging.CRITICAL)
+logging.getLogger("zipminator").setLevel(logging.CRITICAL)
 
 # Ensure the project root is on sys.path so we can import zipminator
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
