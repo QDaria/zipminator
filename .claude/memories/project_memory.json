@@ -1,0 +1,14 @@
+{
+  "memories": [],
+  "manual_memories": [],
+  "realtime_memories": [
+    {
+      "type": "message",
+      "content": "what does thi mean [Image #1]",
+      "added_at": "2026-04-02T10:01:47.584142",
+      "source": "realtime_capture"
+    }
+  ],
+  "created_at": "2026-04-02T10:01:47.584108",
+  "updated_at": "2026-04-02T10:01:47.584144"
+}
