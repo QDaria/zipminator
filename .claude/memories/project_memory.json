@@ -4,7 +4,7 @@
   "realtime_memories": [
     {
       "type": "correction",
-      "content": "When user pastes or cats a prompt file, EXECUTE the workflow immediately. Don't summarize, don't ask. User runs parallel terminals from saved prompts in docs/guides/prompts/.",
+      "content": "When user pastes or cats a prompt file, EXECUTE the workflow immediately. Don't summarize, don't ask. User runs parallel terminals from saved prompts in docs/guides/prompts/. Also: do NOT prompt for permission when writing project_memory.json during cleanup hooks. Write silently.",
       "added_at": "2026-04-02T16:55:23.128521",
       "source": "consolidated"
     },
@@ -15,24 +15,54 @@
       "source": "consolidated"
     },
     {
-      "type": "completed",
-      "content": "Paper 1 polished 0.94->0.97: added 2.7MB ibm_kingston harvest (34 jobs, 156q), updated abstract, corrected NIST caption, verified all 47 citations. 21 pages, zero errors. Submission-ready PoPETs Aug 2026.",
-      "added_at": "2026-04-02T17:16:28.173622",
-      "source": "consolidated"
-    },
-    {
-      "type": "correction",
-      "content": "Do NOT prompt user for permission when writing project_memory.json during cleanup hooks. Write silently.",
-      "added_at": "2026-04-02T16:58:15.970736",
-      "source": "consolidated"
-    },
-    {
       "type": "tech_choice",
-      "content": "CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 set in ~/.zshrc. Restart Claude Code to pick up. Needed for writing full papers in one shot.",
-      "added_at": "2026-04-02T17:20:14.763635",
+      "content": "CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 set in ~/.zshrc. Restart Claude Code to pick up. Needed for writing full papers in one shot. Note: env var is read at launch time only; mid-session changes require restart.",
+      "added_at": "2026-04-02T18:13:00.000000",
       "source": "consolidated"
+    },
+    {
+      "type": "completed",
+      "content": "Paper 1 (PoPETs) 0.97 score, submission-ready. Paper 2 CSI entropy: BibTeX + directory + figures created, main.tex NOT yet written (hit token limit). Patents 2+3 HTML files drafted in docs/ip/. Patent format: 4-5 separate HTML files per patent matching Patent 1 structure.",
+      "added_at": "2026-04-02T17:55:00.000000",
+      "source": "consolidated"
+    },
+    {
+      "type": "completed",
+      "content": "Full project status report generated (Apr 2): 181 commits, 9 pillars (75-100%), 552 Rust + 429 Python + 30 web + 267 mobile tests, 6 platforms, 3 patents (1 filed), live signaling server, PyPI v0.5.0, 18 TestFlight builds.",
+      "added_at": "2026-04-02T18:10:00.000000",
+      "source": "consolidated"
+    },
+    {
+      "type": "claude_response",
+      "content": "Consolidated 11 down to 5. Removed: 4 raw message captures (noise), 1 truncated claude_response, 1 duplicate question. Updated the token env var note with the \"read at launch time\" detail learned this",
+      "added_at": "2026-04-02T18:15:31.033546",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "how do i maximise CLAUDE_CODE_MAX_OUTPUT_TOKENS to 128000? once and for all so i dont neeed to do it for eeach sesssion?",
+      "added_at": "2026-04-02T18:15:31.033562",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "I have fixed to 128K toke so plesase continue; \"⏺ ★ Insight ───────────────────────────────────── The existing IEEE draft at docs/research/csi-entropy/main.tex targets a different venue with different",
+      "added_at": "2026-04-02T18:29:44.974052",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "The other or the forst paten consisted of 4 or 5 htm that I cmd + p to generate pdf's; why did i only have one html for the second paten? and third patent? please organise the ip into directories with",
+      "added_at": "2026-04-02T18:36:21.468177",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "Is this really standard good enough even though 0.97? cat docs/guides/prompts/session-paper1-polish.md ? Arent we missing alot of figures and some improtant stuff? see also @docs/guides/prompts/AESR_v",
+      "added_at": "2026-04-02T18:38:49.981256",
+      "source": "realtime_capture"
     }
   ],
   "created_at": "2026-04-02T10:01:47.584108",
-  "updated_at": "2026-04-02T17:22:03.407734"
+  "updated_at": "2026-04-02T18:39:32.928493"
 }

@@ -1,0 +1,5 @@
+# ABSTRACT / SAMMENDRAG
+
+A method and system for irreversible data anonymization using quantum random number generation (QRNG). Each personally identifiable information (PII) value in a dataset is mapped to a replacement identifier generated from quantum random bytes produced by measuring qubits in superposition. The randomness of the replacement identifiers is governed by the Born rule of quantum mechanics, ensuring no deterministic seed exists. After the anonymization transformation is applied, the one-time pad (OTP) mapping between original values and replacement identifiers is securely destroyed via multi-pass overwrite. The resulting anonymization is information-theoretically irreversible: no adversary, regardless of computational power, can recover the original values. This guarantee holds even if P = NP, because it is physical rather than computational. The system supports multiple quantum hardware providers with automatic failover, thread-safe entropy pooling, provenance tracking, and integration with existing privacy frameworks including k-anonymity and differential privacy.
+
+(Figure 1: System Architecture)

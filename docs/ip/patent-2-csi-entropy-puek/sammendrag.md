@@ -1,0 +1,5 @@
+# ABSTRACT / SAMMENDRAG
+
+A method and system for unilateral entropy harvesting from WiFi Channel State Information (CSI) and location-locked key derivation. Unlike all prior CSI-based approaches that require bilateral key agreement between two endpoints, the present invention operates on a single device, extracting general-purpose entropy bytes from subcarrier phase measurements via Von Neumann debiasing. The Physical Unclonable Environment Key (PUEK) subsystem derives cryptographic keys bound to a physical location's RF eigenstructure using SVD and HKDF-SHA256, with configurable similarity thresholds for different security environments (SCIF 0.98, Office 0.85, Home 0.75). A hybrid composition method XOR-combines CSI entropy with quantum random bytes for defense-in-depth, deriving mesh authentication keys compatible with ML-KEM-768 (NIST FIPS 203). The system implements provenance-preserving pool management that never falls back to operating system entropy, ensuring CSI entropy bytes are genuinely derived from wireless channel measurements.
+
+(Figure 1: Single-Device CSI Entropy Harvesting Pipeline)

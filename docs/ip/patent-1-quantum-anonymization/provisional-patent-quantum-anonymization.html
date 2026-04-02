@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Provisional Patent Application — Quantum Anonymization</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Provisional Patent Application — Quantum
+Anonymization</h1>
+</header>
+<h1 id="provisional-patent-application">PROVISIONAL PATENT
+APPLICATION</h1>
+<h2 id="united-states-patent-and-trademark-office">United States Patent
+and Trademark Office</h2>
+<p><strong>Filing under 35 U.S.C. § 111(b)</strong></p>
+<hr />
+<h2 id="title-of-the-invention">TITLE OF THE INVENTION</h2>
+<p><strong>Method and System for Irreversible Data Anonymization Using
+Quantum Random Number Generation with Physics-Guaranteed
+Non-Reversibility</strong></p>
+<hr />
+<h2 id="inventors">INVENTOR(S)</h2>
+<p>Daniel Mo Houshmand Oslo, Norway</p>
+<hr />
+<h2 id="assignee">ASSIGNEE</h2>
+<p>QDaria AS Oslo, Norway</p>
+<hr />
+<h2 id="cross-reference-to-related-applications">CROSS-REFERENCE TO
+RELATED APPLICATIONS</h2>
+<p>None.</p>
+<hr />
+<h2 id="field-of-the-invention">FIELD OF THE INVENTION</h2>
+<p>The present invention relates to data privacy and anonymization
+technology. More specifically, the invention relates to a method and
+system for irreversibly anonymizing personally identifiable information
+(PII) in datasets using one-time pad (OTP) mappings derived from quantum
+random number generators (QRNG), wherein the irreversibility of the
+anonymization is guaranteed by the Born rule of quantum mechanics rather
+than by computational hardness assumptions.</p>
+<hr />
+<h2 id="background-of-the-invention">BACKGROUND OF THE INVENTION</h2>
+<h3 id="the-anonymization-problem">The Anonymization Problem</h3>
+<p>Organizations that process datasets containing personally
+identifiable information (PII) face regulatory requirements under
+frameworks including the European Union’s General Data Protection
+Regulation (GDPR), the Digital Operational Resilience Act (DORA), the
+California Consumer Privacy Act (CCPA), and the Health Insurance
+Portability and Accountability Act (HIPAA).</p>
+<p>GDPR Recital 26 provides a critical distinction: data that has been
+rendered truly anonymous — such that the data subject is “not or no
+longer identifiable” — falls entirely outside the scope of data
+protection regulation. However, data that is merely pseudonymized (where
+re-identification is possible using additional information) remains
+personal data subject to full regulatory requirements.</p>
+<p>The ability to prove that data has been rendered truly anonymous,
+rather than merely pseudonymized, has significant economic and
+regulatory value.</p>
+<h3 id="limitations-of-classical-anonymization">Limitations of Classical
+Anonymization</h3>
+<p>Existing anonymization techniques include:</p>
+<ul>
+<li><p><strong>k-Anonymity</strong> (Sweeney, 2002): Generalizes
+quasi-identifiers so each record is indistinguishable from at least k-1
+others. Vulnerable to homogeneity attacks and background knowledge
+attacks.</p></li>
+<li><p><strong>l-Diversity</strong> (Machanavajjhala et al., 2007):
+Extends k-anonymity by requiring diversity in sensitive attributes
+within equivalence classes.</p></li>
+<li><p><strong>t-Closeness</strong> (Li et al., 2007): Requires the
+distribution of sensitive attributes within equivalence classes to be
+close to the overall distribution.</p></li>
+<li><p><strong>Differential Privacy</strong> (Dwork, 2006): Adds
+calibrated noise (typically Laplace or Gaussian) to query outputs,
+providing mathematical guarantees that the presence or absence of any
+individual’s data has bounded influence on the output.</p></li>
+<li><p><strong>Tokenization</strong>: Replaces PII with artificial
+identifiers using a reversible mapping stored in a secure
+vault.</p></li>
+<li><p><strong>One-Time Pad (OTP) Masking</strong>: Replaces each value
+with a random substitute generated from a random number source.</p></li>
+</ul>
+<p>All of the above techniques, when implemented in practice, derive
+their irreversibility (where applicable) from <strong>computational
+hardness assumptions</strong>. Specifically, the randomness used in
+noise injection (differential privacy), OTP generation, and hash salting
+comes from classical pseudo-random number generators (PRNGs) or
+cryptographically secure pseudo-random number generators (CSPRNGs).</p>
+<h3 id="the-prng-vulnerability">The PRNG Vulnerability</h3>
+<p>A classical PRNG, including CSPRNGs such as ChaCha20, AES-CTR-DRBG,
+and /dev/urandom, is deterministic: given the internal state (seed),
+every output can be reproduced exactly. The security of these generators
+rests on the computational infeasibility of recovering the seed from the
+output.</p>
+<p>However, the seed exists physically — in RAM, in kernel data
+structures, in hardware state. An adversary who obtains the seed through
+any means (memory forensics, cold boot attack, side-channel attack such
+as Spectre or Meltdown, insider access to system memory, or state-level
+surveillance) can:</p>
+<ol type="1">
+<li>Reconstruct every “random” value the PRNG produced.</li>
+<li>Subtract the noise added during anonymization.</li>
+<li>Recover the original PII values.</li>
+</ol>
+<p>This means classical anonymization provides <strong>computational
+irreversibility</strong> — secure under the assumption that the
+adversary lacks sufficient access or compute to recover the PRNG seed —
+but not <strong>unconditional irreversibility</strong>.</p>
+<h3 id="quantum-random-number-generation">Quantum Random Number
+Generation</h3>
+<p>Quantum Random Number Generators (QRNGs) produce random numbers by
+measuring quantum mechanical phenomena. When a qubit prepared in a
+superposition state |ψ⟩ = α|0⟩ + β|1⟩ is measured, the outcome is
+determined by the Born rule:</p>
+<ul>
+<li>P(|0⟩) = |α|²</li>
+<li>P(|1⟩) = |β|²</li>
+</ul>
+<p>Bell’s theorem (1964), experimentally verified by Aspect et
+al. (1982) and in loophole-free form by Hensen et al. (2015), proves
+that no local hidden variable theory can reproduce the statistics of
+quantum measurements. The measurement outcome is fundamentally
+non-deterministic: there is no underlying state, seed, or hidden
+variable that determines the result.</p>
+<p>QRNG hardware is commercially available from multiple vendors (IBM
+Quantum, Rigetti Computing, ID Quantique, Quantinuum, QuintessenceLabs,
+and others) and produces random numbers that are certifiably random to
+within the precision of quantum mechanics itself.</p>
+<h3 id="the-unoccupied-gap">The Unoccupied Gap</h3>
+<p>Despite the availability of QRNG hardware and the well-understood
+limitations of classical PRNGs for anonymization, no prior system has
+combined QRNG-sourced randomness with data anonymization in a way that
+exploits the Born rule to provide physics-guaranteed irreversibility.
+All existing QRNG applications in the cybersecurity domain focus on
+cryptographic key generation — improving the quality of encryption keys
+— rather than on the anonymization transformation itself.</p>
+<hr />
+<h2 id="summary-of-the-invention">SUMMARY OF THE INVENTION</h2>
+<p>The present invention provides a method and system for irreversible
+data anonymization wherein:</p>
+<ol type="1">
+<li><p>Each unique value in a dataset containing PII is mapped to a
+replacement identifier generated from a quantum random number
+source.</p></li>
+<li><p>The quantum random numbers are produced by measuring qubits in
+superposition on quantum computing hardware, such that the randomness is
+governed by the Born rule and no deterministic seed exists.</p></li>
+<li><p>A one-time pad (OTP) mapping table is constructed in volatile
+memory, mapping each original value to its quantum-random
+replacement.</p></li>
+<li><p>All values in the dataset are replaced using the OTP
+mapping.</p></li>
+<li><p>The OTP mapping table is securely destroyed using multi-pass
+overwrite (e.g., DoD 5220.22-M 3-pass: zeros, ones, random bytes),
+ensuring no copy persists in any storage medium.</p></li>
+</ol>
+<p>Because the replacement identifiers are derived from quantum
+measurements with no underlying seed, and because the mapping table is
+destroyed, the anonymization is <strong>information-theoretically
+irreversible</strong>: no adversary, regardless of computational power
+(classical or quantum), can recover the original values.</p>
+<p>This provides a stronger guarantee than any classical anonymization
+technique, which relies on computational hardness assumptions that may
+be defeated by advances in computing (including quantum computing).</p>
+<hr />
+<h2 id="detailed-description-of-the-invention">DETAILED DESCRIPTION OF
+THE INVENTION</h2>
+<h3 id="system-architecture">System Architecture</h3>
+<p>The system comprises the following components:</p>
+<h4 id="quantum-random-number-source">1. Quantum Random Number
+Source</h4>
+<p>The quantum random number source is a quantum computing processor
+(e.g., IBM Quantum Eagle/Heron series with 100+ qubits, Rigetti Ankaa
+series, or equivalent) accessed via a cloud API (e.g., qBraid, IBM
+Qiskit Runtime, Amazon Braket).</p>
+<p>The QRNG source: - Prepares qubits in superposition states. -
+Measures the qubits, producing random bit strings. - Returns the bit
+strings as raw entropy bytes.</p>
+<p>In the preferred embodiment, multiple QRNG providers are aggregated
+through a provider factory with automatic failover:</p>
+<pre><code>Priority chain: PoolProvider → qBraid → IBM Quantum → Rigetti → API → OS fallback</code></pre>
+<p>The OS fallback (e.g., /dev/urandom) is used only when no quantum
+hardware is available, and the system clearly marks such data as
+“classically anonymized” rather than “quantum-certified anonymous.”</p>
+<h4 id="entropy-pool">2. Entropy Pool</h4>
+<p>Quantum random bytes are buffered in a thread-safe, append-only
+entropy pool stored as a binary file (e.g.,
+<code>quantum_entropy_pool.bin</code>). The pool:</p>
+<ul>
+<li>Is populated by background daemon processes that periodically
+execute quantum circuits and harvest measurement outcomes.</li>
+<li>Supports concurrent reads with position tracking (each consumer
+reads from its own offset).</li>
+<li>Never reuses bytes — once consumed, a byte offset is advanced and
+the byte is not re-read.</li>
+<li>Monitors pool health and triggers refill when remaining bytes fall
+below a configurable threshold.</li>
+</ul>
+<p>In the preferred embodiment, each harvesting cycle produces
+approximately 50 KB of quantum random bytes. A single anonymization
+operation on a typical dataset (10,000 rows × 10 columns) consumes
+approximately 1.6 MB of entropy (16 bytes per unique value × ~100,000
+unique values).</p>
+<h4 id="one-time-pad-anonymization-engine">3. One-Time Pad Anonymization
+Engine</h4>
+<p>The anonymization engine implements the following algorithm:</p>
+<pre><code>ALGORITHM: Quantum OTP Anonymization (Level 10)
+
+INPUT:
+  D = dataset (pandas DataFrame or equivalent tabular structure)
+  pool_path = path to quantum entropy pool file
+
+OUTPUT:
+  D&#39; = anonymized dataset (same schema, all values replaced)
+
+PROCEDURE:
+  1. For each column C in D:
+     a. Initialize empty mapping M_C = {}
+     b. For each value v in C:
+        i.   Let key = string(v)
+        ii.  If key ∉ M_C:
+             - Read 16 bytes from entropy pool at current offset
+             - Advance pool offset by 16
+             - Generate replacement string: r = hex(bytes) or base62(bytes)
+             - Store: M_C[key] = r
+        iii. Replace v with M_C[key] in D&#39;
+  2. After all columns are processed:
+     a. Securely destroy all mapping tables M_C:
+        - Overwrite mapping memory with zeros (pass 1)
+        - Overwrite with ones (pass 2)
+        - Overwrite with random bytes from pool (pass 3)
+        - Release memory
+     b. Clear any intermediate buffers
+  3. Return D&#39;</code></pre>
+<h4 id="mapping-destruction-module">4. Mapping Destruction Module</h4>
+<p>The mapping destruction module ensures no copy of the OTP mapping
+persists after anonymization. It implements:</p>
+<ul>
+<li><strong>DoD 5220.22-M 3-pass overwrite</strong>: zeros, ones, random
+bytes applied sequentially to the memory region containing the
+mapping.</li>
+<li><strong>Python memory clearing</strong>: Uses
+<code>ctypes.memset</code> to overwrite Python string objects before
+garbage collection.</li>
+<li><strong>Verification</strong>: After destruction, the module
+verifies that the memory region contains no original mapping data by
+reading back the overwritten bytes.</li>
+</ul>
+<p>In an alternative embodiment, the mapping table is constructed
+entirely in hardware-protected memory (e.g., Intel SGX enclave or ARM
+TrustZone) and destroyed by enclave teardown, providing additional
+protection against cold boot attacks.</p>
+<h3 id="security-analysis">Security Analysis</h3>
+<h4 id="theorem-information-theoretic-irreversibility">Theorem:
+Information-Theoretic Irreversibility</h4>
+<p><strong>Claim</strong>: Given the anonymized dataset D’ and unlimited
+computational resources, no adversary can recover the original dataset
+D.</p>
+<p><strong>Proof sketch</strong>:</p>
+<ol type="1">
+<li>Each replacement identifier r_i was generated by reading bytes from
+the quantum entropy pool.</li>
+<li>Those bytes were produced by measuring qubits in superposition, with
+outcomes governed by the Born rule.</li>
+<li>By Bell’s theorem, no local hidden variable theory can determine the
+measurement outcomes. The bytes are fundamentally
+non-deterministic.</li>
+<li>The OTP mapping M (which maps original values to replacement
+identifiers) has been destroyed via multi-pass overwrite.</li>
+<li>Without M, recovering the original values requires determining which
+quantum measurement outcomes produced each r_i.</li>
+<li>Since quantum measurement outcomes are information-theoretically
+random (no hidden state determines them), this is equivalent to guessing
+a random string — which has success probability 2^{-128} per value (for
+16-byte identifiers).</li>
+<li>Therefore, the anonymization is information-theoretically
+irreversible. □</li>
+</ol>
+<h4
+id="corollary-independence-from-computational-complexity-assumptions">Corollary:
+Independence from Computational Complexity Assumptions</h4>
+<p><strong>Claim</strong>: The security of this invention holds
+regardless of the resolution of the P vs NP problem.</p>
+<p><strong>Proof sketch</strong>:</p>
+<ol type="1">
+<li><p>Classical anonymization techniques derive irreversibility from
+computational hardness assumptions. Specifically, the security of
+CSPRNGs (ChaCha20, AES-CTR-DRBG) assumes that recovering the internal
+state from the output is computationally infeasible — a problem believed
+to be outside the complexity class P.</p></li>
+<li><p>If P = NP were proven (or practically achieved via quantum
+speedup on specific problem classes), all computational hardness
+assumptions would collapse. CSPRNG seed recovery, hash pre-image
+computation, and discrete logarithm problems would become efficiently
+solvable. Every classical anonymization method would become
+reversible.</p></li>
+<li><p>The present invention’s security does not depend on any
+computational hardness assumption. The irreversibility is derived from
+the Born rule of quantum mechanics, which is a physical law independent
+of computational complexity theory. No algorithm, regardless of its time
+complexity, can predict or retrodict a quantum measurement outcome,
+because the outcome is not determined by any prior state.</p></li>
+<li><p>Therefore, this invention remains secure in a world where P = NP,
+because its security guarantee is physical, not computational. This is a
+strictly stronger guarantee than any classical anonymization method can
+provide. □</p></li>
+</ol>
+<p><strong>Practical implication</strong>: As quantum computing advances
+and classical computational assumptions weaken, organizations using
+classical anonymization face increasing risk of re-identification. The
+present invention provides a migration path to anonymization that is
+immune to advances in computational capability, including both classical
+and quantum computational breakthroughs.</p>
+<h4 id="comparison-with-classical-approaches">Comparison with Classical
+Approaches</h4>
+<table>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 35%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr>
+<th>Property</th>
+<th>Classical PRNG Anonymization</th>
+<th>Quantum OTP Anonymization (This Invention)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Randomness source</td>
+<td>CSPRNG (deterministic given seed)</td>
+<td>QRNG (Born rule, no seed)</td>
+</tr>
+<tr>
+<td>Seed exists?</td>
+<td>Yes (in kernel memory)</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Reversible if seed captured?</td>
+<td>Yes</td>
+<td>Not applicable</td>
+</tr>
+<tr>
+<td>Adversary model</td>
+<td>Computationally bounded</td>
+<td>Unbounded</td>
+</tr>
+<tr>
+<td>Irreversibility guarantee</td>
+<td>Computational hardness</td>
+<td>Quantum mechanics (Born rule)</td>
+</tr>
+<tr>
+<td>Vulnerable to quantum computers?</td>
+<td>Potentially (if seed recovery is improved)</td>
+<td>No</td>
+</tr>
+<tr>
+<td>GDPR Recital 26 compliance</td>
+<td>Arguable (pseudonymization vs. anonymization)</td>
+<td>Strong (information-theoretic anonymization)</td>
+</tr>
+<tr>
+<td>Secure if P = NP?</td>
+<td>No (all hardness assumptions collapse)</td>
+<td>Yes (security is physical, not computational)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="embodiments-and-variations">Embodiments and Variations</h3>
+<h4 id="embodiment-1-pure-quantum-otp-level-10">Embodiment 1: Pure
+Quantum OTP (Level 10)</h4>
+<p>As described above. Every value is replaced with a QRNG-generated
+identifier. Mapping is destroyed.</p>
+<h4
+id="embodiment-2-quantum-otp-with-pre-processing-levels-510">Embodiment
+2: Quantum OTP with Pre-Processing (Levels 5+10)</h4>
+<p>K-anonymity (k ≥ 5) is applied to the dataset first, generalizing
+quasi-identifiers. Then Level 10 quantum OTP is applied to all remaining
+values. This provides defense-in-depth: even if the OTP were somehow
+reversed (which is information-theoretically impossible), the underlying
+data has already been k-anonymized.</p>
+<h4 id="embodiment-3-quantum-differential-privacy-levels-810">Embodiment
+3: Quantum Differential Privacy (Levels 8+10)</h4>
+<p>Laplace-mechanism differential privacy noise is generated from QRNG
+bytes (rather than classical PRNG), then Level 10 quantum OTP is
+applied. The epsilon parameter controls the noise magnitude. This
+provides both differential privacy guarantees and information-theoretic
+irreversibility.</p>
+<h4
+id="embodiment-4-quantum-otp-with-column-selective-application">Embodiment
+4: Quantum OTP with Column-Selective Application</h4>
+<p>Different columns receive different anonymization levels. For
+example: - Quasi-identifiers (age, zip code): Level 5 (k-anonymity) -
+Sensitive attributes (diagnosis, salary): Level 10 (quantum OTP) -
+Direct identifiers (name, SSN, email): Level 10 (quantum OTP)</p>
+<p>This preserves analytical utility of quasi-identifiers while
+providing maximum protection for sensitive and direct identifiers.</p>
+<h4
+id="embodiment-5-multi-provider-entropy-with-provenance-tracking">Embodiment
+5: Multi-Provider Entropy with Provenance Tracking</h4>
+<p>The system tracks which quantum hardware provider produced each
+entropy byte, maintaining a provenance log:</p>
+<pre><code>{
+  &quot;timestamp&quot;: &quot;2026-03-23T14:30:00Z&quot;,
+  &quot;provider&quot;: &quot;ibm_quantum&quot;,
+  &quot;processor&quot;: &quot;ibm_fez&quot;,
+  &quot;qubits&quot;: 156,
+  &quot;circuit_type&quot;: &quot;random_measurement&quot;,
+  &quot;bytes_harvested&quot;: 4096,
+  &quot;pool_offset_start&quot;: 1048576,
+  &quot;pool_offset_end&quot;: 1052672,
+  &quot;certification&quot;: &quot;born_rule&quot;
+}</code></pre>
+<p>This provenance log can be presented to auditors and data protection
+authorities as evidence that the entropy used for anonymization is
+quantum-certified, not classical.</p>
+<h4 id="embodiment-6-hardware-secured-mapping-destruction">Embodiment 6:
+Hardware-Secured Mapping Destruction</h4>
+<p>The OTP mapping table is constructed within a hardware security
+enclave (Intel SGX, ARM TrustZone, or similar). The enclave: - Receives
+the dataset and entropy pool bytes. - Constructs the mapping and applies
+the OTP transformation. - Returns only the anonymized dataset. -
+Destroys the mapping by enclave teardown.</p>
+<p>This provides additional protection against memory forensics, cold
+boot attacks, and side-channel attacks during the brief period when the
+mapping exists.</p>
+<h3 id="implementation">Implementation</h3>
+<p>The preferred embodiment is implemented in the following technology
+stack:</p>
+<ul>
+<li><p><strong>QRNG Harvester</strong>: Python service
+(<code>src/zipminator/entropy/</code>) that executes quantum circuits on
+IBM Quantum (156-qubit Fez/Marrakesh processors) via qBraid API and
+writes measurement outcomes to the entropy pool.</p></li>
+<li><p><strong>Entropy Pool</strong>: Binary file
+(<code>quantum_entropy_pool.bin</code>) with thread-safe reader
+(<code>src/zipminator/entropy/pool_provider.py</code>) using file
+locking, position persistence, and automatic refill triggers.</p></li>
+<li><p><strong>Anonymization Engine</strong>: Python class
+<code>LevelAnonymizer</code> (<code>src/zipminator/anonymizer.py</code>)
+with method <code>apply(dataframe, level=10)</code> that implements the
+quantum OTP algorithm.</p></li>
+<li><p><strong>Cryptographic Core</strong>: Rust implementation of
+ML-KEM-768 (NIST FIPS 203) in <code>crates/zipminator-core/</code> with
+PyO3 bindings, providing the underlying PQC infrastructure.</p></li>
+<li><p><strong>Multi-Platform Delivery</strong>: Python SDK (PyPI
+package), REST API (FastAPI), CLI tool, Flutter mobile/desktop app, and
+Tauri browser.</p></li>
+</ul>
+<p>The system has been tested with: - 64 unit tests covering all 10
+anonymization levels - 45 integration tests - Verification that the
+anonymized output differs from input at every level - Verification that
+Level 10 OTP mapping is consistent within a single run but
+non-reproducible across runs - Verification that QRNG fallback to OS
+entropy functions correctly when quantum hardware is unavailable</p>
+<hr />
+<h2 id="claims">CLAIMS</h2>
+<h3 id="independent-claims">Independent Claims</h3>
+<p><strong>Claim 1.</strong> A computer-implemented method for
+irreversible data anonymization, comprising:</p>
+<ol type="a">
+<li><p>receiving a dataset comprising one or more records containing
+personally identifiable information (PII);</p></li>
+<li><p>for each unique value in the dataset, generating a replacement
+identifier by reading a sequence of bytes from a quantum random number
+source, wherein the quantum random number source produces random numbers
+by measuring quantum states in superposition such that the measurement
+outcomes are governed by the Born rule of quantum mechanics and no
+deterministic seed exists for said random numbers;</p></li>
+<li><p>constructing a one-time pad (OTP) mapping in volatile memory, the
+mapping associating each unique value with its corresponding replacement
+identifier;</p></li>
+<li><p>replacing each value in the dataset with its corresponding
+replacement identifier from the OTP mapping to produce an anonymized
+dataset;</p></li>
+<li><p>securely destroying the OTP mapping by overwriting the memory
+region containing the mapping with at least one pass of non-original
+data; and</p></li>
+<li><p>outputting the anonymized dataset;</p></li>
+</ol>
+<p>wherein the irreversibility of the anonymization is guaranteed by the
+physical properties of quantum measurement rather than by computational
+hardness assumptions, such that no adversary, regardless of
+computational resources, can recover the original values from the
+anonymized dataset.</p>
+<p><strong>Claim 2.</strong> A system for quantum-certified data
+anonymization, comprising:</p>
+<ol type="a">
+<li><p>a quantum random number generator (QRNG) subsystem configured to
+produce random bytes by measuring qubits in superposition on quantum
+computing hardware;</p></li>
+<li><p>an entropy pool configured to buffer quantum random bytes in a
+thread-safe storage medium with position tracking;</p></li>
+<li><p>a processor configured to execute an anonymization algorithm that
+reads bytes from the entropy pool to generate replacement identifiers
+for PII values in a dataset;</p></li>
+<li><p>a mapping destruction module configured to securely erase the OTP
+mapping between original values and replacement identifiers after the
+anonymization is complete;</p></li>
+</ol>
+<p>wherein the system produces anonymized data satisfying the
+requirements of GDPR Recital 26 for anonymous information, with
+irreversibility guaranteed by quantum mechanics.</p>
+<p><strong>Claim 3.</strong> A non-transitory computer-readable medium
+storing instructions that, when executed by a processor, cause the
+processor to perform the method of Claim 1.</p>
+<h3 id="dependent-claims">Dependent Claims</h3>
+<p><strong>Claim 4.</strong> The method of Claim 1, wherein the quantum
+random number source comprises one or more quantum computing processors
+with at least 100 qubits.</p>
+<p><strong>Claim 5.</strong> The method of Claim 1, wherein step (e)
+comprises a multi-pass overwrite including: a first pass of zeros, a
+second pass of ones, and a third pass of random bytes conforming to DoD
+5220.22-M.</p>
+<p><strong>Claim 6.</strong> The method of Claim 1, further comprising,
+prior to step (b), applying k-anonymity generalization to
+quasi-identifier columns of the dataset with k ≥ 5.</p>
+<p><strong>Claim 7.</strong> The method of Claim 1, further comprising,
+prior to step (b), applying differential privacy noise to numerical
+columns of the dataset using a Laplace mechanism with an epsilon
+parameter, wherein the Laplace noise is generated from the quantum
+random number source.</p>
+<p><strong>Claim 8.</strong> The method of Claim 1, wherein the OTP
+mapping is constructed within a hardware security enclave and destroyed
+by enclave teardown.</p>
+<p><strong>Claim 9.</strong> The method of Claim 1, further comprising
+maintaining a provenance log recording, for each quantum random byte
+consumed, the quantum hardware provider, processor identifier, qubit
+count, and timestamp.</p>
+<p><strong>Claim 10.</strong> The method of Claim 1, wherein the quantum
+random number source comprises multiple quantum hardware providers with
+automatic failover, arranged in a priority chain.</p>
+<p><strong>Claim 11.</strong> The method of Claim 1, wherein replacement
+identifiers for identical values within a single anonymization operation
+are identical (consistent mapping), but replacement identifiers for the
+same original value across separate anonymization operations are
+different (non-reproducible mapping).</p>
+<p><strong>Claim 12.</strong> The method of Claim 1, wherein the system
+detects the absence of available quantum random number sources and falls
+back to an operating system entropy source, and marks the resulting
+anonymized data as “classically anonymized” rather than
+“quantum-certified anonymous.”</p>
+<p><strong>Claim 13.</strong> The system of Claim 2, wherein the entropy
+pool is an append-only binary file populated by background daemon
+processes that execute quantum circuits at configurable intervals.</p>
+<p><strong>Claim 14.</strong> The method of Claim 1, applied selectively
+to different columns of the dataset, wherein direct identifiers receive
+quantum OTP anonymization, quasi-identifiers receive k-anonymity
+generalization, and non-identifying columns are preserved unchanged.</p>
+<p><strong>Claim 15.</strong> The method of Claim 1, wherein the
+anonymized dataset is accompanied by a quantum anonymization certificate
+comprising: the timestamp of anonymization, the quantum hardware
+provider(s) used, the total quantum entropy bytes consumed, and a
+cryptographic hash of the anonymized dataset.</p>
+<hr />
+<h2 id="abstract">ABSTRACT</h2>
+<p>A method and system for irreversible data anonymization using quantum
+random number generation (QRNG). Each personally identifiable
+information (PII) value in a dataset is mapped to a replacement
+identifier generated from quantum random bytes produced by measuring
+qubits in superposition. The randomness of the replacement identifiers
+is governed by the Born rule of quantum mechanics, ensuring no
+deterministic seed exists. After the anonymization transformation is
+applied, the one-time pad (OTP) mapping between original values and
+replacement identifiers is securely destroyed via multi-pass overwrite.
+The resulting anonymization is information-theoretically irreversible:
+no adversary, regardless of computational power, can recover the
+original values. This provides a stronger privacy guarantee than
+classical anonymization techniques, which rely on computational hardness
+assumptions that may be defeated by advances in computing, including
+quantum computing. The system supports multiple quantum hardware
+providers with automatic failover, thread-safe entropy pooling,
+provenance tracking, and integration with existing privacy frameworks
+including k-anonymity and differential privacy.</p>
+<hr />
+<h2 id="drawings">DRAWINGS</h2>
+<h3 id="figure-1-system-architecture">Figure 1: System Architecture</h3>
+<pre><code>┌──────────────────────────────────────────────────────────────┐
+│                    QUANTUM LAYER                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
+│  │ IBM Quantum  │  │   Rigetti   │  │   qBraid    │          │
+│  │  156 qubits  │  │   Ankaa     │  │   Gateway   │          │
+│  └──────┬───────┘  └──────┬──────┘  └──────┬──────┘          │
+│         │                 │                 │                  │
+│         └────────────┬────┘────────────────┘                  │
+│                      ▼                                        │
+│         ┌────────────────────────┐                            │
+│         │   ENTROPY HARVESTER    │ Background daemon           │
+│         │   (quantum circuits)   │ ~50KB/cycle                │
+│         └───────────┬────────────┘                            │
+└─────────────────────┼────────────────────────────────────────┘
+                      ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    ENTROPY POOL                               │
+│  ┌────────────────────────────────────────────────────┐      │
+│  │  quantum_entropy_pool.bin                          │      │
+│  │  [QRNG bytes][QRNG bytes][QRNG bytes][...]        │      │
+│  │  Thread-safe │ Position tracking │ Append-only     │      │
+│  └───────────────────────┬────────────────────────────┘      │
+└──────────────────────────┼───────────────────────────────────┘
+                           ▼
+┌──────────────────────────────────────────────────────────────┐
+│                 ANONYMIZATION ENGINE                          │
+│                                                              │
+│  ┌──────────────┐    ┌──────────────┐    ┌───────────────┐  │
+│  │  Read 16B    │───▶│ Build OTP    │───▶│ Replace all   │  │
+│  │  from pool   │    │ mapping in   │    │ values using  │  │
+│  │  per unique  │    │ volatile RAM │    │ OTP mapping   │  │
+│  │  value       │    │              │    │               │  │
+│  └──────────────┘    └──────┬───────┘    └───────┬───────┘  │
+│                             │                     │          │
+│                             ▼                     ▼          │
+│                 ┌──────────────────┐   ┌──────────────────┐  │
+│                 │ DESTROY MAPPING  │   │ OUTPUT ANONYMOUS │  │
+│                 │ DoD 5220.22-M   │   │ DATASET          │  │
+│                 │ 3-pass overwrite │   │ (no mapping      │  │
+│                 │                  │   │  persists)       │  │
+│                 └──────────────────┘   └──────────────────┘  │
+└──────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="figure-2-comparison-of-irreversibility-guarantees">Figure 2:
+Comparison of Irreversibility Guarantees</h3>
+<pre><code>CLASSICAL ANONYMIZATION              QUANTUM ANONYMIZATION (THIS INVENTION)
+═══════════════════════              ═══════════════════════════════════════
+
+Dataset ──▶ CSPRNG Noise ──▶ Anon    Dataset ──▶ QRNG OTP ──▶ Anon Dataset
+               │                                    │
+          Seed exists                          No seed exists
+          in memory                            (Born rule)
+               │                                    │
+          Adversary captures                   No state to
+          seed via side-channel                capture
+               │                                    │
+          Replays PRNG                         Information-
+          output                               theoretically
+               │                               impossible
+          Subtracts noise                           │
+               │                               Anonymization
+          Recovers original                    is PERMANENT
+          data                                      │
+               │                               GDPR Recital 26:
+          ANONYMIZATION                        TRUE anonymous
+          BROKEN                               information</code></pre>
+<h3 id="figure-3-multi-provider-entropy-architecture">Figure 3:
+Multi-Provider Entropy Architecture</h3>
+<pre><code>┌───────────┐   ┌───────────┐   ┌───────────┐   ┌───────────┐
+│ IBM       │   │ Rigetti   │   │ Future    │   │ OS        │
+│ Quantum   │   │ Computing │   │ Provider  │   │ Fallback  │
+│ (156q)    │   │ (Ankaa)   │   │           │   │ /dev/     │
+│           │   │           │   │           │   │ urandom   │
+└─────┬─────┘   └─────┬─────┘   └─────┬─────┘   └─────┬─────┘
+      │               │               │               │
+      ▼               ▼               ▼               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  PROVIDER FACTORY                             │
+│  Priority: Pool ▶ qBraid ▶ IBM ▶ Rigetti ▶ API ▶ OS        │
+│  Automatic failover │ Health monitoring │ Provenance log     │
+└─────────────────────────────┬───────────────────────────────┘
+                              ▼
+                  ┌───────────────────────┐
+                  │   ENTROPY POOL        │
+                  │   (quantum-certified  │
+                  │    or OS-fallback     │
+                  │    clearly marked)    │
+                  └───────────────────────┘</code></pre>
+<hr />
+<h2 id="priority-date">PRIORITY DATE</h2>
+<p>Filing date of this provisional application.</p>
+<hr />
+<h2 id="correspondence-address">CORRESPONDENCE ADDRESS</h2>
+<p>QDaria AS Oslo, Norway mo@qdaria.com</p>
+<hr />
+<p><em>END OF PROVISIONAL PATENT APPLICATION</em></p>
+</body>
+</html>
