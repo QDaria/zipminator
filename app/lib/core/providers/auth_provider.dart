@@ -86,12 +86,7 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
-  /// Google Sign-In via in-app browser OAuth.
-  Future<void> signInWithGoogle() async {
-    await signInWithOAuth(OAuthProvider.google);
-  }
-
-  /// Native Apple Sign-In (system sheet, no browser redirect).
+  /// Native Apple Sign-In (system sheet, no browser).
   Future<void> signInWithApple() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -107,27 +102,20 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
-  /// Browser-based OAuth (GitHub, LinkedIn).
+  /// OAuth via ASWebAuthenticationSession (iOS) or browser (macOS).
+  /// Works for Google, GitHub, LinkedIn - handles redirect automatically.
   Future<void> signInWithOAuth(OAuthProvider provider) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final ok = await SupabaseService.signInWithOAuth(provider);
-      if (!ok) {
-        state = state.copyWith(isLoading: false, error: 'OAuth was cancelled.');
-        return;
-      }
-      // Browser opened; wait for deep-link callback via onAuthStateChange.
-      // Timeout after 30s in case redirect fails.
-      Future.delayed(const Duration(seconds: 30), () {
-        if (state.isLoading) {
-          state = state.copyWith(
-            isLoading: false,
-            error: 'OAuth timed out. Use Google or Apple native sign-in.',
-          );
-        }
-      });
+      final response = await SupabaseService.signInWithOAuthProper(provider);
+      state = state.copyWith(user: response.user, isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      final msg = e.toString();
+      if (msg.contains('CANCELED') || msg.contains('canceled') || msg.contains('cancelled')) {
+        state = state.copyWith(isLoading: false);
+      } else {
+        state = state.copyWith(isLoading: false, error: msg);
+      }
     }
   }
 

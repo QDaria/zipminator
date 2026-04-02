@@ -138,7 +138,7 @@ def load_nexmon_pcap(path: str) -> List[np.ndarray]:
         reader = NEXBeamformReader()
         data = reader.read_file(path)
         frames = []
-        for entry in data.csi_trace:
+        for entry in data.frames:
             if hasattr(entry, 'csi_matrix') and entry.csi_matrix is not None:
                 frames.append(entry.csi_matrix)
         return frames
@@ -154,7 +154,7 @@ def load_intel_dat(path: str) -> List[np.ndarray]:
         reader = IWLBeamformReader()
         data = reader.read_file(path)
         frames = []
-        for entry in data.csi_trace:
+        for entry in data.frames:
             if hasattr(entry, 'csi_matrix') and entry.csi_matrix is not None:
                 frames.append(entry.csi_matrix)
         return frames

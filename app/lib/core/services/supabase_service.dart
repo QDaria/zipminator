@@ -3,16 +3,17 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Singleton wrapper around Supabase client for auth and data access.
 class SupabaseService {
   SupabaseService._();
 
   static SupabaseClient get client => Supabase.instance.client;
 
-  static const _redirectTo = 'com.qdaria.zipminator://login-callback';
+  static const _callbackScheme = 'com.qdaria.zipminator';
+  static const _redirectTo = '$_callbackScheme://login-callback';
 
   static Future<void> initialize() async {
     await dotenv.load(fileName: '.env');
@@ -43,20 +44,44 @@ class SupabaseService {
   ) =>
       client.auth.signUp(email: email, password: password);
 
-  /// OAuth via in-app browser. On iOS uses SFSafariViewController which
-  /// handles the redirect internally (no external Safari needed).
-  static Future<bool> signInWithOAuth(OAuthProvider provider) =>
-      client.auth.signInWithOAuth(
-        provider,
-        redirectTo: _redirectTo,
-        authScreenLaunchMode: LaunchMode.inAppBrowserView,
-      );
+  /// OAuth using ASWebAuthenticationSession (iOS) / browser (macOS).
+  ///
+  /// Uses Supabase's internal PKCE state management (getOAuthSignInUrl
+  /// stores the code verifier, exchangeCodeForSession reads it back).
+  /// FlutterWebAuth2 handles the redirect capture.
+  static Future<AuthResponse> signInWithOAuthProper(
+      OAuthProvider provider) async {
+    // Let Supabase generate the OAuth URL and store the PKCE verifier.
+    final oauthResponse = await client.auth.getOAuthSignInUrl(
+      provider: provider,
+      redirectTo: _redirectTo,
+    );
 
-  /// Google Sign-In via in-app browser OAuth.
-  static Future<bool> signInWithGoogle() =>
-      signInWithOAuth(OAuthProvider.google);
+    // Open ASWebAuthenticationSession (iOS) or browser (macOS).
+    final resultUrl = await FlutterWebAuth2.authenticate(
+      url: oauthResponse.url.toString(),
+      callbackUrlScheme: _callbackScheme,
+      options: const FlutterWebAuth2Options(
+        preferEphemeral: false,
+      ),
+    );
 
-  /// Native Apple Sign-In (system sheet, no browser redirect).
+    // Extract the auth code from the callback.
+    final uri = Uri.parse(resultUrl);
+    final code = uri.queryParameters['code'];
+    if (code == null) {
+      throw const AuthException('OAuth failed: no auth code in callback');
+    }
+
+    // Exchange the code for a session (Supabase reads back the stored verifier).
+    final sessionResponse = await client.auth.exchangeCodeForSession(code);
+    return AuthResponse(
+      session: sessionResponse.session,
+      user: sessionResponse.session?.user,
+    );
+  }
+
+  /// Native Apple Sign-In (system sheet, no browser).
   static Future<AuthResponse> signInWithApple() async {
     final rawNonce = _generateNonce();
     final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
@@ -88,7 +113,6 @@ class SupabaseService {
     return List.generate(length, (_) => chars[rng.nextInt(chars.length)]).join();
   }
 
-  /// Sign out and clear all local session data.
   static Future<void> signOut() async {
     try {
       await client.auth.signOut(scope: SignOutScope.local);

@@ -259,32 +259,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     spacing: 12,
                     runSpacing: 8,
                     children: [
-                      // Native Google Sign-In (no browser redirect).
                       _OAuthButton(
                         icon: Icons.g_mobiledata,
                         label: 'Google',
                         onPressed: () =>
-                            ref.read(authProvider.notifier).signInWithGoogle(),
+                            ref.read(authProvider.notifier).signInWithOAuth(OAuthProvider.google),
                       ),
-                      // Native Apple Sign-In (system sheet).
                       _OAuthButton(
                         icon: Icons.apple,
                         label: 'Apple',
                         onPressed: () =>
                             ref.read(authProvider.notifier).signInWithApple(),
                       ),
-                      // Browser OAuth for GitHub.
                       _OAuthButton(
                         icon: Icons.code,
                         label: 'GitHub',
-                        onPressed: () => _oauthSignIn(OAuthProvider.github),
+                        onPressed: () =>
+                            ref.read(authProvider.notifier).signInWithOAuth(OAuthProvider.github),
                       ),
-                      // Browser OAuth for LinkedIn.
                       _OAuthButton(
                         icon: Icons.business,
                         label: 'LinkedIn',
                         onPressed: () =>
-                            _oauthSignIn(OAuthProvider.linkedinOidc),
+                            ref.read(authProvider.notifier).signInWithOAuth(OAuthProvider.linkedinOidc),
                       ),
                     ],
                   ),
