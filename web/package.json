@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3099",
+    "pqc:env": "micromamba activate zipminator-pqc",
+    "pqc:dev": "concurrently \"micromamba run -n zipminator-pqc python src/api.py\" \"next dev -p 3099\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -53,6 +55,7 @@
     "@types/three": "^0.181.0",
     "@vitejs/plugin-react": "^5.1.4",
     "autoprefixer": "^10.4.27",
+    "concurrently": "^9.2.1",
     "eslint": "^9.0.0",
     "eslint-config-next": "latest",
     "glslify-loader": "^2.0.0",

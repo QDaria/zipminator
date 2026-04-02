@@ -439,6 +439,14 @@ Enterprise features (Flutter apps, browser, VPN, mail, HSM, SSO) require a separ
 - **Repository**: [github.com/QDaria/zipminator](https://github.com/QDaria/zipminator)
 - **Issues**: [github.com/QDaria/zipminator/issues](https://github.com/QDaria/zipminator/issues)
 
+## Web UI Execution Documentation
+
+The interactive web stack for Zipminator (React/Next.js Phase Execution) can be reviewed directly in the attached documentation:
+- [FINAL_WALKTHROUGH_P1_P2.md](docs/guides/FINAL_WALKTHROUGH.md) - BMAD System & Tailwind Initialization
+- [FINAL_WALKTHROUGH_P3_P4.md](docs/guides/FINAL_WALKTHROUGH_P3_P4.md) - Gamification Layer & Quantum State Animators
+- [FINAL_WALKTHROUGH_P5_P6.md](docs/guides/FINAL_WALKTHROUGH_P5_P6.md) - DropZone Arch & PQC Python Interop API
+- [FINAL_WALKTHROUGH_P7_P8.md](docs/guides/FINAL_WALKTHROUGH_P7_P8.md) - Micromamba Integration & Deployment
+
 ---
 
 Built by [QDaria](https://qdaria.com) in Oslo, Norway.

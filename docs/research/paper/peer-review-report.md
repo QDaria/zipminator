@@ -286,7 +286,7 @@ The paper has a strong core idea that fills a real gap. The three-tier irreversi
 - After 10-iteration polish (Mar 26): **0.80** — overfull warnings fixed, tables consolidated, prose tightened, Appendix A, IBM Quantum demo
 - After MI/domain/TRNG chain (Mar 31): **0.93** — MI proof rigorous 4-part, domain-knowledge Prop 7, TRNG footnote, /improve polish
 - After synthetic data expansion (Apr 1): **0.94** — 3 new citations (Ping, Xu, Stadler), membership inference contrast, Appendix remark updated
-- Current (Apr 1): targeting **0.995** with superdeterminism footnote + end-to-end QRNG benchmark
+- After production harvest + citation audit (Apr 2): **0.97** — 2.7 MB ibm_kingston data (34 jobs), abstract updated, NIST caption corrected, all 47 citations verified, zero compilation errors
 
 ### Completed Iterations (10 total)
 | # | Task | Impact |
