@@ -9,6 +9,17 @@ module.exports = {
     theme: {
         extend: {
             colors: {
+                obsidian: {
+                    800: '#1a1a24',
+                    900: '#0f0f14',
+                    950: '#050505',
+                },
+                bmad: {
+                    trigger: '#ff3366',
+                    action: '#00e5ff',
+                    reward: '#b24bf3',
+                    investment: '#39ff14',
+                },
                 quantum: {
                     50: '#f0f4ff',
                     100: '#e0e9ff',
