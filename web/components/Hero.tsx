@@ -1,31 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, Shield, Zap, Book, Cpu, Lock, CheckCircle2 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ArrowRight, Shield, Zap, Book, Cpu } from 'lucide-react'
 import Link from 'next/link'
 import QuantumBackground from './QuantumBackground'
-import DropZone from './DropZone'
 
 const Hero = () => {
-  const [securityLevel, setSecurityLevel] = useState(1);
-  const [showAchievement, setShowAchievement] = useState(false);
-
-  // Simulate gamified unlocking over time (or triggered by future events)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSecurityLevel(prev => {
-        if (prev < 5) {
-          setShowAchievement(true);
-          setTimeout(() => setShowAchievement(false), 3000);
-          return prev + 1;
-        }
-        return prev;
-      });
-    }, 10000); // Level up every 10 seconds for demo purposes
-    return () => clearInterval(interval);
-  }, []);
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -63,23 +43,8 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden py-32 pt-24">
-      {/* Animated Quantum Background powered by BMAD Context */}
-      <QuantumBackground securityLevel={securityLevel} />
-
-      {/* Achievement Toast Overlay */}
-      <AnimatePresence>
-        {showAchievement && (
-          <motion.div
-            initial={{ opacity: 0, y: -50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-obsidian-900/90 border border-bmad-reward/50 px-6 py-3 rounded-full backdrop-blur-xl shadow-2xl shadow-bmad-reward/20"
-          >
-            <CheckCircle2 className="w-5 h-5 text-bmad-investment animate-pulse" />
-            <span className="text-white font-medium">BMAD Reward Unlocked: Deep Entanglement Level {securityLevel}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Animated Quantum Background */}
+      <QuantumBackground />
 
       {/* Radial Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-radial from-quantum-900/20 via-transparent to-transparent pointer-events-none z-[1]" />
@@ -225,11 +190,6 @@ const Hero = () => {
                 <div className="text-gray-400 font-medium">Security Standard</div>
               </div>
             </motion.div>
-          </motion.div>
-
-          {/* Core PQC DropZone Entry */}
-          <motion.div variants={itemVariants} className="mt-16 w-full relative z-20">
-            <DropZone />
           </motion.div>
         </motion.div>
       </div>
