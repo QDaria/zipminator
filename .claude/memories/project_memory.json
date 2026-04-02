@@ -22,8 +22,8 @@
     },
     {
       "type": "completed",
-      "content": "Paper 1 (PoPETs) 0.97 score, submission-ready. Paper 2 CSI entropy: BibTeX + directory + figures created, main.tex NOT yet written (hit token limit). Patents 2+3 HTML files drafted in docs/ip/. Patent format: 4-5 separate HTML files per patent matching Patent 1 structure.",
-      "added_at": "2026-04-02T17:55:00.000000",
+      "content": "Paper 1 (PoPETs) 0.97 score, submission-ready. Paper 2 CSI entropy (ACM WiSec): main.tex COMPLETE (847 lines, 8 pages ACM sigconf, compiles clean, 23 verified refs, all numbers match pipeline output). Patents 2+3: reorganized into docs/ip/patent-{1,2,3}-*/ with 4-5 separate HTML+MD files each. All claims code-verified.",
+      "added_at": "2026-04-02T19:00:00.000000",
       "source": "consolidated"
     },
     {
@@ -31,44 +31,8 @@
       "content": "Full project status report generated (Apr 2): 181 commits, 9 pillars (75-100%), 552 Rust + 429 Python + 30 web + 267 mobile tests, 6 platforms, 3 patents (1 filed), live signaling server, PyPI v0.5.0, 18 TestFlight builds.",
       "added_at": "2026-04-02T18:10:00.000000",
       "source": "consolidated"
-    },
-    {
-      "type": "claude_response",
-      "content": "Consolidated 11 down to 5. Removed: 4 raw message captures (noise), 1 truncated claude_response, 1 duplicate question. Updated the token env var note with the \"read at launch time\" detail learned this",
-      "added_at": "2026-04-02T18:15:31.033546",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "message",
-      "content": "how do i maximise CLAUDE_CODE_MAX_OUTPUT_TOKENS to 128000? once and for all so i dont neeed to do it for eeach sesssion?",
-      "added_at": "2026-04-02T18:15:31.033562",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "message",
-      "content": "I have fixed to 128K toke so plesase continue; \"⏺ ★ Insight ───────────────────────────────────── The existing IEEE draft at docs/research/csi-entropy/main.tex targets a different venue with different",
-      "added_at": "2026-04-02T18:29:44.974052",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "message",
-      "content": "The other or the forst paten consisted of 4 or 5 htm that I cmd + p to generate pdf's; why did i only have one html for the second paten? and third patent? please organise the ip into directories with",
-      "added_at": "2026-04-02T18:36:21.468177",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "message",
-      "content": "Is this really standard good enough even though 0.97? cat docs/guides/prompts/session-paper1-polish.md ? Arent we missing alot of figures and some improtant stuff? see also @docs/guides/prompts/AESR_v",
-      "added_at": "2026-04-02T18:38:49.981256",
-      "source": "realtime_capture"
-    },
-    {
-      "type": "message",
-      "content": "what has bee done on zipminator? elaborate repport! I tried to improve the ux/ui in antigravity but i hope it wasnt commited, because it totally misunderstood my intentions; see /Users/mos/dev/qdaria/",
-      "added_at": "2026-04-02T18:45:12.067377",
-      "source": "realtime_capture"
     }
   ],
   "created_at": "2026-04-02T10:01:47.584108",
-  "updated_at": "2026-04-02T18:45:12.067386"
+  "updated_at": "2026-04-02T19:00:00.000000"
 }
