@@ -17,6 +17,13 @@ const decks = [
     badge: 'Banking',
     badgeColor: '#F59E0B',
   },
+  {
+    title: 'IP Valuation Blueprint',
+    description: 'Three-patent portfolio analysis, regulatory moat, and valuation framework',
+    href: '/invest/blueprint',
+    badge: 'IP Analysis',
+    badgeColor: '#A78BFA',
+  },
 ]
 
 export default function InvestSelectorPage() {
@@ -40,7 +47,7 @@ export default function InvestSelectorPage() {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl w-full">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">
         {decks.map((deck) => (
           <Link
             key={deck.href}

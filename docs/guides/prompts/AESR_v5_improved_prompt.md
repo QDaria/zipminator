@@ -1,6 +1,6 @@
 # AESR v5.0 -- Improved Universal Prompt Engineer
 
-> **Version**: 5.0 | **Date**: 2026-04-01
+> **Version**: 5.1 | **Date**: 2026-04-02
 > **Claude Code**: v2.1.88 | **Ruflo**: v3.5.48
 > **Supersedes**: `prompt_i1.md`, incorporates AESR v4 boot sequence
 > **Purpose**: Eliminates infinite question loops; maximizes infrastructure utilization
@@ -46,13 +46,16 @@ If user asks followup questions after Round 3, redirect to `/improve`.
 Based on task keywords, surface relevant capabilities automatically:
 
 ### Research / Paper / Publication
+- **`quantum-peer-reviewer`** -- Adversarial Reviewer 2 with DUAL SCORING (content quality + submission readiness). Score = min(content, readiness). ALWAYS run this BEFORE claiming a score.
 - `/hive-mind-advanced` -- Queen + specialist reviewers
-- `/verification-quality` -- truth scoring 0.0-1.0
+- `/verification-quality` -- truth scoring 0.0-1.0 (CODE quality only, NOT paper quality)
 - `/quantum-scientific-writer`, `/research-paper-writer` -- prose and format
 - `/quantum-assurance-validator`, `/quantum-cryptanalysis-expert` -- physics and crypto rigor
 - Context7 MCP -- arXiv/IACR/venue format lookup
 - `/ralph-loop` -- persistent iteration until quality threshold met
 - `/episodic-memory:search-conversations` -- retrieve past paper improvement patterns
+
+**LESSON LEARNED (v5.1)**: Never score a paper on content alone. A 0.97 content paper with wrong template, over page limit, and missing required sections scores 0.40 submission readiness. The composite score is min(content, readiness) = 0.40. The `quantum-peer-reviewer` skill enforces this with readiness caps (wrong template = max 0.30, over page limit = max 0.40).
 
 ### Full-Stack Development / Feature Work
 - `/batch-tdd` -- parallel TDD across Rust/Web/Mobile/Browser
@@ -110,6 +113,9 @@ If any of these conditions are true, flag immediately instead of looping:
 | External dependencies (DB, API) | Mark as blocking; propose workarounds |
 | Ambiguous after 3 rounds | Provide 2-3 interpretations, ask user to pick ONE |
 | Quality plateaued after 12 iterations | Document max-achievable score; stop iterating |
+| Paper score inflated (content only) | Run `quantum-peer-reviewer` dual scoring; readiness caps override content |
+| Wrong venue template | BLOCKING — convert template BEFORE any content work |
+| Over page limit | BLOCKING — compress BEFORE polishing prose |
 
 ---
 
@@ -181,21 +187,29 @@ After 3 self-answer rounds, produce this structure:
 ```
 /effort max
 
-Improve docs/research/paper/main.tex from 0.80 to 0.995 quality.
-Target venue: PoPETs 2026 or Nature Computational Science.
+Improve docs/research/paper/main.tex to 0.995 COMPOSITE score.
+Target venue: PoPETs 2026.
 
-Load skills: /quantum-scientific-writer, /verification-quality, /quantum-assurance-validator
+STEP 0 (BLOCKING — before ANY content work):
+  Run quantum-peer-reviewer dual scoring. Get baseline: Content=X, Readiness=Y, Composite=min(X,Y).
+  If wrong template: convert to acmart FIRST.
+  If over page limit: compress to 12pp FIRST.
+  If missing required sections (data availability, ethics, reproducibility): add stubs FIRST.
 
-Orchestration: /hive-mind-advanced with 7 workstreams:
-W1: Theoretical rigor (proofs, formal verification)
-W2: Literature completeness (50+ citations, SOTA comparison)
-W3: Experimental validation (reproducible benchmarks, statistical tests)
-W4: Format compliance (venue template, BibTeX)
-W5: Prose quality (clarity, notation, flow)
-W6: Adversarial review (simulate 3 hostile reviewers)
-W7: False-positive checker (verify flagged issues against sources)
+STEP 1 (Submission Readiness — raise to 0.90+):
+  W1: Template conversion (IEEEtran -> acmart sigconf)
+  W2: Page compression (22pp -> 12pp, move proofs to appendix)
+  W3: Required sections (data availability, reproducibility, ethics, acknowledgments)
+  W4: Artifact prep (benchmark script, requirements.txt, anonymous repo)
 
-Quality gate: 0.995 convergence, Byzantine consensus 5/5, zero mock data.
+STEP 2 (Content Quality — raise to 0.95+):
+  W5: Theoretical rigor (proofs, formal verification)
+  W6: Literature completeness (50+ citations, 2024-25 SOTA comparison)
+  W7: Experimental validation (reproducible benchmarks, statistical tests)
+  W8: Prose quality (clarity, notation, flow)
+  W9: Adversarial review (simulate 3 hostile Reviewer 2s)
+
+Quality gate: Composite 0.995 = min(Content, Readiness) both >= 0.995.
 Use /ralph-loop --max-iterations 20 for persistent iteration.
 Checkpoint daily via ruflo memory + /compact.
 ```

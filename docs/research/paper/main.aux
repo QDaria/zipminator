@@ -77,10 +77,10 @@
 \@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Entropy Consumption for Representative Datasets}}{7}{}\protected@file@percent }
 \newlabel{tab:entropy_budget}{{III}{7}{}{table.3}{}}
 \newlabel{eq:entropy_consumption}{{9}{7}{}{equation.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Security Analysis}{7}{}\protected@file@percent }
+\newlabel{subsec:security}{{\mbox  {V-B}}{7}{}{subsection.5.2}{}}
 \citation{bell1964epr}
 \citation{machanavajjhala2007ldiv}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Security Analysis}{8}{}\protected@file@percent }
-\newlabel{subsec:security}{{\mbox  {V-B}}{8}{}{subsection.5.2}{}}
 \newlabel{prop:pervalue}{{5}{8}{}{theorem.5}{}}
 \newlabel{prop:mi}{{6}{8}{}{theorem.6}{}}
 \newlabel{prop:domainlimit}{{7}{8}{}{theorem.7}{}}
@@ -112,12 +112,12 @@
 \@writefile{toc}{\contentsline {section}{\numberline {VII}Empirical Evaluation}{11}{}\protected@file@percent }
 \newlabel{sec:evaluation}{{VII}{11}{}{section.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Runtime Performance}{11}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Scaling Behavior}{11}{}\protected@file@percent }
+\newlabel{subsec:scaling}{{\mbox  {VII-B}}{11}{}{subsection.7.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Left: mean runtime per anonymization level (1,000 rows). Right: percentage of values transformed. L7--L10 are slower due to entropy pool I/O. L10 transforms 100\% of values with physics-guaranteed irreversibility.}}{11}{}\protected@file@percent }
 \newlabel{fig:benchmarks}{{5}{11}{}{figure.5}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Runtime scaling across dataset sizes for L1, L5, L8, and L10. QRNG-dependent levels (L8, L10) scale linearly with the number of unique values due to per-value entropy pool reads.}}{11}{}\protected@file@percent }
 \newlabel{fig:scaling}{{6}{11}{}{figure.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Scaling Behavior}{11}{}\protected@file@percent }
-\newlabel{subsec:scaling}{{\mbox  {VII-B}}{11}{}{subsection.7.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Hardware Demonstration: IBM Quantum}{11}{}\protected@file@percent }
 \newlabel{subsec:hardware}{{\mbox  {VII-C}}{11}{}{subsection.7.3}{}}
 \citation{dua2019uci}
@@ -139,7 +139,7 @@
 \citation{machanavajjhala2007ldiv,li2007tcloseness}
 \@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Before and after L10 anonymization (UCI Adult dataset, 5 rows, selected columns). Every value is replaced; the mapping is destroyed.}}{13}{}\protected@file@percent }
 \newlabel{tab:beforeafter}{{VII}{13}{}{table.7}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces NIST SP 800-22 statistical randomness tests on the entropy pool (1,000,000 bits, $\alpha = 0.01$). All 11 tests pass. These tests validate statistical quality; the tests were conducted on the OS-sourced entropy pool used for benchmarking. Byte Distribution and Shannon Entropy are supplementary quality metrics, not part of the SP~800-22 suite.}}{13}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces NIST SP 800-22 statistical randomness tests on the entropy pool (1,000,000 bits, $\alpha = 0.01$). Ten of fifteen SP~800-22 tests were run; all pass. Byte Distribution and Shannon Entropy are supplementary quality metrics, not part of the SP~800-22 suite. Tests were conducted on the OS-sourced entropy pool used for benchmarking.}}{13}{}\protected@file@percent }
 \newlabel{tab:nist}{{VIII}{13}{}{table.8}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {VIII}Systematic Comparison}{13}{}\protected@file@percent }
 \newlabel{sec:comparison}{{VIII}{13}{}{section.8}{}}
@@ -185,24 +185,27 @@
 \newlabel{subsec:kanon}{{\mbox  {IX-B}}{15}{}{subsection.9.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-C}}QRNG in Cryptography}{15}{}\protected@file@percent }
 \newlabel{subsec:qrng_crypto}{{\mbox  {IX-C}}{15}{}{subsection.9.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-D}}Quantum Encryption with Certified Deletion}{15}{}\protected@file@percent }
+\citation{bartusek2023certified}
 \citation{nist2023beacon}
+\citation{kavuri2025traceable}
 \citation{vazirani2012certifiable}
 \citation{amer2025certified}
+\citation{liu2025certified}
 \citation{vernam1926cipher}
 \citation{shannon1949secrecy}
-\citation{ping2017datasynthesizer}
-\citation{xu2019ctgan}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-D}}Quantum Encryption with Certified Deletion}{16}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-E}}Randomness Beacons}{16}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-F}}Certified Randomness}{16}{}\protected@file@percent }
 \newlabel{subsec:certified}{{\mbox  {IX-F}}{16}{}{subsection.9.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-G}}Information-Theoretic Security: Shannon's OTP}{16}{}\protected@file@percent }
 \newlabel{subsec:it_security}{{\mbox  {IX-G}}{16}{}{subsection.9.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-H}}Synthetic Data Generation}{16}{}\protected@file@percent }
-\newlabel{subsec:synth}{{\mbox  {IX-H}}{16}{}{subsection.9.8}{}}
+\citation{ping2017datasynthesizer}
+\citation{xu2019ctgan}
 \citation{stadler2022synthetic}
 \citation{hirche2022qdp}
 \citation{hensen2015loophole}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-H}}Synthetic Data Generation}{17}{}\protected@file@percent }
+\newlabel{subsec:synth}{{\mbox  {IX-H}}{17}{}{subsection.9.8}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-I}}Quantum Differential Privacy}{17}{}\protected@file@percent }
 \newlabel{subsec:qdp}{{\mbox  {IX-I}}{17}{}{subsection.9.9}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {X}Discussion}{17}{}\protected@file@percent }
@@ -214,12 +217,12 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-B}}Assumptions and Their Scope}{17}{}\protected@file@percent }
 \newlabel{subsec:assumptions}{{\mbox  {X-B}}{17}{}{subsection.10.2}{}}
 \citation{arute2019supremacy}
-\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Comparison: QKD vs.\ QRNG-OTP-Destroy}}{18}{}\protected@file@percent }
-\newlabel{tab:qkd_vs_l10}{{X}{18}{}{table.10}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-C}}Implications for the HNDL Threat}{18}{}\protected@file@percent }
 \newlabel{subsec:hndl}{{\mbox  {X-C}}{18}{}{subsection.10.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {X-D}}Comparison with Quantum Key Distribution}{18}{}\protected@file@percent }
 \newlabel{subsec:qkd_comparison}{{\mbox  {X-D}}{18}{}{subsection.10.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Comparison: QKD vs.\ QRNG-OTP-Destroy}}{18}{}\protected@file@percent }
+\newlabel{tab:qkd_vs_l10}{{X}{18}{}{table.10}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {XI}Limitations}{18}{}\protected@file@percent }
 \newlabel{sec:limitations}{{XI}{18}{}{section.11}{}}
 \citation{amer2025certified}
@@ -235,55 +238,58 @@
 \bibcite{arute2019supremacy}{5}
 \bibcite{aspect1982epr}{6}
 \bibcite{barak2007privacy}{7}
-\bibcite{bell1964epr}{8}
-\bibcite{bohm1952suggested}{9}
-\bibcite{broadbent2020certified}{10}
-\bibcite{clauser1969chsh}{11}
-\bibcite{cohen2020singling}{12}
-\bibcite{desfontaines2020sok}{13}
-\bibcite{dinur2003revealing}{14}
-\bibcite{dua2019uci}{15}
-\bibcite{dwork2006dp}{16}
-\bibcite{dwork2006icalp}{17}
-\bibcite{dwork2014algfound}{18}
-\bibcite{edpb2020guidelines}{19}
-\bibcite{elemam2008kanon}{20}
-\bibcite{elliot2018functional}{21}
-\bibcite{gaboardi2016psi}{22}
-\bibcite{georgiou2020gdpr}{23}
-\bibcite{gutmann1996secure}{24}
-\bibcite{hensen2015loophole}{25}
-\bibcite{herrero2017qrng}{26}
-\bibcite{hirche2022qdp}{27}
-\bibcite{holohan2019diffprivlib}{28}
+\bibcite{bartusek2023certified}{8}
+\bibcite{bell1964epr}{9}
+\bibcite{bohm1952suggested}{10}
+\bibcite{broadbent2020certified}{11}
+\bibcite{clauser1969chsh}{12}
+\bibcite{cohen2020singling}{13}
+\bibcite{desfontaines2020sok}{14}
+\bibcite{dinur2003revealing}{15}
+\bibcite{dua2019uci}{16}
+\bibcite{dwork2006dp}{17}
+\bibcite{dwork2006icalp}{18}
+\bibcite{dwork2014algfound}{19}
+\bibcite{edpb2020guidelines}{20}
+\bibcite{elemam2008kanon}{21}
+\bibcite{elliot2018functional}{22}
+\bibcite{gaboardi2016psi}{23}
+\bibcite{georgiou2020gdpr}{24}
+\bibcite{gutmann1996secure}{25}
+\bibcite{hensen2015loophole}{26}
 \@writefile{toc}{\contentsline {section}{References}{20}{}\protected@file@percent }
-\bibcite{kifer2011nofree}{29}
-\bibcite{li2007tcloseness}{30}
-\bibcite{ma2016qrng}{31}
-\bibcite{machanavajjhala2007ldiv}{32}
-\bibcite{mcsherry2007mechanism}{33}
-\bibcite{mironov2012significance}{34}
-\bibcite{narayanan2008robust}{35}
-\bibcite{nist2010sp80022}{36}
-\bibcite{nist2023beacon}{37}
-\bibcite{pironio2010certified}{38}
-\bibcite{ping2017datasynthesizer}{39}
-\bibcite{prasser2014arx}{40}
-\bibcite{samarati2001protecting}{41}
-\bibcite{shannon1949secrecy}{42}
-\bibcite{stadler2022synthetic}{43}
-\bibcite{sweeney2002kanon}{44}
-\bibcite{templ2017sdc}{45}
-\bibcite{unruh2015revocable}{46}
-\bibcite{vazirani2012certifiable}{47}
-\bibcite{vernam1926cipher}{48}
-\bibcite{wilson2020dpsql}{49}
-\bibcite{xu2019ctgan}{50}
+\bibcite{herrero2017qrng}{27}
+\bibcite{hirche2022qdp}{28}
+\bibcite{holohan2019diffprivlib}{29}
+\bibcite{kavuri2025traceable}{30}
+\bibcite{kifer2011nofree}{31}
+\bibcite{li2007tcloseness}{32}
+\bibcite{liu2025certified}{33}
+\bibcite{ma2016qrng}{34}
+\bibcite{machanavajjhala2007ldiv}{35}
+\bibcite{mcsherry2007mechanism}{36}
+\bibcite{mironov2012significance}{37}
+\bibcite{narayanan2008robust}{38}
+\bibcite{nist2010sp80022}{39}
+\bibcite{nist2023beacon}{40}
+\bibcite{pironio2010certified}{41}
+\bibcite{ping2017datasynthesizer}{42}
+\bibcite{prasser2014arx}{43}
+\bibcite{samarati2001protecting}{44}
+\bibcite{shannon1949secrecy}{45}
+\bibcite{stadler2022synthetic}{46}
+\bibcite{sweeney2002kanon}{47}
+\bibcite{templ2017sdc}{48}
+\bibcite{unruh2015revocable}{49}
+\bibcite{vazirani2012certifiable}{50}
+\bibcite{vernam1926cipher}{51}
+\bibcite{wilson2020dpsql}{52}
+\bibcite{xu2019ctgan}{53}
 \@writefile{toc}{\contentsline {section}{Appendix}{21}{}\protected@file@percent }
 \newlabel{app:security-game}{{A}{21}{}{section.Appendix.A}{}}
 \newlabel{def:anon-game}{{4}{21}{}{definition.4}{}}
 \newlabel{eq:adv-anon}{{10}{21}{}{equation.10}{}}
 \newlabel{thm:game-security}{{8}{21}{}{theorem.8}{}}
 \newlabel{eq:adv-bound}{{11}{21}{}{equation.11}{}}
-\newlabel{prop:domain}{{9}{21}{}{theorem.9}{}}
+\newlabel{prop:domain}{{9}{22}{}{theorem.9}{}}
 \gdef \@abspage@last{22}

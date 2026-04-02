@@ -22,17 +22,17 @@
     },
     {
       "type": "completed",
-      "content": "Paper 1 (PoPETs) 0.97 score, submission-ready. Paper 2 CSI entropy (ACM WiSec): main.tex COMPLETE (847 lines, 8 pages ACM sigconf, compiles clean, 23 verified refs, all numbers match pipeline output). Patents 2+3: reorganized into docs/ip/patent-{1,2,3}-*/ with 4-5 separate HTML+MD files each. All claims code-verified.",
-      "added_at": "2026-04-02T19:00:00.000000",
+      "content": "Papers: P1 PoPETs 22pp (needs 12pp trim or venue change), P2 CSI WiSec 8pp COMPLETE. Patents: 3 in docs/ip/patent-{1,2,3}-*/ (all claims code-verified, file P2+P3 before publishing ~NOK 5,500 total). Full project (Apr 2): 181 commits, 9 pillars (75-100%), 552 Rust + 429 Python + 30 web + 267 mobile tests, 6 platforms, live signaling, PyPI v0.5.0, 18 TestFlight builds. TestFlight public link: https://testflight.apple.com/join/cNX9nX7G (iOS only; macOS build not yet uploaded).",
+      "added_at": "2026-04-02T23:33:00.000000",
       "source": "consolidated"
     },
     {
-      "type": "completed",
-      "content": "Full project status report generated (Apr 2): 181 commits, 9 pillars (75-100%), 552 Rust + 429 Python + 30 web + 267 mobile tests, 6 platforms, 3 patents (1 filed), live signaling server, PyPI v0.5.0, 18 TestFlight builds.",
-      "added_at": "2026-04-02T18:10:00.000000",
+      "type": "correction",
+      "content": "Peer reviewer skill scored inflated 0.97 using code quality metrics for paper review. Must score submission readiness separately from content quality; missing sections (data availability, ethics, reproducibility) should cap score at 0.80. Skill path: /Users/mos/dev/qdaria/.claude/skills/quantum-peer-reviewer.",
+      "added_at": "2026-04-02T22:35:00.000000",
       "source": "consolidated"
     }
   ],
   "created_at": "2026-04-02T10:01:47.584108",
-  "updated_at": "2026-04-02T19:00:00.000000"
+  "updated_at": "2026-04-02T23:33:05.290196"
 }
