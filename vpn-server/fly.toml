@@ -1,0 +1,40 @@
+# Zipminator Q-VPN Server — Fly.io Configuration
+#
+# IMPORTANT: Fly.io supports UDP services, but IPsec/IKEv2 requires
+# a dedicated IPv4 address. After creating the app, allocate one:
+#
+#   fly ips allocate-v4 --app zipminator-vpn
+#
+# IPsec also requires NET_ADMIN and NET_RAW capabilities which Fly.io
+# grants by default to containers. However, sysctl modifications
+# (ip_forward) may be restricted. See README.md for alternatives.
+
+app = "zipminator-vpn"
+primary_region = "ams"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  VPN_SERVER_ID = "vpn.zipminator.zip"
+
+# IKEv2 uses UDP 500 (IKE) and UDP 4500 (NAT-T).
+# Fly.io handles these via [[services]] with protocol = "udp".
+
+[[services]]
+  internal_port = 500
+  protocol = "udp"
+
+  [[services.ports]]
+    port = 500
+
+[[services]]
+  internal_port = 4500
+  protocol = "udp"
+
+  [[services.ports]]
+    port = 4500
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

@@ -32,4 +32,83 @@ void main() {
       expect(updated.callDuration.inSeconds, 30);
     });
   });
+
+  group('VoipState — incoming call phase', () {
+    test('isIncomingRinging returns true for incomingRinging phase', () {
+      const state = VoipState(phase: CallPhase.incomingRinging);
+      expect(state.isIncomingRinging, true);
+      expect(state.isRinging, false);
+      expect(state.inCall, false);
+      expect(state.isIdle, false);
+    });
+
+    test('isRinging is false when incomingRinging', () {
+      const state = VoipState(phase: CallPhase.incomingRinging);
+      expect(state.isRinging, false);
+    });
+
+    test('inCall is false during incomingRinging', () {
+      const state = VoipState(phase: CallPhase.incomingRinging);
+      expect(state.inCall, false);
+    });
+
+    test('copyWith transitions from incomingRinging to connected', () {
+      const state = VoipState(
+        phase: CallPhase.incomingRinging,
+        contact: VoipContact(
+          id: 'live-alice',
+          name: 'alice',
+          email: '',
+          isOnline: true,
+        ),
+      );
+      final accepted = state.copyWith(
+        phase: CallPhase.connected,
+        isPqSecured: true,
+        isSpeaker: true,
+      );
+      expect(accepted.inCall, true);
+      expect(accepted.isPqSecured, true);
+      expect(accepted.isSpeaker, true);
+      expect(accepted.contact?.name, 'alice');
+    });
+
+    test('copyWith transitions from incomingRinging to idle on decline', () {
+      const state = VoipState(
+        phase: CallPhase.incomingRinging,
+        contact: VoipContact(
+          id: 'live-bob',
+          name: 'bob',
+          email: '',
+          isOnline: true,
+        ),
+      );
+      const declined = VoipState();
+      expect(declined.isIdle, true);
+      expect(declined.contact, null);
+      // Verify the original state was incomingRinging.
+      expect(state.isIncomingRinging, true);
+    });
+  });
+
+  group('CallPhase enum', () {
+    test('contains incomingRinging value', () {
+      expect(CallPhase.values, contains(CallPhase.incomingRinging));
+    });
+
+    test('all expected phases exist', () {
+      expect(CallPhase.values.length, 6);
+      expect(
+        CallPhase.values,
+        containsAll([
+          CallPhase.idle,
+          CallPhase.ringing,
+          CallPhase.incomingRinging,
+          CallPhase.connected,
+          CallPhase.conferencing,
+          CallPhase.ended,
+        ]),
+      );
+    });
+  });
 }

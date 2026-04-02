@@ -7,7 +7,7 @@ import 'package:zipminator/core/services/conference_service.dart';
 import 'package:zipminator/src/rust/api/simple.dart' as rust;
 
 /// Call lifecycle phases.
-enum CallPhase { idle, ringing, connected, conferencing, ended }
+enum CallPhase { idle, ringing, incomingRinging, connected, conferencing, ended }
 
 /// A VoIP contact (reuses the same demo cast as the messenger).
 class VoipContact {
@@ -76,6 +76,7 @@ class VoipState {
   bool get inCall =>
       phase == CallPhase.connected || phase == CallPhase.conferencing;
   bool get isRinging => phase == CallPhase.ringing;
+  bool get isIncomingRinging => phase == CallPhase.incomingRinging;
   bool get isEnded => phase == CallPhase.ended;
   bool get isIdle => phase == CallPhase.idle;
   bool get isConference => phase == CallPhase.conferencing;
@@ -225,7 +226,7 @@ class VoipNotifier extends Notifier<VoipState> {
           _conference!.onPeerJoined(from);
         }
       case 'call_end':
-        if (state.inCall) {
+        if (state.inCall || state.isIncomingRinging) {
           _conference?.dispose();
           _conference = null;
           state = const VoipState();
@@ -250,21 +251,11 @@ class VoipNotifier extends Notifier<VoipState> {
     }
   }
 
-  /// Handle an incoming call: set up WebRTC audio and auto-accept.
-  // TODO(mo): Replace auto-accept with incoming call UI (accept/decline).
-  Future<void> _handleIncomingCall(String callerUsername) async {
-    final ratchet = ref.read(ratchetProvider.notifier);
-
-    await _ensureConference(audioOnly: true);
-    Helper.setSpeakerphoneOn(true);
-
-    // Accept the call — caller will then send a WebRTC offer.
-    ratchet.sendCallAccept(callerUsername);
-
+  /// Handle an incoming call: show ringing UI and wait for user to accept or
+  /// decline. WebRTC and conference setup are deferred until acceptance.
+  void _handleIncomingCall(String callerUsername) {
     state = state.copyWith(
-      phase: CallPhase.connected,
-      isPqSecured: true,
-      isSpeaker: true,
+      phase: CallPhase.incomingRinging,
       contact: VoipContact(
         id: 'live-$callerUsername',
         name: callerUsername,
@@ -272,6 +263,39 @@ class VoipNotifier extends Notifier<VoipState> {
         isOnline: true,
       ),
     );
+  }
+
+  /// User accepted the incoming call: set up WebRTC audio, notify the caller,
+  /// and transition to connected.
+  Future<void> acceptIncomingCall() async {
+    final contact = state.contact;
+    if (contact == null || !state.isIncomingRinging) return;
+
+    final ratchet = ref.read(ratchetProvider.notifier);
+
+    await _ensureConference(audioOnly: true);
+    Helper.setSpeakerphoneOn(true);
+
+    // Notify the caller so they send a WebRTC offer.
+    ratchet.sendCallAccept(contact.id.replaceFirst('live-', ''));
+
+    state = state.copyWith(
+      phase: CallPhase.connected,
+      isPqSecured: true,
+      isSpeaker: true,
+    );
+  }
+
+  /// User declined the incoming call: notify the caller and reset to idle.
+  void declineIncomingCall() {
+    final contact = state.contact;
+    if (contact != null) {
+      final username = contact.id.replaceFirst('live-', '');
+      ref.read(ratchetProvider.notifier).sendCallEnd(username);
+    }
+    _conference?.dispose();
+    _conference = null;
+    state = const VoipState();
   }
 
   /// Create a [ConferenceService] if one doesn't already exist.

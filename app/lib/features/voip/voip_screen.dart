@@ -134,6 +134,17 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
               contact: voip.contact!,
               onHangup: _endCall,
             ),
+          CallPhase.incomingRinging => _IncomingCallView(
+              contact: voip.contact!,
+              onAccept: () async {
+                await ref.read(voipProvider.notifier).acceptIncomingCall();
+                HapticFeedback.heavyImpact();
+                _startCallTimer();
+              },
+              onDecline: () {
+                ref.read(voipProvider.notifier).declineIncomingCall();
+              },
+            ),
           CallPhase.connected => _ConnectedView(
               voip: voip,
               formatDuration: _formatDuration,
@@ -560,6 +571,255 @@ class _RingingView extends StatelessWidget {
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: QuantumTheme.quantumRed,
                 ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Incoming Call View (someone is calling you)
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _IncomingCallView extends StatelessWidget {
+  final VoipContact contact;
+  final VoidCallback onAccept;
+  final VoidCallback onDecline;
+
+  const _IncomingCallView({
+    required this.contact,
+    required this.onAccept,
+    required this.onDecline,
+  });
+
+  String get _initials {
+    final parts = contact.name.split(' ');
+    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}';
+    return contact.name.substring(0, 1);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const PillarStatusBanner(
+            description: 'Incoming PQ-SRTP call',
+            status: PillarStatus.ready,
+          ),
+          const SizedBox(height: 32),
+
+          // Pulsing ring animation around avatar
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // Outer pulse ring
+              Container(
+                width: 160,
+                height: 160,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: QuantumTheme.quantumCyan.withValues(alpha: 0.3),
+                    width: 2,
+                  ),
+                ),
+              )
+                  .animate(onPlay: (c) => c.repeat())
+                  .scale(
+                    begin: const Offset(0.8, 0.8),
+                    end: const Offset(1.2, 1.2),
+                    duration: 1200.ms,
+                    curve: Curves.easeOut,
+                  )
+                  .fadeOut(duration: 1200.ms),
+
+              // Middle pulse ring
+              Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: QuantumTheme.quantumCyan.withValues(alpha: 0.2),
+                    width: 2,
+                  ),
+                ),
+              )
+                  .animate(onPlay: (c) => c.repeat())
+                  .scale(
+                    begin: const Offset(0.9, 0.9),
+                    end: const Offset(1.15, 1.15),
+                    duration: 1200.ms,
+                    delay: 400.ms,
+                    curve: Curves.easeOut,
+                  )
+                  .fadeOut(duration: 1200.ms, delay: 400.ms),
+
+              // Avatar
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      QuantumTheme.quantumCyan.withValues(alpha: 0.6),
+                      QuantumTheme.quantumPurple.withValues(alpha: 0.6),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color:
+                          QuantumTheme.quantumCyan.withValues(alpha: 0.3),
+                      blurRadius: 24,
+                      spreadRadius: -4,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    _initials,
+                    style: const TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Caller name
+          Text(
+            contact.name,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: QuantumTheme.textPrimary,
+                ),
+          ),
+          const SizedBox(height: 8),
+
+          // "Incoming call..." label
+          Text(
+            'Incoming call...',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: QuantumTheme.quantumCyan,
+                ),
+          )
+              .animate(onPlay: (c) => c.repeat())
+              .fadeIn(duration: 600.ms)
+              .then()
+              .fadeOut(duration: 600.ms),
+
+          const SizedBox(height: 8),
+          Text(
+            'PQ-SRTP encrypted voice call',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: QuantumTheme.textSecondary,
+                ),
+          ),
+
+          const SizedBox(height: 48),
+
+          // Accept / Decline buttons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Decline
+              Column(
+                children: [
+                  GestureDetector(
+                    onTap: onDecline,
+                    child: Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: QuantumTheme.quantumRed,
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                QuantumTheme.quantumRed.withValues(alpha: 0.4),
+                            blurRadius: 16,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.call_end,
+                          color: Colors.white, size: 32),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Decline',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: QuantumTheme.quantumRed,
+                        ),
+                  ),
+                ],
+              )
+                  .animate()
+                  .fadeIn(delay: 200.ms, duration: 300.ms)
+                  .slideX(begin: -0.2),
+
+              const SizedBox(width: 64),
+
+              // Accept
+              Column(
+                children: [
+                  GestureDetector(
+                    onTap: onAccept,
+                    child: Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: QuantumTheme.quantumGreen,
+                        boxShadow: [
+                          BoxShadow(
+                            color: QuantumTheme.quantumGreen
+                                .withValues(alpha: 0.4),
+                            blurRadius: 16,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.call,
+                          color: Colors.white, size: 32),
+                    ),
+                  )
+                      .animate(onPlay: (c) => c.repeat())
+                      .scale(
+                        begin: const Offset(1.0, 1.0),
+                        end: const Offset(1.08, 1.08),
+                        duration: 800.ms,
+                        curve: Curves.easeInOut,
+                      )
+                      .then()
+                      .scale(
+                        begin: const Offset(1.08, 1.08),
+                        end: const Offset(1.0, 1.0),
+                        duration: 800.ms,
+                        curve: Curves.easeInOut,
+                      ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Accept',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: QuantumTheme.quantumGreen,
+                        ),
+                  ),
+                ],
+              )
+                  .animate()
+                  .fadeIn(delay: 200.ms, duration: 300.ms)
+                  .slideX(begin: 0.2),
+            ],
           ),
         ],
       ),
