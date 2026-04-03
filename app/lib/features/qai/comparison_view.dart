@@ -8,6 +8,7 @@ import 'package:zipminator/shared/widgets/widgets.dart';
 
 /// Provider color mapping per [LLMProvider].
 Color _providerColor(LLMProvider provider) => switch (provider) {
+      LLMProvider.onDevice => QuantumTheme.quantumGreen,
       LLMProvider.gemini => QuantumTheme.quantumBlue,
       LLMProvider.groq => QuantumTheme.quantumGreen,
       LLMProvider.deepSeek => QuantumTheme.quantumCyan,
@@ -39,8 +40,9 @@ class ComparisonView extends ConsumerWidget {
             runSpacing: 8,
             children: kAvailableModels.map((model) {
               final selected = comparison.selectedModelIds.contains(model.id);
-              final hasKey = qaiState.apiKeys.containsKey(model.provider) &&
-                  qaiState.apiKeys[model.provider]!.isNotEmpty;
+              final hasKey = model.provider.isOnDevice ||
+                  (qaiState.apiKeys.containsKey(model.provider) &&
+                      qaiState.apiKeys[model.provider]!.isNotEmpty);
               return FilterChip(
                 label: Text(model.displayName),
                 selected: selected,
@@ -54,7 +56,9 @@ class ComparisonView extends ConsumerWidget {
                   backgroundColor: _providerColor(model.provider),
                 ),
                 tooltip: hasKey
-                    ? model.provider.displayName
+                    ? model.provider.isOnDevice
+                        ? '${model.provider.displayName} (no API key needed)'
+                        : model.provider.displayName
                     : '${model.provider.displayName} - API key required',
               );
             }).toList(),

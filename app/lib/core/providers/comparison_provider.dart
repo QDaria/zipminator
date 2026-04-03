@@ -108,8 +108,8 @@ class ComparisonNotifier extends Notifier<ComparisonState> {
       return;
     }
 
-    final apiKey = apiKeys[model.provider];
-    if (apiKey == null || apiKey.isEmpty) {
+    final apiKey = model.provider.isOnDevice ? '' : (apiKeys[model.provider] ?? '');
+    if (!model.provider.isOnDevice && apiKey.isEmpty) {
       _setError(
         modelId,
         'No API key for ${model.provider.displayName}',

@@ -297,15 +297,25 @@ class SettingsScreen extends ConsumerWidget {
                     )),
           ),
 
-          // Per-provider API key tiles
+          // On-device status (no API key needed)
+          ListTile(
+            leading: Icon(Icons.smartphone, color: QuantumTheme.quantumGreen),
+            title: const Text('On-Device (Google AI Edge)'),
+            subtitle: const Text('No API key needed. Models run locally.'),
+            trailing: Icon(Icons.check_circle,
+                color: QuantumTheme.quantumGreen, size: 20),
+          ),
+
+          // Per-provider API key tiles (skip on-device)
           for (final provider in LLMProvider.values)
-            _ProviderApiKeyTile(
-              provider: provider,
-              color: _providerColors[provider] ?? QuantumTheme.quantumPurple,
-              hint: _providerHints[provider] ?? '',
-              isConfigured: qai.apiKeys.containsKey(provider) &&
-                  qai.apiKeys[provider]!.isNotEmpty,
-            ),
+            if (!provider.isOnDevice)
+              _ProviderApiKeyTile(
+                provider: provider,
+                color: _providerColors[provider] ?? QuantumTheme.quantumPurple,
+                hint: _providerHints[provider] ?? '',
+                isConfigured: qai.apiKeys.containsKey(provider) &&
+                    qai.apiKeys[provider]!.isNotEmpty,
+              ),
 
           const Divider(),
 

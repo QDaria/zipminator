@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'on_device_service.dart';
 import 'openai_compatible_service.dart';
 
 /// Supported LLM providers.
 enum LLMProvider {
+  onDevice('On-Device', 'Google AI Edge'),
   gemini('Gemini', 'Google'),
   groq('Groq', 'Groq'),
   deepSeek('DeepSeek', 'DeepSeek'),
@@ -14,6 +16,9 @@ enum LLMProvider {
   final String displayName;
   final String company;
   const LLMProvider(this.displayName, this.company);
+
+  /// Whether this provider runs entirely on-device (no network, no API key).
+  bool get isOnDevice => this == LLMProvider.onDevice;
 }
 
 /// Model metadata for UI display.
@@ -23,16 +28,93 @@ class LLMModel {
   final LLMProvider provider;
   final bool freeTier;
 
+  /// Size in bytes for on-device models (used for download UI).
+  final int? sizeBytes;
+
+  /// HuggingFace repo ID for on-device model downloads.
+  final String? hfRepo;
+
+  /// Filename within the HuggingFace repo.
+  final String? hfFilename;
+
+  /// Supported modalities (text, vision, audio, thinking).
+  final List<String> modalities;
+
   const LLMModel({
     required this.id,
     required this.displayName,
     required this.provider,
     this.freeTier = false,
+    this.sizeBytes,
+    this.hfRepo,
+    this.hfFilename,
+    this.modalities = const ['text'],
   });
+
+  /// Human-readable size string.
+  String get sizeLabel {
+    if (sizeBytes == null) return '';
+    final mb = sizeBytes! / (1024 * 1024);
+    if (mb >= 1024) return '${(mb / 1024).toStringAsFixed(1)} GB';
+    return '${mb.toStringAsFixed(0)} MB';
+  }
+
+  bool get isOnDevice => provider == LLMProvider.onDevice;
 }
 
-/// All available models grouped by provider. Free-tier models listed first.
+/// All available models grouped by provider. On-device first, then cloud.
 const kAvailableModels = <LLMModel>[
+  // On-Device (Google AI Edge Gallery / LiteRT-LM — no API key, 100% private)
+  LLMModel(
+    id: 'gemma-3-1b-it-q4',
+    displayName: 'Gemma 3 1B',
+    provider: LLMProvider.onDevice,
+    freeTier: true,
+    sizeBytes: 612368384, // ~584 MB
+    hfRepo: 'litert-community/Gemma3-1B-IT',
+    hfFilename: 'gemma3-1b-it-q4_0.litertlm',
+    modalities: ['text'],
+  ),
+  LLMModel(
+    id: 'gemma-4-e2b-it',
+    displayName: 'Gemma 4 E2B',
+    provider: LLMProvider.onDevice,
+    freeTier: true,
+    sizeBytes: 2791728742, // ~2.6 GB
+    hfRepo: 'litert-community/Gemma4-E2B-it',
+    hfFilename: 'gemma4-e2b-it.litertlm',
+    modalities: ['text', 'vision', 'audio', 'thinking'],
+  ),
+  LLMModel(
+    id: 'gemma-4-e4b-it',
+    displayName: 'Gemma 4 E4B',
+    provider: LLMProvider.onDevice,
+    freeTier: true,
+    sizeBytes: 3971973120, // ~3.7 GB
+    hfRepo: 'litert-community/Gemma4-E4B-it',
+    hfFilename: 'gemma4-e4b-it.litertlm',
+    modalities: ['text', 'vision', 'audio', 'thinking'],
+  ),
+  LLMModel(
+    id: 'gemma-3n-e2b-it',
+    displayName: 'Gemma 3n E2B',
+    provider: LLMProvider.onDevice,
+    freeTier: true,
+    sizeBytes: 3971973120, // ~3.7 GB
+    hfRepo: 'litert-community/Gemma3n-E2B-it',
+    hfFilename: 'gemma3n-e2b-it.litertlm',
+    modalities: ['text', 'vision', 'audio'],
+  ),
+  LLMModel(
+    id: 'deepseek-r1-distill-qwen-1.5b',
+    displayName: 'DeepSeek R1 1.5B',
+    provider: LLMProvider.onDevice,
+    freeTier: true,
+    sizeBytes: 1610612736, // ~1.5 GB
+    hfRepo: 'litert-community/DeepSeek-R1-Distill-Qwen-1.5B',
+    hfFilename: 'deepseek-r1-distill-qwen-1.5b.litertlm',
+    modalities: ['text'],
+  ),
   // Gemini (free tier, very capable)
   LLMModel(
       id: 'gemini-2.5-flash',
@@ -250,6 +332,7 @@ class OpenRouterService extends OpenAICompatibleService {
 /// Factory to create the right service for a provider.
 LLMService createLLMService(LLMProvider provider, String apiKey) =>
     switch (provider) {
+      LLMProvider.onDevice => OnDeviceService(),
       LLMProvider.claude => ClaudeService(apiKey: apiKey),
       LLMProvider.gemini => GeminiService(apiKey: apiKey),
       LLMProvider.groq => GroqService(apiKey: apiKey),
