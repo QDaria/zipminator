@@ -374,7 +374,7 @@ PART 6: ZIPMINATOR RESEARCH PAPER — SPECIFIC INSTANTIATION
 ═══════════════════════════════════════════════════════════════
 
 Based on the status report. Current state:
-  Paper: docs/research/paper/main.tex (IEEE format, PoPETs 2026 target)
+  Paper: docs/research/paper-1-quantum-anonymization/main.tex (IEEE format, PoPETs 2026 target)
   Score: 0.45/1.0 (major revision)
   LaTeX source: EXISTS ← this is the key, full loop is available
   Core claim: First anonymization with Born-rule-guaranteed irreversibility
@@ -414,7 +414,7 @@ Replace in ÆSIR v4.0:
   5. UCI Adult dataset evaluation: verify the empirical results added in
      commit 4796ffc are statistically sound and the methodology is complete.
   
-  LaTeX source: docs/research/paper/main.tex
+  LaTeX source: docs/research/paper-1-quantum-anonymization/main.tex
   Target venue: PoPETs 2026 (Privacy Enhancing Technologies Symposium)
   Format: IEEE, deadline: check https://popets.net for current CFP
   </task>

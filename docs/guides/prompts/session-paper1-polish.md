@@ -9,8 +9,8 @@
 
 Read these files before doing anything:
 - `CLAUDE.md` and `.claude/rules/` (all rules, especially zero-hallucination.md and tdd-ralph.md)
-- `docs/research/paper/main.tex` (the paper, 20 pages)
-- `docs/research/paper/peer-review-report.md` (review gaps)
+- `docs/research/paper-1-quantum-anonymization/main.tex` (the paper, 20 pages)
+- `docs/research/paper-1-quantum-anonymization/peer-review-report.md` (review gaps)
 - `memory/project_paper_polish.md` (3 done, 3 pending items)
 - `docs/guides/prompts/AESR_v5_improved_prompt.md`
 
@@ -25,7 +25,7 @@ Then load these skills:
 
 ## Task
 
-Finish 3 remaining items to bring the quantum-certified anonymization paper from 0.80 to 0.995 quality. Edit `docs/research/paper/main.tex` directly.
+Finish 3 remaining items to bring the quantum-certified anonymization paper from 0.80 to 0.995 quality. Edit `docs/research/paper-1-quantum-anonymization/main.tex` directly.
 
 ## Orchestration
 

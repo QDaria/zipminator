@@ -748,7 +748,7 @@ See `.claude/commands/mega-task.md` for the full 6-phase protocol.
 ```
 /hive-mind-advanced
 
-Improve docs/research/paper/main.tex to score 0.995 for Nature Physics.
+Improve docs/research/paper-1-quantum-anonymization/main.tex to score 0.995 for Nature Physics.
 
 Load skills: /quantum-scientific-writer, /research-paper-writer,
 /verification-quality, /quantum-assurance-validator
@@ -883,7 +883,7 @@ The Stop hook prevents session exit. Each iteration sees the test files from pre
 # Schedule a nightly paper improvement agent
 /schedule create "paper-polish" \
   --cron "0 2 * * *" \
-  --prompt "/effort max\nRun /improve paper on docs/research/paper/main.tex. \
+  --prompt "/effort max\nRun /improve paper on docs/research/paper-1-quantum-anonymization/main.tex. \
     Focus on the lowest-scoring dimension. Commit if score improves by 0.05+."
 
 # Or use /loop for in-session recurring checks
@@ -913,7 +913,7 @@ The Stop hook prevents session exit. Each iteration sees the test files from pre
 <!-- SECTION: PART 4 -->
 # Part 4: Use Case — Research Paper to Nature/Science Caliber
 
-Target: `docs/research/paper/main.tex` (currently scored 0.80/1.0 by adversarial PoPETs review)
+Target: `docs/research/paper-1-quantum-anonymization/main.tex` (currently scored 0.80/1.0 by adversarial PoPETs review)
 Goal: Iteratively improve to 0.995 threshold for Nature/Science submission.
 
 ---
@@ -1050,7 +1050,7 @@ cd docs/research/paper && pdflatex main.tex && bibtex main && pdflatex main.tex 
 # Visual inspection via Playwright
 
 # Commit with quality score
-git add docs/research/paper/
+git add docs/research/paper-1-quantum-anonymization/
 git commit -m "paper(anonymization): improve to score X.XX
 
 Quality: 0.80 -> X.XX | N iterations | AESR v4
@@ -1066,7 +1066,7 @@ ruflo hooks post-task --task-id "paper-improve-nature"
 ```
 /effort max
 
-Improve docs/research/paper/main.tex from score 0.80 to 0.995 for Nature Physics.
+Improve docs/research/paper-1-quantum-anonymization/main.tex from score 0.80 to 0.995 for Nature Physics.
 
 Load: /quantum-scientific-writer, /research-paper-writer, /verification-quality,
       /quantum-assurance-validator, /quantum-cryptanalysis-expert
