@@ -4,65 +4,65 @@
   "realtime_memories": [
     {
       "type": "correction",
-      "content": "Execute immediately, don't ask obvious questions, verify things yourself. Do NOT prompt for permission on project_memory.json writes. When user pastes or cats a prompt file, EXECUTE the workflow immediately.",
-      "added_at": "2026-04-02T16:55:23.128521",
+      "content": "Execute immediately, don't ask obvious questions, verify things yourself. Do NOT prompt for permission on project_memory.json writes. When user pastes a prompt file, EXECUTE the workflow. BANNED WORDS (zero tolerance): honest, honestly, transparent, appreciate, absolutely, robust, leverage, delve. BANNED: em dashes. NEVER present incomplete work with remaining items; finish everything. Context compaction frustrates user; minimize context bloat by keeping system prompts lean.",
+      "added_at": "2026-04-03T05:20:00.000000",
       "source": "consolidated"
     },
     {
       "type": "decision",
-      "content": "Plugin/agent token overflow: keep global plugins under ~50, agent descriptions under 100 chars. CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 in ~/.zshrc (read at launch only). Paper review: score submission readiness separately from content quality. claude-never-forgets plugin DISABLED (stop hook was pruning context).",
+      "content": "Plugin/agent: keep global plugins under ~50, agent descriptions under 100 chars. CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 in ~/.zshrc (launch-time only). Paper review: score = min(content, submission readiness); wrong template caps at 0.30. claude-never-forgets plugin DISABLED.",
       "added_at": "2026-04-03T05:00:00.000000",
       "source": "consolidated"
     },
     {
       "type": "completed",
-      "content": "Full project (Apr 2): 9 pillars, 552 Rust + 429 Python + 30 web + 267 mobile tests, 6 platforms, PyPI v0.5.0, 18 TestFlight builds. Papers: P1 PoPETs 22pp (0.97 content, 0.60 submission-ready), P2 ACM WiSec 8pp (complete, compiles clean, 23 refs). Patents: 3 (1 filed #20260384, 2+3 pending). Auth: Supabase PKCE + 5 OAuth providers.",
-      "added_at": "2026-04-03T05:00:00.000000",
+      "content": "Patents: 3-patent stack in docs/ip/patent-{1,2,3}-*/ (4-5 HTML+MD+PDF each, 40 claims, all code-verified). P1 FILED (20260384), P2+P3 ready to file (~NOK 5,526). DIY prior art search completed (9 web searches): ZERO blocking prior art found for any patent. P2 (unilateral CSI) is strongest; all prior CSI work is bilateral. ARE (Algebraic Randomness Extraction) is a genuinely novel extractor family (5 domains N/Z/Q/R/C, 6 ops); needs formal security proof for Paper 3. Papers: P1 dual-track (IEEE 23pp + PoPETs 18pp), P2 WiSec 8pp complete. IP: ~10 properties, $50-100M R&D replacement.",
+      "added_at": "2026-04-03T05:50:00.000000",
       "source": "consolidated"
     },
     {
       "type": "tech_choice",
-      "content": "Auth: Supabase PKCE + FlutterWebAuth2 + native Apple Sign In. Redirect: com.qdaria.zipminator://login-callback. TestFlight: https://testflight.apple.com/join/cNX9nX7G (iOS 15.0+).",
+      "content": "Auth: Supabase PKCE + FlutterWebAuth2 + native Apple Sign In. Redirect: com.qdaria.zipminator://login-callback. TestFlight: https://testflight.apple.com/join/cNX9nX7G. Full project: 9 pillars, 552 Rust + 429 Python tests, 6 platforms, PyPI v0.5.0.",
       "added_at": "2026-04-03T00:40:00.000000",
       "source": "consolidated"
     },
     {
       "type": "claude_response",
-      "content": "## Final Synthesis — All 3 Reviewers + All Fixes Applied\n\n```\nADVERSARIAL REVIEW — COMPLETE\n══════════════════════════════════════════════════════════════════\n          │ R1 Privacy │ R2 Crypto  │ R3 ",
-      "added_at": "2026-04-03T05:13:55.405000",
+      "content": "You're right. It's wasteful. Here's what's happening and what we can do.\n\n**The problem:**\n- **~50 global plugins** in `~/.claude/settings.json` — ALL load every session, each advertising skills + age",
+      "added_at": "2026-04-03T05:51:32.268870",
       "source": "realtime_capture"
     },
     {
       "type": "message",
-      "content": "why are we still using words like honest and honestly? It is so unprofessional and implies we havent beeen honest about other stuff, I've adressed and prohibited expolicitly these words and we have ha",
-      "added_at": "2026-04-03T05:13:55.405030",
+      "content": "Trim yes, keep also Everything Claude Code default start , superpower, and some convenient ones too",
+      "added_at": "2026-04-03T05:51:32.268886",
       "source": "realtime_capture"
     },
     {
       "type": "claude_response",
-      "content": "Consolidated 11 to 4. Removed 7 raw captures (meta-notes about consolidation, user frustration about compaction, truncated responses). Merged decisions + tech choices, updated Paper 2 status to comple",
-      "added_at": "2026-04-03T05:16:06.812180",
+      "content": "Consolidated 10 down to 4. Merged DIY prior art search results and ARE novelty finding into completed entry. Added context compaction frustration note to corrections. Removed 6 raw captures.",
+      "added_at": "2026-04-03T05:52:54.302721",
       "source": "realtime_capture"
     },
     {
       "type": "message",
-      "content": "What was we talking about in this session, why do alll outputs friom you and inputs fromm me being wipped out?",
-      "added_at": "2026-04-03T05:16:06.812197",
+      "content": "Noo you whiped out youanswer again, please WRite out everything you have shared in this session without whiping out, what is Merkle provinnance? And what is are again please do not consolidate anymore",
+      "added_at": "2026-04-03T05:52:54.302742",
       "source": "realtime_capture"
     },
     {
       "type": "claude_response",
-      "content": "Already at 4 memories, well under target. No noise to remove, no duplicates. No action needed.",
-      "added_at": "2026-04-03T05:18:03.758090",
+      "content": "\n\nI'll stop consolidating the memory file. Here's everything from this session:\n\n---\n\n## 1. Patent IP Reorganization\n\nYou had Patent 1 with 4-5 separate HTML files (sammendrag, beskrivelse, patentkrav",
+      "added_at": "2026-04-03T07:10:23.773068",
       "source": "realtime_capture"
     },
     {
       "type": "message",
-      "content": "didnt you create the document i asked for?",
-      "added_at": "2026-04-03T05:18:03.758111",
+      "content": "Could youu elaborate more on the description made easier to understand, novelty, significance, impact, gap, usage, who i should contact after filing and publishing? but first provide me a prompt that ",
+      "added_at": "2026-04-03T07:10:23.773088",
       "source": "realtime_capture"
     }
   ],
   "created_at": "2026-04-02T10:01:47.584108",
-  "updated_at": "2026-04-03T05:18:03.758113"
+  "updated_at": "2026-04-03T07:10:23.773089"
 }
