@@ -119,7 +119,7 @@ export const SectionRegulatoryMoat = () => {
           className="text-lg font-semibold text-slate-100 mb-1"
           style={{ fontFamily: 'var(--font-fraunces)' }}
         >
-          Cumulative Regulatory Pressure (2018 -- 2035)
+          Cumulative Regulatory Pressure (2018\u20132035)
         </h3>
         <p
           className="text-sm text-slate-400 mb-6"

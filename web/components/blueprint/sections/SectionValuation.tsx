@@ -98,14 +98,16 @@ interface Props {
 }
 
 export const SectionValuation = ({ scenario }: Props) => {
-  const rows = VALUATION_METHODS
+  // Separate Lifetime row (outlier at $1B-$10B) from patent-level rows ($15M-$100M)
+  const lifetimeRow = VALUATION_METHODS.find((r) => r.method.startsWith('Lifetime'))
+  const patentRows = VALUATION_METHODS.filter((r) => !r.method.startsWith('Lifetime'))
 
   return (
     <div className="space-y-12">
       {/* Hero metric cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {HERO_METRICS.map((m, i) => {
-          const row = rows[m.index]
+          const row = VALUATION_METHODS[m.index]
           const value = row[scenario]
           return (
             <motion.div
@@ -137,7 +139,45 @@ export const SectionValuation = ({ scenario }: Props) => {
         })}
       </div>
 
-      {/* Grouped BarChart */}
+      {/* Lifetime callout (separate from chart to avoid scale distortion) */}
+      {lifetimeRow && (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="rounded-xl p-6 border"
+          style={{ background: 'rgba(245,158,11,0.04)', borderColor: 'rgba(245,158,11,0.15)' }}
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-lg">&#x1f4c8;</span>
+            <h4
+              className="text-sm font-bold text-amber-400 uppercase tracking-wider"
+              style={{ fontFamily: 'var(--font-jetbrains)' }}
+            >
+              Standard-Essential Lifetime Value
+            </h4>
+          </div>
+          <div className="flex items-baseline gap-6 flex-wrap">
+            {(['conservative', 'moderate', 'optimistic'] as const).map((s) => (
+              <div key={s} className="text-center">
+                <p className="text-2xl font-bold" style={{
+                  fontFamily: 'var(--font-jetbrains)',
+                  color: s === 'conservative' ? '#22D3EE' : s === 'moderate' ? '#F59E0B' : '#34D399',
+                }}>
+                  {fmt(lifetimeRow[s], lifetimeRow.unit)}
+                </p>
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">{s}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-500 mt-3" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+            If any patent becomes standard-essential (e.g., NIST PQC mandates). Shown separately due to order-of-magnitude difference.
+          </p>
+        </motion.div>
+      )}
+
+      {/* Grouped BarChart (without Lifetime outlier) */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -147,14 +187,17 @@ export const SectionValuation = ({ scenario }: Props) => {
         style={{ background: 'rgba(15,23,42,0.5)', border: '1px solid rgba(255,255,255,0.06)' }}
       >
         <h3
-          className="text-lg font-semibold text-slate-100 mb-6"
+          className="text-lg font-semibold text-slate-100 mb-1"
           style={{ fontFamily: 'var(--font-fraunces), Georgia, serif' }}
         >
           Valuation by Method
         </h3>
+        <p className="text-sm text-slate-500 mb-6" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+          Pre-revenue and per-patent valuations (millions USD)
+        </p>
 
         <ResponsiveContainer width="100%" height={380}>
-          <BarChart data={rows} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
+          <BarChart data={patentRows} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis
               dataKey="method"
@@ -166,11 +209,11 @@ export const SectionValuation = ({ scenario }: Props) => {
             />
             <YAxis
               tick={{ fill: '#64748b', fontSize: 10 }}
-              tickFormatter={(v: number) => fmt(v)}
+              tickFormatter={(v: number) => `$${v}M`}
             />
             <Tooltip
               contentStyle={TOOLTIP_STYLE}
-              formatter={(value: number, name: string) => [fmt(value), name]}
+              formatter={(value: number, name: string) => [`$${value}M`, name]}
             />
             <Legend
               wrapperStyle={{ fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11 }}
@@ -224,7 +267,7 @@ export const SectionValuation = ({ scenario }: Props) => {
                 style={{ background: d.color, opacity: 0.7 }}
               />
               <span style={{ fontFamily: 'var(--font-dm-sans)' }}>
-                {d.category} &mdash; ${d.amount}M
+                {d.category}: ${d.amount}M
               </span>
             </div>
           ))}
