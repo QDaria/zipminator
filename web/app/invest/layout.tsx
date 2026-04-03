@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function InvestLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="h-screen overflow-hidden bg-gray-950 text-white">
+    <div className="min-h-screen bg-gray-950 text-white overflow-y-auto">
       {children}
     </div>
   )
