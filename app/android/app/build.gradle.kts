@@ -57,6 +57,14 @@ android {
     }
 }
 
+dependencies {
+    // Google AI Edge LiteRT-LM runtime for on-device Gemma inference.
+    // https://github.com/google-ai-edge/gallery
+    implementation("com.google.ai.edge.litert:litert-lm:1.0.0")
+    // MediaPipe fallback (older models that use .task format).
+    implementation("com.google.mediapipe:tasks-genai:0.10.22")
+}
+
 flutter {
     source = "../.."
 }

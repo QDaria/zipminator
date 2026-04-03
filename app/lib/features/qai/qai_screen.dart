@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/core/providers/comparison_provider.dart';
+import 'package:zipminator/core/providers/on_device_provider.dart';
 import 'package:zipminator/core/providers/pii_provider.dart';
 import 'package:zipminator/core/providers/qai_provider.dart';
 import 'package:zipminator/core/providers/voice_provider.dart';
@@ -23,6 +24,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
   final _scrollController = ScrollController();
 
   static const _providerColors = {
+    LLMProvider.onDevice: QuantumTheme.quantumGreen,
     LLMProvider.gemini: QuantumTheme.quantumBlue,
     LLMProvider.groq: QuantumTheme.quantumGreen,
     LLMProvider.deepSeek: QuantumTheme.quantumCyan,
@@ -119,8 +121,47 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
       body: GradientBackground(
         child: Column(
           children: [
-            // API key banner
-            if (!qai.hasApiKey)
+            // On-device privacy badge
+            if (qai.selectedProvider.isOnDevice)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                color: QuantumTheme.quantumGreen.withValues(alpha: 0.08),
+                child: Row(
+                  children: [
+                    Icon(Icons.shield_outlined,
+                        size: 16, color: QuantumTheme.quantumGreen),
+                    const SizedBox(width: 6),
+                    Text(
+                      '100% On-Device',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: QuantumTheme.quantumGreen,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'No data leaves your device',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: QuantumTheme.quantumGreen
+                                .withValues(alpha: 0.7),
+                          ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      'Google AI Edge',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: QuantumTheme.quantumGreen
+                                .withValues(alpha: 0.5),
+                            fontSize: 10,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+
+            // API key banner (cloud providers only)
+            if (!qai.selectedProvider.isOnDevice && !qai.hasApiKey)
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -190,31 +231,85 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                 child: Row(
                   children: qai.availableModels.map((model) {
                     final isSelected = qai.selectedModel == model.id;
+                    final onDevice = ref.watch(onDeviceProvider);
+                    final isDownloaded =
+                        model.isOnDevice && onDevice.isModelDownloaded(model.id);
+                    final isDownloading =
+                        onDevice.downloadingModelId == model.id;
+
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text(model.displayName),
-                        selected: isSelected,
-                        selectedColor: providerColor.withValues(alpha: 0.3),
-                        side: BorderSide(
-                          color: isSelected
-                              ? providerColor.withValues(alpha: 0.6)
-                              : providerColor.withValues(alpha: 0.15),
+                      child: GestureDetector(
+                        onLongPress: model.isOnDevice && isDownloaded
+                            ? () => _showModelActions(context, ref, model)
+                            : null,
+                        child: ChoiceChip(
+                          avatar: model.isOnDevice
+                              ? Icon(
+                                  isDownloaded
+                                      ? Icons.check_circle_outline
+                                      : isDownloading
+                                          ? Icons.downloading
+                                          : Icons.download_outlined,
+                                  size: 14,
+                                  color: isSelected
+                                      ? providerColor
+                                      : providerColor.withValues(alpha: 0.5),
+                                )
+                              : null,
+                          label: Text(
+                            model.isOnDevice
+                                ? '${model.displayName} (${model.sizeLabel})'
+                                : model.displayName,
+                          ),
+                          selected: isSelected,
+                          selectedColor: providerColor.withValues(alpha: 0.3),
+                          side: BorderSide(
+                            color: isSelected
+                                ? providerColor.withValues(alpha: 0.6)
+                                : providerColor.withValues(alpha: 0.15),
+                          ),
+                          labelStyle: TextStyle(
+                            color: isSelected ? providerColor : null,
+                            fontWeight: isSelected ? FontWeight.w600 : null,
+                            fontSize: 12,
+                          ),
+                          onSelected: (_) {
+                            ref.read(qaiProvider.notifier).selectModel(model.id);
+                            // Auto-trigger download if not yet available.
+                            if (model.isOnDevice && !isDownloaded && !isDownloading) {
+                              ref.read(onDeviceProvider.notifier).downloadModel(model);
+                            }
+                          },
                         ),
-                        labelStyle: TextStyle(
-                          color: isSelected ? providerColor : null,
-                          fontWeight: isSelected ? FontWeight.w600 : null,
-                          fontSize: 12,
-                        ),
-                        onSelected: (_) => ref
-                            .read(qaiProvider.notifier)
-                            .selectModel(model.id),
                       ),
                     );
                   }).toList(),
                 ),
               ),
             ),
+
+            // Download progress bar for on-device models
+            if (ref.watch(onDeviceProvider).isDownloading)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    LinearProgressIndicator(
+                      value: ref.watch(onDeviceProvider).downloadProgress,
+                      color: providerColor,
+                      backgroundColor: providerColor.withValues(alpha: 0.1),
+                      minHeight: 3,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Downloading model... ${(ref.watch(onDeviceProvider).downloadProgress * 100).toStringAsFixed(0)}%',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ],
+                ),
+              ),
 
             // Comparison mode or Messages
             if (ref.watch(comparisonProvider).isActive)
@@ -241,7 +336,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                               iconColor: providerColor,
                             ),
                             Text(
-                              '6 providers, 14 models — select above',
+                              '7 providers, 19 models — on-device by default',
                               style: Theme.of(context).textTheme.bodySmall,
                             )
                                 .animate()
@@ -353,6 +448,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
   }
 
   IconData _providerIcon(LLMProvider provider) => switch (provider) {
+        LLMProvider.onDevice => Icons.smartphone,
         LLMProvider.gemini => Icons.auto_awesome,
         LLMProvider.groq => Icons.bolt,
         LLMProvider.deepSeek => Icons.psychology,
@@ -360,6 +456,36 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
         LLMProvider.claude => Icons.diamond_outlined,
         LLMProvider.openRouter => Icons.router_outlined,
       };
+
+  void _showModelActions(
+      BuildContext context, WidgetRef ref, LLMModel model) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: Text(model.displayName),
+              subtitle: Text(
+                '${model.sizeLabel} · ${model.modalities.join(", ")}',
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.delete_outline,
+                  color: QuantumTheme.quantumRed),
+              title: const Text('Delete model'),
+              onTap: () {
+                ref.read(onDeviceProvider.notifier).deleteModel(model.id);
+                Navigator.pop(ctx);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _QaiMessageBubble extends StatelessWidget {
