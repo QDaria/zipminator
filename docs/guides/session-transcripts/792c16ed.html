@@ -1,0 +1,70 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Session 792c16ed | 2026-04-03 04:59</title><style>
+body{font-family:'DM Sans',-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:20px;background:#0a0a0f;color:#e0e0e0}
+h1{color:#22d3ee;font-size:1.4em;border-bottom:1px solid #333;padding-bottom:10px}
+.meta{color:#888;font-size:.85em;margin-bottom:20px}
+.msg{margin:16px 0;padding:12px 16px;border-radius:8px;overflow-wrap:break-word}
+.human{background:#1a1a2e;border-left:3px solid #22d3ee}
+.assistant{background:#111118;border-left:3px solid #34d399}
+.system{background:#0d0d14;border-left:3px solid #555;color:#777;font-size:.8em;max-height:60px;overflow:hidden;cursor:pointer}
+.system:hover{max-height:none}
+.thinking{background:#0d0d1a;border-left:3px solid #a78bfa;color:#999;font-size:.85em;max-height:80px;overflow:hidden;cursor:pointer}
+.thinking:hover{max-height:none}
+.role{font-weight:700;font-size:.75em;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.human .role{color:#22d3ee}.assistant .role{color:#34d399}.system .role{color:#666}.thinking .role{color:#a78bfa}
+pre{background:#0d0d14;padding:10px;border-radius:4px;overflow-x:auto;font-size:.85em;white-space:pre-wrap}
+code{font-family:'JetBrains Mono',monospace}
+.tool{color:#f59e0b;font-size:.8em;margin:4px 0;padding:6px;background:#0d0d14;border-radius:4px}
+a{color:#22d3ee}
+@media print{body{background:#fff;color:#000}.msg{border:1px solid #ccc}}
+</style></head><body>
+<h1>Session 792c16ed</h1>
+<div class="meta">Full ID: <code>792c16ed-b156-4027-9dba-6522eae16dfd</code><br>Modified: 2026-04-03 04:59<br>Size: 800,584 bytes<br>
+Messages: 11 human, 6 assistant text<br>
+Resume: <code>claude --resume 792c16ed-b156-4027-9dba-6522eae16dfd</code></div>
+<div class="msg human"><div class="role">You</div>Could you add farawayfields808@gmail.com one who ois going to join our team to testflight external tester? [Image #1] Why is this goddamn testflight review taking so long time? and what shoudl I write in the &quot;Review Notes&quot; and &quot;License Agreement&quot;License Agreement&quot; and or other fields? Is there anyway we can sppeed up this progress??</div>
+<div class="msg human"><div class="role">You</div>[Image: source: /Users/mos/Downloads/screencapture-appstoreconnect-apple-teams-bfb71eaa-2ad6-4908-a649-05ee6114b4aa-apps-6760352331-testflight-test-info-2026-04-02-17_45_48.png]</div>
+<div class="msg assistant"><div class="role">Claude</div>You&#x27;ve hit your limit · resets 9pm (Europe/Oslo)</div>
+<div class="msg human"><div class="role">You</div>resume?</div>
+<div class="msg thinking"><div class="role">Thinking</div>...</div>
+<div class="msg assistant"><div class="role">Claude</div>Here&#x27;s the quick rundown on all your TestFlight questions:<br><br>## Adding External Tester<br><br>In the left sidebar, click the **+** next to &quot;Beta Testers&quot; under EXTERNAL TESTING. Enter `farawayfields808@gmail.com`. They&#x27;ll get an invite email once the build is approved.<br><br>**But**: external testers require the build to pass **Beta App Review** first. That&#x27;s what&#x27;s blocking you.<br><br>## Why Review Takes So Long<br><br>The **first external TestFlight build** always requires manual Apple review. This typically takes **24-48 hours**, sometimes up to 72h. After the first build is approved, subsequent builds with minor changes usually get **auto-approved within minutes**.<br><br>Your Review Notes and License Agreement fields are both empty. That can slow things down because reviewers don&#x27;t know what they&#x27;re looking at.<br><br>## What to Fill In<br><br>**Review Notes** (paste this or adapt):<br>```<br>Zipminator is a post-quantum encrypted communications app. <br>This beta tests: PQC-encrypted messaging, VoIP calls, and <br>VPN connectivity between devices. No sign-in required for <br>basic testing. Tap any pillar on the home screen to explore <br>features. Voice calls require two devices on the same <br>signaling server (wss://zipminator-signaling.fly.dev).<br>```<br><br>**License Agreement** (standard beta EULA, paste this):<br>```<br>This is a beta version of Zipminator provided for testing <br>purposes only. By installing this app, you agree that: <br>(1) the software is provided &quot;as is&quot; without warranty; <br>(2) you will not redistribute the app or its contents; <br>(3) collected feedback may be used to improve the product; <br>(4) QDaria AS reserves all intellectual property rights. <br>For questions: mo@qdaria.com<br>```<br><br>**Leave &quot;Sign-in required&quot; unchecked** (you don&#x27;t want reviewers stuck on a login screen).<br><br>## How to Speed It Up<br><br>1. **Fill in Review Notes + License Agreement now and hit Save** -- incomplete metadata is the #1 cause of delays<br>2. Make sure you have **at least 1 screenshot** uploaded in App Information (the yellow banner says it&#x27;s using old ones)<br>3. After the first build clears review, all future builds auto-approve (seconds, not days)<br>4. If stuck &gt;48h, use the **Contact Us** link at bottom of App Store Connect or the Resolution Center<br><br>`★ Insight ─────────────────────────────────────`<br>- **Internal testers** (up to 100) never need Apple review. You can add teammates there for instant access while waiting for external approval.<br>- **External testing** supports up to 10,000 testers but requires that one-time Beta App Review gate.<br>- Once approved, you can keep shipping new builds via Transporter and they auto-approve as long as you don&#x27;t change entitlements or add major new capabilities.<br>`─────────────────────────────────────────────────`<br><br>**Fastest path right now**: Fill in those two fields, hit Save, and add `farawayfields808@gmail.com` as an **Internal Tester** so they can start testing immediately while you wait for external approval. You can have up to 100 internal testers (they just need an App Store Connect role).</div>
+<div class="msg human"><div class="role">You</div>Stop hook feedback:<br>🧹 Memory cleanup required. You have 23 memories.<br><br>Read .claude/memories/project_memory.json and consolidate realtime_memories.<br><br>SIGNAL (keep): preferences, decisions, corrections, tech choices, completed features, conventions<br>NOISE (remove): greetings, thanks, praise without context, exact duplicates<br><br>For each memory ask: &quot;Will this help me serve the user better next session?&quot; If yes, keep it.<br><br>Merge related memories into single entries. Target: 5-7 memories. Write back silently.</div>
+<div class="msg thinking"><div class="role">Thinking</div>...</div>
+<div class="tool">[Read] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;}</code></div>
+<div class="tool">[Tool Result] <pre>1	{
+2	  &quot;memories&quot;: [],
+3	  &quot;manual_memories&quot;: [],
+4	  &quot;realtime_memories&quot;: [
+5	    {
+6	      &quot;type&quot;: &quot;correction&quot;,
+7	      &quot;content&quot;: &quot;When user pastes or cats a prompt file, EXECUTE the workflow immediately. Don&#x27;t summarize, don&#x27;t ask. User runs parallel terminals from saved prompts in docs/guides</pre></div>
+<div class="msg assistant"><div class="role">Claude</div>Good, only 5 realtime memories. They&#x27;re already consolidated from a previous cleanup. All 5 pass the &quot;will this help next session?&quot; test. I&#x27;ll do a minor merge and trim the stale TestFlight detail.</div>
+<div class="tool">[Edit] <code>{&quot;replace_all&quot;: false, &quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;, &quot;old_string&quot;: &quot;  \&quot;realtime_memories\&quot;: [\n    {\n      \&quot;type\&quot;: \&quot;correction\&quot;,\n      \&quot;</code></div>
+<div class="tool">[Tool Result] <pre>The file /Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json has been updated successfully.</pre></div>
+<div class="msg assistant"><div class="role">Claude</div>Cleaned: merged the two `completed` entries into one, extracted the peer reviewer correction into its own entry (it&#x27;s actionable feedback), dropped the stale TestFlight tester detail (already handled this session). 5 memories, all signal.</div>
+<div class="msg human"><div class="role">You</div>What was we talking about in this session, why do alll outputs friom you and     <br>inputs fromm me being wipped out?</div>
+<div class="msg thinking"><div class="role">Thinking</div>...</div>
+<div class="msg assistant"><div class="role">Claude</div>## What we talked about this session<br><br>You asked about **TestFlight external testing**:<br><br>1. **Adding `farawayfields808@gmail.com`** as an external tester (click + next to &quot;Beta Testers&quot; in sidebar, or add them as Internal Tester for instant access)<br>2. **Why review is slow** -- first external build always needs manual Apple review (24-48h). Your Review Notes and License Agreement fields were empty, which slows it down<br>3. **What to put in Review Notes**: I gave you copy-paste text explaining Zipminator&#x27;s PQC messaging/VoIP/VPN features<br>4. **What to put in License Agreement**: I gave you a short beta EULA template<br>5. **How to speed it up**: fill those fields, hit Save; subsequent builds auto-approve after the first one clears<br><br>## Why messages keep disappearing<br><br>Two things are happening:<br><br>1. **Context compaction** -- when the conversation gets long, Claude Code automatically summarizes older messages to stay within the context window. This is normal behavior, not a bug. Your messages aren&#x27;t deleted from the terminal, they&#x27;re just compressed in my working memory.<br><br>2. **Your stop hook** (`hooks/stop_cleanup.py`) fires on every response and captures message snippets into `project_memory.json`. The `claude-never-forgets` plugin was also doing this but you already disabled it (good -- it was the worst offender).<br><br>The stop hook is still noisy though. It captured 4 new raw message/response entries since the cleanup I just did. That&#x27;s the `realtime_capture` source adding entries like your &quot;goddamit&quot; message and my cleanup confirmations. These are noise, not signal.<br><br>**To reduce the annoyance**: the stop hook&#x27;s memory capture is what&#x27;s cluttering things. The actual conversation content is fine -- scroll up in your terminal and it&#x27;s all there. The &quot;disappearing&quot; feeling comes from compaction dropping older messages from my context, not from anything being deleted on your end.</div>
+<div class="msg human"><div class="role">You</div>Stop hook feedback:<br>🧹 Memory cleanup required. You have 11 memories.<br><br>Read .claude/memories/project_memory.json and consolidate realtime_memories.<br><br>SIGNAL (keep): preferences, decisions, corrections, tech choices, completed features, conventions<br>NOISE (remove): greetings, thanks, praise without context, exact duplicates<br><br>For each memory ask: &quot;Will this help me serve the user better next session?&quot; If yes, keep it.<br><br>Merge related memories into single entries. Target: 5-7 memories. Write back silently.</div>
+<div class="tool">[Read] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;}</code></div>
+<div class="tool">[Tool Result] <pre>1	{
+2	  &quot;memories&quot;: [],
+3	  &quot;manual_memories&quot;: [],
+4	  &quot;realtime_memories&quot;: [
+5	    {
+6	      &quot;type&quot;: &quot;correction&quot;,
+7	      &quot;content&quot;: &quot;Execute immediately, don&#x27;t ask obvious questions, verify things yourself. Do NOT prompt for permission on project_memory.json writes.&quot;,
+8	      &quot;added_at&quot;: &quot;2026-04</pre></div>
+<div class="tool">[Edit] <code>{&quot;replace_all&quot;: false, &quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;, &quot;old_string&quot;: &quot;  \&quot;realtime_memories\&quot;: [\n    {\n      \&quot;type\&quot;: \&quot;correction\&quot;,\n      \&quot;</code></div>
+<div class="tool">[Tool Result] <pre>&lt;tool_use_error&gt;File has been modified since read, either by the user or by a linter. Read it again before attempting to write it.&lt;/tool_use_error&gt;</pre></div>
+<div class="tool">[Read] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;}</code></div>
+<div class="tool">[Tool Result] <pre>1	{
+2	  &quot;memories&quot;: [],
+3	  &quot;manual_memories&quot;: [],
+4	  &quot;realtime_memories&quot;: [
+5	    {
+6	      &quot;type&quot;: &quot;correction&quot;,
+7	      &quot;content&quot;: &quot;Execute immediately, don&#x27;t ask obvious questions, verify things yourself. Do NOT prompt for permission on project_memory.json writes. When user pastes or cats a pro</pre></div>
+<div class="msg assistant"><div class="role">Claude</div>Already at 4 memories, all signal. No cleanup needed this time -- the external hook already consolidated before I got here.</div>
+</body></html>

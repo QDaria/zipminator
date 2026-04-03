@@ -1,0 +1,119 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Session 15852b7b | 2026-04-02 18:30</title><style>
+body{font-family:'DM Sans',-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:20px;background:#0a0a0f;color:#e0e0e0}
+h1{color:#22d3ee;font-size:1.4em;border-bottom:1px solid #333;padding-bottom:10px}
+.meta{color:#888;font-size:.85em;margin-bottom:20px}
+.msg{margin:16px 0;padding:12px 16px;border-radius:8px;overflow-wrap:break-word}
+.human{background:#1a1a2e;border-left:3px solid #22d3ee}
+.assistant{background:#111118;border-left:3px solid #34d399}
+.system{background:#0d0d14;border-left:3px solid #555;color:#777;font-size:.8em;max-height:60px;overflow:hidden;cursor:pointer}
+.system:hover{max-height:none}
+.thinking{background:#0d0d1a;border-left:3px solid #a78bfa;color:#999;font-size:.85em;max-height:80px;overflow:hidden;cursor:pointer}
+.thinking:hover{max-height:none}
+.role{font-weight:700;font-size:.75em;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.human .role{color:#22d3ee}.assistant .role{color:#34d399}.system .role{color:#666}.thinking .role{color:#a78bfa}
+pre{background:#0d0d14;padding:10px;border-radius:4px;overflow-x:auto;font-size:.85em;white-space:pre-wrap}
+code{font-family:'JetBrains Mono',monospace}
+.tool{color:#f59e0b;font-size:.8em;margin:4px 0;padding:6px;background:#0d0d14;border-radius:4px}
+a{color:#22d3ee}
+@media print{body{background:#fff;color:#000}.msg{border:1px solid #ccc}}
+</style></head><body>
+<h1>Session 15852b7b</h1>
+<div class="meta">Full ID: <code>15852b7b-da2b-4f23-bdb1-34c6879f55d9</code><br>Modified: 2026-04-02 18:30<br>Size: 256,096 bytes<br>
+Messages: 15 human, 4 assistant text<br>
+Resume: <code>claude --resume 15852b7b-da2b-4f23-bdb1-34c6879f55d9</code></div>
+<div class="msg human"><div class="role">You</div>what has bee done on zipminator? elaborate repport</div>
+<div class="msg thinking"><div class="role">Thinking</div>...</div>
+<div class="msg assistant"><div class="role">Claude</div>Let me pull the current state from the key tracking files to give you an accurate, comprehensive report.</div>
+<div class="tool">[Read] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/docs/guides/FEATURES.md&quot;, &quot;limit&quot;: 200}</code></div>
+<div class="tool">[Read] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/docs/guides/implementation_plan.md&quot;, &quot;limit&quot;: 200}</code></div>
+<div class="tool">[Tool Result] <pre>1	# Zipminator Feature Matrix — Code-Verified Status
+2	
+3	&gt; **Single Source of Truth** for all pillar statuses. Updated after every code change session.
+4	&gt;
+5	&gt; Last verified: 2026-03-20 | Verifier: Claude Code Physical Cryptography Wave 1
+6	&gt;
+7	&gt; Percentages reconciled Mar 19 2026 — summary table n</pre></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;git log --oneline --since=\&quot;2026-01-01\&quot; | head -80&quot;, &quot;description&quot;: &quot;Show recent commits since Jan 2026&quot;}</code></div>
+<div class="tool">[Tool Result] <pre>1	# Zipminator: The First Quantum Post-Quantum Cybersecurity Super-App
+2	
+3	## Vision
+4	
+5	Zipminator is no longer just a file vault or key generator. It is the world&#x27;s first **Post-Quantum Cryptography (PQC) Super-App**. Relying on React Native (Expo) for mobile/tablet and Tauri for desktop, the ap</pre></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;git log --oneline | wc -l &amp;&amp; echo \&quot;---\&quot; &amp;&amp; git log --format=\&quot;%h %ad %s\&quot; --date=short | head -20&quot;, &quot;description&quot;: &quot;Total commits and recent history&quot;}</code></div>
+<div class="tool">[Tool Result] <pre>2b3bc65 chore: auto-commit 4 files from session
+357b24b chore: auto-commit 3 files from session
+b02d282 chore(web): auto-commit 9 files from session
+6312116 chore: auto-commit 1 files from session
+bb3012c chore(web): auto-commit 5 files from session
+ee87f9d chore(web): auto-commit 6 files from sessi</pre></div>
+<div class="tool">[Tool Result] <pre>     181
+---
+2b3bc65 2026-04-02 chore: auto-commit 4 files from session
+357b24b 2026-04-02 chore: auto-commit 3 files from session
+b02d282 2026-04-02 chore(web): auto-commit 9 files from session
+6312116 2026-04-02 chore: auto-commit 1 files from session
+bb3012c 2026-04-02 chore(web): auto-commit 5 f</pre></div>
+<div class="msg thinking"><div class="role">Thinking</div>...</div>
+<div class="msg assistant"><div class="role">Claude</div>Let me grab test counts and codebase metrics for the full picture.</div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;find . -name \&quot;*.rs\&quot; -not -path \&quot;./_archive/*\&quot; -not -path \&quot;./target/*\&quot; | wc -l &amp;&amp; echo \&quot;Rust files\&quot; &amp;&amp; find . -name \&quot;*.py\&quot; -not -path \&quot;./_archive/*\&quot; -not -path \&quot;./.venv/*\&quot; -n</code></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;git log --oneline | wc -l &amp;&amp; echo \&quot;total commits\&quot; &amp;&amp; git log --format=\&quot;%ad\&quot; --date=short | sort -u | wc -l &amp;&amp; echo \&quot;active days\&quot; &amp;&amp; git log --format=\&quot;%ad\&quot; --date=short | head -1 &amp;</code></div>
+<div class="tool">[Tool Result] <pre>     181
+total commits
+      29
+active days
+2026-04-02
+latest commit
+2025-06-22
+first commit</pre></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;find . -name \&quot;*.rs\&quot; -not -path \&quot;./target/*\&quot; -not -path \&quot;./_archive/*\&quot; -exec cat {} + 2&gt;/dev/null | wc -l &amp;&amp; echo \&quot;lines of Rust\&quot; &amp;&amp; find . -name \&quot;*.py\&quot; -not -path \&quot;./_archive/*</code></div>
+<div class="tool">[Tool Result] <pre>     286
+Rust files
+    1102
+Python files
+     186
+Dart files
+     572
+TS/TSX files</pre></div>
+<div class="tool">[Tool Result] <pre>  270833
+lines of Rust
+  275199
+lines of Python
+   36854
+lines of Dart</pre></div>
+<div class="msg thinking"><div class="role">Thinking</div>...</div>
+<div class="msg assistant"><div class="role">Claude</div>---<br><br># Zipminator Project Report<br>**Date**: April 2, 2026 | **Branch**: `main` | **Commits**: 181 across 29 active days<br><br>---<br><br>## What is Zipminator<br><br>Zipminator is the world&#x27;s first Post-Quantum Cryptography (PQC) super-app. It is a QCaaS/QCaaP cybersecurity platform that harvests real quantum entropy from IBM Quantum hardware (156-qubit systems) and uses it to power 9 pillars of military-grade encryption infrastructure. It protects communications, data at rest, network traffic, and spatial awareness from both classical and quantum adversaries.<br><br>It is encryption infrastructure, not antivirus or EDR.<br><br>---<br><br>## Codebase Scale<br><br>| Metric | Count |<br>|--------|-------|<br>| **Rust files** | 286 (~270K lines) |<br>| **Python files** | 1,102 (~275K lines) |<br>| **Dart (Flutter)** | 186 (~37K lines) |<br>| **TypeScript/TSX** | 572 |<br>| **Total commits** | 181 |<br>| **First commit** | June 22, 2025 |<br>| **Latest commit** | April 2, 2026 |<br>| **Active dev days** | 29 |<br><br>---<br><br>## The 9 Pillars and Their Status<br><br>| # | Pillar | Status | Description |<br>|---|--------|--------|-------------|<br>| 1 | **Quantum Vault** | **100%** | AES-256-GCM encryption with ML-KEM-768 derived keys, DoD 5220.22-M 3-pass self-destruct, PII auto-scanning, Tauri UI wired |<br>| 2 | **PQC Messenger** | **85%** | Post-Quantum Double Ratchet protocol, WebSocket signaling, MessageStore with offline queue + group fanout. Live on iPhone via signaling server |<br>| 3 | **Quantum VoIP** | **90%** | PQ-SRTP with AES-256-GCM frame encryption, WebRTC peer connections, encrypted voicemail, 33 tests. Audio plumbing fixed Apr 1 |<br>| 4 | **Q-VPN** | **90%** | WireGuard wrapped in ML-KEM-768 handshakes, kill switch, full state machine. iOS NEVPNManager bridge created |<br>| 5 | **10-Level Anonymizer** | **95%** | All L1-L10 implemented (regex masking through quantum OTP). Origin: NAV production code. 109 tests. Patent pending |<br>| 6 | **Q-AI Assistant** | **85%** | Ollama local LLM, 18-pattern PromptGuard, PII-before-send scanning, PQC tunnel with ephemeral ML-KEM-768 per session. 85 tests |<br>| 7 | **Quantum Mail** | **75%** | PQC envelope encryption, SMTP transport, server-side self-destruct TTL, Docker stack ready. Domain: `@zipminator.zip` |<br>| 8 | **ZipBrowser** | **85%** | Tauri 2.x, 7 privacy subsystems, AI sidebar, PQC proxy, Argon2 password vault. 103 Rust tests. DMG: 5.7MB Apple Silicon |<br>| 9 | **Q-Mesh (RuView)** | **90%** | WiFi sensing mesh for pose/heartbeat detection through walls. QRNG replaces classical mesh keys. 106 mesh tests |<br><br>---<br><br>## Platforms Shipped<br><br>| Platform | Tech | Status |<br>|----------|------|--------|<br>| **Flutter super-app** | Flutter 3.41.4 + Riverpod 3 + FRB v2.11.1 | All 9 pillars + Settings. 18 TestFlight builds shipped |<br>| **macOS desktop** | Tauri 2.x DMG | 5.7MB Apple Silicon, ad-hoc signed |<br>| **Web landing** | Next.js 16 + Tailwind | Live at zipminator.zip, 22 routes |<br>| **Demo** | Flask + static React | `./demo/run.sh`, auto-bootstraps entropy pool |<br>| **Python SDK** | PyPI `zipminator` v0.5.0 | 429 tests, 15-country PII patterns |<br>| **Mobile (legacy)** | Expo React Native | 267/274 tests |<br><br>---<br><br>## Test Suite<br><br>| Domain | Tests Passing |<br>|--------|---------------|<br>| **Rust workspace** | 552 |<br>| **Python SDK** | 429 (17 skipped) |<br>| **Web (vitest)** | 30 |<br>| **Mobile (Expo)** | 267/274 |<br>| **Flutter** | 14 pass, 23 need Supabase |<br>| **E2E signaling** | 6/6 |<br><br>---<br><br>## Cryptographic Foundation<br><br>- **Algorithm**: NIST FIPS 203 (ML-KEM-768), verified against NIST KAT test vectors<br>- **Engine**: Rust Kyber768 core in `crates/zipminator-core/`, exposed to Python via PyO3/maturin<br>- **Entropy**: Three provenance-clean pools (never mixed):<br>  - 2.7 MB real quantum entropy from IBM Kingston (156q, 34 jobs)<br>  - CSI WiFi entropy pool (classical physical, from ESP32)<br>  - 15 MB OS urandom (fallback)<br>- **Compositor**: XOR-fuses available sources with health monitoring + Merkle provenance<br>- **NIST health tests**: SP 800-90B online (RCT + APT + MCV estimator)<br>- **Fuzz targets**: `cargo fuzz run fuzz_keygen`<br><br>---<br><br>## Research and IP Portfolio<br><br>### Papers<br>1. **Quantum-Certified Anonymization** (PoPETs Aug 2026): 0.97/1.0 quality score, 20 pages, 47 refs, 8 figures, 2.7 MB IBM Quantum demo data. Submission-ready.<br>2. **CSI Entropy** (drafted): WiFi CSI as entropy source, compiled PDF exists<br>3. **CHE Framework** (planned): Certified Heterogeneous Entropy, multi-source composition with formal bounds<br><br>### Patents<br>1. **Patent 1** (FILED, Sohknadsnummer 20260384): Quantum anonymization (QRNG-OTP-Destroy), priority March 24, 2026<br>2. **Patent 2** (TO FILE): CSI entropy + PUEK + CSI-PQC. Zero prior art on unilateral CSI<br>3. **Patent 3** (TO FILE): CHE framework (ARE extractor + Merkle provenance)<br><br>### Novel Contributions<br>- Algebraic Randomness Extraction (ARE) engine in both Rust and Python<br>- CsiPoolProvider that preserves provenance (no OS fallback, raises RuntimeError)<br>- 10-level anonymization system from L1 regex through L10 quantum OTP<br><br>---<br><br>## Infrastructure<br><br>| Component | Status |<br>|-----------|--------|<br>| **Signaling server** | Live at `wss://zipminator-signaling.fly.dev` (Fly.io) |<br>| **Web landing** | `https://www.zipminator.zip` (Vercel) |<br>| **OAuth** | GitHub + Google + LinkedIn (next-auth v5 beta, all verified working) |<br>| **Supabase waitlist** | Rate-limited, Zod-validated |<br>| **PyPI** | `zipminator` v0.5.0 (stable release, published Apr 2) |<br>| **GitHub (public)** | `QDaria/zipminator` (Apache-2.0) |<br>| **GitHub (private)** | `MoHoushmand/zipminator-pqc` (full monorepo) |<br>| **Apple Developer** | Enrolled, 18 TestFlight builds |<br>| **Jupyter Book docs** | `docs.zipminator.zip` (custom domain) |<br><br>---<br><br>## What Was Done in the Last Sprint (Mar 26 - Apr 2)<br><br>1. **Live messaging on iPhone**: Signaling server deployed, real WebSocket messaging verified<br>2. **WebRTC integration**: `flutter_webrtc ^0.12.4` for voice/video calls<br>3. **VoIP audio fix**: Speaker toggle wired to platform API, 1:1 calls use real WebRTC<br>4. **VPN bridge**: Native iOS NEVPNManager platform channel created<br>5. **18 TestFlight builds**: Continuous delivery pipeline working<br>6. **IBM Quantum harvest**: 2.7 MB real quantum entropy from ibm_kingston (34 jobs, 156 qubits)<br>7. **Research paper**: Polished to 0.97 score, all 47 citations verified, submission-ready<br>8. **CSI entropy paper**: Drafted with references<br>9. **Patent drafting**: Workflows for patents 2 and 3 reviewed<br>10. **Python SDK**: v0.5.0 published to PyPI<br>11. **Plugin/agent cleanup**: Trimmed from 161 to 50 global plugins, 100 to 34 agents (fixed token overflow)<br><br>---<br><br>## What Remains<br><br>| Area | Gap |<br>|------|-----|<br>| **VPN server** | Created in `vpn-server/` but not deployed to `*.vpn.zipminator.zip` |<br>| **Physical voice test** | VoIP audio wired but needs device-to-device call test |<br>| **Mail server** | Docker stack ready, no production SMTP/IMAP host yet |<br>| **Patents 2+3** | Workflows drafted, need filing before publishing papers 2+3 |<br>| **Play Store** | Not yet submitted |<br>| **App Store** | Need to expire old 1.0.0(1) build, submit current |<br>| **FIPS 140-3** | $80-150K certification process not started |<br>| **Multi-user testing** | Live signaling works 1:1, needs group/stress test |<br><br>---<br><br>`★ Insight ─────────────────────────────────────`<br>**Architecture pattern**: Zipminator uses a layered crypto architecture where Rust is the single source of truth for all cryptographic operations. Python gets access via PyO3/maturin, Flutter via `flutter_rust_bridge`, and the browser via Tauri commands. This means one auditable crypto core serves every platform, rather than reimplementing ML-KEM-768 four times.<br><br>**Provenance-clean entropy**: The three-pool architecture (quantum, CSI, OS) is unusual. Most systems would XOR everything together. By keeping pools separate with Merkle provenance, each byte of entropy can be traced back to its source, which is critical for the patent claims and the PoPETs paper.<br><br>**Test density**: ~1,300 tests across the workspace for a 10-month-old project is substantial, especially given that the crypto core has fuzz targets and constant-time verification.<br>`─────────────────────────────────────────────────`</div>
+<div class="msg human"><div class="role">You</div>Stop hook feedback:<br>🧹 Memory cleanup required. You have 10 memories.<br><br>Read .claude/memories/project_memory.json and consolidate realtime_memories.<br><br>SIGNAL (keep): preferences, decisions, corrections, tech choices, completed features, conventions<br>NOISE (remove): greetings, thanks, praise without context, exact duplicates<br><br>For each memory ask: &quot;Will this help me serve the user better next session?&quot; If yes, keep it.<br><br>Merge related memories into single entries. Target: 5-7 memories. Write back silently.</div>
+<div class="tool">[Read] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;}</code></div>
+<div class="tool">[Tool Result] <pre>1	{
+2	  &quot;memories&quot;: [],
+3	  &quot;manual_memories&quot;: [],
+4	  &quot;realtime_memories&quot;: [
+5	    {
+6	      &quot;type&quot;: &quot;correction&quot;,
+7	      &quot;content&quot;: &quot;When user pastes or cats a prompt file, EXECUTE the workflow immediately. Don&#x27;t summarize, don&#x27;t ask. User runs parallel terminals from saved prompts in docs/guides</pre></div>
+<div class="tool">[Write] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;, &quot;content&quot;: &quot;{\n  \&quot;memories\&quot;: [],\n  \&quot;manual_memories\&quot;: [],\n  \&quot;realtime_memories\&quot;: [\n    {\n      \&quot;type\&quot;</code></div>
+<div class="tool">[Tool Result] <pre>File content has changed since it was last read. This commonly happens when a linter or formatter run via Bash rewrites the file. Call Read on this file to refresh, then retry the edit.</pre></div>
+<div class="tool">[Read] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;}</code></div>
+<div class="tool">[Tool Result] <pre>1	{
+2	  &quot;memories&quot;: [],
+3	  &quot;manual_memories&quot;: [],
+4	  &quot;realtime_memories&quot;: [
+5	    {
+6	      &quot;type&quot;: &quot;correction&quot;,
+7	      &quot;content&quot;: &quot;When user pastes or cats a prompt file, EXECUTE the workflow immediately. Don&#x27;t summarize, don&#x27;t ask. User runs parallel terminals from saved prompts in docs/guides</pre></div>
+<div class="tool">[Write] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;, &quot;content&quot;: &quot;{\n  \&quot;memories\&quot;: [],\n  \&quot;manual_memories\&quot;: [],\n  \&quot;realtime_memories\&quot;: [\n    {\n      \&quot;type\&quot;</code></div>
+<div class="tool">[Tool Result] <pre>File content has changed since it was last read. This commonly happens when a linter or formatter run via Bash rewrites the file. Call Read on this file to refresh, then retry the edit.</pre></div>
+<div class="tool">[Read] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;}</code></div>
+<div class="tool">[Tool Result] <pre>1	{
+2	  &quot;memories&quot;: [],
+3	  &quot;manual_memories&quot;: [],
+4	  &quot;realtime_memories&quot;: [
+5	    {
+6	      &quot;type&quot;: &quot;correction&quot;,
+7	      &quot;content&quot;: &quot;When user pastes or cats a prompt file, EXECUTE the workflow immediately. Don&#x27;t summarize, don&#x27;t ask. User runs parallel terminals from saved prompts in docs/guides</pre></div>
+<div class="tool">[Write] <code>{&quot;file_path&quot;: &quot;/Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json&quot;, &quot;content&quot;: &quot;{\n  \&quot;memories\&quot;: [],\n  \&quot;manual_memories\&quot;: [],\n  \&quot;realtime_memories\&quot;: [\n    {\n      \&quot;type\&quot;</code></div>
+<div class="tool">[Tool Result] <pre>The file /Users/mos/dev/qdaria/zipminator/.claude/memories/project_memory.json has been updated successfully.</pre></div>
+<div class="msg assistant"><div class="role">Claude</div>Memory consolidated: 10 entries down to 5. Merged the two correction entries, merged paper/patent completions, removed noise (task notifications, API error echoes, conversation fragments). All signal preserved.</div>
+</body></html>

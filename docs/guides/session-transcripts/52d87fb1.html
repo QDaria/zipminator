@@ -1,0 +1,81 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Session 52d87fb1 | 2026-04-02 18:05</title><style>
+body{font-family:'DM Sans',-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:20px;background:#0a0a0f;color:#e0e0e0}
+h1{color:#22d3ee;font-size:1.4em;border-bottom:1px solid #333;padding-bottom:10px}
+.meta{color:#888;font-size:.85em;margin-bottom:20px}
+.msg{margin:16px 0;padding:12px 16px;border-radius:8px;overflow-wrap:break-word}
+.human{background:#1a1a2e;border-left:3px solid #22d3ee}
+.assistant{background:#111118;border-left:3px solid #34d399}
+.system{background:#0d0d14;border-left:3px solid #555;color:#777;font-size:.8em;max-height:60px;overflow:hidden;cursor:pointer}
+.system:hover{max-height:none}
+.thinking{background:#0d0d1a;border-left:3px solid #a78bfa;color:#999;font-size:.85em;max-height:80px;overflow:hidden;cursor:pointer}
+.thinking:hover{max-height:none}
+.role{font-weight:700;font-size:.75em;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.human .role{color:#22d3ee}.assistant .role{color:#34d399}.system .role{color:#666}.thinking .role{color:#a78bfa}
+pre{background:#0d0d14;padding:10px;border-radius:4px;overflow-x:auto;font-size:.85em;white-space:pre-wrap}
+code{font-family:'JetBrains Mono',monospace}
+.tool{color:#f59e0b;font-size:.8em;margin:4px 0;padding:6px;background:#0d0d14;border-radius:4px}
+a{color:#22d3ee}
+@media print{body{background:#fff;color:#000}.msg{border:1px solid #ccc}}
+</style></head><body>
+<h1>Session 52d87fb1</h1>
+<div class="meta">Full ID: <code>52d87fb1-3071-47cd-9e9e-1f7d33eb5c40</code><br>Modified: 2026-04-02 18:05<br>Size: 115,046 bytes<br>
+Messages: 10 human, 2 assistant text<br>
+Resume: <code>claude --resume 52d87fb1-3071-47cd-9e9e-1f7d33eb5c40</code></div>
+<div class="msg human"><div class="role">You</div>what has bee done on zipminator?</div>
+<div class="msg thinking"><div class="role">Thinking</div>...</div>
+<div class="msg assistant"><div class="role">Claude</div>Let me pull together the current state from memory, git history, and the project files.</div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;git log --oneline -20 --format=\&quot;%h %ad %s\&quot; --date=short&quot;, &quot;description&quot;: &quot;Show recent git commits&quot;}</code></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;git log --oneline --since=\&quot;2026-03-01\&quot; --format=\&quot;%h %ad %s\&quot; --date=short | wc -l&quot;, &quot;description&quot;: &quot;Count commits since March 2026&quot;}</code></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;git log --oneline --since=\&quot;2026-03-01\&quot; --format=\&quot;%ad\&quot; --date=short | sort -u&quot;, &quot;description&quot;: &quot;Show active development days&quot;}</code></div>
+<div class="tool">[Tool Result] <pre>17e8f99 2026-04-02 chore(web): auto-commit 8 files from session
+162232b 2026-04-02 chore(web): auto-commit 73 files from session
+e52e2d2 2026-04-02 chore: auto-commit 4 files from session
+ae4bf4b 2026-04-02 chore(python): auto-commit 4 files from session
+5658949 2026-04-02 chore(flutter): auto-commi</pre></div>
+<div class="tool">[Tool Result] <pre>     171</pre></div>
+<div class="tool">[Tool Result] <pre>2026-03-01
+2026-03-02
+2026-03-03
+2026-03-04
+2026-03-07
+2026-03-08
+2026-03-09
+2026-03-10
+2026-03-11
+2026-03-17
+2026-03-18
+2026-03-19
+2026-03-20
+2026-03-21
+2026-03-22
+2026-03-23
+2026-03-24
+2026-03-25
+2026-03-26
+2026-03-27
+2026-03-28
+2026-03-29
+2026-03-30
+2026-03-31
+2026-04-01
+2026-04-02</pre></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;git log --oneline --all | wc -l&quot;, &quot;description&quot;: &quot;Total commit count&quot;}</code></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;find /Users/mos/dev/qdaria/zipminator -name \&quot;*.rs\&quot; -not -path \&quot;*/target/*\&quot; | wc -l &amp;&amp; find /Users/mos/dev/qdaria/zipminator -name \&quot;*.py\&quot; -not -path \&quot;*/__pycache__/*\&quot; -not -path \&quot;</code></div>
+<div class="tool">[Tool Result] <pre>fatal: bad object refs/heads/CLAUDE.md
+       0</pre></div>
+<div class="tool">[Tool Result] <pre>     309
+     649
+     180
+     557</pre></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;git rev-list --count HEAD&quot;, &quot;description&quot;: &quot;Total commits on HEAD&quot;}</code></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;cloc --quiet --sum-one /Users/mos/dev/qdaria/zipminator/crates /Users/mos/dev/qdaria/zipminator/src /Users/mos/dev/qdaria/zipminator/app/lib /Users/mos/dev/qdaria/zipminator/web/src /User</code></div>
+<div class="tool">[Tool Result] <pre>175</pre></div>
+<div class="tool">[Tool Result] <pre>cloc not available</pre></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;wc -l $(find /Users/mos/dev/qdaria/zipminator/crates -name \&quot;*.rs\&quot; -not -path \&quot;*/target/*\&quot;) 2&gt;/dev/null | tail -1&quot;, &quot;description&quot;: &quot;Count Rust lines in crates&quot;}</code></div>
+<div class="tool">[Bash] <code>{&quot;command&quot;: &quot;wc -l $(find /Users/mos/dev/qdaria/zipminator/app/lib -name \&quot;*.dart\&quot;) 2&gt;/dev/null | tail -1&quot;, &quot;description&quot;: &quot;Count Dart lines in Flutter app&quot;}</code></div>
+<div class="tool">[Tool Result] <pre>   19185 total</pre></div>
+<div class="tool">[Tool Result] <pre>   18551 total</pre></div>
+<div class="msg assistant"><div class="role">Claude</div>Here&#x27;s the full picture of what&#x27;s been built on Zipminator:<br><br>---<br><br>## Zipminator: Current State (Apr 2, 2026)<br><br>**175 commits**, 26 active dev days in the last month, **171 commits since March 1 alone**. This has been an intense sprint.<br><br>### What It Is<br><br>The world&#x27;s first **Post-Quantum Cryptography (PQC) super-app**: a QCaaS/QCaaP cybersecurity platform with 9 pillars of military-grade encryption. It shields network traffic, stored credentials, and data at rest from both classical and quantum adversaries. Uses **NIST FIPS 203 ML-KEM-768** (Kyber) as the core crypto algorithm.<br><br>### What&#x27;s Built (by component)<br><br>| Component | Tech | Lines | Status |<br>|-----------|------|-------|--------|<br>| **Rust crypto core** | Kyber768, PyO3, NIST KAT, fuzz | ~19K | 552 tests passing |<br>| **Flutter super-app** | Dart, Riverpod 3, FRB v2.11.1 | ~18.5K | 18 TestFlight builds shipped |<br>| **Python SDK** | PyO3 bindings, entropy, PII scanner | 649 files | v0.5.0 on PyPI, 429 tests |<br>| **Web landing** | Next.js 16, Tailwind, Framer Motion | 557 TS files | Live at zipminator.zip |<br>| **Tauri browser** | Rust + Tauri 2.x, 7 privacy systems | in crates | 103 tests, DMG built |<br>| **API backend** | FastAPI, PostgreSQL, Redis | in api/ | Needs DB to start |<br>| **Mobile** | Expo React Native | in mobile/ | 267/274 tests |<br>| **Signaling server** | WebSocket on Fly.io | Python | Live at wss://zipminator-signaling.fly.dev |<br>| **Demo** | Flask + static React | in demo/ | Working, auto-bootstraps entropy |<br><br>### 9 Pillars (all 100% code-complete as of Mar 17)<br><br>1. **Q-VPN** - PQC-encrypted VPN tunnel<br>2. **Q-Mail** - Quantum-safe email<br>3. **Q-Messenger** - Real-time encrypted messaging (verified on iPhone)<br>4. **Q-VoIP** - Voice/video calls via WebRTC (audio plumbing fixed Apr 1)<br>5. **Q-Vault** - Encrypted file storage with self-destruct<br>6. **Q-Browser** - Tauri PQC browser with 7 privacy subsystems<br>7. **Q-Mesh** - WiFi DensePose via ESP32-S3 CSI (integrated RuView)<br>8. **Q-Identity** - PQC digital identity + PII scanner (15 countries)<br>9. **Entropy Pool** - QRNG from IBM Quantum (2.7 MB real quantum entropy from ibm_kingston 156q)<br><br>### Recent Sprint Highlights (Mar-Apr 2026)<br><br>- **Mar 17**: Enterprise Upgrade Sprint completed all 9 pillars to 100%<br>- **Mar 24**: **Patent filed** (Søknadsnummer 20260384) for quantum anonymization<br>- **Mar 26-30**: UX Sprint with 18 TestFlight builds, live signaling, real messaging on iPhone<br>- **Mar 30**: WebRTC integrated for real voice/video conference calls<br>- **Apr 1**: VoIP audio fix (speaker toggle, 1:1 WebRTC), CSI entropy pool provider added, IBM quantum harvest (2.7 MB from ibm_kingston)<br>- **Apr 2**: Python SDK v0.5.0 published to PyPI, web dashboard updates<br><br>### Research &amp; IP<br><br>- **3 patents** in portfolio (1 filed, 2 to file before papers publish)<br>- **Research paper** at 0.80/1.0 adversarial PoPETs review score (targeting Aug 2026 submission)<br>- **CHE Framework** paper: Certified Heterogeneous Entropy (novel CSI-as-entropy contribution)<br>- **IBM Quantum**: Real jobs on ibm_kingston (156 qubits) and ibm_fez (156 qubits, Heron r2)<br><br>### Infra &amp; DevOps<br><br>- OAuth working (GitHub, Google, LinkedIn)<br>- Docker Compose for full stack (postgres, redis, api, web)<br>- Apple Developer enrolled, TestFlight pipeline active<br>- Public repo at github.com/QDaria/zipminator (Apache-2.0)<br>- Private monorepo at MoHoushmand/zipminator-pqc<br><br>### What Remains<br><br>- Physical voice test on real devices (VoIP audio)<br>- Incoming call UI<br>- Deploy VPN server<br>- Multi-user testing<br>- Play Store submission<br>- 3 items for paper score 0.90+ (MI proof, domain-attack proposition, TRNG footnote)<br>- File patents 2 and 3 before publishing papers 2 and 3<br><br>`★ Insight ─────────────────────────────────────`<br>**Scale context**: ~1,695 source files across Rust, Python, Dart, and TypeScript. The Rust crypto core (19K lines) provides the security foundation, exposed to Python via PyO3 and to Flutter via flutter_rust_bridge. This &quot;write once in Rust, bind everywhere&quot; pattern is why one crate powers the SDK, the browser, and the mobile app simultaneously.<br><br>**Entropy provenance** is architecturally interesting: three separate pools (quantum, CSI WiFi, OS) are never mixed, preserving cryptographic provenance. The CompositorProvider XOR-fuses them only at consumption time with Merkle audit trails. This is what the CHE patent covers.<br>`─────────────────────────────────────────────────`</div>
+</body></html>
