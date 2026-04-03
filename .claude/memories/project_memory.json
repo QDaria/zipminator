@@ -4,59 +4,65 @@
   "realtime_memories": [
     {
       "type": "correction",
-      "content": "When user pastes or cats a prompt file, EXECUTE the workflow immediately. Don't summarize, don't ask. User runs parallel terminals from saved prompts in docs/guides/prompts/. Also: do NOT prompt for permission when writing project_memory.json during cleanup hooks. Write silently.",
+      "content": "Execute immediately, don't ask obvious questions, verify things yourself. Do NOT prompt for permission on project_memory.json writes. When user pastes or cats a prompt file, EXECUTE the workflow immediately.",
       "added_at": "2026-04-02T16:55:23.128521",
       "source": "consolidated"
     },
     {
       "type": "decision",
-      "content": "Plugin/agent token overflow fix: keep global plugins under ~50, agent descriptions under 100 chars, to avoid ~15.9k token context overflow.",
-      "added_at": "2026-04-02T11:23:50.962571",
-      "source": "consolidated"
-    },
-    {
-      "type": "tech_choice",
-      "content": "CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 set in ~/.zshrc. Restart Claude Code to pick up. Needed for writing full papers in one shot. Note: env var is read at launch time only; mid-session changes require restart.",
-      "added_at": "2026-04-02T18:13:00.000000",
+      "content": "Plugin/agent token overflow: keep global plugins under ~50, agent descriptions under 100 chars. CLAUDE_CODE_MAX_OUTPUT_TOKENS=128000 in ~/.zshrc (read at launch only). Paper review: score submission readiness separately from content quality. claude-never-forgets plugin DISABLED (stop hook was pruning context).",
+      "added_at": "2026-04-03T05:00:00.000000",
       "source": "consolidated"
     },
     {
       "type": "completed",
-      "content": "Papers: P1 PoPETs 22pp (needs 12pp trim or venue change), P2 CSI WiSec 8pp COMPLETE. Patents: 3 in docs/ip/patent-{1,2,3}-*/ (all claims code-verified, file P2+P3 before publishing ~NOK 5,500 total). Full project (Apr 2): 181 commits, 9 pillars (75-100%), 552 Rust + 429 Python + 30 web + 267 mobile tests, 6 platforms, live signaling, PyPI v0.5.0, 18 TestFlight builds. TestFlight public link: https://testflight.apple.com/join/cNX9nX7G (iOS only; macOS build not yet uploaded).",
-      "added_at": "2026-04-02T23:33:00.000000",
+      "content": "Full project (Apr 2): 9 pillars, 552 Rust + 429 Python + 30 web + 267 mobile tests, 6 platforms, PyPI v0.5.0, 18 TestFlight builds. Papers: P1 PoPETs 22pp (0.97 content, 0.60 submission-ready), P2 ACM WiSec 8pp (complete, compiles clean, 23 refs). Patents: 3 (1 filed #20260384, 2+3 pending). Auth: Supabase PKCE + 5 OAuth providers.",
+      "added_at": "2026-04-03T05:00:00.000000",
       "source": "consolidated"
     },
     {
-      "type": "correction",
-      "content": "Peer reviewer skill scored inflated 0.97 using code quality metrics for paper review. Must score submission readiness separately from content quality; missing sections (data availability, ethics, reproducibility) should cap score at 0.80. Skill path: /Users/mos/dev/qdaria/.claude/skills/quantum-peer-reviewer.",
-      "added_at": "2026-04-02T22:35:00.000000",
+      "type": "tech_choice",
+      "content": "Auth: Supabase PKCE + FlutterWebAuth2 + native Apple Sign In. Redirect: com.qdaria.zipminator://login-callback. TestFlight: https://testflight.apple.com/join/cNX9nX7G (iOS 15.0+).",
+      "added_at": "2026-04-03T00:40:00.000000",
       "source": "consolidated"
     },
     {
       "type": "claude_response",
-      "content": "Consolidated 10 down to 5. Removed transient task notifications, truncated messages, and ephemeral claude_response captures. Merged the TestFlight link into the existing project status entry.\n\n---\n\nBa",
-      "added_at": "2026-04-02T23:40:02.741744",
+      "content": "## Final Synthesis — All 3 Reviewers + All Fixes Applied\n\n```\nADVERSARIAL REVIEW — COMPLETE\n══════════════════════════════════════════════════════════════════\n          │ R1 Privacy │ R2 Crypto  │ R3 ",
+      "added_at": "2026-04-03T05:13:55.405000",
       "source": "realtime_capture"
     },
     {
       "type": "message",
-      "content": "Yes of course check oAuth, it is essentioial that they can login with their own credentials, wther it be Linkedin, Apple, Github, Google or Email, they must all be working no matter what!!!",
-      "added_at": "2026-04-02T23:40:02.741759",
+      "content": "why are we still using words like honest and honestly? It is so unprofessional and implies we havent beeen honest about other stuff, I've adressed and prohibited expolicitly these words and we have ha",
+      "added_at": "2026-04-03T05:13:55.405030",
       "source": "realtime_capture"
     },
     {
       "type": "claude_response",
-      "content": "Here's the full picture.\n\n`★ Insight ─────────────────────────────────────`\nThe auth architecture is well-designed: Supabase PKCE flow + `FlutterWebAuth2` for OAuth providers, native `sign_in_with_app",
-      "added_at": "2026-04-02T23:42:12.530233",
+      "content": "Consolidated 11 to 4. Removed 7 raw captures (meta-notes about consolidation, user frustration about compaction, truncated responses). Merged decisions + tech choices, updated Paper 2 status to comple",
+      "added_at": "2026-04-03T05:16:06.812180",
       "source": "realtime_capture"
     },
     {
       "type": "message",
-      "content": "Yes why are you asking me for such obvious questions? Why cant you just have this as a rule?",
-      "added_at": "2026-04-02T23:42:12.530249",
+      "content": "What was we talking about in this session, why do alll outputs friom you and inputs fromm me being wipped out?",
+      "added_at": "2026-04-03T05:16:06.812197",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "claude_response",
+      "content": "Already at 4 memories, well under target. No noise to remove, no duplicates. No action needed.",
+      "added_at": "2026-04-03T05:18:03.758090",
+      "source": "realtime_capture"
+    },
+    {
+      "type": "message",
+      "content": "didnt you create the document i asked for?",
+      "added_at": "2026-04-03T05:18:03.758111",
       "source": "realtime_capture"
     }
   ],
   "created_at": "2026-04-02T10:01:47.584108",
-  "updated_at": "2026-04-02T23:42:12.530251"
+  "updated_at": "2026-04-03T05:18:03.758113"
 }
