@@ -119,9 +119,9 @@ Use /hive-mind-advanced with 7 workstreams:
 
 ## Output
 
-Create: `docs/research/csi-entropy-paper/main.tex` (ACM sigconf)
-Create: `docs/research/csi-entropy-paper/references.bib`
-Create: `docs/research/csi-entropy-paper/figures/` (any diagrams)
+Create: `docs/research/paper-2-csi-entropy-puek/main.tex` (ACM sigconf)
+Create: `docs/research/paper-2-csi-entropy-puek/references.bib`
+Create: `docs/research/paper-2-csi-entropy-puek/figures/` (any diagrams)
 
 ## Quality Gates (ALL must pass)
 

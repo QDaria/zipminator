@@ -187,7 +187,7 @@ After 3 self-answer rounds, produce this structure:
 ```
 /effort max
 
-Improve docs/research/paper/main.tex to 0.995 COMPOSITE score.
+Improve docs/research/paper-1-quantum-anonymization/main.tex to 0.995 COMPOSITE score.
 Target venue: PoPETs 2026.
 
 STEP 0 (BLOCKING — before ANY content work):
