@@ -68,7 +68,7 @@
 <p>No existing entropy system provides cryptographic proof of which sources contributed to a given entropy output. Auditors and regulators (particularly under DORA Article 7, which mandates full cryptographic key lifecycle management) cannot verify the lineage of entropy used in key generation.</p>
 
 <h3>No Graceful Degradation Standard</h3>
-<p>Existing multi-source entropy systems either require all sources to be available or silently substitute weaker sources without adjusting entropy estimates. No prior system provides honest, automatically adjusted min-entropy bounds when sources degrade or fail.</p>
+<p>Existing multi-source entropy systems either require all sources to be available or silently substitute weaker sources without adjusting entropy estimates. No prior system provides accurately adjusted min-entropy bounds when sources degrade or fail.</p>
 <hr />
 
 <h2>SUMMARY OF THE INVENTION</h2>
@@ -213,7 +213,7 @@ return result[:output_len]</code></pre>
 <li>adjusting the reported min-entropy bound to reflect only the entropy of sources that actually contributed to the composition;</li>
 <li>raising an error if fewer than a configurable minimum number of non-FAILED sources are available;</li>
 </ol>
-<p>wherein the system continues to produce certified entropy even when individual sources fail, with honest min-entropy bounds that decrease as sources drop out, and wherein no silent fallback to weaker entropy sources occurs without explicit reporting in the provenance certificate.</p>
+<p>wherein the system continues to produce certified entropy even when individual sources fail, with accurately adjusted min-entropy bounds that decrease as sources drop out, and wherein no silent fallback to weaker entropy sources occurs without explicit reporting in the provenance certificate.</p>
 
 <h3>Dependent Claims</h3>
 

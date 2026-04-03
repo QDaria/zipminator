@@ -44,7 +44,7 @@ wherein the certificate provides cryptographic proof of which sources contribute
 
 (e) raising an error if fewer than a configurable minimum number of non-FAILED sources are available;
 
-wherein the system continues to produce certified entropy even when individual sources fail, with honest min-entropy bounds that decrease as sources drop out, and wherein no silent fallback to weaker entropy sources occurs without explicit reporting in the provenance certificate.
+wherein the system continues to produce certified entropy even when individual sources fail, with accurately adjusted min-entropy bounds that decrease as sources drop out, and wherein no silent fallback to weaker entropy sources occurs without explicit reporting in the provenance certificate.
 
 ## Dependent Claims
 

@@ -203,7 +203,7 @@
 <li><p>adjusting the reported min-entropy bound to reflect only the entropy of sources that actually contributed to the composition;</p></li>
 <li><p>raising an error if fewer than a configurable minimum number of non-FAILED sources are available;</p></li>
 </ol>
-<p>wherein the system continues to produce certified entropy even when individual sources fail, with honest min-entropy bounds that decrease as sources drop out, and wherein no silent fallback to weaker entropy sources occurs without explicit reporting in the provenance certificate.</p>
+<p>wherein the system continues to produce certified entropy even when individual sources fail, with accurately adjusted min-entropy bounds that decrease as sources drop out, and wherein no silent fallback to weaker entropy sources occurs without explicit reporting in the provenance certificate.</p>
 
 <h2 id="dependent-claims">Dependent Claims</h2>
 <p><strong>Claim 4.</strong> The method of Claim 1, wherein the SHAKE-256 expansion produces 34 bytes per algebraic step, comprising 1 byte for domain selection modulo 5, 16 bytes for a signed 128-bit value, 16 bytes for a signed 128-bit imaginary component, and 1 byte for operation selection modulo 6.</p>
