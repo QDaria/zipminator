@@ -46,7 +46,7 @@ Patent literature confirms this bilateral focus:
 
 All prior art requires **two cooperating endpoints** that observe the same channel simultaneously. The extracted bits serve exclusively as a shared secret key. No prior system uses CSI measurements from a **single device** to produce **general-purpose entropy bytes** suitable for any cryptographic application (key generation, nonce creation, entropy pool seeding, randomness extraction).
 
-This represents a paradigm shift from bilateral key agreement to unilateral entropy harvesting.
+This represents a fundamental departure from bilateral key agreement, introducing unilateral entropy harvesting as a distinct application of CSI measurements.
 
 ### Physical Unclonable Functions (PUFs) vs. Environment Keys
 
@@ -157,11 +157,11 @@ Input keying material requires a minimum of 32 bytes (`MIN_ENTROPY_BYTES`, `entr
 
 The preferred embodiment is implemented in:
 
-- **Rust crate** `zipminator-mesh`: CSI entropy harvester (`csi_entropy.rs`, 407 lines, 12 tests), PUEK (`puek.rs`, 393 lines, 11 tests), entropy bridge (`entropy_bridge.rs`, 368 lines, 11 tests).
-- **Python module** `src/zipminator/entropy/csi_pool_provider.py`: CSI pool reader with position persistence and file locking (132 lines, 11 tests).
+- **Rust crate** `zipminator-mesh`: CSI entropy harvester (`csi_entropy.rs`, 407 lines, 11 tests), PUEK (`puek.rs`, 393 lines, 11 tests), entropy bridge (`entropy_bridge.rs`, 368 lines, 11 tests).
+- **Python module** `src/zipminator/entropy/csi_pool_provider.py`: CSI pool reader with position persistence and file locking (133 lines, 11 tests).
 - **ESP32-S3**: CSI capture platform (802.11n HT20, 56 subcarriers).
 
-Total test coverage: 45 tests across the three Rust modules plus 11 Python tests.
+Total test coverage: 33 tests across the three Rust modules plus 11 Python tests.
 
 ## DRAWINGS
 

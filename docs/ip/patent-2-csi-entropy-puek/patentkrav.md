@@ -71,3 +71,5 @@ wherein the derived keys are suitable for use with ML-KEM-768 (NIST FIPS 203) ke
 **Claim 12.** The method of Claim 3, further comprising deriving a MeshKey for HMAC-SHA256 beacon authentication from the composed entropy using HKDF-SHA256.
 
 **Claim 13.** The method of Claim 1, wherein a CSI pool provider raises a runtime error when the pool file is exhausted rather than falling back to operating system entropy, thereby preserving the provenance integrity of CSI-derived entropy.
+
+**Claim 14.** The method of Claim 1, wherein the wireless interface is any IEEE 802.11-compatible device capable of reporting per-subcarrier complex-valued channel state information, including but not limited to 802.11n, 802.11ac, and 802.11ax interfaces with any subcarrier count.

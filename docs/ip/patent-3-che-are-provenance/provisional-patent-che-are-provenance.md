@@ -186,6 +186,30 @@ The Digital Operational Resilience Act (DORA), effective in Norway from 1 July 2
 | Program generation | Random matrix | Seed + code | SHAKE-256 expansion |
 | Output expansion | Not built-in | Not built-in | Counter-mode SHA-256 |
 
+### ARE Entropy Contribution Independent of Output Expansion
+
+The algebraic program contributes entropy to the extraction pipeline through three mechanisms that operate independently of the SHA-256 counter-mode output expansion:
+
+1. **Input diffusion**: Each algebraic step mixes the accumulator with a pseudorandom value drawn from SHAKE-256 expansion. Because the program traverses five distinct number domains with different arithmetic semantics (modular wrapping in N, signed projection in Z, scaled rational arithmetic in Q, fixed-point computation in R, and complex plane operations in C), the accumulator undergoes non-linear transformations that cannot be replicated by any single-domain hash function.
+
+2. **Domain-crossing non-linearity**: Consecutive steps may execute in different domains (e.g., NATURAL followed by COMPLEX followed by RATIONAL). Each domain transition introduces a projection operation that is not invertible in the general case. An adversary who observes the output cannot reconstruct the intermediate accumulator states without knowing both the seed and the exact domain sequence.
+
+3. **Algebraic mixing with bounded exponentiation**: The EXP operation (capped at exponent 64) introduces polynomial non-linearity within each domain. Combined with the six available operations across five domains, the program space is combinatorially large: for an N-step program, there are (5 * 6)^N = 30^N possible program structures, each producing distinct accumulator trajectories.
+
+The SHA-256 counter-mode expansion serves as a final uniformity guarantee, ensuring the output distribution is computationally indistinguishable from uniform. However, even if SHA-256 were replaced with any other PRF, the algebraic program would still provide min-entropy reduction from the input, because the domain-crossing non-linearities are properties of the algebraic execution, not the output hash.
+
+Empirical validation: the ARE extractor passes NIST SP 800-22 Statistical Test Suite checks for frequency, runs, block frequency, and longest run of ones, with p-values consistently above 0.01 across multiple seeds (verified in `tests/python/test_entropy_are_nist.py`).
+
+### Health Test Specification
+
+The NIST SP 800-90B health monitoring referenced in Claim 3 implements the following tests:
+
+- **Repetition Count Test**: Detects a single value repeated more than the expected maximum consecutive count for the source's estimated min-entropy.
+- **Adaptive Proportion Test**: Monitors the frequency of the most common value within a sliding window, flagging if it exceeds the expected proportion for the declared entropy rate.
+- **Min-Entropy Estimation**: Computes a conservative lower bound on bits-per-byte using the most common value estimator from SP 800-90B Section 6.3.1.
+
+A source is classified as FAILED when more than 1% of byte reads trigger a health test failure. DEGRADED status is assigned when anomalies are detected but remain below the 1% threshold.
+
 ---
 
 ## CLAIMS
@@ -234,7 +258,7 @@ wherein the certificate provides cryptographic proof of which sources contribute
 
 (e) raising an error if fewer than a configurable minimum number of non-FAILED sources are available;
 
-wherein the system continues to produce certified entropy even when individual sources fail, with honest min-entropy bounds that decrease as sources drop out, and wherein no silent fallback to weaker entropy sources occurs without explicit reporting in the provenance certificate.
+wherein the system continues to produce certified entropy even when individual sources fail, with accurately adjusted min-entropy bounds that decrease as sources drop out, and wherein no silent fallback to weaker entropy sources occurs without explicit reporting in the provenance certificate.
 
 ### Dependent Claims
 
