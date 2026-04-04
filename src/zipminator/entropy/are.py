@@ -435,7 +435,7 @@ class AreExtractor:
             Extracted value in range [0, modulus).
         """
         acc = input_val
-        for step in self._steps:
+        for idx, step in enumerate(self._steps):
             acc = domain_execute(
                 step.domain,
                 step.operation,
@@ -445,6 +445,15 @@ class AreExtractor:
                 self._modulus,
                 self._domain_bound,
             )
+            # Zero-avoidance: prevent absorbing-state collapse.
+            # MUL and MOD have 0 as a fixed point; once acc=0, all
+            # subsequent MUL/MOD steps preserve 0, destroying entropy.
+            # Inject a deterministic perturbation derived from the
+            # step index and original input to escape the zero state.
+            if acc == 0:
+                acc = ((step.value + idx + 1) ^ (input_val & 0xFF)) % self._domain_bound
+                if acc == 0:
+                    acc = idx + 1
         # Final reduction mod modulus.
         # Ensure non-negative result.
         return abs(acc) % self._modulus

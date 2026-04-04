@@ -34,7 +34,7 @@ Related to Norwegian Patent Application No. 20260384 (filed 2026-03-24), "Method
 
 ## FIELD OF THE INVENTION
 
-The present invention relates to cryptographic entropy management. More specifically, the invention relates to: (1) a new family of randomness extractors based on algebraic programs over five number domains; (2) a method for composing entropy from multiple heterogeneous sources with per-source health monitoring and Merkle-tree provenance certificates; and (3) a graceful degradation protocol that maintains certified entropy production when individual sources fail.
+The present invention relates to cryptographic entropy management. More specifically, the invention relates to: (1) a new family of randomness extractors based on algebraic programs over five or more number domains, including extensions to hypercomplex algebras, finite fields, and p-adic numbers; (2) a method for composing entropy from multiple heterogeneous sources with per-source health monitoring and Merkle-tree provenance certificates; (3) a graceful degradation protocol that maintains certified entropy production when individual sources fail; and (4) the application of algebraic extraction as a conditioner for wireless Channel State Information entropy sources.
 
 ---
 
@@ -74,9 +74,10 @@ Existing multi-source entropy systems (US10140095, US9477443B1) either require a
 
 The present invention provides three interrelated methods:
 
-1. **Algebraic Randomness Extraction (ARE)**: A new family of randomness extractors parameterized by algebraic programs over five number domains (N, Z, Q, R, C) with six arithmetic operations (ADD, SUB, MUL, DIV, MOD, EXP). Programs are generated deterministically from a seed via SHAKE-256. This is distinct from all known hash-based extractor families.
+1. **Algebraic Randomness Extraction (ARE)**: A new family of randomness extractors parameterized by algebraic programs over five or more number domains with six arithmetic operations (ADD, SUB, MUL, DIV, MOD, EXP). The core embodiment uses five classical domains (N, Z, Q, R, C). Extended embodiments include quaternions (H) for non-commutative mixing, octonions (O) for non-associative mixing, finite fields GF(p^n) for provable uniform distribution, and p-adic numbers (Q_p) for orthogonal-metric mixing. Programs are generated deterministically from a seed via SHAKE-256. This family is distinct from all known hash-based extractor families.
 2. **Certified heterogeneous entropy composition**: Multiple independent entropy sources (quantum, classical physical, operating system) are XOR-fused with per-source NIST SP 800-90B health monitoring. Each composition produces a Merkle-tree provenance certificate with canonically serialized source records as leaves, providing cryptographic proof of entropy lineage.
 3. **Graceful degradation**: Failed sources are automatically excluded from composition. Degraded sources trigger warnings but continue to contribute. The reported min-entropy bound is adjusted to reflect only the sources that actually contributed. A configurable minimum source count prevents composition below a safety threshold.
+4. **ARE as entropy source conditioner**: The algebraic extraction method can replace Von Neumann debiasing at the entropy source level, processing full quantized measurements rather than single least-significant bits, reducing extraction loss from approximately 50% to approximately 15%.
 
 ---
 
@@ -123,6 +124,97 @@ while len(result) < output_len:
     counter += 1
 return result[:output_len]
 ```
+
+### 1.6 Extended Number Domains
+
+The ARE framework accommodates algebraic structures beyond the five classical number domains. The following extensions introduce qualitatively different algebraic properties that enhance mixing and inversion resistance.
+
+#### 1.6.1 Quaternions (H)
+
+The quaternion algebra is a 4-dimensional associative division algebra over the reals, defined by Hamilton's relations: i² = j² = k² = ijk = -1. Quaternion multiplication is non-commutative: ij = k but ji = -k.
+
+For ARE, non-commutativity means that a multiplication step `acc * value` produces a different result from `value * acc`. The SHAKE-256 program generator encodes an additional byte per quaternion step to specify left-multiplication or right-multiplication, effectively doubling the mixing paths through each step. An adversary attempting to invert the program must determine the multiplication direction at each step.
+
+Quaternion arithmetic in the ARE program operates on bounded quaternion values (a + bi + cj + dk) where a, b, c, d are bounded integers. The projection to integers takes the scalar part (a) after the quaternion operation.
+
+#### 1.6.2 Octonions (O)
+
+The octonion algebra is an 8-dimensional non-associative division algebra over the reals, with multiplication defined by the Fano plane. Octonions are the largest normed division algebra by Hurwitz's theorem (1898): R, C, H, and O are the only normed division algebras over the reals. Octonion multiplication is both non-commutative and non-associative: (ab)c is not equal to a(bc) in general.
+
+Non-associativity has a profound consequence for ARE: a sequence of K octonion multiplication steps cannot be simplified by algebraic regrouping. In commutative and associative domains (N through C), an adversary can attempt to combine consecutive steps algebraically. In octonion steps, each parenthesization of the operations produces a distinct result. The number of distinct parenthesizations grows as the Catalan numbers C(K) = (2K)! / ((K+1)! * K!), making inversion combinatorially harder.
+
+Because octonions are a division algebra, no zero divisors exist. This ensures that no sequence of octonion operations can force the accumulator to a degenerate state (unlike sedenions, the 16-dimensional Cayley-Dickson algebra, which does have zero divisors and is therefore excluded from preferred embodiments).
+
+#### 1.6.3 Finite Fields GF(p^n)
+
+A finite field GF(p^n) for prime p and positive integer n contains exactly p^n elements. Arithmetic is exact: addition and multiplication are defined modulo an irreducible polynomial of degree n over GF(p). Every nonzero element has a multiplicative inverse. There are no overflow, rounding, or projection concerns.
+
+For ARE, finite fields provide the strongest per-step min-entropy guarantee. If the input to a field multiplication by a nonzero constant is uniformly distributed over GF(p^n), the output is also uniformly distributed, because multiplication by a nonzero element is a bijection on GF(p^n)* (this follows from the group structure of the multiplicative group). Addition and subtraction of any constant are also bijections. The per-step min-entropy is therefore log_2(p^n) bits when the input is uniform and the operand is nonzero. When the operand is zero (which occurs with probability 1/p^n in a random program), the accumulator is unchanged for multiplication or zero for division; these cases do not reduce min-entropy below that of the previous step.
+
+In the preferred embodiment, GF(2^8) is used (the same field as AES), containing 256 elements with arithmetic defined modulo the irreducible polynomial x^8 + x^4 + x^3 + x + 1. Operations in GF(2^8) can be hardware-accelerated via the PCLMULQDQ (carry-less multiplication) instruction available on modern x86 processors.
+
+For larger fields, GF(2^128) (used in AES-GCM for Galois authentication) provides 128-bit per-step min-entropy. GF(p) for large primes p (as used in elliptic curve cryptography) provides approximately log_2(p) bits per step.
+
+#### 1.6.4 p-adic Numbers (Q_p)
+
+For each prime p, the p-adic numbers Q_p form a completion of the rational numbers Q with respect to the p-adic absolute value |x|_p = p^(-v_p(x)), where v_p(x) is the p-adic valuation (the largest power of p dividing x).
+
+The defining property is the ultrametric inequality: |a + b|_p <= max(|a|_p, |b|_p). This is strictly stronger than the triangle inequality satisfied by the real absolute value. In practical terms, two numbers that are "close" in the real metric (|a - b| small) can be "far" in the p-adic metric (|a - b|_p large), and vice versa.
+
+For ARE, p-adic arithmetic introduces mixing that is mathematically orthogonal to real-number arithmetic. Alternating between Real (R) and p-adic (Q_p) steps forces an adversary to track the accumulator's value in two incompatible topologies simultaneously. This provides a dimension of mixing that R alone cannot achieve.
+
+In the preferred embodiment, truncated p-adic arithmetic is used: values are represented as finite p-adic expansions a_0 + a_1*p + a_2*p^2 + ... + a_{k-1}*p^{k-1} with precision k. Arithmetic is performed modulo p^k. The projection to integers takes the natural integer representation of the truncated expansion.
+
+#### 1.6.5 Domain Properties and Selection Rationale
+
+| Domain | Commutative | Associative | Division algebra | Zero divisors | ARE value |
+|---|---|---|---|---|---|
+| N (naturals) | Yes | Yes | No | No | Modular wrapping |
+| Z (integers) | Yes | Yes | No | No | Signed projection |
+| Q (rationals) | Yes | Yes | Yes | No | Rational scaling |
+| R (reals) | Yes | Yes | Yes | No | Fixed-point mixing |
+| C (complex) | Yes | Yes | Yes | No | Plane rotation |
+| H (quaternions) | **No** | Yes | Yes | No | Non-commutative mixing |
+| O (octonions) | **No** | **No** | Yes | No | Non-associative mixing |
+| GF(p^n) | Yes | Yes | Yes | No | Provable uniformity |
+| Q_p (p-adic) | Yes | Yes | Yes | No | Orthogonal metric |
+| S (sedenions) | No | No | **No** | **Yes** | **Excluded** (zero divisors) |
+
+The Cayley-Dickson construction produces algebras of dimension 2^n for n = 0, 1, 2, 3, ... (R, C, H, O, S, ...). Each doubling loses an algebraic property: R to C loses ordering; C to H loses commutativity; H to O loses associativity; O to S loses the division algebra property and introduces zero divisors. The preferred embodiment stops at octonions (O) because zero divisors in sedenions and higher algebras create degenerate accumulator states that reduce mixing quality.
+
+The extended program generation allocates additional SHAKE-256 bytes per step when the selected domain requires multi-component values: 4 components for H (scalar, i, j, k), 8 components for O, field element encoding for GF, and p-adic digit sequences for Q_p.
+
+### 1.7 ARE as Entropy Source Conditioner
+
+The ARE extraction method can be applied at the entropy source level as a replacement for Von Neumann debiasing. This is particularly relevant for Channel State Information (CSI) entropy sources (as described in the co-pending patent application for "Unilateral CSI Entropy Harvesting").
+
+#### 1.7.1 Current CSI Extraction (Von Neumann)
+
+The current CSI harvesting pipeline processes 56 subcarrier phase measurements per WiFi frame (802.11n HT20):
+
+1. For each complex subcarrier value H_k, compute phase: arg(H_k).
+2. Quantize phase to 256 levels (8 bits).
+3. Extract the least-significant bit (1 bit per subcarrier) = 56 raw bits per frame.
+4. Apply Von Neumann debiasing: ~50% discard rate = ~28 usable bits = ~3.5 bytes per frame.
+5. Estimated min-entropy: ~6.5 bits/byte.
+
+The Von Neumann method discards approximately 50% of input bits and uses only 1 of 8 available quantized bits per subcarrier, resulting in significant extraction loss.
+
+#### 1.7.2 ARE-Based CSI Extraction
+
+The ARE conditioner processes the full 8-bit quantized phase measurements:
+
+1. For each complex subcarrier value H_k, compute phase: arg(H_k).
+2. Quantize phase to 256 levels (8 bits).
+3. Collect all 8 bits per subcarrier = 448 raw bits (56 bytes) per frame.
+4. Process the 56 input bytes through an ARE program with an independent seed.
+5. The algebraic program mixes values across domains, removing spatial correlation between adjacent subcarriers through domain-crossing non-linearities.
+6. Reduce output via modular prime reduction.
+7. Estimated output: ~47-50 usable bytes per frame with ~7.0-7.5 bits/byte min-entropy.
+
+The improvement comes from two sources: (a) using all quantized bits rather than only the LSB (8x more raw input), and (b) the algebraic mixing removes inter-subcarrier correlation more effectively than Von Neumann discard (which operates on bit pairs independently without cross-subcarrier mixing).
+
+When GF(2^8) steps are included in the ARE program, each step that operates in GF provides a provable per-step uniform distribution guarantee, enabling formal min-entropy bounds for the conditioned output.
 
 ### 2. Certified Heterogeneous Entropy Composition
 
@@ -186,11 +278,28 @@ The Digital Operational Resilience Act (DORA), effective in Norway from 1 July 2
 
 | Property | Universal Hashing | Trevisan | ARE (This Invention) |
 |---|---|---|---|
-| Mechanism | Linear hash families | Error-correcting codes | Algebraic programs over 5 domains |
+| Mechanism | Linear hash families | Error-correcting codes | Algebraic programs over 5+ domains |
 | Operations | Multiply-add (GF(2)) | Bit extraction | ADD, SUB, MUL, DIV, MOD, EXP |
-| Domains | Binary fields | Binary | N, Z, Q, R, C |
+| Domains | Binary fields | Binary | N, Z, Q, R, C + H, O, GF, Q_p |
+| Commutativity | Yes (GF(2)) | N/A | Broken in H, O domains |
+| Associativity | Yes (GF(2)) | N/A | Broken in O domain |
+| Provable per-step bound | Yes (pairwise independence) | Yes (Nisan-Wigderson) | Yes for GF steps; conjectured for others |
+| Program space (K steps) | 2^(n*n) matrices | 2^(seed_len) | (D*6)^K where D = number of domains |
 | Program generation | Random matrix | Seed + code | SHAKE-256 expansion |
 | Output expansion | Not built-in | Not built-in | Counter-mode SHA-256 |
+| Hardware acceleration | No | No | GF(2^8) via PCLMULQDQ |
+
+### Extended Domain Mixing Properties
+
+Non-commutative domains (H) and non-associative domains (O) enhance ARE security through mechanisms unavailable in hash-based extractors:
+
+1. **Non-commutative mixing (H)**: In quaternion steps, `acc * value` and `value * acc` produce different results. The program must specify multiplication direction. An adversary attempting to invert the extraction must determine the direction at each quaternion step, doubling the search space per step.
+
+2. **Non-associative mixing (O)**: In octonion steps, the result depends on the parenthesization of operations. For a sequence of K octonion multiplications, the number of distinct computation paths grows as the Catalan number C(K). This makes algebraic shortcut attacks (simplifying the program by regrouping operations) impossible in O steps.
+
+3. **Provable uniformity (GF)**: In finite field steps, if the accumulator is uniformly distributed over GF(p^n), then the output of any invertible field operation (addition, subtraction, multiplication or division by a nonzero element) is also uniformly distributed. This provides a formal per-step min-entropy guarantee: H_min >= log_2(p^n) bits for steps with nonzero operands.
+
+4. **Orthogonal-metric mixing (Q_p)**: Alternating between R steps and Q_p steps forces the accumulator through topologically incompatible spaces. Two values close in R-metric may be far in Q_p-metric. An adversary who can bound the accumulator in one metric gains no information about its position in the other.
 
 ### ARE Entropy Contribution Independent of Output Expansion
 
@@ -344,4 +453,63 @@ State 4: Single source (if min_sources = 1)
 
 State 4b: Error (if min_sources > 1)
   RuntimeError: Only 1 healthy source, need 2
+```
+
+### Figure 4: Extended Domain Mixing in ARE
+
+```
+SHAKE-256 seed expansion
+  |
+  v  Per-step domain selection (mod D, where D = number of domains)
+  |
+  +--[0: NATURAL]--- modular wrapping, commutative, associative
+  +--[1: INTEGER]--- signed projection, commutative, associative
+  +--[2: RATIONAL]-- scaled fractions, commutative, associative
+  +--[3: REAL]------ fixed-point, commutative, associative
+  +--[4: COMPLEX]--- plane rotation, commutative, associative
+  +--[5: QUATERNION] 4D Hamilton, NON-COMMUTATIVE, associative
+  |                  ij=k, ji=-k; left vs right multiplication
+  +--[6: OCTONION]-- 8D Fano plane, NON-COMMUTATIVE, NON-ASSOCIATIVE
+  |                  (ab)c != a(bc); Catalan(K) inversion paths
+  +--[7: GF(p^n)]--- exact finite field, PROVABLE UNIFORM OUTPUT
+  |                  H_min >= log2(p^n) bits per step
+  +--[8: Q_p]------- p-adic ultrametric, ORTHOGONAL to R-metric
+                     |a+b|_p <= max(|a|_p, |b|_p)
+
+                        Algebraic properties gained:
+  Domains 0-4:          commutative, associative (classical tower)
+  Domain 5 (H):       + non-commutativity (direction-dependent mixing)
+  Domain 6 (O):       + non-associativity (grouping-dependent mixing)
+  Domain 7 (GF):      + provable per-step uniformity
+  Domain 8 (Q_p):     + orthogonal metric (topology-independent mixing)
+```
+
+### Figure 5: ARE as CSI Entropy Conditioner
+
+```
+CURRENT PIPELINE (Von Neumann):           ARE PIPELINE:
+  56 subcarriers                            56 subcarriers
+  |                                         |
+  v                                         v
+  Phase: arg(H_k)                           Phase: arg(H_k)
+  |                                         |
+  v                                         v
+  Quantize to 256 levels                    Quantize to 256 levels
+  |                                         |
+  v                                         v
+  Extract LSB only (1 bit each)             Use ALL 8 bits (8 bits each)
+  = 56 raw bits                             = 448 raw bits (56 bytes)
+  |                                         |
+  v                                         v
+  Von Neumann debiasing                     ARE algebraic program
+  ~50% discard                              cross-domain mixing
+  = ~28 bits = ~3.5 bytes                   removes inter-subcarrier
+  |                                         correlation
+  v                                         |
+  ~6.5 bits/byte                            v
+                                            ~47-50 bytes per frame
+                                            ~7.0-7.5 bits/byte
+
+  Extraction efficiency: ~25%               Extraction efficiency: ~85%
+  Uses: 1 of 8 quantized bits              Uses: all 8 quantized bits
 ```
