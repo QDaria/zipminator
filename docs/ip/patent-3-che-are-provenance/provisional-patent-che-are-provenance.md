@@ -54,13 +54,19 @@ All known families of randomness extractors are hash-based:
 
 No prior extractor family uses **algebraic programs** (sequences of arithmetic operations across multiple number domains) as the extraction mechanism.
 
-### Lack of Provenance Certification
+### Multi-Source Entropy Aggregation
 
-No existing entropy system provides cryptographic proof of which sources contributed to a given entropy output. Auditors and regulators (particularly under DORA Article 7, which mandates full cryptographic key lifecycle management) cannot verify the lineage of entropy used in key generation.
+US10402172B1 (Qrypt, Inc.) describes a multi-source entropy aggregation and distribution network that collects entropy from diverse sources including quantum generators and tags each entropy sequence with flat provenance metadata (source identifier, timestamp, sequence number). However, this system uses flat metadata tags rather than hierarchical cryptographic proofs. There is no Merkle-tree structure binding source records to a verifiable root hash, no per-composition certificate that can be independently verified by an auditor, and no formal min-entropy bound adjustment when sources degrade.
 
-### No Graceful Degradation Standard
+US10140095 (Oracle) describes collecting entropy from diverse sources with health checks and threshold-based acceptance. Sources are either included or excluded in a binary fashion; the system does not recalculate composite min-entropy bounds during partial failure.
 
-Existing multi-source entropy systems either require all sources to be available or silently substitute weaker sources without adjusting entropy estimates. No prior system provides automatically adjusted min-entropy bounds when sources degrade or fail.
+### Lack of Cryptographic Provenance Certification
+
+While flat provenance tagging exists (US10402172B1), no existing entropy system provides a **cryptographically verifiable proof structure** (such as a Merkle tree) certifying which sources contributed to a given entropy output, their health status at composition time, and the resulting min-entropy bound. Auditors and regulators (particularly under DORA Article 7, which mandates full cryptographic key lifecycle management) cannot independently verify the lineage of entropy used in key generation.
+
+### No Graceful Degradation with Formal Bound Adjustment
+
+Existing multi-source entropy systems (US10140095, US9477443B1) either require all sources to be available, silently substitute weaker sources, or perform binary include/exclude on source failure. No prior system provides **formally adjusted min-entropy bounds** that decrease as sources degrade or fail, while maintaining a certified audit trail of the degradation event in the provenance certificate.
 
 ---
 

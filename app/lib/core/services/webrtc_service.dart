@@ -99,13 +99,31 @@ class WebRtcService {
   }
 }
 
-/// Capture local camera + microphone.
+/// Configure the audio session for VoIP (critical on iOS for audibility).
+Future<void> configureVoipAudioSession({bool speakerphone = true}) async {
+  Helper.setSpeakerphoneOn(speakerphone);
+}
+
+/// Capture local camera + microphone with VoIP-optimized audio constraints.
 Future<MediaStream> getLocalMediaStream({
   bool video = true,
   bool audio = true,
 }) async {
-  return await navigator.mediaDevices.getUserMedia({
-    'audio': audio,
+  final stream = await navigator.mediaDevices.getUserMedia({
+    'audio': audio
+        ? {
+            'echoCancellation': true,
+            'autoGainControl': true,
+            'noiseSuppression': true,
+            'sampleRate': 48000,
+            'channelCount': 1,
+            // iOS: force voice processing audio unit for clear VoIP audio
+            'googEchoCancellation': true,
+            'googAutoGainControl': true,
+            'googNoiseSuppression': true,
+            'googHighpassFilter': true,
+          }
+        : false,
     'video': video
         ? {
             'facingMode': 'user',
@@ -114,4 +132,11 @@ Future<MediaStream> getLocalMediaStream({
           }
         : false,
   });
+
+  // Ensure audio tracks are enabled and volume is up.
+  for (final track in stream.getAudioTracks()) {
+    track.enabled = true;
+  }
+
+  return stream;
 }

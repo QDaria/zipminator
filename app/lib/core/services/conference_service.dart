@@ -37,8 +37,12 @@ class ConferenceService {
   ConferenceService({required SendSignal sendSignal})
       : _sendSignal = sendSignal;
 
-  /// Start the local media capture.
+  /// Start the local media capture with VoIP-optimized audio.
   Future<void> startLocalMedia({bool video = true, bool audio = true}) async {
+    // Configure audio session BEFORE capturing media (critical on iOS).
+    if (audio) {
+      await configureVoipAudioSession(speakerphone: true);
+    }
     _localStream = await getLocalMediaStream(video: video, audio: audio);
   }
 

@@ -28,6 +28,23 @@ class AuthState {
       );
 
   bool get isAuthenticated => user != null;
+
+  /// Display name from user_metadata, or email prefix.
+  String get displayName {
+    final meta = user?.userMetadata;
+    final fullName = meta?['full_name'] as String?;
+    if (fullName != null && fullName.isNotEmpty) return fullName;
+    final email = user?.email ?? '';
+    if (email.contains('@')) return email.split('@').first;
+    return email;
+  }
+
+  /// Username from user_metadata (null if not yet set).
+  String? get username => user?.userMetadata?['username'] as String?;
+
+  /// Whether onboarding (username creation) is needed.
+  bool get needsOnboarding =>
+      isAuthenticated && (username == null || username!.isEmpty);
 }
 
 /// Notifier that tracks Supabase auth state and exposes sign-in/sign-out.
@@ -103,19 +120,42 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   /// OAuth via ASWebAuthenticationSession (iOS) or browser (macOS).
-  /// Works for Google, GitHub, LinkedIn - handles redirect automatically.
+  /// Works for Google, GitHub, LinkedIn. Uses ephemeral sessions and
+  /// Supabase's getSessionFromUrl for correct PKCE + fragment handling.
   Future<void> signInWithOAuth(OAuthProvider provider) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final response = await SupabaseService.signInWithOAuthProper(provider);
+      final response = await SupabaseService.signInWithOAuthBrowser(provider);
       state = state.copyWith(user: response.user, isLoading: false);
     } catch (e) {
       final msg = e.toString();
-      if (msg.contains('CANCELED') || msg.contains('canceled') || msg.contains('cancelled')) {
+      if (msg.contains('CANCELED') ||
+          msg.contains('canceled') ||
+          msg.contains('cancelled')) {
         state = state.copyWith(isLoading: false);
       } else {
         state = state.copyWith(isLoading: false, error: msg);
       }
+    }
+  }
+
+  /// Update the user's profile (username and/or display name).
+  Future<void> updateProfile({
+    String? username,
+    String? displayName,
+  }) async {
+    try {
+      await SupabaseService.updateProfile(
+        username: username,
+        displayName: displayName,
+      );
+      // Refresh user to pick up new metadata.
+      final refreshed = SupabaseService.currentUser;
+      if (refreshed != null) {
+        state = state.copyWith(user: refreshed);
+      }
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
     }
   }
 

@@ -18,8 +18,8 @@ docs/research/paper-1-quantum-anonymization/main-popets.tex
 - docs/research/paper-1-quantum-anonymization/main-popets.tex
 - docs/research/paper-1-quantum-anonymization/figures/ (8 existing PDFs)
 - docs/ip/patent-1-quantum-anonymization/ (patent-paper alignment)
-- docs/guides/FEATURES.md (Pillar 7: QRNG, Pillar 9: Anonymization)
-- src/zipminator/anonymization/ + src/zipminator/entropy/
+- docs/guides/FEATURES.md (Pillar 1: Encryption Core incl. QRNG, Pillar 7: Quantum Mail, Pillar 9: Q-Mesh)
+- src/zipminator/crypto/ + src/zipminator/entropy/
 - .claude/rules/zero-hallucination.md + .claude/rules/02-security-pqc.md
 
 ## Skills to Invoke (in order)
@@ -47,15 +47,13 @@ docs/research/paper-1-quantum-anonymization/main-popets.tex
 - W3: Required sections: data availability, reproducibility, ethics, acknowledgments
 - W4: Artifact appendix (benchmark commands, requirements.txt, anonymous repo)
 - W5: ORCID — replace placeholder or remove
-- W6: All 8 existing figures: verify captions, labels, references in text
-- W7: Add 4 new figures:
+- W6: 8 figure PDFs exist but only 6 referenced in text (fig3_protocol + fig7_comparison orphaned). Add missing \includegraphics + captions for fig3, fig7
+- W7: Add 4 new figures (bringing total from 8 to 12):
   - Fig 9: Protocol state machine (L1-L10 → anonymization → destruction)
   - Fig 10: HNDL threat model timeline
   - Fig 11: Comparison chart vs Google DP, ARX, Apple DP
   - Fig 12: Security game diagram (formal proof structure)
-- W8: Add 2 new tables:
-  - Comparison matrix: Zipminator L10 vs DP/ARX/Apple (guarantees, entropy, reversibility)
-  - GDPR/DORA compliance checklist (deletion right, audit trail)
+- W8: Paper already has 9 tables. Verify all 9 are correctly captioned and referenced. If comparison matrix (Zipminator L10 vs DP/ARX/Apple) and GDPR/DORA compliance checklist are NOT among them, add them (target: 9-11 tables total)
 
 ## Phase 2: Content Quality → 0.95+
 - W9: Invoke quantum-literature-synthesis-expert — papers published 2024 through April 2026
@@ -84,7 +82,7 @@ docs/research/paper-1-quantum-anonymization/main-popets.tex
 - [ ] Page count within PoPETs limits (18pp body)
 - [ ] No "FIPS certified" language (.claude/rules/02-security-pqc.md)
 - [ ] Patent-paper alignment: no claim contradicts patent-1
-- [ ] 12 figures + 9 tables, all referenced in text
+- [ ] 12 figures + 9-11 tables, all referenced in text
 - [ ] Multi-provider consensus: Opus 4.6 + GPT-5.4 + Gemini 3.1 Pro + Grok 4 agree >= 0.95
 
 ## Rules
