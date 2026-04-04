@@ -281,12 +281,14 @@ class TestSpecVectors:
         assert ext.extract(50) == 9
 
     def test_vector6_exponentiation(self):
-        """Vector 6: x=2, [(N, 10, Exp)], p=257 -> 0.
+        """Vector 6: x=2, [(N, 10, Exp)], p=257.
 
-        Trace: 2^10=1024 mod 256=0.
+        Trace: 2^10=1024 mod 256=0, then zero-avoidance perturbs:
+        acc = ((10 + 0 + 1) ^ (2 & 0xFF)) % 256 = 9.
+        Final: 9 % 257 = 9.
         """
         ext = self._make_ext([AreStep(Domain.NATURAL, 10, 0, Operation.EXP)])
-        assert ext.extract(2) == 0
+        assert ext.extract(2) == 9
 
     def test_vector7_multi_step_large_acc(self):
         """Vector 7: x=128, [(Z,127,Add),(N,2,Mul),(Z,-1,Add)], p=257 -> 253.
