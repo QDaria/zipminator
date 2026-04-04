@@ -10,6 +10,7 @@ import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy import stats
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
@@ -57,7 +58,7 @@ def generate_dataset(n_rows: int = 1000) -> pd.DataFrame:
     })
 
 
-def benchmark_levels(df: pd.DataFrame, n_runs: int = 5):
+def benchmark_levels(df: pd.DataFrame, n_runs: int = 30):
     """Benchmark all 10 levels, return timing and property data."""
     results = []
     for level in range(1, 11):
@@ -69,6 +70,12 @@ def benchmark_levels(df: pd.DataFrame, n_runs: int = 5):
             out = anon.apply(df_copy, level=level)
             t1 = time.perf_counter()
             times.append((t1 - t0) * 1000)  # ms
+
+        # 95% CI using Student's t-distribution
+        ci_lo, ci_hi = stats.t.interval(
+            0.95, len(times) - 1,
+            loc=np.mean(times), scale=stats.sem(times),
+        )
 
         # Measure properties on last run
         anon = LevelAnonymizer()
@@ -92,13 +99,18 @@ def benchmark_levels(df: pd.DataFrame, n_runs: int = 5):
             "level": level,
             "mean_ms": np.mean(times),
             "std_ms": np.std(times),
+            "ci_lo": ci_lo,
+            "ci_hi": ci_hi,
             "min_ms": np.min(times),
             "max_ms": np.max(times),
             "pct_changed": changed / total * 100,
             "input_unique": input_unique,
             "output_unique": output_unique,
         })
-        print(f"  L{level:2d}: {np.mean(times):8.1f} ms  |  {changed/total*100:5.1f}% changed  |  unique: {input_unique} -> {output_unique}")
+        print(
+            f"  L{level:2d}: {np.mean(times):8.1f} ms [{ci_lo:.1f}, {ci_hi:.1f}]  |"
+            f"  {changed/total*100:5.1f}% changed  |  unique: {input_unique} -> {output_unique}"
+        )
 
     return results
 
@@ -192,8 +204,8 @@ if __name__ == "__main__":
     df = generate_dataset(1000)
     print(f"  Shape: {df.shape}, Columns: {list(df.columns)}")
 
-    print("\nBenchmarking all 10 levels (5 runs each)...")
-    results = benchmark_levels(df, n_runs=5)
+    print("\nBenchmarking all 10 levels (30 runs each)...")
+    results = benchmark_levels(df, n_runs=30)
 
     print("\nBenchmarking scaling (L1, L5, L8, L10)...")
     scaling = benchmark_scaling()
@@ -203,9 +215,15 @@ if __name__ == "__main__":
     plot_scaling(scaling)
 
     # Print summary table for paper
-    print("\n=== PAPER TABLE: Empirical Evaluation ===")
-    print(f"{'Level':>5} {'Mean (ms)':>10} {'Std':>8} {'Changed%':>9} {'Unique In':>10} {'Unique Out':>11}")
-    print("-" * 60)
+    print("\n=== PAPER TABLE: Empirical Evaluation (n=30) ===")
+    print(
+        f"{'Level':>5} {'Mean (ms)':>10} {'95% CI lower':>13} {'95% CI upper':>13}"
+        f" {'Changed%':>9} {'Unique Out':>11}"
+    )
+    print("-" * 70)
     for r in results:
-        print(f"  L{r['level']:<3} {r['mean_ms']:>9.1f} {r['std_ms']:>8.1f} {r['pct_changed']:>8.1f}% {r['input_unique']:>10} {r['output_unique']:>11}")
+        print(
+            f"  L{r['level']:<3} {r['mean_ms']:>9.1f} {r['ci_lo']:>13.1f} {r['ci_hi']:>13.1f}"
+            f" {r['pct_changed']:>8.1f}% {r['output_unique']:>11}"
+        )
     print("\nDone.")
