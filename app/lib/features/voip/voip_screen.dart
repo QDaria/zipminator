@@ -1407,9 +1407,11 @@ class _ConferenceViewState extends ConsumerState<_ConferenceView> {
                   onPressed: () {
                     final roomId = voip.roomId ?? '';
                     if (roomId.isEmpty) return;
-                    Share.share(
-                      'Join my Zipminator conference!\nRoom ID: $roomId',
-                      subject: 'Zipminator Conference Invite',
+                    SharePlus.instance.share(
+                      ShareParams(
+                        text: 'Join my Zipminator conference!\nRoom ID: $roomId',
+                        subject: 'Zipminator Conference Invite',
+                      ),
                     );
                   },
                   icon: Icon(Icons.share, size: 18,

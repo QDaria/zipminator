@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zipminator/core/services/supabase_service.dart';
 import 'package:zipminator/features/auth/login_screen.dart';
+import 'package:zipminator/features/auth/onboarding_screen.dart';
 import 'package:zipminator/features/auth/profile_screen.dart';
 import 'package:zipminator/features/vault/vault_screen.dart';
 import 'package:zipminator/features/messenger/messenger_screen.dart';
@@ -35,23 +36,40 @@ final GoRouter appRouter = GoRouter(
   initialLocation: '/vault',
   refreshListenable: _StreamNotifier(SupabaseService.authStateChanges),
   redirect: (context, state) {
-    final isLoginRoute = state.matchedLocation == '/login';
-    // Guard against Supabase not being initialized (e.g. in tests)
+    final path = state.matchedLocation;
+    final isLoginRoute = path == '/login';
+    final isOnboarding = path == '/onboarding';
+    final isCallback = path == '/login-callback';
+
+    // Guard against Supabase not being initialized (e.g. in tests).
     bool loggedIn;
     try {
       loggedIn = SupabaseService.currentUser != null;
     } catch (_) {
-      // Supabase not initialized — skip auth redirect
       return isLoginRoute ? '/vault' : null;
     }
 
-    if (!loggedIn && !isLoginRoute) return '/login';
-    if (loggedIn && isLoginRoute) return '/vault';
+    // Not logged in: force login (except callback route).
+    if (!loggedIn && !isLoginRoute && !isCallback) return '/login';
+
+    // Logged in on login page: check if onboarding needed.
+    if (loggedIn && isLoginRoute) {
+      final username = SupabaseService.currentUsername;
+      if (username == null || username.isEmpty) return '/onboarding';
+      return '/vault';
+    }
+
+    // Logged in but still need username: keep on onboarding.
+    if (loggedIn && !isOnboarding) {
+      final username = SupabaseService.currentUsername;
+      if (username == null || username.isEmpty) return '/onboarding';
+    }
+
     return null;
   },
   routes: [
-    // OAuth callback — Supabase handles the code exchange via onAuthStateChange;
-    // just redirect to the main app once the deep link arrives.
+    // OAuth callback: Supabase handles the code exchange via deep link
+    // handler in supabase_flutter. Redirect to vault once processed.
     GoRoute(
       path: '/login-callback',
       redirect: (context, state) => '/vault',
@@ -60,6 +78,11 @@ final GoRouter appRouter = GoRouter(
       path: '/login',
       name: 'login',
       builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/onboarding',
+      name: 'onboarding',
+      builder: (context, state) => const OnboardingScreen(),
     ),
     ShellRoute(
       builder: (context, state, child) => ShellScaffold(child: child),

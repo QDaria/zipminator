@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/core/providers/ratchet_provider.dart';
 import 'package:zipminator/core/services/conference_service.dart';
+import 'package:zipminator/core/services/webrtc_service.dart';
 import 'package:zipminator/src/rust/api/simple.dart' as rust;
 
 /// Call lifecycle phases.
@@ -347,7 +348,8 @@ class VoipNotifier extends Notifier<VoipState> {
 
   void toggleSpeaker() {
     final newValue = !state.isSpeaker;
-    Helper.setSpeakerphoneOn(newValue);
+    // Route through webrtc_service which handles the platform audio session.
+    configureVoipAudioSession(speakerphone: newValue);
     state = state.copyWith(isSpeaker: newValue);
   }
 

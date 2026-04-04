@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zipminator/core/providers/auth_provider.dart';
+import 'package:zipminator/core/providers/biometric_provider.dart';
 import 'package:zipminator/core/providers/qai_provider.dart';
 import 'package:zipminator/core/providers/ratchet_provider.dart';
 import 'package:zipminator/core/services/messenger_service.dart';
@@ -207,16 +208,14 @@ class SettingsScreen extends ConsumerWidget {
               backgroundColor: QuantumTheme.quantumCyan.withValues(alpha: 0.2),
               child: Icon(Icons.person, color: QuantumTheme.quantumCyan),
             ),
-            title: Text(auth.user?.email ?? 'Not signed in'),
+            title: Text(auth.displayName),
             subtitle: Text(
-              signalingState == SignalingConnectionState.connected
-                  ? 'Signaling: Connected'
-                  : 'Signaling: ${signalingState.name}',
+              auth.username != null
+                  ? '@${auth.username}'
+                  : (auth.user?.email ?? 'Not signed in'),
               style: TextStyle(
-                color: signalingState == SignalingConnectionState.connected
-                    ? QuantumTheme.quantumGreen
-                    : QuantumTheme.quantumRed,
-                fontSize: 12,
+                color: QuantumTheme.textSecondary,
+                fontSize: 13,
               ),
             ),
             trailing: auth.isAuthenticated
@@ -233,6 +232,32 @@ class SettingsScreen extends ConsumerWidget {
                     onPressed: () => context.go('/login'),
                     child: const Text('Sign In'),
                   ),
+            onTap: () => context.go('/profile'),
+          ),
+
+          // Biometric lock
+          _BiometricTile(),
+
+          // Signaling status
+          ListTile(
+            leading: Icon(
+              Icons.cell_tower,
+              color: signalingState == SignalingConnectionState.connected
+                  ? QuantumTheme.quantumGreen
+                  : QuantumTheme.quantumRed,
+            ),
+            title: const Text('Signaling Server'),
+            subtitle: Text(
+              signalingState == SignalingConnectionState.connected
+                  ? 'Connected'
+                  : signalingState.name,
+              style: TextStyle(
+                color: signalingState == SignalingConnectionState.connected
+                    ? QuantumTheme.quantumGreen
+                    : QuantumTheme.quantumRed,
+                fontSize: 12,
+              ),
+            ),
           ),
           const Divider(),
 
@@ -832,6 +857,44 @@ class _BrowserDestructCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Biometric Lock Tile
+// ---------------------------------------------------------------------------
+
+class _BiometricTile extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final biometric = ref.watch(biometricProvider);
+
+    return biometric.when(
+      data: (state) {
+        if (!state.available) return const SizedBox.shrink();
+        return SwitchListTile(
+          secondary: Icon(
+            Icons.fingerprint,
+            color: state.enabled
+                ? QuantumTheme.quantumGreen
+                : QuantumTheme.quantumCyan,
+          ),
+          title: const Text('Face ID / Biometric Lock'),
+          subtitle: Text(
+            state.enabled
+                ? 'App locks when backgrounded'
+                : 'Unlock Zipminator with biometrics',
+            style: TextStyle(fontSize: 12, color: QuantumTheme.textSecondary),
+          ),
+          value: state.enabled,
+          onChanged: (_) => ref.read(biometricProvider.notifier).toggle(),
+          activeTrackColor: QuantumTheme.quantumGreen.withValues(alpha: 0.6),
+          activeThumbColor: QuantumTheme.quantumGreen,
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }
