@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:zipminator/core/providers/ratchet_provider.dart';
 import 'package:zipminator/core/services/conference_service.dart';
 import 'package:zipminator/src/rust/api/simple.dart' as rust;
@@ -113,18 +112,37 @@ class VoipState {
 
 /// Manages VoIP call state with PQ-SRTP key derivation, live signaling,
 /// and WebRTC conference support.
+///
+/// The call duration timer lives here (not in the widget) so it persists
+/// when the user navigates to other tabs mid-call.
 class VoipNotifier extends Notifier<VoipState> {
   ConferenceService? _conference;
   StreamSubscription<Map<String, dynamic>>? _signalSub;
+  Timer? _callTimer;
 
   @override
   VoipState build() {
     ref.onDispose(() {
+      _callTimer?.cancel();
       _signalSub?.cancel();
       _conference?.dispose();
     });
     _startSignalListener();
     return const VoipState();
+  }
+
+  void _startCallTimer() {
+    _callTimer?.cancel();
+    _callTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      state = state.copyWith(
+        callDuration: state.callDuration + const Duration(seconds: 1),
+      );
+    });
+  }
+
+  void _stopCallTimer() {
+    _callTimer?.cancel();
+    _callTimer = null;
   }
 
   // ── 1:1 calls ─────────────────────────────────────────────────────
@@ -139,14 +157,13 @@ class VoipNotifier extends Notifier<VoipState> {
   }
 
   /// Derive SRTP keys from a Kyber shared secret, set up WebRTC audio, and
-  /// move to connected.
+  /// move to connected. Starts the call duration timer.
   Future<void> connectCall(Uint8List sharedSecret) async {
     try {
       final keys = await rust.deriveSrtpKeys(sharedSecret: sharedSecret);
 
-      // Set up WebRTC for real audio
+      // Set up WebRTC for real audio (configures audio session internally)
       await _ensureConference(audioOnly: true);
-      Helper.setSpeakerphoneOn(true);
 
       state = state.copyWith(
         phase: CallPhase.connected,
@@ -155,6 +172,7 @@ class VoipNotifier extends Notifier<VoipState> {
         srtpMasterKey: Uint8List.fromList(keys.masterKey),
         srtpMasterSalt: Uint8List.fromList(keys.masterSalt),
       );
+      _startCallTimer();
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -163,6 +181,7 @@ class VoipNotifier extends Notifier<VoipState> {
   Future<void> startCall(Uint8List sharedSecret) => connectCall(sharedSecret);
 
   void endCall() {
+    _stopCallTimer();
     final contact = state.contact;
     if (contact != null) {
       ref.read(ratchetProvider.notifier).sendCallEnd(contact.id);
@@ -190,6 +209,7 @@ class VoipNotifier extends Notifier<VoipState> {
       roomId: roomId,
       isPqSecured: true,
     );
+    _startCallTimer();
   }
 
   /// Join an existing conference room.
@@ -203,6 +223,7 @@ class VoipNotifier extends Notifier<VoipState> {
       roomId: roomId,
       isPqSecured: true,
     );
+    _startCallTimer();
   }
 
   void _startSignalListener() {
@@ -266,15 +287,15 @@ class VoipNotifier extends Notifier<VoipState> {
   }
 
   /// User accepted the incoming call: set up WebRTC audio, notify the caller,
-  /// and transition to connected.
+  /// and transition to connected. Starts the call duration timer.
   Future<void> acceptIncomingCall() async {
     final contact = state.contact;
     if (contact == null || !state.isIncomingRinging) return;
 
     final ratchet = ref.read(ratchetProvider.notifier);
 
+    // Set up WebRTC for real audio (configures audio session internally)
     await _ensureConference(audioOnly: true);
-    Helper.setSpeakerphoneOn(true);
 
     // Notify the caller so they send a WebRTC offer.
     ratchet.sendCallAccept(contact.id.replaceFirst('live-', ''));
@@ -284,6 +305,7 @@ class VoipNotifier extends Notifier<VoipState> {
       isPqSecured: true,
       isSpeaker: true,
     );
+    _startCallTimer();
   }
 
   /// User declined the incoming call: notify the caller and reset to idle.
@@ -331,10 +353,6 @@ class VoipNotifier extends Notifier<VoipState> {
 
   void toggleVideo() {
     _conference?.toggleVideo();
-  }
-
-  void updateCallDuration(Duration duration) {
-    state = state.copyWith(callDuration: duration);
   }
 }
 

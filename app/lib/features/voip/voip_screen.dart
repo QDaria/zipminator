@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:zipminator/core/providers/crypto_provider.dart';
 import 'package:zipminator/core/providers/ratchet_provider.dart';
 import 'package:zipminator/core/providers/srtp_provider.dart';
@@ -19,24 +20,12 @@ class VoipScreen extends ConsumerStatefulWidget {
 }
 
 class _VoipScreenState extends ConsumerState<VoipScreen> {
-  Timer? _callTimer;
   Timer? _ringTimer;
 
   @override
   void dispose() {
-    _callTimer?.cancel();
     _ringTimer?.cancel();
     super.dispose();
-  }
-
-  void _startCallTimer() {
-    _callTimer?.cancel();
-    _callTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      final current = ref.read(voipProvider).callDuration;
-      ref.read(voipProvider.notifier).updateCallDuration(
-            current + const Duration(seconds: 1),
-          );
-    });
   }
 
   String _formatDuration(Duration d) {
@@ -77,18 +66,17 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
       return;
     }
 
-    // 4. Wait for a minimum 2s ringing animation, then connect
+    // 4. Wait for a minimum 2s ringing animation, then connect.
+    //    Timer is managed by the provider (survives tab navigation).
     _ringTimer?.cancel();
     _ringTimer = Timer(const Duration(seconds: 2), () async {
       if (!mounted) return;
       await notifier.connectCall(enc.sharedSecret);
       HapticFeedback.heavyImpact();
-      _startCallTimer();
     });
   }
 
   void _endCall() {
-    _callTimer?.cancel();
     _ringTimer?.cancel();
     final voip = ref.read(voipProvider);
     final duration = voip.callDuration;
@@ -139,7 +127,6 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
               onAccept: () async {
                 await ref.read(voipProvider.notifier).acceptIncomingCall();
                 HapticFeedback.heavyImpact();
-                _startCallTimer();
               },
               onDecline: () {
                 ref.read(voipProvider.notifier).declineIncomingCall();
@@ -1170,7 +1157,7 @@ class _ConferenceButtons extends ConsumerStatefulWidget {
 
 class _ConferenceButtonsState extends ConsumerState<_ConferenceButtons> {
   final _roomCtrl = TextEditingController();
-  bool _showJoinField = false;
+  bool _expanded = false;
 
   @override
   void dispose() {
@@ -1178,15 +1165,18 @@ class _ConferenceButtonsState extends ConsumerState<_ConferenceButtons> {
     super.dispose();
   }
 
-  void _startConference() {
-    final roomId = 'zip-${DateTime.now().millisecondsSinceEpoch % 100000}';
-    ref.read(voipProvider.notifier).createConference(roomId);
-  }
-
-  void _joinConference() {
-    final roomId = _roomCtrl.text.trim();
-    if (roomId.isEmpty) return;
-    ref.read(voipProvider.notifier).joinConference(roomId);
+  void _startOrJoinConference() {
+    final input = _roomCtrl.text.trim();
+    // If user typed a room ID, join it; otherwise generate one.
+    final roomId = input.isNotEmpty
+        ? input
+        : 'zip-${DateTime.now().millisecondsSinceEpoch % 100000}';
+    if (input.isEmpty) {
+      // Created a new room; show the ID so they can share it.
+      ref.read(voipProvider.notifier).createConference(roomId);
+    } else {
+      ref.read(voipProvider.notifier).joinConference(roomId);
+    }
   }
 
   @override
@@ -1198,62 +1188,70 @@ class _ConferenceButtonsState extends ConsumerState<_ConferenceButtons> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                Icon(Icons.video_call, color: QuantumTheme.quantumPurple, size: 20),
-                const SizedBox(width: 8),
-                Text('Conference', style: Theme.of(context).textTheme.titleSmall),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: _startConference,
-                    icon: const Icon(Icons.add_call, size: 16),
-                    label: const Text('Start'),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: QuantumTheme.quantumPurple,
-                      foregroundColor: Colors.white,
-                    ),
+            // Header row: tap to expand/collapse
+            InkWell(
+              onTap: () => setState(() => _expanded = !_expanded),
+              borderRadius: BorderRadius.circular(8),
+              child: Row(
+                children: [
+                  Icon(Icons.video_call, color: QuantumTheme.quantumPurple, size: 20),
+                  const SizedBox(width: 8),
+                  Text('Conference (4+ people)',
+                      style: Theme.of(context).textTheme.titleSmall),
+                  const Spacer(),
+                  Icon(
+                    _expanded ? Icons.expand_less : Icons.expand_more,
+                    color: QuantumTheme.textSecondary,
+                    size: 20,
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => setState(() => _showJoinField = !_showJoinField),
-                    icon: const Icon(Icons.login, size: 16),
-                    label: const Text('Join'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: QuantumTheme.quantumPurple,
-                      side: BorderSide(color: QuantumTheme.quantumPurple.withValues(alpha: 0.5)),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-            if (_showJoinField) ...[
-              const SizedBox(height: 8),
+            if (_expanded) ...[
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: _roomCtrl,
                       decoration: const InputDecoration(
-                        hintText: 'Room ID...',
+                        hintText: 'Room ID (leave blank to create new)',
                         isDense: true,
                         border: InputBorder.none,
                       ),
-                      onSubmitted: (_) => _joinConference(),
+                      onSubmitted: (_) => _startOrJoinConference(),
                     ),
                   ),
-                  IconButton.filled(
-                    onPressed: _joinConference,
-                    icon: const Icon(Icons.arrow_forward, size: 16),
-                    style: IconButton.styleFrom(
-                      backgroundColor: QuantumTheme.quantumPurple,
-                      foregroundColor: Colors.white,
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: () {
+                        _roomCtrl.clear();
+                        _startOrJoinConference();
+                      },
+                      icon: const Icon(Icons.add_call, size: 16),
+                      label: const Text('New Room'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: QuantumTheme.quantumPurple,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _startOrJoinConference,
+                      icon: const Icon(Icons.login, size: 16),
+                      label: const Text('Join'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: QuantumTheme.quantumPurple,
+                        side: BorderSide(
+                            color: QuantumTheme.quantumPurple.withValues(alpha: 0.5)),
+                      ),
                     ),
                   ),
                 ],
@@ -1290,7 +1288,6 @@ class _ConferenceView extends ConsumerStatefulWidget {
 }
 
 class _ConferenceViewState extends ConsumerState<_ConferenceView> {
-  Timer? _durationTimer;
   final _localRenderer = RTCVideoRenderer();
   final Map<String, RTCVideoRenderer> _remoteRenderers = {};
   StreamSubscription<Map<String, MediaStream>>? _streamsSub;
@@ -1299,7 +1296,6 @@ class _ConferenceViewState extends ConsumerState<_ConferenceView> {
   void initState() {
     super.initState();
     _initRendererAndStreams();
-    _startDurationTimer();
   }
 
   Future<void> _initRendererAndStreams() async {
@@ -1307,15 +1303,6 @@ class _ConferenceViewState extends ConsumerState<_ConferenceView> {
     if (!mounted) return;
     _setupStreams();
     setState(() {});
-  }
-
-  void _startDurationTimer() {
-    _durationTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      final current = ref.read(voipProvider).callDuration;
-      ref.read(voipProvider.notifier).updateCallDuration(
-            current + const Duration(seconds: 1),
-          );
-    });
   }
 
   void _setupStreams() {
@@ -1358,7 +1345,6 @@ class _ConferenceViewState extends ConsumerState<_ConferenceView> {
 
   @override
   void dispose() {
-    _durationTimer?.cancel();
     _streamsSub?.cancel();
     _localRenderer.dispose();
     for (final r in _remoteRenderers.values) {
@@ -1374,7 +1360,7 @@ class _ConferenceViewState extends ConsumerState<_ConferenceView> {
 
     return Column(
       children: [
-        // Header
+        // Header with share button
         SafeArea(
           bottom: false,
           child: Padding(
@@ -1387,11 +1373,52 @@ class _ConferenceViewState extends ConsumerState<_ConferenceView> {
                   color: QuantumTheme.quantumGreen,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  'Room: ${voip.roomId ?? ""}',
-                  style: Theme.of(context).textTheme.titleSmall,
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      final roomId = voip.roomId ?? '';
+                      if (roomId.isNotEmpty) {
+                        Clipboard.setData(ClipboardData(text: roomId));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Room ID copied: $roomId'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Room: ${voip.roomId ?? ""}',
+                          style: Theme.of(context).textTheme.titleSmall,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(Icons.copy, size: 14,
+                            color: QuantumTheme.textSecondary),
+                      ],
+                    ),
+                  ),
                 ),
-                const Spacer(),
+                // Share invite button
+                IconButton(
+                  onPressed: () {
+                    final roomId = voip.roomId ?? '';
+                    if (roomId.isEmpty) return;
+                    Share.share(
+                      'Join my Zipminator conference!\nRoom ID: $roomId',
+                      subject: 'Zipminator Conference Invite',
+                    );
+                  },
+                  icon: Icon(Icons.share, size: 18,
+                      color: QuantumTheme.quantumCyan),
+                  tooltip: 'Share invite',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                ),
+                const SizedBox(width: 4),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(

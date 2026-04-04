@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zipminator/core/providers/srtp_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
 
 /// Persistent shell with navigation for all 9 pillars.
 /// Desktop: NavigationRail with logo + settings.
 /// Mobile: NavigationBar (4 tabs + "More") with overflow bottom sheet.
-class ShellScaffold extends StatelessWidget {
+/// Shows a mini call bar when a VoIP call is active on a non-VoIP tab.
+class ShellScaffold extends ConsumerWidget {
   final Widget child;
 
   const ShellScaffold({super.key, required this.child});
@@ -39,9 +42,12 @@ class ShellScaffold extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final index = _currentIndex(context);
     final isWide = MediaQuery.sizeOf(context).width > 800;
+    final voip = ref.watch(voipProvider);
+    final isOnVoipTab = GoRouterState.of(context).uri.path.startsWith('/voip');
+    final showCallBar = voip.inCall && !isOnVoipTab;
 
     if (isWide) {
       return Scaffold(
@@ -102,7 +108,14 @@ class ShellScaffold extends StatelessWidget {
             ),
             const VerticalDivider(width: 1),
             Expanded(
-              child: GradientBackground(child: _animatedChild(child)),
+              child: Column(
+                children: [
+                  if (showCallBar) _MiniCallBar(voip: voip),
+                  Expanded(
+                    child: GradientBackground(child: _animatedChild(child)),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -113,7 +126,14 @@ class ShellScaffold extends StatelessWidget {
     final mobileIndex = index < _mobileTabCount ? index : _mobileTabCount;
 
     return Scaffold(
-      body: GradientBackground(child: _animatedChild(child)),
+      body: Column(
+        children: [
+          if (showCallBar) _MiniCallBar(voip: voip),
+          Expanded(
+            child: GradientBackground(child: _animatedChild(child)),
+          ),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: mobileIndex,
         onDestinationSelected: (i) {
@@ -228,4 +248,81 @@ class _NavTab {
   final String subtitle;
 
   const _NavTab(this.path, this.icon, this.selectedIcon, this.label, this.subtitle);
+}
+
+/// Compact call bar shown when a VoIP call is active but the user is on
+/// another tab. Tap to return to the VoIP screen.
+class _MiniCallBar extends StatelessWidget {
+  final VoipState voip;
+
+  const _MiniCallBar({required this.voip});
+
+  String _formatDuration(Duration d) {
+    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '${d.inHours > 0 ? '${d.inHours}:' : ''}$m:$s';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.go('/voip'),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top + 4,
+          bottom: 6,
+          left: 16,
+          right: 16,
+        ),
+        decoration: BoxDecoration(
+          color: QuantumTheme.quantumGreen.withValues(alpha: 0.15),
+          border: Border(
+            bottom: BorderSide(
+              color: QuantumTheme.quantumGreen.withValues(alpha: 0.3),
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              voip.isConference ? Icons.video_call : Icons.phone_in_talk,
+              color: QuantumTheme.quantumGreen,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                voip.isConference
+                    ? 'Conference: ${voip.roomId ?? ""}'
+                    : 'Call: ${voip.contact?.name ?? "Unknown"}',
+                style: TextStyle(
+                  color: QuantumTheme.quantumGreen,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(
+              _formatDuration(voip.callDuration),
+              style: TextStyle(
+                color: QuantumTheme.quantumGreen,
+                fontSize: 13,
+                fontFamily: 'JetBrains Mono',
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Tap to return',
+              style: TextStyle(
+                color: QuantumTheme.quantumGreen.withValues(alpha: 0.7),
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

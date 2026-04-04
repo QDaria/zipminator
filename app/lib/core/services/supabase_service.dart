@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -44,37 +45,30 @@ class SupabaseService {
   ) =>
       client.auth.signUp(email: email, password: password);
 
-  /// OAuth using ASWebAuthenticationSession (iOS) / browser (macOS).
+  /// OAuth via ASWebAuthenticationSession (iOS) / browser (macOS).
   ///
-  /// Uses Supabase's internal PKCE state management (getOAuthSignInUrl
-  /// stores the code verifier, exchangeCodeForSession reads it back).
-  /// FlutterWebAuth2 handles the redirect capture.
-  static Future<AuthResponse> signInWithOAuthProper(
+  /// Uses ephemeral sessions to avoid stale cookie issues on iOS 17+.
+  /// Delegates URL parsing to Supabase's getSessionFromUrl which handles
+  /// both query-param and fragment-based callbacks correctly.
+  static Future<AuthResponse> signInWithOAuthBrowser(
       OAuthProvider provider) async {
-    // Let Supabase generate the OAuth URL and store the PKCE verifier.
     final oauthResponse = await client.auth.getOAuthSignInUrl(
       provider: provider,
       redirectTo: _redirectTo,
     );
 
-    // Open ASWebAuthenticationSession (iOS) or browser (macOS).
     final resultUrl = await FlutterWebAuth2.authenticate(
       url: oauthResponse.url.toString(),
       callbackUrlScheme: _callbackScheme,
       options: const FlutterWebAuth2Options(
-        preferEphemeral: false,
+        preferEphemeral: true,
       ),
     );
 
-    // Extract the auth code from the callback.
+    // Let Supabase parse the full callback URL (handles code in query
+    // params, fragments, error responses, and PKCE exchange).
     final uri = Uri.parse(resultUrl);
-    final code = uri.queryParameters['code'];
-    if (code == null) {
-      throw const AuthException('OAuth failed: no auth code in callback');
-    }
-
-    // Exchange the code for a session (Supabase reads back the stored verifier).
-    final sessionResponse = await client.auth.exchangeCodeForSession(code);
+    final sessionResponse = await client.auth.getSessionFromUrl(uri);
     return AuthResponse(
       session: sessionResponse.session,
       user: sessionResponse.session?.user,
@@ -82,6 +76,9 @@ class SupabaseService {
   }
 
   /// Native Apple Sign-In (system sheet, no browser).
+  ///
+  /// Extracts givenName/familyName from the Apple credential (only sent
+  /// on first sign-in) and stores them in Supabase user_metadata.
   static Future<AuthResponse> signInWithApple() async {
     final rawNonce = _generateNonce();
     final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
@@ -99,11 +96,61 @@ class SupabaseService {
       throw const AuthException('Apple Sign In failed: no ID token');
     }
 
-    return client.auth.signInWithIdToken(
+    final response = await client.auth.signInWithIdToken(
       provider: OAuthProvider.apple,
       idToken: idToken,
       nonce: rawNonce,
     );
+
+    // Apple only sends name on FIRST sign-in; capture it immediately.
+    final givenName = credential.givenName;
+    final familyName = credential.familyName;
+    if (givenName != null || familyName != null) {
+      final fullName =
+          '${givenName ?? ''} ${familyName ?? ''}'.trim();
+      try {
+        await client.auth.updateUser(UserAttributes(
+          data: {
+            'full_name': fullName,
+            'given_name': givenName,
+            'family_name': familyName,
+          },
+        ));
+      } catch (e) {
+        debugPrint('Failed to store Apple name: $e');
+      }
+    }
+
+    return response;
+  }
+
+  // ---- Profile helpers ----
+
+  /// Read the username from user_metadata.
+  static String? get currentUsername {
+    return currentUser?.userMetadata?['username'] as String?;
+  }
+
+  /// Read the display name (full_name or email prefix).
+  static String get currentDisplayName {
+    final meta = currentUser?.userMetadata;
+    final fullName = meta?['full_name'] as String?;
+    if (fullName != null && fullName.isNotEmpty) return fullName;
+    final email = currentUser?.email ?? '';
+    if (email.contains('@')) return email.split('@').first;
+    return email;
+  }
+
+  /// Update username and/or display name in user_metadata.
+  static Future<void> updateProfile({
+    String? username,
+    String? displayName,
+  }) async {
+    final data = <String, dynamic>{};
+    if (username != null) data['username'] = username;
+    if (displayName != null) data['full_name'] = displayName;
+    if (data.isEmpty) return;
+    await client.auth.updateUser(UserAttributes(data: data));
   }
 
   static String _generateNonce([int length = 32]) {
