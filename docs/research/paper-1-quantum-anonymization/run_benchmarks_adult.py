@@ -2,8 +2,8 @@
 """Reproduce Table 8 (UCI Adult benchmark) from the PoPETs paper.
 
 Downloads the UCI Adult dataset (32,561 records, 15 attributes) and runs
-anonymizer levels L1, L2, L4, L5, L8, L10. Measures timing (5 runs,
-mean + std), unique output values, and changed-cell percentage.
+anonymizer levels L1, L2, L4, L5, L8, L10. Measures timing (30 runs,
+mean + 95% CI), unique output values, and changed-cell percentage.
 
 Reference values from main.tex lines 710-718:
   L1   Regex masking         164 ms   22,134 unique   60%
@@ -22,6 +22,7 @@ import urllib.request
 
 import numpy as np
 import pandas as pd
+from scipy import stats
 
 # Suppress noisy entropy pool exhaustion warnings during benchmarking.
 # The pool falls back to os.urandom which is fine for timing/property tests.
@@ -87,7 +88,7 @@ def count_changed(original: pd.DataFrame, result: pd.DataFrame) -> float:
 
 
 def benchmark_level(
-    df: pd.DataFrame, level: int, n_runs: int = 5, **kwargs
+    df: pd.DataFrame, level: int, n_runs: int = 30, **kwargs
 ) -> dict:
     """Benchmark a single level: timing, unique count, changed %."""
     times = []
@@ -98,6 +99,12 @@ def benchmark_level(
         _out = anon.apply(df_copy, level=level, **kwargs)
         t1 = time.perf_counter()
         times.append((t1 - t0) * 1000)
+
+    # 95% CI using Student's t-distribution
+    ci_lo, ci_hi = stats.t.interval(
+        0.95, len(times) - 1,
+        loc=np.mean(times), scale=stats.sem(times),
+    )
 
     # Final run for property measurement
     anon = LevelAnonymizer()
@@ -111,6 +118,8 @@ def benchmark_level(
         "level": level,
         "mean_ms": np.mean(times),
         "std_ms": np.std(times),
+        "ci_lo": ci_lo,
+        "ci_hi": ci_hi,
         "unique_out": unique_out,
         "pct_changed": pct_changed,
     }
@@ -142,7 +151,7 @@ def main():
 
     # 2. Run benchmarks
     levels = [1, 2, 4, 5, 8, 10]
-    n_runs = 5
+    n_runs = 30
     results = []
 
     print(f"\nBenchmarking levels {levels} ({n_runs} runs each)...")
@@ -154,22 +163,22 @@ def main():
         r = benchmark_level(df, level, n_runs=n_runs)
         results.append(r)
         print(
-            f"{r['mean_ms']:,.0f} ms (std {r['std_ms']:.0f}) | "
+            f"{r['mean_ms']:,.0f} ms [{r['ci_lo']:.0f}, {r['ci_hi']:.0f}] | "
             f"unique: {r['unique_out']:,} | "
             f"changed: {r['pct_changed']:.0f}%"
         )
 
     # 3. Print comparison table
-    print("\n" + "=" * 70)
-    print("RESULTS vs. PAPER (Table 8)")
-    print("=" * 70)
+    print("\n" + "=" * 90)
+    print("RESULTS vs. PAPER (Table 8) -- n=30, 95% CI")
+    print("=" * 90)
     print(
         f"{'Level':>5}  {'Technique':<22} "
-        f"{'Time(ms)':>9} {'Paper':>7} "
+        f"{'Mean(ms)':>9} {'95% CI':>17} {'Paper':>7} "
         f"{'Unique':>9} {'Paper':>9} "
         f"{'Chg%':>5} {'Paper':>5}"
     )
-    print("-" * 85)
+    print("-" * 105)
 
     for r in results:
         lvl = r["level"]
@@ -177,10 +186,11 @@ def main():
         # Flags for match/mismatch
         unique_match = "OK" if abs(r["unique_out"] - ref["unique_out"]) / max(ref["unique_out"], 1) < 0.05 else "DIFF"
         changed_match = "OK" if abs(r["pct_changed"] - ref["changed_pct"]) < 5 else "DIFF"
+        ci_str = f"[{r['ci_lo']:.0f}, {r['ci_hi']:.0f}]"
 
         print(
             f"  L{lvl:<3} {ref['technique']:<22} "
-            f"{r['mean_ms']:>8,.0f} {ref['time_ms']:>7,} "
+            f"{r['mean_ms']:>8,.0f} {ci_str:>17} {ref['time_ms']:>7,} "
             f"{r['unique_out']:>9,} {ref['unique_out']:>9,} [{unique_match}] "
             f"{r['pct_changed']:>4.0f}% {ref['changed_pct']:>4}% [{changed_match}]"
         )
@@ -208,7 +218,7 @@ def main():
     print(f"  [{'x' if len(df) >= 30000 else ' '}] UCI Adult downloaded ({len(df):,} records)")
     all_ran = len(results) == len(levels)
     print(f"  [{'x' if all_ran else ' '}] Anonymizer levels L1,L2,L4,L5,L8,L10 run successfully")
-    print(f"  [x] Timing recorded ({n_runs} runs each)")
+    print(f"  [x] Timing recorded ({n_runs} runs each, 95% CI via Student's t)")
 
     unique_ok = all(
         abs(r["unique_out"] - PAPER_TABLE_8[r["level"]]["unique_out"])
