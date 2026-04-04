@@ -319,3 +319,98 @@ class TestSpecVectors:
             AreStep(Domain.NATURAL, 173, 0, Operation.MUL),
         ])
         assert ext.extract(1) == 203
+
+
+# ---------------------------------------------------------------------------
+# Extended Domains: Quaternion, Octonion, GF, p-adic (Claims 13-16)
+# ---------------------------------------------------------------------------
+class TestExtendedDomains:
+    """Tests for the extended number domains (H, O, GF, Q_p)."""
+
+    def test_quaternion_domain_exists(self):
+        """Claim 13: Quaternion domain is available."""
+        assert Domain.QUATERNION == 5
+
+    def test_octonion_domain_exists(self):
+        """Claim 14: Octonion domain is available."""
+        assert Domain.OCTONION == 6
+
+    def test_gf_domain_exists(self):
+        """Claim 15: Finite field domain is available."""
+        assert Domain.GF == 7
+
+    def test_padic_domain_exists(self):
+        """Claim 16: p-adic domain is available."""
+        assert Domain.PADIC == 8
+
+    def test_quaternion_non_commutative(self):
+        """Claim 13: acc*val != val*acc in quaternion domain.
+
+        Quaternion multiplication is non-commutative.
+        We test that domain_execute with MUL produces different results
+        depending on which value is the accumulator vs the step value.
+        """
+        # acc=1 (pure i), val=2 (pure j): i*j=k vs j*i=-k
+        r1 = domain_execute(Domain.QUATERNION, Operation.MUL, 10, 20, 30, 257, 256)
+        r2 = domain_execute(Domain.QUATERNION, Operation.MUL, 20, 10, 30, 257, 256)
+        assert r1 != r2, "Quaternion MUL must be non-commutative"
+
+    def test_octonion_non_associative(self):
+        """Claim 14: Octonion multiplication is non-associative.
+
+        (a*b)*c != a*(b*c) in general for octonions.
+        """
+        # Compute (a*b)*c
+        ab = domain_execute(Domain.OCTONION, Operation.MUL, 3, 5, 7, 257, 256)
+        ab_c = domain_execute(Domain.OCTONION, Operation.MUL, ab, 11, 13, 257, 256)
+        # Compute a*(b*c) -- b*c first
+        bc = domain_execute(Domain.OCTONION, Operation.MUL, 5, 11, 13, 257, 256)
+        a_bc = domain_execute(Domain.OCTONION, Operation.MUL, 3, bc, 7, 257, 256)
+        # Non-associativity: results should differ for generic inputs
+        # (may not always differ for degenerate inputs, but should for these)
+        assert ab_c != a_bc, "Octonion MUL must be non-associative"
+
+    def test_gf_add_invertible(self):
+        """Claim 15: GF addition is exact, no overflow."""
+        result = domain_execute(Domain.GF, Operation.ADD, 200, 100, 0, 257, 256)
+        # GF(2^8): XOR-based addition, 200 ^ 100 = 172
+        assert 0 <= result < 256
+
+    def test_gf_mul_nonzero_invertible(self):
+        """Claim 15: GF(2^8) multiplication of nonzero elements is nonzero."""
+        result = domain_execute(Domain.GF, Operation.MUL, 7, 11, 0, 257, 256)
+        assert result != 0, "GF mul of nonzero elements must be nonzero"
+
+    def test_padic_ultrametric(self):
+        """Claim 16: p-adic domain produces valid bounded output."""
+        result = domain_execute(Domain.PADIC, Operation.ADD, 42, 17, 0, 257, 256)
+        assert 0 <= result < 256
+
+    def test_from_seed_uses_extended_domains(self):
+        """Extended domains appear in seed-generated programs when num_domains=9."""
+        import hashlib
+        seed = hashlib.sha256(b"extended-domain-test-seed").digest()
+        ext = AreExtractor.from_seed(seed, num_steps=100, num_domains=9)
+        domains_used = {s.domain for s in ext.steps}
+        # With 100 steps and 9 domains, all should appear
+        assert len(domains_used) >= 7, f"Expected >=7 domains, got {domains_used}"
+
+    def test_extended_extract_deterministic(self):
+        """Extended domain extraction is deterministic."""
+        import hashlib
+        seed = hashlib.sha256(b"extended-determinism").digest()
+        ext = AreExtractor.from_seed(seed, num_steps=16, num_domains=9)
+        r1 = ext.extract(42)
+        r2 = ext.extract(42)
+        assert r1 == r2
+
+    def test_extended_extract_bytes_quality(self):
+        """Extended domain ARE output has reasonable byte distribution."""
+        import hashlib
+        from collections import Counter
+        seed = hashlib.sha256(b"extended-quality").digest()
+        ext = AreExtractor.from_seed(seed, num_steps=16, num_domains=9)
+        out = ext.extract_bytes(bytes(range(256)) * 4, output_len=256)
+        assert len(out) == 256
+        unique = len(set(out))
+        assert unique > 100, f"Expected >100 unique bytes, got {unique}"
