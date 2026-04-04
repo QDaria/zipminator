@@ -82,7 +82,7 @@ docs/research/paper-1-quantum-anonymization/main-popets.tex
 - [ ] Page count within PoPETs limits (18pp body)
 - [ ] No "FIPS certified" language (.claude/rules/02-security-pqc.md)
 - [ ] Patent-paper alignment: no claim contradicts patent-1
-- [ ] 12 figures + 9-11 tables, all referenced in text
+- [ ] 12 figures + 10 tables, all referenced in text
 - [ ] Multi-provider consensus: Opus 4.6 + GPT-5.4 + Gemini 3.1 Pro + Grok 4 agree >= 0.95
 
 ## Rules
