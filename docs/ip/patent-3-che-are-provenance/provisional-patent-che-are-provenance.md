@@ -34,7 +34,7 @@ Related to Norwegian Patent Application No. 20260384 (filed 2026-03-24), "Method
 
 ## FIELD OF THE INVENTION
 
-The present invention relates to cryptographic entropy management. More specifically, the invention relates to: (1) a new family of randomness extractors based on algebraic programs over five number domains; (2) a method for composing entropy from multiple heterogeneous sources with per-source health monitoring and Merkle-tree provenance certificates; and (3) a graceful degradation protocol that maintains certified entropy production when individual sources fail.
+The present invention relates to cryptographic entropy management. More specifically, the invention relates to: (1) a new family of randomness extractors based on algebraic programs over five or more number domains, including extensions to hypercomplex algebras, finite fields, and p-adic numbers; (2) a method for composing entropy from multiple heterogeneous sources with per-source health monitoring and Merkle-tree provenance certificates; (3) a graceful degradation protocol that maintains certified entropy production when individual sources fail; and (4) the application of algebraic extraction as a conditioner for wireless Channel State Information entropy sources.
 
 ---
 
