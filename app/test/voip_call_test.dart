@@ -91,6 +91,55 @@ void main() {
     });
   });
 
+  group('VoipState — conference', () {
+    test('isConference is true for conferencing phase', () {
+      const state = VoipState(
+        phase: CallPhase.conferencing,
+        roomId: 'zip-12345',
+      );
+      expect(state.isConference, true);
+      expect(state.inCall, true);
+      expect(state.roomId, 'zip-12345');
+    });
+
+    test('clearRoom resets roomId to null', () {
+      const state = VoipState(
+        phase: CallPhase.conferencing,
+        roomId: 'zip-12345',
+      );
+      final cleared = state.copyWith(clearRoom: true, phase: CallPhase.idle);
+      expect(cleared.roomId, isNull);
+      expect(cleared.isIdle, true);
+    });
+
+    test('participants list tracks peers', () {
+      const state = VoipState(
+        phase: CallPhase.conferencing,
+        participants: ['alice', 'bob'],
+      );
+      expect(state.participants.length, 2);
+      final afterLeave = state.copyWith(
+        participants: state.participants.where((p) => p != 'bob').toList(),
+      );
+      expect(afterLeave.participants, ['alice']);
+    });
+  });
+
+  group('VoipState — timer reset on call end', () {
+    test('resetting to VoipState() clears duration', () {
+      const active = VoipState(
+        phase: CallPhase.connected,
+        callDuration: Duration(seconds: 45),
+      );
+      expect(active.callDuration.inSeconds, 45);
+
+      // Simulates what endCall and remote call_end do: reset to const VoipState()
+      const reset = VoipState();
+      expect(reset.callDuration, Duration.zero);
+      expect(reset.isIdle, true);
+    });
+  });
+
   group('CallPhase enum', () {
     test('contains incomingRinging value', () {
       expect(CallPhase.values, contains(CallPhase.incomingRinging));

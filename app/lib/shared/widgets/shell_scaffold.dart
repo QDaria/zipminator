@@ -108,14 +108,21 @@ class ShellScaffold extends ConsumerWidget {
             ),
             const VerticalDivider(width: 1),
             Expanded(
-              child: Column(
-                children: [
-                  if (showCallBar) _MiniCallBar(voip: voip),
-                  Expanded(
-                    child: GradientBackground(child: _animatedChild(child)),
-                  ),
-                ],
-              ),
+              child: showCallBar
+                  ? Column(
+                      children: [
+                        _MiniCallBar(voip: voip),
+                        Expanded(
+                          child: MediaQuery.removePadding(
+                            context: context,
+                            removeTop: true,
+                            child: GradientBackground(
+                                child: _animatedChild(child)),
+                          ),
+                        ),
+                      ],
+                    )
+                  : GradientBackground(child: _animatedChild(child)),
             ),
           ],
         ),
@@ -126,14 +133,22 @@ class ShellScaffold extends ConsumerWidget {
     final mobileIndex = index < _mobileTabCount ? index : _mobileTabCount;
 
     return Scaffold(
-      body: Column(
-        children: [
-          if (showCallBar) _MiniCallBar(voip: voip),
-          Expanded(
-            child: GradientBackground(child: _animatedChild(child)),
-          ),
-        ],
-      ),
+      body: showCallBar
+          ? Column(
+              children: [
+                _MiniCallBar(voip: voip),
+                Expanded(
+                  // Remove top padding so child screens' SafeArea
+                  // doesn't double-count the space the call bar occupies.
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    child: GradientBackground(child: _animatedChild(child)),
+                  ),
+                ),
+              ],
+            )
+          : GradientBackground(child: _animatedChild(child)),
       bottomNavigationBar: NavigationBar(
         selectedIndex: mobileIndex,
         onDestinationSelected: (i) {

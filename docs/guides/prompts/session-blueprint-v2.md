@@ -1,7 +1,32 @@
 # Blueprint v2: IP Valuation Documentation — Enhancement Session
 
-> **Launch**: `claude --effort max`
-> Then paste everything below.
+> **Version**: 2.1 | **Date**: 2026-04-04
+> **Source data verified against**: `docs/ip/patent-{1,2,3}-*/patentkrav.md` (46 claims total)
+> **Incorporates**: AESR v5 self-answer protocol, /improve iteration, patent deep-dive content
+> **Supersedes**: Original blueprint data (which had stale claim counts)
+
+---
+
+## How to Execute (End-to-End)
+
+### Step 1: Launch
+```bash
+claude --effort max
+```
+
+### Step 2: Paste this entire prompt (everything below the `---` line)
+
+### Step 3: Self-Answer Protocol (AESR v5 style, 3 rounds)
+The session will auto-discover capabilities and ask 3 questions with suggested answers.
+Approve with `Y` or override. After Round 3, execution begins.
+
+### Step 4: Execution proceeds in 5 phases (see bottom of prompt)
+Each phase produces verifiable output. Run `/improve` after each phase to catch regressions.
+
+### Step 5: Verification
+After Phase 5, run `cd web && npx next build` to verify compilation.
+Then `cd web && npm run dev` and open `localhost:3099/invest/blueprint`.
+Take Playwright screenshot as proof.
 
 ---
 
@@ -9,11 +34,16 @@
 
 ## Pre-Read (MANDATORY — read ALL before writing anything)
 
+### Core Project Files
 ```
 CLAUDE.md
 .claude/rules/01-stack.md
 .claude/rules/02-security-pqc.md
 .claude/rules/zero-hallucination.md
+```
+
+### Blueprint Infrastructure (current state)
+```
 web/app/invest/blueprint/page.tsx
 web/app/invest/blueprint/layout.tsx
 web/lib/blueprint-data.ts
@@ -35,9 +65,78 @@ web/components/blueprint/sections/SectionFloorMatters.tsx
 web/components/pitch/pitch-ui/MetricCard.tsx
 web/components/pitch/pitch-ui/AnimatedCounter.tsx
 web/components/pitch/chart-config.ts
+```
+
+### Content Sources (read for prose and data)
+```
 docs/guides/conversation.txt
 docs/guides/FEATURES.md
 ```
+
+### Patent Source Files (AUTHORITATIVE claim counts and technical details)
+```
+docs/ip/patent-1-quantum-anonymization/patentkrav.md
+docs/ip/patent-1-quantum-anonymization/beskrivelse.md
+docs/ip/patent-2-csi-entropy-puek/patentkrav.md
+docs/ip/patent-2-csi-entropy-puek/beskrivelse.md
+docs/ip/patent-3-che-are-provenance/patentkrav.md
+docs/ip/patent-3-che-are-provenance/beskrivelse.md
+```
+
+### Research Papers (for concrete numbers and citations)
+```
+docs/research/paper-2-csi-entropy-puek/main.tex
+docs/research/paper-3-che-are-provenance/main-draft.tex
+docs/research/paper-2-csi-entropy-puek/references.bib
+docs/research/paper-3-che-are-provenance/references.bib
+```
+
+---
+
+## CRITICAL: Updated Patent Data (verified Apr 4, 2026)
+
+The existing `blueprint-data.ts` has STALE claim counts. Update these FIRST:
+
+| Patent | Old claims | Actual claims | Source |
+|--------|-----------|---------------|--------|
+| P1: Quantum Anonymization | 15 | **15** (3 ind + 12 dep) | `patent-1-*/patentkrav.md` |
+| P2: CSI Entropy + PUEK | 13 | **14** (3 ind + 11 dep) | `patent-2-*/patentkrav.md` |
+| P3: CHE + ARE | 12 | **17** (3 ind + 14 dep) | `patent-3-*/patentkrav.md` |
+| **Total** | **40** | **46** | Verified from patent files |
+
+### P3 Extended Domains (NEW, not in current data)
+Patent 3 now covers **9+ algebraic domains**, not 5:
+1. Natural numbers (N) -- modulo n wrapping
+2. Integers (Z) -- signed projection
+3. Rationals (Q) -- scaled integer arithmetic
+4. Reals (R) -- fixed-point
+5. Complex numbers (C) -- real-part projection
+6. **Quaternions (H)** -- non-commutative (ij=k, ji=-k), left/right multiplication encoding
+7. **Octonions (O)** -- non-associative (Fano plane), Catalan(K) distinct inversion paths
+8. **Finite Fields GF(p^n)** -- exact arithmetic, provable per-step uniformity, PCLMULQDQ acceleration
+9. **p-adic Numbers (Q_p)** -- ultrametric topology orthogonal to real arithmetic
+10. *(Also claims)* split-complex (j^2=+1), tropical semirings (min, +)
+
+### ARE as CSI Conditioner (NEW, Claim 17)
+ARE replaces Von Neumann debiasing for CSI entropy extraction:
+- Von Neumann: ~50% extraction loss, ~3.5 bytes/frame, ~6.5 bits/byte
+- ARE: ~15% extraction loss, ~47-50 bytes/frame, ~7.0-7.5 bits/byte
+- Processes FULL 8-bit quantized phase (not just LSB)
+
+### PUEK Security Profiles (from P2)
+| Profile | Threshold (tau) | Use Case |
+|---------|----------------|----------|
+| SCIF | 0.98 | Military/intelligence facilities |
+| Office | 0.85 | Corporate environments |
+| Home | 0.75 | Residential |
+| Custom | [0.0, 1.0] | User-defined |
+
+### Paper Status (verified Apr 4, 2026)
+| Paper | Venue | Status | Refs | Figures | Key Numbers |
+|-------|-------|--------|------|---------|-------------|
+| Paper 1 | PoPETs 2026 + IEEE | Dual-track, 0.97 content | ~50 | 12 | 10 anonymization levels, 64+45 tests |
+| Paper 2 | ACM WiSec 2026 | **COMPLETE** | 32 | 9 TikZ | 2,690 bytes, 5.50 bits/byte MCV, 24.5% extraction, 343 frames, 256 subcarriers |
+| Paper 3 | IEEE S&P / USENIX | **DRAFTED** | 34 | 10 TikZ | 2.7 MB IBM Quantum, 9+ domains, GF bijection proof |
 
 ---
 
@@ -172,9 +271,32 @@ Renders the citation callout pattern above. Default color is indigo. Use amber f
 
 ---
 
-## Data Additions to `web/lib/blueprint-data.ts`
+## Data Fixes and Additions to `web/lib/blueprint-data.ts`
 
-Add these 7 new exports after the existing ones:
+### CRITICAL FIXES (apply FIRST before adding new exports)
+
+**Fix PATENT_STACK claim counts:**
+```ts
+// P2: claims 13 -> 14
+{ id: 'P2', name: 'CSI Entropy + PUEK', layer: 'Generation', color: '#F59E0B', filing: 'TO FILE', status: 'DRAFTED', claims: 14, desc: 'Unilateral WiFi entropy harvesting + location-locked keys via RF eigenstructure' },
+// P3: claims 12 -> 17
+{ id: 'P3', name: 'CHE + ARE', layer: 'Composition', color: '#34D399', filing: 'TO FILE', status: 'DRAFTED', claims: 17, desc: 'Algebraic Randomness Extraction over 9+ domains (N/Z/Q/R/C/H/O/GF/Qp) + Merkle provenance certificates' },
+```
+
+**Fix hero stats in page.tsx:**
+```ts
+{ label: 'Claims', value: '46', sub: 'code-verified' },  // was 40
+```
+
+**Fix PATENT_DETAILS:**
+- P2: `totalClaims: 14`, `independentClaims: 3`, `dependentClaims: 11`
+- P3: `totalClaims: 17`, `independentClaims: 3`, `dependentClaims: 14`
+- P3 keyInnovation: update to mention 9+ domains (not just 5): `'ARE: first algebraic extractor family (9+ domains: N/Z/Q/R/C/H/O/GF(p^n)/Q_p × 6 ops). Merkle provenance = auditable entropy. ARE as CSI conditioner: 85% extraction vs 50% Von Neumann.'`
+
+**Fix NOVELTY_RADAR:**
+- P3 Theoretical Novelty: `92 -> 96` (9+ domains is stronger than 5)
+
+### New exports (add after existing ones):
 
 ### 1. VALUATION_PROGRESSION
 ```ts
@@ -192,8 +314,58 @@ export const ARE_EXTRACTOR_COMPARISON = [
   { family: 'Trevisan',           year: 2001, mechanism: 'Error-correcting codes + bit extraction', limitation: 'Near-linear, binary',    domain: 'GF(2)' },
   { family: 'Leftover Hash Lemma',year: 1999, mechanism: 'Any universal hash family',      limitation: 'Hash-based, single domain',        domain: 'GF(2)' },
   { family: 'Cryptomite',         year: 2024, mechanism: 'Hash-based (latest library)',     limitation: 'Still hash-based',                 domain: 'GF(2)' },
-  { family: 'ARE (Zipminator)',    year: 2026, mechanism: 'Algebraic programs over 5 domains (N,Z,Q,R,C) × 6 ops', limitation: 'Needs formal security reduction', domain: 'N/Z/Q/R/C' },
+  { family: 'ARE (Zipminator)',    year: 2026, mechanism: 'Algebraic programs over 9+ domains × 6 ops', limitation: 'Needs formal security reduction (GF steps proven)', domain: 'N/Z/Q/R/C/H/O/GF/Qp' },
 ]
+```
+
+### 2b. ARE_DOMAIN_PROPERTIES (NEW)
+```ts
+export const ARE_DOMAIN_PROPERTIES = [
+  { domain: 'N (Natural)',     commutative: true,  associative: true,  divisionAlgebra: false, zeroDiv: false, special: 'Modulo n wrapping' },
+  { domain: 'Z (Integer)',     commutative: true,  associative: true,  divisionAlgebra: false, zeroDiv: false, special: 'Signed projection' },
+  { domain: 'Q (Rational)',    commutative: true,  associative: true,  divisionAlgebra: true,  zeroDiv: false, special: 'Scaled integer arithmetic' },
+  { domain: 'R (Real)',        commutative: true,  associative: true,  divisionAlgebra: true,  zeroDiv: false, special: 'Fixed-point' },
+  { domain: 'C (Complex)',     commutative: true,  associative: true,  divisionAlgebra: true,  zeroDiv: false, special: 'Real-part projection' },
+  { domain: 'H (Quaternion)',  commutative: false, associative: true,  divisionAlgebra: true,  zeroDiv: false, special: 'Left/right multiply encoding; ij=k, ji=-k' },
+  { domain: 'O (Octonion)',    commutative: false, associative: false, divisionAlgebra: true,  zeroDiv: false, special: 'Fano plane; Catalan(K) inversion paths; Hurwitz limit' },
+  { domain: 'GF(p^n)',        commutative: true,  associative: true,  divisionAlgebra: true,  zeroDiv: false, special: 'Provable per-step uniformity; PCLMULQDQ HW accel' },
+  { domain: 'Q_p (p-adic)',   commutative: true,  associative: true,  divisionAlgebra: true,  zeroDiv: false, special: 'Ultrametric; orthogonal to R topology' },
+]
+```
+
+### 2c. PAPER_CONCRETE_NUMBERS (NEW, from research papers)
+```ts
+export const PAPER_CONCRETE_NUMBERS = {
+  paper2: {
+    venue: 'ACM WiSec 2026',
+    status: 'COMPLETE',
+    refs: 32,
+    figures: 9,
+    frames: 343,
+    subcarriers: 256,
+    extractedBytes: 2690,
+    extractionRatio: 24.5,
+    minEntropyMCV: 5.50,
+    ibmQuantumMinEntropy: 6.35,
+    osUrandomMinEntropy: 6.36,
+    esp32Cost: 5,
+    esp32MonthlyMB: '45-90',
+    ibmCostPerSec: 1.60,
+    qubits: 156,
+    dataset: 'TU Darmstadt Nexmon / Gi-z CSI-Data (Broadcom BCM4339)',
+  },
+  paper3: {
+    venue: 'IEEE S&P / USENIX Security 2027',
+    status: 'DRAFTED',
+    refs: 34,
+    figures: 10,
+    ibmQuantumMB: 2.7,
+    domains: '9+',
+    gfBijectionProven: true,
+    areExtractionEfficiency: 85,
+    vonNeumannEfficiency: 50,
+  },
+}
 ```
 
 ### 3. REGULATION_CITATIONS
@@ -310,6 +482,22 @@ export const REFERENCES = [
   { id: 'trevisan-2001', citation: 'Trevisan, L. Extractors and Pseudorandom Generators. Journal of the ACM, 48(4):860-879, 2001.', type: 'academic' },
   { id: 'vadhan-survey', citation: 'Vadhan, S. Pseudorandomness. Foundations and Trends in Theoretical Computer Science, 7(1-3):1-336, 2012.', type: 'academic' },
   { id: 'born-rule', citation: 'Born, M. Zur Quantenmechanik der Stoßvorgange. Zeitschrift fur Physik, 37(12):863-867, 1926.', type: 'academic' },
+  { id: 'hurwitz-1898', citation: 'Hurwitz, A. Uber die Komposition der quadratischen Formen von beliebig vielen Variablen. Nachrichten von der Gesellschaft der Wissenschaften zu Gottingen, 1898.', type: 'academic' },
+  { id: 'liu-2012', citation: 'Liu, H., Wang, Y., Yang, J., Chen, Y. Fast and Practical Secret Key Extraction by Exploiting Channel Response. INFOCOM 2012.', type: 'academic' },
+  { id: 'chatterjee-2018', citation: 'Chatterjee, B., Das, D., Maity, S., Sen, S. RF-PUF: Enhancing IoT Security through Authentication of Wireless Nodes Using In-Situ Machine Learning. IEEE HPCA, 2018.', type: 'academic' },
+  { id: 'paper2-wisec', citation: 'Houshmand, D.M. Unilateral WiFi CSI as a NIST-Validated Entropy Source: From Bilateral Key Agreement to Single-Device Randomness. ACM WiSec 2026 (submitted).', type: 'qdaria' },
+  { id: 'paper3-che', citation: 'Houshmand, D.M. Certified Heterogeneous Entropy with Algebraic Randomness Extraction. IEEE S&P / USENIX Security (in preparation).', type: 'qdaria' },
+  { id: 'paper1-popets', citation: 'Houshmand, D.M. Quantum-Certified Data Anonymization via Information-Theoretic Irreversibility. PoPETs 2026 (in preparation).', type: 'qdaria' },
+]
+```
+
+### Also add PUEK_SECURITY_PROFILES
+```ts
+export const PUEK_SECURITY_PROFILES = [
+  { profile: 'SCIF / Military', threshold: 0.98, desc: 'Sensitive Compartmented Information Facilities', falseReject: 'High', geofenceRadius: '~1m' },
+  { profile: 'Office / Corporate', threshold: 0.85, desc: 'Standard corporate environments', falseReject: 'Medium', geofenceRadius: '~5m' },
+  { profile: 'Home / Residential', threshold: 0.75, desc: 'Consumer-grade location binding', falseReject: 'Low', geofenceRadius: '~15m' },
+  { profile: 'Custom', threshold: '[0.0, 1.0]', desc: 'User-defined for special environments', falseReject: 'Variable', geofenceRadius: 'Variable' },
 ]
 ```
 
@@ -329,10 +517,10 @@ export const PATENT_PROSE = {
     caveats: 'CSI entropy rate depends on environmental richness (multipath density). In anechoic or RF-quiet environments, the entropy rate drops. The compositor (P3) handles this via health monitoring and graceful degradation.',
   },
   P3: {
-    mechanism: 'ARE (Algebraic Randomness Extraction) runs each input value through a program of arithmetic operations across five number systems: natural numbers (N), integers (Z), rationals (Q), reals (R), and complex numbers (C). The program is generated deterministically from a seed via SHAKE-256. Each step consumes 34 bytes from the seed: 1 byte selects the domain (mod 5), 16 bytes for the operand value, 16 bytes for the imaginary component, 1 byte selects the operation (mod 6: ADD, SUB, MUL, DIV, EXP, MOD). The result passes through all steps, then abs(result) mod prime produces the output. Merkle provenance certificates record which entropy sources contributed, when, at what health status, and at what min-entropy rate. Each source record is hashed and assembled into a Merkle tree whose root serves as a tamper-evident fingerprint of the entire entropy lineage.',
-    innovation: 'ARE is a genuinely new family of randomness extractors. All known extractors since Carter and Wegman (1979) use linear or near-linear operations in binary fields (GF(2)). Universal hashing, Trevisan extractors, and the Leftover Hash Lemma all operate in one algebraic domain. ARE uses nonlinear arithmetic across five algebraic structures. If the formal security proof holds, it becomes the third extractor family in 47 years. Merkle provenance is also novel: no existing system provides cryptographic proof of entropy lineage. NIST SP 800-90B defines health tests for single sources but says nothing about multi-source composition, provenance tracking, or certificates.',
-    implications: 'DORA Article 7 requires full cryptographic key lifecycle management. Regulators can ask: "Where did the entropy for this key come from? Prove it." No existing system can answer this. Zipminator\'s Merkle certificates can. Graceful degradation is the third innovation: most multi-source systems either require all sources (fragile) or silently substitute a weaker source when one fails (dishonest). Zipminator\'s compositor excludes failed sources, includes degraded sources with warnings, drops the reported min-entropy bound to reflect only what actually contributed, and records everything in the certificate.',
-    caveats: 'ARE currently relies on SHA-256 counter mode for final output expansion (are.py lines 496-506). A pure security proof showing ARE alone produces near-uniform output would make it a standalone primitive. That proof is the main contribution for Paper 3 and a collaboration target with Dodis (NYU), Vadhan (Harvard), or Renner (ETH Zurich).',
+    mechanism: 'ARE (Algebraic Randomness Extraction) runs each input value through a program of arithmetic operations across 9+ number systems. The five classical domains are N, Z, Q, R, C. The extended domains (Patent 3, Claims 13-16) are quaternions H (non-commutative: ij=k, ji=-k, left/right multiply encoding), octonions O (non-associative: Fano plane, Catalan(K) distinct inversion paths, largest normed division algebra by Hurwitz theorem), finite fields GF(p^n) (exact arithmetic, provable per-step uniformity, PCLMULQDQ HW acceleration), and p-adic numbers Q_p (ultrametric |a+b|_p <= max(|a|_p, |b|_p), orthogonal to R topology). The program is generated deterministically from SHAKE-256: 34 bytes per step (1B domain, 16B value, 16B imaginary, 1B operation). Results pass through all steps, then abs(result) mod prime. Merkle provenance certificates: source records serialized as pipe-separated canonical encoding (name|min_entropy(6dp)|status|bytes|timestamp(6dp)|sha256), SHA-256 leaf hashes, recursive pair combination, odd-node duplication. ARE also serves as a CSI conditioner (Claim 17): replaces Von Neumann debiasing, processes full 8-bit quantized phase measurements, improving extraction from ~50% to ~85%.',
+    innovation: 'ARE is a genuinely new family of randomness extractors. All known extractors since Carter and Wegman (1979) use linear or near-linear operations in binary fields (GF(2)). ARE uses nonlinear arithmetic across 9+ algebraic structures, including non-commutative quaternions and non-associative octonions. For GF(p^n) steps, there is a formal proof: min-entropy is preserved exactly (bijection on the multiplicative group). Octonion non-associativity means K multiplication steps have Catalan(K) = (2K)!/(K+1)!K! distinct inversion paths. Program space: 30^N for N steps vs 2^(n*n) for universal hashing. Paper 3 (34 refs, 10 TikZ figures) establishes all four contributions. Merkle provenance is also novel: NIST SP 800-90B covers single sources; composition, provenance, and certificates are all new.',
+    implications: 'DORA Article 7 requires full cryptographic key lifecycle management. Regulators can ask: "Where did the entropy for this key come from? Prove it." No existing system answers this; Zipminator Merkle certificates do. Graceful degradation: most multi-source systems either require all sources (fragile) or silently substitute weaker sources (dishonest). Zipminator excludes failed, warns on degraded, drops min-entropy honestly, and records everything. As CSI conditioner (Claim 17): ~47-50 bytes per WiFi frame vs Von Neumann ~3.5 bytes, a 13x extraction throughput improvement.',
+    caveats: 'SHA-256 counter mode for final expansion (are.py:496-506). GF(p^n) steps formally proven; classical and hypercomplex domains have empirical validation, not formal reductions yet. Paper 3 identifies what is proven, conjectured, and open. Collaboration targets: Dodis (NYU), Vadhan (Harvard), Renner (ETH Zurich).',
   },
 }
 ```
@@ -396,11 +584,15 @@ Group them visually: privacy regulations (GDPR, HIPAA, CCPA) together, then comp
 4. Caveats (honest limitations)
 
 **Add data tables:**
-- For P3: Insert the ARE Extractor Family Comparison table from `ARE_EXTRACTOR_COMPARISON`. Style it like the existing regulation table (alternating rows, mono values, color-coded accent).
-- For P2: Add a prior art comparison mini-table showing Mathur 2008, Jana 2009, Liu 2012, Avrahami 2023 as bilateral vs. Zipminator as unilateral.
+- For P3: Insert the ARE Extractor Family Comparison table from `ARE_EXTRACTOR_COMPARISON` AND the new `ARE_DOMAIN_PROPERTIES` table showing all 9+ domains with their algebraic properties (commutative/associative/division algebra/zero divisors). Style both like the existing regulation table.
+- For P3: Add a "Paper 3 Concrete Numbers" callout using `PAPER_CONCRETE_NUMBERS.paper3` data.
+- For P2: Add a prior art comparison mini-table showing Mathur 2008, Jana 2009, Liu 2012, Avrahami 2023 as bilateral vs. Zipminator as unilateral. Add "Paper 2 Concrete Numbers" callout using `PAPER_CONCRETE_NUMBERS.paper2` (2,690 bytes, 5.50 bits/byte MCV, 24.5% extraction, $5 ESP32 vs $1.60/sec IBM Quantum).
 - For P1: Add a comparison table showing k-anonymity, differential privacy, tokenization, pseudonymization, homomorphic encryption as computational vs. P1 as information-theoretic.
 
 **Add mechanism code blocks** using the mechanism code block pattern for each patent's technical flow.
+
+**Add ARE as CSI Conditioner subsection in P3 tab** (from Claim 17):
+Show a comparison: Von Neumann (~50% loss, ~3.5 bytes/frame, ~6.5 bits/byte) vs ARE (~15% loss, ~47-50 bytes/frame, ~7.0-7.5 bits/byte). Include the "processes full 8-bit quantized phase, not just LSB" explanation.
 
 **Add the Merkle provenance analogy** for P3: "When you buy organic food, there is a chain-of-custody certificate: this apple came from this farm, picked on this date, inspected by this auditor. Merkle provenance does the same for entropy."
 
@@ -420,13 +612,15 @@ Group them visually: privacy regulations (GDPR, HIPAA, CCPA) together, then comp
 **Add a "World's Firsts" callout box** (cyan accent):
 List all unique innovations:
 1. First physics-proven anonymization (Born rule irreversibility)
-2. First unilateral CSI entropy harvesting
-3. First location-locked keys (PUEK, environment fingerprint)
-4. First algebraic randomness extractor (ARE, 5 domains)
-5. First Merkle-tree entropy provenance
-6. First multi-source compositor with graceful degradation + honest bounds
-7. First CSI + PQC combination (WiFi CSI → ML-KEM-768)
-8. First 9-pillar PQC super-app
+2. First unilateral CSI entropy harvesting (all prior art bilateral since 2008)
+3. First location-locked keys (PUEK: environment fingerprint via SVD eigenstructure, not hardware PUF)
+4. First algebraic randomness extractor (ARE: 9+ domains including quaternions, octonions, GF(p^n), p-adic)
+5. First formal proof of min-entropy preservation for finite field extractor steps (GF bijection)
+6. First Merkle-tree entropy provenance certificates
+7. First multi-source compositor with graceful degradation + honest min-entropy bounds
+8. First CSI + PQC combination (WiFi CSI via ARE conditioner → ML-KEM-768)
+9. First 9-pillar PQC super-app (single codebase, 6 platforms)
+10. First ARE-based CSI conditioner (13x throughput improvement over Von Neumann)
 
 **Keep:** RadarChart and prior art comparison table unchanged.
 
@@ -641,22 +835,73 @@ Mark this as OPTIONAL. The page should work without it.
 
 ## Quality Gates (ALL must pass)
 
-1. [ ] Every section has 3+ paragraphs of DM Sans prose
-2. [ ] All 8 regulations have verbatim citation callouts (GDPR + 7 new)
-3. [ ] ARE extractor family comparison table present in Section 3
-4. [ ] Merkle provenance "organic food" analogy present in Section 3
-5. [ ] Graceful degradation "fragile vs dishonest" framing present in Section 3
-6. [ ] VALUATION_PROGRESSION table (1/2/3-patent) present in Section 5
-7. [ ] No hedge language ("I cannot give you a number", "Anyone who does is making it up")
-8. [ ] AnimatedCounter used for at least 3 headline numbers
-9. [ ] Scenario toggle updates all valuation numbers live (preserve existing behavior)
-10. [ ] All headings use Fraunces font
-11. [ ] All body prose uses DM Sans font
-12. [ ] All data values use JetBrains Mono font
-13. [ ] Section 13 (Product Showcase) exists with platform grid and app valuation chart
-14. [ ] Section 14 (References) exists with grouped reference list
-15. [ ] `cd web && npx next build` completes without errors
-16. [ ] Page renders at `localhost:3099/invest/blueprint` with all 14 sections visible
+### Data Accuracy (verify against patent files)
+1. [ ] P2 claims = 14 (3 ind + 11 dep), NOT 13
+2. [ ] P3 claims = 17 (3 ind + 14 dep), NOT 12
+3. [ ] Total claims = 46, NOT 40
+4. [ ] Hero stats show "46" claims (page.tsx)
+5. [ ] P3 description mentions 9+ domains, NOT 5
+
+### Content Completeness
+6. [ ] Every section has 3+ paragraphs of DM Sans prose
+7. [ ] All 8 regulations have verbatim citation callouts (GDPR + 7 new)
+8. [ ] ARE extractor family comparison table present in Section 3
+9. [ ] ARE domain properties table (9+ domains with algebraic properties) present in Section 3
+10. [ ] Merkle provenance "organic food" analogy present in Section 3
+11. [ ] Graceful degradation "fragile vs dishonest" framing present in Section 3
+12. [ ] ARE as CSI conditioner (85% vs 50%) in Section 3 P3 tab
+13. [ ] PUEK security profiles table (SCIF/Office/Home) in Section 3 P2 tab
+14. [ ] Paper 2 concrete numbers (5.50 bits/byte, 2,690 bytes, $5 ESP32) in Section 3
+15. [ ] VALUATION_PROGRESSION table (1/2/3-patent) present in Section 5
+16. [ ] No hedge language ("I cannot give you a number", "Anyone who does is making it up")
+
+### Visualization and Interaction
+17. [ ] AnimatedCounter used for at least 3 headline numbers
+18. [ ] Scenario toggle updates all valuation numbers live (preserve existing behavior)
+19. [ ] All headings use Fraunces font
+20. [ ] All body prose uses DM Sans font
+21. [ ] All data values use JetBrains Mono font
+
+### New Sections
+22. [ ] Section 13 (Product Showcase) exists with platform grid and app valuation chart
+23. [ ] Section 14 (References) exists with grouped reference list including QDaria papers
+
+### Build Verification
+24. [ ] `cd web && npx next build` completes without errors
+25. [ ] Page renders at `localhost:3099/invest/blueprint` with all 14 sections visible
+
+---
+
+## Iteration Protocol (AESR v5 style)
+
+After each execution phase, run `/improve` to analyze and strengthen output:
+
+```
+Phase 1 (Data) -> /improve -> fix any data inconsistencies
+Phase 2 (Components) -> /improve -> verify component API consistency
+Phase 3 (Prose) -> /improve -> check prose quality, citation accuracy
+Phase 4 (New sections) -> /improve -> verify integration with existing page
+Phase 5 (Polish) -> /improve -> final quality sweep
+```
+
+If quality plateaus after 12 iterations on any section, document the max-achievable state and move on.
+
+Use `/simplify` after completing all prose additions to check for dead code, unused imports, or redundant components.
+
+### Self-Answer Protocol (at session start)
+```
+QUESTION 1: Parallel or sequential section enhancement?
+SUGGESTED: Batch parallel (Sections 1-3, then 4-6, then 7-9, then 10-14). Use agent teams with worktree isolation for batches.
+[Y / override]
+
+QUESTION 2: Which reasoning depth?
+SUGGESTED: --effort max (patent IP + valuation content is investor-critical)
+[Y / override]
+
+QUESTION 3: Quality threshold?
+SUGGESTED: 0.99 (all 25 quality gates must pass before declaring done)
+[Y / override]
+```
 
 ---
 
