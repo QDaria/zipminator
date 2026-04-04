@@ -7,11 +7,32 @@ import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
 
 /// Profile screen showing user info, linked providers, and logout.
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  final _usernameController = TextEditingController();
+  bool _editingUsername = false;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveUsername() async {
+    final username = _usernameController.text.trim().toLowerCase();
+    if (username.isEmpty || username.length < 3) return;
+    await ref.read(authProvider.notifier).updateProfile(username: username);
+    if (mounted) setState(() => _editingUsername = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
     final user = auth.user;
 
@@ -33,7 +54,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            // Avatar + email card
+            // Avatar + name + email card
             QuantumCard(
               child: Column(
                 children: [
@@ -42,7 +63,7 @@ class ProfileScreen extends ConsumerWidget {
                     backgroundColor:
                         QuantumTheme.quantumCyan.withValues(alpha: 0.2),
                     child: Text(
-                      _initials(user),
+                      _initials(auth),
                       style: GoogleFonts.outfit(
                         fontSize: 28,
                         fontWeight: FontWeight.w600,
@@ -50,24 +71,91 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
+                  // Display name
                   Text(
-                    user?.email ?? 'Not signed in',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
+                    auth.displayName,
+                    style: GoogleFonts.outfit(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                       color: QuantumTheme.textPrimary,
                     ),
                   ),
-                  if (user?.id != null) ...[
-                    const SizedBox(height: 4),
+                  // Username
+                  if (auth.username != null && auth.username!.isNotEmpty)
                     Text(
-                      'ID: ${user!.id.substring(0, 8)}...',
+                      '@${auth.username}',
                       style: GoogleFonts.jetBrainsMono(
-                        fontSize: 12,
-                        color: QuantumTheme.textSecondary,
+                        fontSize: 14,
+                        color: QuantumTheme.quantumCyan,
                       ),
                     ),
-                  ],
+                  const SizedBox(height: 4),
+                  Text(
+                    user?.email ?? 'Not signed in',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: QuantumTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Edit username
+            QuantumCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Username',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: QuantumTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (_editingUsername) ...[
+                    TextField(
+                      controller: _usernameController,
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.alternate_email),
+                        hintText: 'new-username',
+                        isDense: true,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () =>
+                              setState(() => _editingUsername = false),
+                          child: const Text('Cancel'),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: _saveUsername,
+                          child: const Text('Save'),
+                        ),
+                      ],
+                    ),
+                  ] else
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.alternate_email,
+                          color: QuantumTheme.quantumCyan),
+                      title: Text(auth.username ?? 'Not set'),
+                      trailing: TextButton(
+                        onPressed: () {
+                          _usernameController.text = auth.username ?? '';
+                          setState(() => _editingUsername = true);
+                        },
+                        child: const Text('Change'),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -117,7 +205,7 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _InfoRow(label: 'Version', value: '0.2.0-beta'),
+                  _InfoRow(label: 'Version', value: '0.5.0-beta'),
                   _InfoRow(label: 'Crypto Engine', value: 'ML-KEM-768'),
                   _InfoRow(label: 'Standard', value: 'NIST FIPS 203'),
                 ],
@@ -154,11 +242,15 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  String _initials(dynamic user) {
-    if (user == null) return '?';
-    final email = user.email as String? ?? '';
-    if (email.isEmpty) return '?';
-    return email[0].toUpperCase();
+  String _initials(AuthState auth) {
+    final name = auth.displayName;
+    if (name.isEmpty) return '?';
+    // Use first letter of first and last word if available.
+    final parts = name.split(' ');
+    if (parts.length >= 2) {
+      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    }
+    return name[0].toUpperCase();
   }
 
   List<Widget> _buildProviderChips(List<String> providers) {

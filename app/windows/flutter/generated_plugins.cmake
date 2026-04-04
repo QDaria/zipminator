@@ -7,6 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_window
   flutter_tts
   flutter_webrtc
+  local_auth_windows
   permission_handler_windows
   share_plus
   speech_to_text_windows
