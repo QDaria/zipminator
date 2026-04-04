@@ -44,7 +44,7 @@ class BiometricNotifier extends AsyncNotifier<BiometricState> {
   /// Toggle biometric lock on/off. When turning on, verifies with biometric
   /// first so only the device owner can enable it.
   Future<void> toggle() async {
-    final current = state.valueOrNull ?? const BiometricState();
+    final current = state.value ?? const BiometricState();
     if (!current.available) return;
 
     if (!current.enabled) {
@@ -65,7 +65,7 @@ class BiometricNotifier extends AsyncNotifier<BiometricState> {
   Future<bool> unlock() async {
     final ok = await BiometricService.authenticate();
     if (ok) {
-      final current = state.valueOrNull ?? const BiometricState();
+      final current = state.value ?? const BiometricState();
       state = AsyncData(current.copyWith(locked: false));
     }
     return ok;
@@ -73,7 +73,7 @@ class BiometricNotifier extends AsyncNotifier<BiometricState> {
 
   /// Lock the app (called when app goes to background).
   void lock() {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current != null && current.enabled && current.available) {
       state = AsyncData(current.copyWith(locked: true));
     }

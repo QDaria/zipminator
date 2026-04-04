@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -42,10 +40,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } else {
       await notifier.signInWithEmail(email, password);
     }
-  }
-
-  Future<void> _oauthSignIn(OAuthProvider provider) async {
-    await ref.read(authProvider.notifier).signInWithOAuth(provider);
   }
 
   @override

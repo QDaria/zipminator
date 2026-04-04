@@ -71,7 +71,7 @@ class SupabaseService {
     final sessionResponse = await client.auth.getSessionFromUrl(uri);
     return AuthResponse(
       session: sessionResponse.session,
-      user: sessionResponse.session?.user,
+      user: sessionResponse.session.user,
     );
   }
 
