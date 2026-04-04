@@ -39,11 +39,11 @@ class ConferenceService {
 
   /// Start the local media capture with VoIP-optimized audio.
   Future<void> startLocalMedia({bool video = true, bool audio = true}) async {
-    // Configure audio session BEFORE capturing media (critical on iOS).
+    _localStream = await getLocalMediaStream(video: video, audio: audio);
+    // Configure speaker route AFTER getUserMedia so iOS doesn't reset it.
     if (audio) {
       await configureVoipAudioSession(speakerphone: true);
     }
-    _localStream = await getLocalMediaStream(video: video, audio: audio);
   }
 
   /// A new peer joined the room — create a connection and send an offer.

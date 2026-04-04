@@ -32,12 +32,14 @@ class _ZipminatorAppState extends ConsumerState<ZipminatorApp>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Lock when app goes to background; auto-unlock prompt on resume.
+    final bio = ref.read(biometricProvider);
+    if (!bio.hasValue) return; // Provider still loading.
+
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden) {
       ref.read(biometricProvider.notifier).lock();
     } else if (state == AppLifecycleState.resumed) {
-      final bio = ref.read(biometricProvider).value;
-      if (bio != null && bio.locked) {
+      if (bio.value!.locked) {
         ref.read(biometricProvider.notifier).unlock();
       }
     }

@@ -249,6 +249,7 @@ class VoipNotifier extends Notifier<VoipState> {
         }
       case 'call_end':
         if (state.inCall || state.isIncomingRinging) {
+          _stopCallTimer();
           _conference?.dispose();
           _conference = null;
           state = const VoipState();

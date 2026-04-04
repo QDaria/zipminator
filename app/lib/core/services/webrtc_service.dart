@@ -100,8 +100,9 @@ class WebRtcService {
 }
 
 /// Configure the audio session for VoIP (critical on iOS for audibility).
+/// Must be called AFTER getUserMedia so iOS doesn't reset the audio route.
 Future<void> configureVoipAudioSession({bool speakerphone = true}) async {
-  Helper.setSpeakerphoneOn(speakerphone);
+  await Helper.setSpeakerphoneOn(speakerphone);
 }
 
 /// Capture local camera + microphone with VoIP-optimized audio constraints.
