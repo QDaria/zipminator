@@ -143,65 +143,162 @@
       margin-bottom: 4em;
       text-align: center;
     }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
 </head>
 <body>
+<header id="title-block-header">
+<h1 class="title">patentkrav</h1>
+</header>
 <h1 id="claims-patentkrav">CLAIMS / PATENTKRAV</h1>
 <h2 id="independent-claims">Independent Claims</h2>
-
-<p><strong>Claim 1.</strong> A computer-implemented method for unilateral entropy harvesting from wireless channel state information, comprising:</p>
+<p><strong>Claim 1.</strong> A computer-implemented method for
+unilateral entropy harvesting from wireless channel state information,
+comprising:</p>
 <ol type="a">
-<li><p>receiving WiFi Channel State Information (CSI) frames from a wireless interface, each frame comprising complex-valued subcarrier measurements;</p></li>
-<li><p>for each subcarrier measurement, computing the phase angle and quantizing said phase to a discrete level;</p></li>
-<li><p>extracting the least-significant bit (LSB) of each quantized phase value to produce a raw bit stream;</p></li>
-<li><p>applying Von Neumann debiasing to the raw bit stream, wherein consecutive bit pairs are processed such that differing pairs produce an output bit and identical pairs are discarded;</p></li>
+<li><p>receiving WiFi Channel State Information (CSI) frames from a
+wireless interface, each frame comprising complex-valued subcarrier
+measurements;</p></li>
+<li><p>for each subcarrier measurement, computing the phase angle and
+quantizing said phase to a discrete level;</p></li>
+<li><p>extracting the least-significant bit (LSB) of each quantized
+phase value to produce a raw bit stream;</p></li>
+<li><p>applying Von Neumann debiasing to the raw bit stream, wherein
+consecutive bit pairs are processed such that differing pairs produce an
+output bit and identical pairs are discarded;</p></li>
 <li><p>accumulating debiased output bits into entropy bytes;</p></li>
 </ol>
-<p>wherein the method operates on a single device without requiring a second wireless endpoint, and the output bytes constitute general-purpose entropy suitable for any cryptographic application, distinct from bilateral key agreement protocols that require two cooperating endpoints.</p>
-
-<p><strong>Claim 2.</strong> A method for deriving location-locked encryption keys from wireless channel eigenstructure, comprising:</p>
+<p>wherein the method operates on a single device without requiring a
+second wireless endpoint, and the output bytes constitute
+general-purpose entropy suitable for any cryptographic application,
+distinct from bilateral key agreement protocols that require two
+cooperating endpoints.</p>
+<p><strong>Claim 2.</strong> A method for deriving location-locked
+encryption keys from wireless channel eigenstructure, comprising:</p>
 <ol type="a">
-<li><p>capturing CSI magnitude data across multiple frames from a WiFi interface at an enrollment location;</p></li>
-<li><p>computing a covariance matrix from the centered CSI magnitude data;</p></li>
-<li><p>performing Singular Value Decomposition (SVD) on said covariance matrix to obtain eigenvalues sorted in descending order;</p></li>
-<li><p>storing the top-K eigenvalues as an enrollment profile together with a configurable similarity threshold;</p></li>
-<li><p>at key-derivation time, capturing fresh CSI magnitude data from the same physical location;</p></li>
-<li><p>computing fresh eigenvalues via SVD of the fresh CSI covariance matrix;</p></li>
-<li><p>computing cosine similarity between the enrolled and fresh eigenvalue vectors;</p></li>
-<li><p>if the cosine similarity meets or exceeds the threshold, deriving a cryptographic key from the enrolled eigenmodes using HKDF-SHA256 with a purpose-specific info string;</p></li>
-<li><p>if the cosine similarity falls below the threshold, rejecting the key derivation request;</p></li>
+<li><p>capturing complex-valued CSI data across multiple frames from a
+WiFi interface at an enrollment location, forming a matrix <span
+class="math inline"><strong>C</strong> ∈ ℂ<sup><em>M</em> × <em>K</em></sup></span>
+where <span class="math inline"><em>M</em></span> is the number of
+frames and <span class="math inline"><em>K</em></span> is the number of
+subcarriers;</p></li>
+<li><p>performing Singular Value Decomposition (SVD) on said CSI matrix
+to obtain <span
+class="math inline"><strong>C</strong> = <strong>U</strong><strong>Σ</strong><strong>V</strong><sup><em>H</em></sup></span>,
+where <span class="math inline"><strong>V</strong></span> contains the
+right singular vectors;</p></li>
+<li><p>storing the top-<span class="math inline"><em>d</em></span> right
+singular vectors <span
+class="math inline"><strong>V</strong><sub>ref</sub> = [<strong>v</strong><sub>1</sub>, …, <strong>v</strong><sub><em>d</em></sub>]</span>
+as an enrollment profile together with a configurable similarity
+threshold;</p></li>
+<li><p>at key-derivation time, capturing fresh complex-valued CSI data
+from the same physical location;</p></li>
+<li><p>computing fresh right singular vectors <span
+class="math inline"><strong>V</strong><sub>new</sub></span> via SVD of
+the fresh CSI matrix;</p></li>
+<li><p>computing subspace similarity as <span class="math inline">$s =
+\frac{1}{d}\sum_{i=1}^{d}|\langle \mathbf{v}_{\mathrm{ref},i},
+\mathbf{v}_{\mathrm{new},i}\rangle|^2$</span>;</p></li>
+<li><p>if the subspace similarity <span
+class="math inline"><em>s</em></span> meets or exceeds the threshold,
+deriving a cryptographic key from the enrollment eigenstructure using
+HKDF-SHA256 with a purpose-specific info string;</p></li>
+<li><p>if the subspace similarity <span
+class="math inline"><em>s</em></span> falls below the threshold,
+rejecting the key derivation request;</p></li>
 </ol>
-<p>wherein the derived key is cryptographically bound to the physical RF environment of the enrollment location and cannot be derived from a different physical location, and wherein the method fingerprints the environment rather than the hardware device.</p>
-
-<p><strong>Claim 3.</strong> A method for generating post-quantum mesh encryption keys from composed entropy, comprising:</p>
+<p>wherein the derived key is cryptographically bound to the physical RF
+environment of the enrollment location and cannot be derived from a
+different physical location, and wherein the method fingerprints the
+environment rather than the hardware device.</p>
+<p><strong>Claim 3.</strong> A method for generating post-quantum mesh
+encryption keys from composed entropy, comprising:</p>
 <ol type="a">
 <li><p>obtaining CSI entropy bytes via the method of Claim 1;</p></li>
-<li><p>obtaining quantum random bytes from a quantum random number generator (QRNG);</p></li>
-<li><p>XOR-combining the CSI entropy bytes with the QRNG bytes to produce composed entropy, wherein the composed output has min-entropy at least as high as the stronger individual source;</p></li>
-<li><p>deriving mesh authentication keys using HKDF-SHA256 with the composed entropy as input keying material and distinct purpose-specific info strings for each key type;</p></li>
+<li><p>obtaining quantum random bytes from a quantum random number
+generator (QRNG);</p></li>
+<li><p>XOR-combining the CSI entropy bytes with the QRNG bytes to
+produce composed entropy, wherein the composed output has min-entropy at
+least as high as the stronger individual source;</p></li>
+<li><p>deriving mesh authentication keys using HKDF-SHA256 with the
+composed entropy as input keying material and distinct purpose-specific
+info strings for each key type;</p></li>
 </ol>
-<p>wherein the derived keys are suitable for use with ML-KEM-768 (NIST FIPS 203) key encapsulation in a wireless mesh network, and wherein compromise of either individual entropy source does not reduce the security of the composed output below the entropy of the uncompromised source.</p>
-
+<p>wherein the derived keys are suitable for use with ML-KEM-768 (NIST
+FIPS 203) key encapsulation in a wireless mesh network, and wherein
+compromise of either individual entropy source does not reduce the
+security of the composed output below the entropy of the uncompromised
+source.</p>
 <h2 id="dependent-claims">Dependent Claims</h2>
-
-<p><strong>Claim 4.</strong> The method of Claim 1, wherein the CSI frames comprise 56 complex-valued subcarrier measurements conforming to the IEEE 802.11n HT20 frame structure.</p>
-
-<p><strong>Claim 5.</strong> The method of Claim 1, wherein the Von Neumann debiasing processes consecutive bit pairs such that a pair (0, 1) produces output bit 0, a pair (1, 0) produces output bit 1, and pairs (0, 0) and (1, 1) are discarded.</p>
-
-<p><strong>Claim 6.</strong> The method of Claim 1, wherein the wireless interface is an ESP32-S3 microcontroller configured to capture raw CSI data from WiFi frames.</p>
-
-<p><strong>Claim 7.</strong> The method of Claim 1, further comprising writing the accumulated entropy bytes to a persistent pool file in append mode, enabling offline consumption by a separate process with position tracking.</p>
-
-<p><strong>Claim 8.</strong> The method of Claim 2, wherein the configurable similarity threshold is selected from preset security profiles comprising: SCIF (0.98), Office (0.85), Home (0.75), or a custom value in the range [0.0, 1.0].</p>
-
-<p><strong>Claim 9.</strong> The method of Claim 2, wherein the HKDF-SHA256 key derivation uses a fixed info string for domain separation and an optional salt parameter for network-specific binding.</p>
-
-<p><strong>Claim 10.</strong> The method of Claim 3, wherein the XOR combination provides defense-in-depth such that even if the CSI data is fully compromised by an adversary, the composed output retains the full entropy of the QRNG source.</p>
-
-<p><strong>Claim 11.</strong> The method of Claim 3, further comprising deriving a SipHash-2-4 frame integrity key from the composed entropy using HKDF-SHA256 with a distinct info string separate from the mesh authentication key.</p>
-
-<p><strong>Claim 12.</strong> The method of Claim 3, further comprising deriving a MeshKey for HMAC-SHA256 beacon authentication from the composed entropy using HKDF-SHA256.</p>
-
-<p><strong>Claim 13.</strong> The method of Claim 1, wherein a CSI pool provider raises a runtime error when the pool file is exhausted rather than falling back to operating system entropy, thereby preserving the provenance integrity of CSI-derived entropy.</p>
+<p><strong>Claim 4.</strong> The method of Claim 1, wherein the CSI
+frames comprise 56 complex-valued subcarrier measurements conforming to
+the IEEE 802.11n HT20 frame structure.</p>
+<p><strong>Claim 5.</strong> The method of Claim 1, wherein the Von
+Neumann debiasing processes consecutive bit pairs such that a pair (0,
+1) produces output bit 0, a pair (1, 0) produces output bit 1, and pairs
+(0, 0) and (1, 1) are discarded.</p>
+<p><strong>Claim 6.</strong> The method of Claim 1, wherein the wireless
+interface is an ESP32-S3 microcontroller configured to capture raw CSI
+data from WiFi frames.</p>
+<p><strong>Claim 7.</strong> The method of Claim 1, further comprising
+writing the accumulated entropy bytes to a persistent pool file in
+append mode, enabling offline consumption by a separate process with
+position tracking.</p>
+<p><strong>Claim 8.</strong> The method of Claim 2, wherein the
+configurable similarity threshold is selected from preset security
+profiles comprising: Standard (0.75, office access and workstations),
+Elevated (0.85, financial and medical records), High (0.95, government
+classified and SCIF), Military (0.98, defense, nuclear, and critical
+infrastructure), or a custom value in the range [0.0, 1.0].</p>
+<p><strong>Claim 9.</strong> The method of Claim 2, wherein the
+HKDF-SHA256 key derivation uses a fixed info string for domain
+separation and an optional salt parameter for network-specific
+binding.</p>
+<p><strong>Claim 10.</strong> The method of Claim 3, wherein the XOR
+combination provides defense-in-depth such that even if the CSI data is
+fully compromised by an adversary, the composed output retains the full
+entropy of the QRNG source.</p>
+<p><strong>Claim 11.</strong> The method of Claim 3, further comprising
+deriving a SipHash-2-4 frame integrity key from the composed entropy
+using HKDF-SHA256 with a distinct info string separate from the mesh
+authentication key.</p>
+<p><strong>Claim 12.</strong> The method of Claim 3, further comprising
+deriving a MeshKey for HMAC-SHA256 beacon authentication from the
+composed entropy using HKDF-SHA256.</p>
+<p><strong>Claim 13.</strong> The method of Claim 1, wherein a CSI pool
+provider raises a runtime error when the pool file is exhausted rather
+than falling back to operating system entropy, thereby preserving the
+provenance integrity of CSI-derived entropy.</p>
+<p><strong>Claim 14.</strong> The method of Claim 1, wherein the
+wireless interface is any IEEE 802.11-compatible device capable of
+reporting per-subcarrier complex-valued channel state information,
+including but not limited to 802.11n, 802.11ac, and 802.11ax interfaces
+with any subcarrier count.</p>
 </body>
 </html>

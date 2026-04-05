@@ -1,0 +1,92 @@
+================================================================
+IACR ePrint — PAPER 1
+================================================================
+PDF: docs/research/eprint/paper1-quantum-anonymization.pdf
+
+Title:
+Quantum-Certified Anonymization: Irreversibility Beyond Computational Hardness
+
+Author 1:
+  Name: Daniel Mo Houshmand
+  ORCID: 0009-0008-2270-5454
+  Email: mo@qdaria.com
+  Institution: QDaria Quantum Research
+  ROR ID: (leave blank)
+
+Abstract:
+We present the first data anonymization system whose irreversibility is guaranteed by the Born rule of quantum mechanics rather than by computational hardness assumptions. Every deployed anonymization tool derives its randomness from a classical PRNG; an adversary who captures the PRNG state can reconstruct every "random" value and reverse the anonymization completely. We introduce QRNG-OTP-Destroy, a protocol that replaces each personally identifiable value with a quantum-random token and irreversibly destroys the mapping. Because quantum measurement outcomes are governed by the Born rule, no deterministic seed exists, and the anonymization is information-theoretically irreversible against adversaries with unbounded computational power. We formalize three tiers of irreversibility (computational, information-theoretic, and physics-guaranteed), prove that no classical PRNG-based method achieves the strongest tier, and prove that QRNG-OTP-Destroy does. We report on an implementation with 10 progressive anonymization levels and a multi-provider entropy architecture (Rigetti, IBM Quantum, qBraid) with automatic failover to OS entropy. We validate the implementation with 966 unit and integration tests, evaluate it on the UCI Adult dataset (32,561 records), and demonstrate production-scale quantum entropy harvesting (6.8 MB from 35 IBM Quantum jobs on 156-qubit processors). The system provides the first auditable chain from entropy provenance to a GDPR Recital 26 anonymity argument.
+
+Category: foundations
+
+Keywords: anonymization, quantum random number generation, Born rule, differential privacy, GDPR, information-theoretic security, one-time pad
+
+Publication Information: Published nowhere else
+
+Additional notes:
+Norwegian Patent Application No. 20260384 (Patentstyret, 24 March 2026). Open-source implementation: https://github.com/QDaria/quantum-certified-anonymization
+
+Message to editor(s): (leave blank)
+
+License: CC-BY
+
+================================================================
+IACR ePrint — PAPER 2
+================================================================
+PDF: docs/research/eprint/paper2-csi-entropy-puek.pdf
+
+Title:
+Unilateral WiFi CSI as a NIST-Validated Entropy Source: From Bilateral Key Agreement to Single-Device Randomness
+
+Author 1:
+  Name: Daniel Mo Houshmand
+  ORCID: 0009-0008-2270-5454
+  Email: mo@qdaria.com
+  Institution: QDaria Quantum Research
+  ROR ID: (leave blank)
+
+Abstract:
+Every prior system that extracts randomness from WiFi Channel State Information (CSI) requires two cooperating endpoints exploiting channel reciprocity for bilateral key agreement. We present the first system, measurement, and NIST SP 800-90B validation of WiFi CSI as a unilateral entropy source: a single device passively measuring ambient CSI to harvest genuine physical randomness with no cooperating partner. Using the public Gi-z/CSI-Data corpus (TU Darmstadt Nexmon captures, Broadcom BCM4339), we extract phase least-significant bits from 343 frames across 256 OFDM subcarriers, apply Von Neumann debiasing, and obtain 2,690 bytes of entropy at a 24.5% extraction ratio. The NIST SP 800-90B ea_non_iid assessment yields a final min-entropy of 5.50 bits/byte (MCV estimator, 99% confidence), compared to 6.35 for IBM Quantum (ibm_kingston, 156 qubits) and 6.36 for os.urandom. We introduce the Physical Unclonable Environment Key (PUEK), which derives location-locked cryptographic keys from the SVD eigenstructure of CSI measurements, with security profiles from $\tau = 0.75$ (office) to $\tau = 0.98$ (military). The method is hardware-agnostic, working with any IEEE 802.11n/ac/ax device; a \$5 ESP32-S3 reference implementation produces 45--90 MB/month at zero marginal cost. We provide a formal indistinguishability game and proof sketch for PUEK security under a spatial decorrelation assumption. All code and data references are open-source.
+
+Category: implementation
+
+Keywords: WiFi CSI, entropy source, NIST SP 800-90B, unilateral randomness, physical unclonable environment key, post-quantum cryptography, IoT security
+
+Publication Information: Published nowhere else
+
+Additional notes:
+Patent pending (Patentstyret, April 2026). Open-source implementation: https://github.com/QDaria/unilateral-csi-entropy
+
+Message to editor(s): (leave blank)
+
+License: CC-BY
+
+================================================================
+IACR ePrint — PAPER 3
+================================================================
+PDF: docs/research/eprint/paper3-che-are-provenance.pdf
+
+Title:
+Certified Heterogeneous Entropy with Algebraic Randomness Extraction
+
+Author 1:
+  Name: Daniel Mo Houshmand
+  ORCID: 0009-0008-2270-5454
+  Email: mo@qdaria.com
+  Institution: QDaria Quantum Research
+  ROR ID: (leave blank)
+
+Abstract:
+Composing entropy from heterogeneous sources -- quantum hardware, WiFi Channel State Information (CSI), and operating system random number generators -- is essential for post-quantum cryptographic systems but lacks formal provenance guarantees. We present the Certified Heterogeneous Entropy (CHE) framework, which makes three contributions. First, we introduce Algebraic Randomness Extraction (ARE), a new family of seeded extractors parameterized by algebraic programs over bounded number domains with six arithmetic operations, generated deterministically from SHAKE-256. The core construction operates over five classical domains ($\mathbb{N}_n, \mathbb{Z}_n, \mathbb{Q}_n, \mathbb{R}_n, \mathbb{C}_n$) and extends to quaternions ($\mathbb{H}$, non-commutative), octonions ($\mathbb{O}$, non-associative), finite fields $\mathrm{GF}(p^n)$ (provable per-step uniformity), and $p$-adic numbers. Second, we describe a certified composition protocol that XOR-fuses entropy from multiple independent sources while constructing Merkle-tree provenance certificates proving per-source contribution. Third, we show that the framework degrades gracefully when individual sources fail, maintaining accurate min-entropy bounds without silent fallback. Our implementation processes 6.8 MB of IBM Quantum entropy (156 qubits), WiFi CSI entropy from ESP32-S3 hardware, and OS entropy through the ARE extractor and compositor pipeline. NIST SP 800-90B testing validates output quality. The provenance certificates provide a complete audit trail satisfying DORA Art. 7 requirements for cryptographic key lifecycle management in EU-regulated financial institutions. We formally prove that GF-domain steps preserve min-entropy exactly (bijection on the multiplicative group) and show empirically that the two-layer architecture (algebraic fold + SHA-256 expansion) provides defense-in-depth extraction distinct from hash-only approaches. All code is open-source.
+
+Category: foundations
+
+Keywords: randomness extraction, entropy composition, Merkle provenance, algebraic extractors, post-quantum cryptography, DORA compliance, heterogeneous entropy
+
+Publication Information: Published nowhere else
+
+Additional notes:
+Patent pending (Patentstyret, April 2026). Open-source implementation: https://github.com/QDaria/certified-heterogeneous-entropy
+
+Message to editor(s): (leave blank)
+
+License: CC-BY

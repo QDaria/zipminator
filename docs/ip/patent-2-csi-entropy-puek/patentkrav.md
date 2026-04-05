@@ -18,23 +18,21 @@ wherein the method operates on a single device without requiring a second wirele
 
 **Claim 2.** A method for deriving location-locked encryption keys from wireless channel eigenstructure, comprising:
 
-(a) capturing CSI magnitude data across multiple frames from a WiFi interface at an enrollment location;
+(a) capturing complex-valued CSI data across multiple frames from a WiFi interface at an enrollment location, forming a matrix $\mathbf{C} \in \mathbb{C}^{M \times K}$ where $M$ is the number of frames and $K$ is the number of subcarriers;
 
-(b) computing a covariance matrix from the centered CSI magnitude data;
+(b) performing Singular Value Decomposition (SVD) on said CSI matrix to obtain $\mathbf{C} = \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^H$, where $\mathbf{V}$ contains the right singular vectors;
 
-(c) performing Singular Value Decomposition (SVD) on said covariance matrix to obtain eigenvalues sorted in descending order;
+(c) storing the top-$d$ right singular vectors $\mathbf{V}_{\mathrm{ref}} = [\mathbf{v}_1, \ldots, \mathbf{v}_d]$ as an enrollment profile together with a configurable similarity threshold;
 
-(d) storing the top-K eigenvalues as an enrollment profile together with a configurable similarity threshold;
+(d) at key-derivation time, capturing fresh complex-valued CSI data from the same physical location;
 
-(e) at key-derivation time, capturing fresh CSI magnitude data from the same physical location;
+(e) computing fresh right singular vectors $\mathbf{V}_{\mathrm{new}}$ via SVD of the fresh CSI matrix;
 
-(f) computing fresh eigenvalues via SVD of the fresh CSI covariance matrix;
+(f) computing subspace similarity as $s = \frac{1}{d}\sum_{i=1}^{d}|\langle \mathbf{v}_{\mathrm{ref},i}, \mathbf{v}_{\mathrm{new},i}\rangle|^2$;
 
-(g) computing cosine similarity between the enrolled and fresh eigenvalue vectors;
+(g) if the subspace similarity $s$ meets or exceeds the threshold, deriving a cryptographic key from the enrollment eigenstructure using HKDF-SHA256 with a purpose-specific info string;
 
-(h) if the cosine similarity meets or exceeds the threshold, deriving a cryptographic key from the enrolled eigenmodes using HKDF-SHA256 with a purpose-specific info string;
-
-(i) if the cosine similarity falls below the threshold, rejecting the key derivation request;
+(h) if the subspace similarity $s$ falls below the threshold, rejecting the key derivation request;
 
 wherein the derived key is cryptographically bound to the physical RF environment of the enrollment location and cannot be derived from a different physical location, and wherein the method fingerprints the environment rather than the hardware device.
 
@@ -60,7 +58,7 @@ wherein the derived keys are suitable for use with ML-KEM-768 (NIST FIPS 203) ke
 
 **Claim 7.** The method of Claim 1, further comprising writing the accumulated entropy bytes to a persistent pool file in append mode, enabling offline consumption by a separate process with position tracking.
 
-**Claim 8.** The method of Claim 2, wherein the configurable similarity threshold is selected from preset security profiles comprising: SCIF (0.98), Office (0.85), Home (0.75), or a custom value in the range [0.0, 1.0].
+**Claim 8.** The method of Claim 2, wherein the configurable similarity threshold is selected from preset security profiles comprising: Standard (0.75, office access and workstations), Elevated (0.85, financial and medical records), High (0.95, government classified and SCIF), Military (0.98, defense, nuclear, and critical infrastructure), or a custom value in the range [0.0, 1.0].
 
 **Claim 9.** The method of Claim 2, wherein the HKDF-SHA256 key derivation uses a fixed info string for domain separation and an optional salt parameter for network-specific binding.
 
