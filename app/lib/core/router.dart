@@ -35,10 +35,22 @@ class _StreamNotifier extends ChangeNotifier {
   }
 }
 
+/// No-op listenable for tests where Supabase is not initialized.
+class _NoopNotifier extends ChangeNotifier {}
+
+/// Safe auth stream listenable: returns no-op in test environments.
+ChangeNotifier _authRefreshListenable() {
+  try {
+    return _StreamNotifier(SupabaseService.authStateChanges);
+  } catch (_) {
+    return _NoopNotifier();
+  }
+}
+
 /// Auth-reactive GoRouter. Re-evaluates redirect on every auth state change.
 final GoRouter appRouter = GoRouter(
   initialLocation: '/vault',
-  refreshListenable: _StreamNotifier(SupabaseService.authStateChanges),
+  refreshListenable: _authRefreshListenable(),
   redirect: (context, state) {
     final path = state.matchedLocation;
     final isLoginRoute = path == '/login';

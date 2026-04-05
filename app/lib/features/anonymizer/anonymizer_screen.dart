@@ -584,7 +584,7 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
           // Text field -- obscured when hidden
           TextField(
             controller: _controller,
-            maxLines: 5,
+            maxLines: _scannerContentVisible ? 5 : 1,
             obscureText: !_scannerContentVisible,
             decoration: InputDecoration(
               hintText: _scannerContentVisible
