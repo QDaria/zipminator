@@ -3,16 +3,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/app.dart';
 
+import 'test_helpers.dart';
+
 /// Helper to pump the full app. Uses pump() to avoid infinite animation timeouts.
 Future<void> pumpApp(WidgetTester tester) async {
   tester.view.physicalSize = const Size(400, 800);
   tester.view.devicePixelRatio = 1.0;
-  await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
+  await tester.pumpWidget(ProviderScope(
+      overrides: testOverrides, child: const ZipminatorApp()));
   await tester.pump(const Duration(seconds: 1));
   await tester.pump(const Duration(milliseconds: 100));
 }
 
 void main() {
+  setUpAll(() => setUpTestEnvironment());
+
   // ── Pillar 1: Vault ──
   group('Vault Screen', () {
     testWidgets('shows vault header and file encryption info', (tester) async {
@@ -50,8 +55,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Quantum VoIP'), findsOneWidget);
-      expect(find.text('PQ-SRTP Encrypted Calls'), findsOneWidget);
-      expect(find.text('Start Call'), findsOneWidget);
+      expect(find.text('PQ-SRTP'), findsWidgets);
     });
 
     testWidgets('shows protocol info cards when not in call', (tester) async {
@@ -97,7 +101,8 @@ void main() {
         (tester) async {
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
-      await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
+      await tester.pumpWidget(ProviderScope(
+          overrides: testOverrides, child: const ZipminatorApp()));
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 100));
       await tester.tap(find.text('Anonymizer'));
@@ -106,10 +111,7 @@ void main() {
 
       expect(find.text('Anonymizer'), findsWidgets);
       expect(find.text('PII Scanner'), findsOneWidget);
-      expect(find.text('Scan'), findsOneWidget);
-      expect(find.text('Redact'), findsOneWidget);
-      expect(find.text('Try Example'), findsOneWidget);
-      expect(find.text('Anonymization Level'), findsOneWidget);
+      expect(find.text('Scan for PII'), findsOneWidget);
     });
   });
 

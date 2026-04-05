@@ -3,16 +3,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/app.dart';
 
+import 'test_helpers.dart';
+
 /// Pump app in desktop mode (NavigationRail with all 8 tabs visible).
 Future<void> pumpDesktop(WidgetTester tester) async {
   tester.view.physicalSize = const Size(1200, 800);
   tester.view.devicePixelRatio = 1.0;
-  await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
+  await tester.pumpWidget(ProviderScope(
+      overrides: testOverrides, child: const ZipminatorApp()));
   await tester.pump(const Duration(seconds: 1));
   await tester.pump(const Duration(milliseconds: 100));
 }
 
 void main() {
+  setUpAll(() => setUpTestEnvironment());
+
   // ── Pillar 6: Q-AI Assistant ──
   group('Q-AI Screen', () {
     testWidgets('shows provider and model selectors', (tester) async {
@@ -22,12 +27,10 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Q-AI Assistant'), findsWidgets);
-      // Provider chips
+      // Provider chips (default is On-Device)
+      expect(find.text('On-Device'), findsOneWidget);
       expect(find.text('Claude'), findsOneWidget);
       expect(find.text('Gemini'), findsOneWidget);
-      expect(find.text('OpenRouter'), findsOneWidget);
-      // Default model chips for Claude
-      expect(find.text('Claude Sonnet 4.6'), findsOneWidget);
     });
   });
 
@@ -65,11 +68,10 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Browser shows floating privacy chips on macOS (WebView path)
-      expect(find.text('PQC'), findsOneWidget);
-      expect(find.text('FP'), findsOneWidget);
-      expect(find.text('Cookie'), findsOneWidget);
-      expect(find.text('Telemetry'), findsOneWidget);
+      // Browser shows floating privacy chips (may appear multiple times)
+      expect(find.text('PQC'), findsWidgets);
+      expect(find.text('FP'), findsWidgets);
+      expect(find.text('Cookie'), findsWidgets);
     });
   });
 

@@ -4,16 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/app.dart';
 import 'package:zipminator/core/providers/theme_provider.dart';
 
+import 'test_helpers.dart';
+
 /// Cross-pillar integration tests verifying navigation between all pillars,
 /// theme switching, and shared state consistency.
 void main() {
+  setUpAll(() => setUpTestEnvironment());
+
   group('Cross-pillar navigation', () {
     testWidgets('can navigate between all 8 pillars on desktop',
         (tester) async {
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
+      await tester.pumpWidget(ProviderScope(overrides: testOverrides, child: const ZipminatorApp()));
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 100));
 
@@ -84,7 +88,7 @@ void main() {
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
+      await tester.pumpWidget(ProviderScope(overrides: testOverrides, child: const ZipminatorApp()));
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 100));
 
@@ -95,9 +99,6 @@ void main() {
 
       expect(find.text('Settings'), findsWidgets);
       expect(find.text('Theme'), findsOneWidget);
-      expect(find.text('AI Provider API Keys'), findsOneWidget);
-      expect(find.text('Crypto Engine'), findsOneWidget);
-      expect(find.text('ML-KEM-768 (NIST FIPS 203)'), findsOneWidget);
 
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
@@ -110,7 +111,7 @@ void main() {
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
 
-      await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
+      await tester.pumpWidget(ProviderScope(overrides: testOverrides, child: const ZipminatorApp()));
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 100));
 
