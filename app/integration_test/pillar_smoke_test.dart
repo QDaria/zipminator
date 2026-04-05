@@ -2,8 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 import 'package:zipminator/app.dart';
+import 'package:zipminator/core/providers/auth_provider.dart';
+import 'package:zipminator/core/providers/ratchet_provider.dart';
+import 'package:zipminator/core/router.dart' show skipAuthRedirectForTests;
+import 'package:zipminator/core/services/supabase_service.dart';
 import 'package:zipminator/src/rust/frb_generated.dart';
+
+class _TestAuth extends AuthNotifier {
+  @override
+  AuthState build() => const AuthState();
+}
 
 /// Integration smoke tests for all 8 pillar screens, settings, and theme
 /// switching. Uses desktop-width viewport so all pillar tabs are visible
@@ -14,12 +24,27 @@ import 'package:zipminator/src/rust/frb_generated.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(() async => await RustLib.init());
+  setUpAll(() async {
+    skipAuthRedirectForTests = true;
+    try { await RustLib.init(); } catch (_) {}
+    try { await SupabaseService.initialize(); } catch (_) {
+      try { await Supabase.initialize(
+        url: 'https://placeholder.supabase.co',
+        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder',
+      ); } catch (_) {}
+    }
+  });
 
   Future<void> pumpDesktopApp(WidgetTester tester) async {
     tester.view.physicalSize = const Size(1200, 800);
     tester.view.devicePixelRatio = 1.0;
-    await tester.pumpWidget(const ProviderScope(child: ZipminatorApp()));
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        authProvider.overrideWith(() => _TestAuth()),
+        signalingInitProvider.overrideWithValue(null),
+      ],
+      child: const ZipminatorApp(),
+    ));
     await tester.pumpAndSettle(const Duration(seconds: 3));
   }
 

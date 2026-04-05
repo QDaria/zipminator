@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Description</title>
+  <title>beskrivelse</title>
   <style>
     /* Default styles provided by pandoc.
     ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -143,174 +143,359 @@
       margin-bottom: 4em;
       text-align: center;
     }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
 </head>
 <body>
+<header id="title-block-header">
+<h1 class="title">beskrivelse</h1>
+</header>
 <h1 id="description-beskrivelse">DESCRIPTION / BESKRIVELSE</h1>
-
 <h2 id="title-of-the-invention">TITLE OF THE INVENTION</h2>
-<p><strong>Method and System for Unilateral Entropy Harvesting from Wireless Channel State Information with Post-Quantum Key Derivation</strong></p>
-<hr />
-
+<p>Method and System for Unilateral Entropy Harvesting from Wireless
+Channel State Information with Post-Quantum Key Derivation</p>
 <h2 id="inventors">INVENTOR(S)</h2>
-<p>Daniel Mo Houshmand<br/>Oslo, Norway</p>
-<hr />
-
+<p>Daniel Mo Houshmand Oslo, Norway</p>
 <h2 id="assignee">ASSIGNEE</h2>
-<p>QDaria AS<br/>Oslo, Norway</p>
-<hr />
-
-<h2 id="cross-reference-to-related-applications">CROSS-REFERENCE TO RELATED APPLICATIONS</h2>
-<p>Related to Norwegian Patent Application No. 20260384 (filed 2026-03-24), &ldquo;Method and System for Irreversible Data Anonymization Using Quantum Random Number Generation,&rdquo; which shares the entropy pool infrastructure but claims a distinct invention.</p>
-<hr />
-
+<p>QDaria AS Oslo, Norway</p>
+<h2 id="cross-reference-to-related-applications">CROSS-REFERENCE TO
+RELATED APPLICATIONS</h2>
+<p>Related to Norwegian Patent Application No. 20260384 (filed
+2026-03-24), “Method and System for Irreversible Data Anonymization
+Using Quantum Random Number Generation,” which shares the entropy pool
+infrastructure but claims a distinct invention.</p>
 <h2 id="field-of-the-invention">FIELD OF THE INVENTION</h2>
-<p>The present invention relates to wireless security, entropy generation, and post-quantum cryptography. More specifically, the invention relates to: (1) a method for extracting general-purpose cryptographic entropy from WiFi Channel State Information (CSI) using a single device without bilateral key agreement; (2) a method for deriving location-locked encryption keys from CSI eigenstructure (Physical Unclonable Environment Keys); and (3) a method for composing CSI entropy with quantum random bytes to derive mesh network keys compatible with NIST FIPS 203 (ML-KEM-768).</p>
-<hr />
-
+<p>The present invention relates to wireless security, entropy
+generation, and post-quantum cryptography. More specifically, the
+invention relates to: (1) a method for extracting general-purpose
+cryptographic entropy from WiFi Channel State Information (CSI) using a
+single device without bilateral key agreement; (2) a method for deriving
+location-locked encryption keys from CSI eigenstructure (Physical
+Unclonable Environment Keys); and (3) a method for composing CSI entropy
+with quantum random bytes to derive mesh network keys compatible with
+NIST FIPS 203 (ML-KEM-768).</p>
 <h2 id="background-of-the-invention">BACKGROUND OF THE INVENTION</h2>
-
-<h3 id="csi-based-key-agreement">CSI-Based Key Agreement: The State of the Art</h3>
-<p>Channel State Information (CSI) describes the frequency-domain response of a wireless channel across OFDM subcarriers. Each subcarrier measurement is a complex number encoding amplitude and phase, influenced by multipath propagation, scattering, and the physical environment.</p>
-
-<p>Prior work has exploited CSI for <strong>bilateral key agreement</strong>, wherein two wireless endpoints simultaneously observe the same channel and extract correlated random bits:</p>
+<h3 id="csi-based-key-agreement-the-state-of-the-art">CSI-Based Key
+Agreement: The State of the Art</h3>
+<p>Channel State Information (CSI) describes the frequency-domain
+response of a wireless channel across OFDM subcarriers. Each subcarrier
+measurement is a complex number encoding amplitude and phase, influenced
+by multipath propagation, scattering, and the physical environment.</p>
+<p>Prior work has exploited CSI for <strong>bilateral key
+agreement</strong>, wherein two wireless endpoints simultaneously
+observe the same channel and extract correlated random bits:</p>
 <ul>
-<li><strong>Mathur et al. (2008)</strong>, &ldquo;Radio-Telepathy: Extracting a Secret Key from an Unauthenticated Wireless Channel,&rdquo; ACM MobiCom. First demonstration of RSS-based bilateral key extraction.</li>
-<li><strong>Jana et al. (2009)</strong>, ACM MobiCom. Extended bilateral key extraction to CSI (amplitude and phase) across OFDM subcarriers.</li>
-<li><strong>Liu et al. (2012)</strong>, IEEE TIFS. Adaptive quantization for bilateral CSI key generation with improved bit agreement rates.</li>
-<li><strong>Avrahami et al. (2023)</strong>. Recent bilateral WiFi-based key exchange with enhanced reconciliation.</li>
+<li><strong>Mathur et al. (2008)</strong>, “Radio-Telepathy: Extracting
+a Secret Key from an Unauthenticated Wireless Channel,” ACM MobiCom.
+First demonstration of RSS-based bilateral key extraction.</li>
+<li><strong>Jana et al. (2009)</strong>, ACM MobiCom. Extended bilateral
+key extraction to CSI (amplitude and phase) across OFDM
+subcarriers.</li>
+<li><strong>Liu et al. (2012)</strong>, IEEE TIFS. Adaptive quantization
+for bilateral CSI key generation with improved bit agreement rates.</li>
+<li><strong>Avrahami et al. (2023)</strong>. Recent bilateral WiFi-based
+key exchange with enhanced reconciliation.</li>
 </ul>
-
 <p>Patent literature confirms this bilateral focus:</p>
 <ul>
-<li><strong>WO2007124054A2</strong>: Wireless channel-based key agreement requiring both endpoints.</li>
-<li><strong>US20210345102A1</strong>: Bilateral CSI key generation with quantization.</li>
-<li><strong>US10402172B1</strong>: Symmetric key extraction from shared wireless observations.</li>
-<li><strong>US8015224B1</strong>: Channel reciprocity-based key distribution.</li>
+<li><strong>WO2007124054A2</strong>: Wireless channel-based key
+agreement requiring both endpoints.</li>
+<li><strong>US20210345102A1</strong>: Bilateral CSI key generation with
+quantization.</li>
+<li><strong>US10402172B1</strong>: Symmetric key extraction from shared
+wireless observations.</li>
+<li><strong>US8015224B1</strong>: Channel reciprocity-based key
+distribution.</li>
 </ul>
-
 <h3 id="the-unoccupied-gap">The Unoccupied Gap</h3>
-<p>All prior art requires <strong>two cooperating endpoints</strong> that observe the same channel simultaneously. The extracted bits serve exclusively as a shared secret key. No prior system uses CSI measurements from a <strong>single device</strong> to produce <strong>general-purpose entropy bytes</strong> suitable for any cryptographic application (key generation, nonce creation, entropy pool seeding, randomness extraction).</p>
-
-<p>This represents a fundamental departure from bilateral key agreement, introducing unilateral entropy harvesting as a distinct application of CSI measurements.</p>
-
-<h3 id="pufs-vs-environment-keys">Physical Unclonable Functions (PUFs) vs. Environment Keys</h3>
-<p>RF-PUF approaches (e.g., Chatterjee et al. 2018) fingerprint <strong>hardware</strong> manufacturing variations. The present invention fingerprints the <strong>physical RF environment</strong> (room geometry, furniture, wall materials) via CSI eigenstructure. The key is bound to a location, not a device.</p>
-
-<h3 id="post-quantum-key-derivation-gap">Post-Quantum Key Derivation Gap</h3>
-<p>No prior art combines WiFi CSI entropy with ML-KEM-768 (NIST FIPS 203) key encapsulation for quantum-resistant mesh networking.</p>
-<hr />
-
+<p>All prior art requires <strong>two cooperating endpoints</strong>
+that observe the same channel simultaneously. The extracted bits serve
+exclusively as a shared secret key. No prior system uses CSI
+measurements from a <strong>single device</strong> to produce
+<strong>general-purpose entropy bytes</strong> suitable for any
+cryptographic application (key generation, nonce creation, entropy pool
+seeding, randomness extraction).</p>
+<p>This represents a fundamental departure from bilateral key agreement,
+introducing unilateral entropy harvesting as a distinct application of
+CSI measurements.</p>
+<h3
+id="physical-unclonable-functions-pufs-vs.-environment-keys">Physical
+Unclonable Functions (PUFs) vs. Environment Keys</h3>
+<p>RF-PUF approaches (e.g., Chatterjee et al. 2018) fingerprint
+<strong>hardware</strong> manufacturing variations. The present
+invention fingerprints the <strong>physical RF environment</strong>
+(room geometry, furniture, wall materials) via CSI eigenstructure. The
+key is bound to a location, not a device.</p>
+<h3 id="post-quantum-key-derivation-gap">Post-Quantum Key Derivation
+Gap</h3>
+<p>No prior art combines WiFi CSI entropy with ML-KEM-768 (NIST FIPS
+203) key encapsulation for quantum-resistant mesh networking.</p>
 <h2 id="summary-of-the-invention">SUMMARY OF THE INVENTION</h2>
 <p>The present invention provides three interrelated methods:</p>
-<ol>
-<li><strong>Unilateral CSI entropy harvesting</strong>: A single device extracts phase LSBs from WiFi CSI subcarrier measurements, applies Von Neumann debiasing, and produces general-purpose entropy bytes. No second endpoint participates.</li>
-<li><strong>Physical Unclonable Environment Key (PUEK)</strong>: CSI covariance eigenstructure is captured at enrollment. At key-derivation time, fresh CSI eigenvalues are compared via cosine similarity against the enrollment profile. If similarity meets a configurable threshold (0.75&ndash;0.98), a 32-byte key is derived via HKDF-SHA256. The key is cryptographically bound to the physical location.</li>
-<li><strong>Hybrid CSI+QRNG mesh key derivation</strong>: CSI entropy bytes are XOR-combined with quantum random bytes for defense-in-depth. The composed entropy feeds HKDF-SHA256 to derive MeshKey (HMAC-SHA256 beacon authentication) and SipHashKey (SipHash-2-4 frame integrity) compatible with ML-KEM-768 mesh networks.</li>
+<ol type="1">
+<li><strong>Unilateral CSI entropy harvesting</strong>: A single device
+extracts phase LSBs from WiFi CSI subcarrier measurements, applies Von
+Neumann debiasing, and produces general-purpose entropy bytes. No second
+endpoint participates.</li>
+<li><strong>Physical Unclonable Environment Key (PUEK)</strong>: The SVD
+eigenstructure of complex-valued CSI measurements is captured at
+enrollment, storing the top-<span class="math inline"><em>d</em></span>
+right singular vectors as a location fingerprint. At key-derivation
+time, fresh CSI singular vectors are compared via subspace similarity
+(<span class="math inline">$s = \frac{1}{d}\sum|\langle
+\mathbf{v}_{\mathrm{ref},i},
+\mathbf{v}_{\mathrm{new},i}\rangle|^2$</span>) against the enrollment
+profile. If <span class="math inline"><em>s</em></span> meets a
+configurable threshold (Standard 0.75, Elevated 0.85, High 0.95,
+Military 0.98), a 32-byte key is derived via HKDF-SHA256. The key is
+cryptographically bound to the physical location.</li>
+<li><strong>Hybrid CSI+QRNG mesh key derivation</strong>: CSI entropy
+bytes are XOR-combined with quantum random bytes for defense-in-depth.
+The composed entropy feeds HKDF-SHA256 to derive MeshKey (HMAC-SHA256
+beacon authentication) and SipHashKey (SipHash-2-4 frame integrity)
+compatible with ML-KEM-768 mesh networks.</li>
 </ol>
-<hr />
-
-<h2 id="detailed-description-of-the-invention">DETAILED DESCRIPTION OF THE INVENTION</h2>
-
+<h2 id="detailed-description-of-the-invention">DETAILED DESCRIPTION OF
+THE INVENTION</h2>
 <h3 id="system-architecture">System Architecture</h3>
-
 <h4 id="csi-capture">1. CSI Capture</h4>
-<p>The preferred embodiment uses an ESP32-S3 microcontroller configured to capture raw CSI data from WiFi frames. Each CSI frame comprises 56 complex-valued subcarrier measurements conforming to the 802.11n HT20 frame structure (<code>CSI_SUBCARRIERS = 56</code>, defined in <code>crates/zipminator-mesh/src/csi_entropy.rs:22</code>).</p>
-
+<p>The preferred embodiment uses an ESP32-S3 microcontroller configured
+to capture raw CSI data from WiFi frames. Each CSI frame comprises 56
+complex-valued subcarrier measurements conforming to the 802.11n HT20
+frame structure (<code>CSI_SUBCARRIERS = 56</code>, defined in
+<code>crates/zipminator-mesh/src/csi_entropy.rs:22</code>).</p>
 <h4 id="phase-lsb-extraction">2. Phase LSB Extraction</h4>
-<p>For each complex subcarrier value H<sub>k</sub>, the system computes the phase angle via <code>arg(H_k)</code>, quantizes it to 256 discrete levels, and extracts the least-significant bit:</p>
+<p>For each complex subcarrier value H_k, the system computes the phase
+angle via <code>arg(H_k)</code>, quantizes it to 256 discrete levels,
+and extracts the least-significant bit:</p>
 <pre><code>quantized = ((phase + PI) / (2 * PI) * 256.0) as u8
 lsb = (quantized &amp; 1) != 0</code></pre>
-<p>This produces 56 raw bits per CSI frame. Implementation: <code>extract_phase_lsbs()</code> at <code>csi_entropy.rs:96-108</code>.</p>
-
+<p>This produces 56 raw bits per CSI frame. Implementation:
+<code>extract_phase_lsbs()</code> at
+<code>csi_entropy.rs:96-108</code>.</p>
 <h4 id="von-neumann-debiasing">3. Von Neumann Debiasing</h4>
-<p>Raw phase LSBs exhibit measurement bias. The <code>VonNeumannExtractor</code> (<code>csi_entropy.rs:36-90</code>) processes consecutive bit pairs:</p>
+<p>Raw phase LSBs exhibit measurement bias. The
+<code>VonNeumannExtractor</code> (<code>csi_entropy.rs:36-90</code>)
+processes consecutive bit pairs:</p>
 <ul>
-<li>(0, 1) &rarr; output bit 0</li>
-<li>(1, 0) &rarr; output bit 1</li>
-<li>(0, 0) or (1, 1) &rarr; discard</li>
+<li>(0, 1) -&gt; output bit 0</li>
+<li>(1, 0) -&gt; output bit 1</li>
+<li>(0, 0) or (1, 1) -&gt; discard</li>
 </ul>
-<p>This produces approximately 14 unbiased bits per 56-subcarrier frame (50% discard rate typical). Eight accumulated bits form one entropy byte.</p>
-
+<p>This produces approximately 14 unbiased bits per 56-subcarrier frame
+(50% discard rate typical). Eight accumulated bits form one entropy
+byte.</p>
 <h4 id="xor-defense-in-depth">4. XOR Defense-in-Depth</h4>
-<p>The <code>CsiEntropySource</code> (<code>csi_entropy.rs:121-228</code>) optionally accepts a secondary entropy source (e.g., QRNG pool) via <code>with_xor_source()</code> (<code>csi_entropy.rs:143-149</code>). Each debiased byte is XORed with a byte from the secondary source. By the XOR lemma, the composed output has min-entropy at least as high as the stronger individual source.</p>
-
+<p>The <code>CsiEntropySource</code>
+(<code>csi_entropy.rs:121-228</code>) optionally accepts a secondary
+entropy source (e.g., QRNG pool) via <code>with_xor_source()</code>
+(<code>csi_entropy.rs:143-149</code>). Each debiased byte is XORed with
+a byte from the secondary source. By the XOR lemma, the composed output
+has min-entropy at least as high as the stronger individual source.</p>
 <h4 id="pool-file-writer">5. Pool File Writer</h4>
-<p>The <code>flush_to_file()</code> method (<code>csi_entropy.rs:187-206</code>) appends accumulated entropy bytes to a persistent pool file (<code>csi_entropy_pool.bin</code>) in append mode. This enables the Python <code>CsiPoolProvider</code> (<code>src/zipminator/entropy/csi_pool_provider.py:38-132</code>) to consume CSI entropy from a separate file with full provenance tracking. The <code>CsiPoolProvider</code> raises <code>RuntimeError</code> when the pool is exhausted rather than falling back to <code>os.urandom</code>, preserving provenance integrity.</p>
-
-<h4 id="puek-enrollment-and-verification">6. PUEK Enrollment and Verification</h4>
+<p>The <code>flush_to_file()</code> method
+(<code>csi_entropy.rs:187-206</code>) appends accumulated entropy bytes
+to a persistent pool file (<code>csi_entropy_pool.bin</code>) in append
+mode. This enables the Python <code>CsiPoolProvider</code>
+(<code>src/zipminator/entropy/csi_pool_provider.py:38-132</code>) to
+consume CSI entropy from a separate file with full provenance tracking.
+The <code>CsiPoolProvider</code> raises <code>RuntimeError</code> when
+the pool is exhausted rather than falling back to
+<code>os.urandom</code>, preserving provenance integrity.</p>
+<h4 id="puek-enrollment-and-verification">6. PUEK Enrollment and
+Verification</h4>
 <p>Enrollment (<code>puek.rs:121-137</code>):</p>
-<ol>
-<li>Capture CSI magnitude data across N frames (rows) and M subcarriers (columns).</li>
-<li>Center the data matrix by subtracting column means.</li>
-<li>Compute the covariance matrix C = X<sup>T</sup>X.</li>
-<li>Perform SVD to obtain eigenvalues sorted in descending order (<code>compute_eigenmodes()</code>, <code>puek.rs:86-114</code>).</li>
-<li>Store the top-K eigenvalues with a similarity threshold from <code>SecurityProfile</code> (<code>puek.rs:35-57</code>): SCIF (0.98), Office (0.85), Home (0.75), or Custom.</li>
+<ol type="1">
+<li>Capture complex-valued CSI data across <span
+class="math inline"><em>M</em></span> frames (rows) and <span
+class="math inline"><em>K</em></span> subcarriers (columns), forming
+matrix <span
+class="math inline"><strong>C</strong> ∈ ℂ<sup><em>M</em> × <em>K</em></sup></span>.</li>
+<li>Perform SVD: <span
+class="math inline"><strong>C</strong> = <strong>U</strong><strong>Σ</strong><strong>V</strong><sup><em>H</em></sup></span>,
+obtaining right singular vectors <span
+class="math inline"><strong>V</strong></span>
+(<code>compute_eigenmodes()</code>, <code>puek.rs:86-114</code>).</li>
+<li>Store the top-<span class="math inline"><em>d</em></span> right
+singular vectors <span
+class="math inline"><strong>V</strong><sub>ref</sub> = [<strong>v</strong><sub>1</sub>, …, <strong>v</strong><sub><em>d</em></sub>]</span>
+with a similarity threshold from <code>SecurityProfile</code>
+(<code>puek.rs:35-57</code>): Standard (0.75), Elevated (0.85), High
+(0.95), Military (0.98), or Custom.</li>
 </ol>
-<p>Verification (<code>PuekVerifier::verify_and_derive()</code>, <code>puek.rs:178-217</code>):</p>
-<ol>
-<li>Capture fresh CSI data from the same location.</li>
-<li>Compute fresh eigenvalues via SVD.</li>
-<li>Compute cosine similarity between enrolled and fresh eigenvalue vectors (<code>cosine_similarity()</code>, <code>puek.rs:140-161</code>).</li>
-<li>If similarity &ge; threshold: derive a 32-byte key via HKDF-SHA256 using enrolled eigenmodes as input keying material, with info string <code>zipminator-puek-v1</code> (<code>puek.rs:16</code>).</li>
-<li>If similarity &lt; threshold: return <code>EnvironmentMismatch</code> error.</li>
+<p>Verification (<code>PuekVerifier::verify_and_derive()</code>,
+<code>puek.rs:178-217</code>):</p>
+<ol type="1">
+<li>Capture fresh complex-valued CSI data from the same location.</li>
+<li>Compute fresh right singular vectors <span
+class="math inline"><strong>V</strong><sub>new</sub></span> via
+SVD.</li>
+<li>Compute subspace similarity <span class="math inline">$s =
+\frac{1}{d}\sum_{i=1}^{d}|\langle \mathbf{v}_{\mathrm{ref},i},
+\mathbf{v}_{\mathrm{new},i}\rangle|^2$</span>
+(<code>cosine_similarity()</code>, <code>puek.rs:140-161</code>).</li>
+<li>If similarity &gt;= threshold: derive a 32-byte key via HKDF-SHA256
+using enrolled eigenmodes as input keying material, with info string
+<code>zipminator-puek-v1</code> (<code>puek.rs:16</code>).</li>
+<li>If similarity &lt; threshold: return
+<code>EnvironmentMismatch</code> error.</li>
 </ol>
-<p>The <code>DerivedKey</code> (<code>puek.rs:229-248</code>) implements <code>ZeroizeOnDrop</code> and redacts its Debug output.</p>
-
+<p>The <code>DerivedKey</code> (<code>puek.rs:229-248</code>) implements
+<code>ZeroizeOnDrop</code> and redacts its Debug output.</p>
 <h4 id="mesh-key-derivation">7. Mesh Key Derivation</h4>
-<p>The <code>EntropyBridge</code> (<code>entropy_bridge.rs:124-219</code>) derives purpose-specific mesh keys from composed entropy:</p>
+<p>The <code>EntropyBridge</code>
+(<code>entropy_bridge.rs:124-219</code>) derives purpose-specific mesh
+keys from composed entropy:</p>
 <ul>
-<li><strong>MeshKey</strong> (16-byte PSK): HKDF-SHA256 with info string <code>zipminator-mesh-psk-v1</code> (<code>entropy_bridge.rs:23</code>). Used for HMAC-SHA256 beacon authentication (<code>derive_mesh_key()</code>, <code>entropy_bridge.rs:140-145</code>).</li>
-<li><strong>SipHashKey</strong> (16-byte): HKDF-SHA256 with info string <code>zipminator-mesh-siphash-v1</code> (<code>entropy_bridge.rs:26</code>). Used for SipHash-2-4 frame integrity (<code>derive_siphash_key()</code>, <code>entropy_bridge.rs:152-161</code>).</li>
+<li><strong>MeshKey</strong> (16-byte PSK): HKDF-SHA256 with info string
+<code>zipminator-mesh-psk-v1</code> (<code>entropy_bridge.rs:23</code>).
+Used for HMAC-SHA256 beacon authentication
+(<code>derive_mesh_key()</code>,
+<code>entropy_bridge.rs:140-145</code>).</li>
+<li><strong>SipHashKey</strong> (16-byte): HKDF-SHA256 with info string
+<code>zipminator-mesh-siphash-v1</code>
+(<code>entropy_bridge.rs:26</code>). Used for SipHash-2-4 frame
+integrity (<code>derive_siphash_key()</code>,
+<code>entropy_bridge.rs:152-161</code>).</li>
 </ul>
-<p>Input keying material requires a minimum of 32 bytes (<code>MIN_ENTROPY_BYTES</code>, <code>entropy_bridge.rs:20</code>). The IKM is zeroized after derivation.</p>
-<hr />
-
-<h3 id="security-analysis">Security Analysis</h3>
-
-<h4 id="unilateral-vs-bilateral">Unilateral vs. Bilateral: Why This Matters</h4>
+<p>Input keying material requires a minimum of 32 bytes
+(<code>MIN_ENTROPY_BYTES</code>, <code>entropy_bridge.rs:20</code>). The
+IKM is zeroized after derivation.</p>
+<h2 id="security-analysis">SECURITY ANALYSIS</h2>
+<h3 id="unilateral-vs.-bilateral-why-this-matters">Unilateral
+vs. Bilateral: Why This Matters</h3>
 <table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
 <thead>
-<tr><th>Property</th><th>Bilateral (Prior Art)</th><th>Unilateral (This Invention)</th></tr>
+<tr>
+<th>Property</th>
+<th>Bilateral (Prior Art)</th>
+<th>Unilateral (This Invention)</th>
+</tr>
 </thead>
 <tbody>
-<tr><td>Endpoints required</td><td>Two (synchronized)</td><td>One</td></tr>
-<tr><td>Output type</td><td>Shared secret key only</td><td>General-purpose entropy bytes</td></tr>
-<tr><td>Reconciliation needed</td><td>Yes (bit mismatch correction)</td><td>No</td></tr>
-<tr><td>Uses</td><td>Key agreement</td><td>Any cryptographic application</td></tr>
-<tr><td>PQC compatibility</td><td>Not addressed</td><td>ML-KEM-768 via HKDF</td></tr>
-<tr><td>Deployment</td><td>Both devices must cooperate</td><td>Single device, passive capture</td></tr>
+<tr>
+<td>Endpoints required</td>
+<td>Two (synchronized)</td>
+<td>One</td>
+</tr>
+<tr>
+<td>Output type</td>
+<td>Shared secret key only</td>
+<td>General-purpose entropy bytes</td>
+</tr>
+<tr>
+<td>Reconciliation needed</td>
+<td>Yes (bit mismatch correction)</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Uses</td>
+<td>Key agreement</td>
+<td>Any cryptographic application</td>
+</tr>
+<tr>
+<td>PQC compatibility</td>
+<td>Not addressed</td>
+<td>ML-KEM-768 via HKDF</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>Both devices must cooperate</td>
+<td>Single device, passive capture</td>
+</tr>
 </tbody>
 </table>
-
-<h4 id="puek-vs-rf-puf">PUEK vs. RF-PUF</h4>
+<h3 id="puek-vs.-rf-puf">PUEK vs. RF-PUF</h3>
 <table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
 <thead>
-<tr><th>Property</th><th>RF-PUF (Chatterjee 2018)</th><th>PUEK (This Invention)</th></tr>
+<tr>
+<th>Property</th>
+<th>RF-PUF (Chatterjee 2018)</th>
+<th>PUEK (This Invention)</th>
+</tr>
 </thead>
 <tbody>
-<tr><td>What is fingerprinted</td><td>Hardware manufacturing defects</td><td>Physical RF environment</td></tr>
-<tr><td>Key bound to</td><td>Device</td><td>Location</td></tr>
-<tr><td>Key changes when</td><td>Device replaced</td><td>Room altered</td></tr>
-<tr><td>Security profiles</td><td>Fixed</td><td>Configurable (0.75&ndash;0.98)</td></tr>
-<tr><td>Key derivation</td><td>Direct from hardware response</td><td>HKDF-SHA256 from eigenstructure</td></tr>
+<tr>
+<td>What is fingerprinted</td>
+<td>Hardware manufacturing defects</td>
+<td>Physical RF environment</td>
+</tr>
+<tr>
+<td>Key bound to</td>
+<td>Device</td>
+<td>Location</td>
+</tr>
+<tr>
+<td>Key changes when</td>
+<td>Device replaced</td>
+<td>Room altered</td>
+</tr>
+<tr>
+<td>Security profiles</td>
+<td>Fixed</td>
+<td>Configurable (0.75-0.98)</td>
+</tr>
+<tr>
+<td>Key derivation</td>
+<td>Direct from hardware response</td>
+<td>HKDF-SHA256 from eigenstructure</td>
+</tr>
 </tbody>
 </table>
-<hr />
-
-<h3 id="implementation">Implementation</h3>
+<h2 id="implementation">IMPLEMENTATION</h2>
 <p>The preferred embodiment is implemented in:</p>
 <ul>
-<li><strong>Rust crate</strong> <code>zipminator-mesh</code>: CSI entropy harvester (<code>csi_entropy.rs</code>, 407 lines, 12 tests), PUEK (<code>puek.rs</code>, 393 lines, 11 tests), entropy bridge (<code>entropy_bridge.rs</code>, 368 lines, 11 tests).</li>
-<li><strong>Python module</strong> <code>src/zipminator/entropy/csi_pool_provider.py</code>: CSI pool reader with position persistence and file locking (132 lines, 11 tests).</li>
-<li><strong>ESP32-S3</strong>: CSI capture platform (802.11n HT20, 56 subcarriers).</li>
+<li><strong>Rust crate</strong> <code>zipminator-mesh</code>: CSI
+entropy harvester (<code>csi_entropy.rs</code>, 407 lines, 11 tests),
+PUEK (<code>puek.rs</code>, 393 lines, 11 tests), entropy bridge
+(<code>entropy_bridge.rs</code>, 368 lines, 11 tests).</li>
+<li><strong>Python module</strong>
+<code>src/zipminator/entropy/csi_pool_provider.py</code>: CSI pool
+reader with position persistence and file locking (133 lines, 11
+tests).</li>
+<li><strong>ESP32-S3</strong>: CSI capture platform (802.11n HT20, 56
+subcarriers).</li>
 </ul>
-<p>Total test coverage: 45 tests across the three Rust modules plus 11 Python tests.</p>
-<hr />
-
+<p>Total test coverage: 33 tests across the three Rust modules plus 11
+Python tests.</p>
 <h2 id="drawings">DRAWINGS</h2>
-
-<h3 id="figure-1">Figure 1: Single-Device CSI Entropy Harvesting Pipeline</h3>
+<h3 id="figure-1-single-device-csi-entropy-harvesting-pipeline">Figure
+1: Single-Device CSI Entropy Harvesting Pipeline</h3>
 <pre><code>WiFi CSI Frame (56 subcarriers, 802.11n HT20)
   |
   v
@@ -345,37 +530,35 @@ lsb = (quantized &amp; 1) != 0</code></pre>
 |   -&gt; MeshKey (16B PSK)        |  entropy_bridge.rs
 |   -&gt; SipHashKey (16B)         |
 +-------------------------------+</code></pre>
-
-<h3 id="figure-2">Figure 2: PUEK Enrollment and Verification</h3>
+<h3 id="figure-2-puek-enrollment-and-verification">Figure 2: PUEK
+Enrollment and Verification</h3>
 <pre><code>ENROLLMENT                          VERIFICATION
 ===========                         ============
 
-CSI magnitudes                      Fresh CSI magnitudes
-(frames x subcarriers)              (frames x subcarriers)
+Complex CSI matrix C                Fresh CSI matrix C&#39;
+(M frames x K subcarriers)          (M&#39; frames x K subcarriers)
   |                                   |
   v                                   v
-Center data (subtract means)        Center data
+SVD: C = U Sigma V^H               SVD: C&#39; = U&#39; Sigma&#39; V&#39;^H
   |                                   |
   v                                   v
-Covariance matrix: X^T * X         Covariance matrix: X^T * X
-  |                                   |
-  v                                   v
-SVD -&gt; eigenvalues (desc.)          SVD -&gt; eigenvalues (desc.)
+Right singular vectors V            Right singular vectors V&#39;
   |                                   |
   v                                   |
-Store top-K eigenmodes              |
+Store top-d vectors V_ref           |
 + threshold (0.75-0.98)            |
   |                                   |
   +------------+----------------------+
                |
                v
-      cosine_similarity(enrolled, fresh)
+      subspace_similarity(V_ref, V_new)
+      s = (1/d) * sum |&lt;v_ref_i, v_new_i&gt;|^2
                |
                +--- &gt;= threshold ---&gt; HKDF-SHA256 ---&gt; DerivedKey (32B)
                |
                +--- &lt; threshold ----&gt; EnvironmentMismatch ERROR</code></pre>
-
-<h3 id="figure-3">Figure 3: Prior Art Comparison</h3>
+<h3 id="figure-3-prior-art-comparison">Figure 3: Prior Art
+Comparison</h3>
 <pre><code>PRIOR ART (ALL BILATERAL)            THIS INVENTION (UNILATERAL)
 =========================            ===========================
 

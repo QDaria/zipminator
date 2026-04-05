@@ -18,6 +18,10 @@ import 'package:zipminator/features/mesh/mesh_screen.dart';
 import 'package:zipminator/features/settings/settings_screen.dart';
 import 'package:zipminator/shared/widgets/shell_scaffold.dart';
 
+/// Set to true in E2E/integration tests to bypass auth redirect.
+/// Defaults to false; only test harnesses should set this.
+bool skipAuthRedirectForTests = false;
+
 /// Converts a Stream into a Listenable for GoRouter.refreshListenable.
 class _StreamNotifier extends ChangeNotifier {
   late final StreamSubscription<dynamic> _sub;
@@ -40,6 +44,9 @@ final GoRouter appRouter = GoRouter(
     final isLoginRoute = path == '/login';
     final isOnboarding = path == '/onboarding';
     final isCallback = path == '/login-callback';
+
+    // In E2E tests, skip all auth redirects so pillar screens render directly.
+    if (skipAuthRedirectForTests) return null;
 
     // Guard against Supabase not being initialized (e.g. in tests).
     bool loggedIn;

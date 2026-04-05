@@ -79,7 +79,7 @@ No prior art combines WiFi CSI entropy with ML-KEM-768 (NIST FIPS 203) key encap
 The present invention provides three interrelated methods:
 
 1. **Unilateral CSI entropy harvesting**: A single device extracts phase LSBs from WiFi CSI subcarrier measurements, applies Von Neumann debiasing, and produces general-purpose entropy bytes. No second endpoint participates.
-2. **Physical Unclonable Environment Key (PUEK)**: CSI covariance eigenstructure is captured at enrollment. At key-derivation time, fresh CSI eigenvalues are compared via cosine similarity against the enrollment profile. If similarity meets a configurable threshold (0.75-0.98), a 32-byte key is derived via HKDF-SHA256. The key is cryptographically bound to the physical location.
+2. **Physical Unclonable Environment Key (PUEK)**: The SVD eigenstructure of complex-valued CSI measurements is captured at enrollment, storing the top-d right singular vectors as a location fingerprint. At key-derivation time, fresh CSI singular vectors are compared via subspace similarity against the enrollment profile. If similarity meets a configurable threshold (Standard 0.75, Elevated 0.85, High 0.95, Military 0.98), a 32-byte key is derived via HKDF-SHA256. The key is cryptographically bound to the physical location.
 3. **Hybrid CSI+QRNG mesh key derivation**: CSI entropy bytes are XOR-combined with quantum random bytes for defense-in-depth. The composed entropy feeds HKDF-SHA256 to derive MeshKey (HMAC-SHA256 beacon authentication) and SipHashKey (SipHash-2-4 frame integrity) compatible with ML-KEM-768 mesh networks.
 
 ---
@@ -127,15 +127,15 @@ Enrollment (`puek.rs:121-137`):
 
 1. Capture CSI magnitude data across N frames (rows) and M subcarriers (columns).
 2. Center the data matrix by subtracting column means.
-3. Compute the covariance matrix C = X^T * X.
+3. Perform SVD on the complex CSI matrix: C = U Sigma V^H.
 4. Perform SVD to obtain eigenvalues sorted in descending order (`compute_eigenmodes()`, `puek.rs:86-114`).
-5. Store the top-K eigenvalues with a similarity threshold from `SecurityProfile` (`puek.rs:35-57`): SCIF (0.98), Office (0.85), Home (0.75), or Custom.
+5. Store the top-d right singular vectors with a similarity threshold from `SecurityProfile` (`puek.rs:35-57`): Standard (0.75), Elevated (0.85), High (0.95), Military (0.98), or Custom.
 
 Verification (`PuekVerifier::verify_and_derive()`, `puek.rs:178-217`):
 
 1. Capture fresh CSI data from the same location.
-2. Compute fresh eigenvalues via SVD.
-3. Compute cosine similarity between enrolled and fresh eigenvalue vectors (`cosine_similarity()`, `puek.rs:140-161`).
+2. Compute fresh right singular vectors via SVD.
+3. Compute subspace similarity between enrolled and fresh right singular vectors (`cosine_similarity()`, `puek.rs:140-161`).
 4. If similarity >= threshold: derive a 32-byte key via HKDF-SHA256 using enrolled eigenmodes as input keying material, with info string `zipminator-puek-v1` (`puek.rs:16`).
 5. If similarity < threshold: return `EnvironmentMismatch` error.
 
@@ -207,21 +207,21 @@ wherein the method operates on a single device without requiring a second wirele
 
 (a) capturing CSI magnitude data across multiple frames from a WiFi interface at an enrollment location;
 
-(b) computing a covariance matrix from the centered CSI magnitude data;
+(b) performing Singular Value Decomposition (SVD) on the complex-valued CSI matrix to obtain right singular vectors;
 
-(c) performing Singular Value Decomposition (SVD) on said covariance matrix to obtain eigenvalues sorted in descending order;
+(c) storing the top-d right singular vectors as an enrollment profile;
 
-(d) storing the top-K eigenvalues as an enrollment profile together with a configurable similarity threshold;
+(d) storing the top-d right singular vectors as an enrollment profile together with a configurable similarity threshold;
 
 (e) at key-derivation time, capturing fresh CSI magnitude data from the same physical location;
 
-(f) computing fresh eigenvalues via SVD of the fresh CSI covariance matrix;
+(f) computing fresh right singular vectors via SVD of the fresh CSI matrix;
 
-(g) computing cosine similarity between the enrolled and fresh eigenvalue vectors;
+(g) computing subspace similarity as s = (1/d) sum |<v_ref_i, v_new_i>|^2;
 
-(h) if the cosine similarity meets or exceeds the threshold, deriving a cryptographic key from the enrolled eigenmodes using HKDF-SHA256 with a purpose-specific info string;
+(h) if the subspace similarity s meets or exceeds the threshold, deriving a cryptographic key from the enrolled eigenmodes using HKDF-SHA256 with a purpose-specific info string;
 
-(i) if the cosine similarity falls below the threshold, rejecting the key derivation request;
+(i) if the subspace similarity s falls below the threshold, rejecting the key derivation request;
 
 wherein the derived key is cryptographically bound to the physical RF environment of the enrollment location and cannot be derived from a different physical location, and wherein the method fingerprints the environment rather than the hardware device.
 
@@ -247,7 +247,7 @@ wherein the derived keys are suitable for use with ML-KEM-768 (NIST FIPS 203) ke
 
 **Claim 7.** The method of Claim 1, further comprising writing the accumulated entropy bytes to a persistent pool file in append mode, enabling offline consumption by a separate process with position tracking.
 
-**Claim 8.** The method of Claim 2, wherein the configurable similarity threshold is selected from preset security profiles comprising: SCIF (0.98), Office (0.85), Home (0.75), or a custom value in the range [0.0, 1.0].
+**Claim 8.** The method of Claim 2, wherein the configurable similarity threshold is selected from preset security profiles comprising: Standard (0.75), Elevated (0.85), High (0.95), Military (0.98), or a custom value in the range [0.0, 1.0].
 
 **Claim 9.** The method of Claim 2, wherein the HKDF-SHA256 key derivation uses a fixed info string for domain separation and an optional salt parameter for network-specific binding.
 
@@ -265,7 +265,7 @@ wherein the derived keys are suitable for use with ML-KEM-768 (NIST FIPS 203) ke
 
 ## ABSTRACT
 
-A method and system for unilateral entropy harvesting from WiFi Channel State Information (CSI) and location-locked key derivation. Unlike all prior CSI-based approaches that require bilateral key agreement between two endpoints, the present invention operates on a single device, extracting general-purpose entropy bytes from subcarrier phase measurements via Von Neumann debiasing. The Physical Unclonable Environment Key (PUEK) subsystem derives cryptographic keys bound to a physical location's RF eigenstructure using SVD and HKDF-SHA256, with configurable similarity thresholds for different security environments (SCIF 0.98, Office 0.85, Home 0.75). A hybrid composition method XOR-combines CSI entropy with quantum random bytes for defense-in-depth, deriving mesh authentication keys compatible with ML-KEM-768 (NIST FIPS 203). The system implements provenance-preserving pool management that never falls back to operating system entropy, ensuring CSI entropy bytes are genuinely derived from wireless channel measurements.
+A method and system for unilateral entropy harvesting from WiFi Channel State Information (CSI) and location-locked key derivation. Unlike all prior CSI-based approaches that require bilateral key agreement between two endpoints, the present invention operates on a single device, extracting general-purpose entropy bytes from subcarrier phase measurements via Von Neumann debiasing. The Physical Unclonable Environment Key (PUEK) subsystem derives cryptographic keys bound to a physical location's RF eigenstructure using SVD and HKDF-SHA256, with configurable similarity thresholds for different security environments (Standard 0.75, Elevated 0.85, High 0.95, Military 0.98). A hybrid composition method XOR-combines CSI entropy with quantum random bytes for defense-in-depth, deriving mesh authentication keys compatible with ML-KEM-768 (NIST FIPS 203). The system implements provenance-preserving pool management that never falls back to operating system entropy, ensuring CSI entropy bytes are genuinely derived from wireless channel measurements.
 
 ---
 

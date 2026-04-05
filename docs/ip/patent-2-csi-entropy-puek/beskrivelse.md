@@ -61,7 +61,7 @@ No prior art combines WiFi CSI entropy with ML-KEM-768 (NIST FIPS 203) key encap
 The present invention provides three interrelated methods:
 
 1. **Unilateral CSI entropy harvesting**: A single device extracts phase LSBs from WiFi CSI subcarrier measurements, applies Von Neumann debiasing, and produces general-purpose entropy bytes. No second endpoint participates.
-2. **Physical Unclonable Environment Key (PUEK)**: CSI covariance eigenstructure is captured at enrollment. At key-derivation time, fresh CSI eigenvalues are compared via cosine similarity against the enrollment profile. If similarity meets a configurable threshold (0.75-0.98), a 32-byte key is derived via HKDF-SHA256. The key is cryptographically bound to the physical location.
+2. **Physical Unclonable Environment Key (PUEK)**: The SVD eigenstructure of complex-valued CSI measurements is captured at enrollment, storing the top-$d$ right singular vectors as a location fingerprint. At key-derivation time, fresh CSI singular vectors are compared via subspace similarity ($s = \frac{1}{d}\sum|\langle \mathbf{v}_{\mathrm{ref},i}, \mathbf{v}_{\mathrm{new},i}\rangle|^2$) against the enrollment profile. If $s$ meets a configurable threshold (Standard 0.75, Elevated 0.85, High 0.95, Military 0.98), a 32-byte key is derived via HKDF-SHA256. The key is cryptographically bound to the physical location.
 3. **Hybrid CSI+QRNG mesh key derivation**: CSI entropy bytes are XOR-combined with quantum random bytes for defense-in-depth. The composed entropy feeds HKDF-SHA256 to derive MeshKey (HMAC-SHA256 beacon authentication) and SipHashKey (SipHash-2-4 frame integrity) compatible with ML-KEM-768 mesh networks.
 
 ## DETAILED DESCRIPTION OF THE INVENTION
@@ -105,17 +105,15 @@ The `flush_to_file()` method (`csi_entropy.rs:187-206`) appends accumulated entr
 
 Enrollment (`puek.rs:121-137`):
 
-1. Capture CSI magnitude data across N frames (rows) and M subcarriers (columns).
-2. Center the data matrix by subtracting column means.
-3. Compute the covariance matrix C = X^T * X.
-4. Perform SVD to obtain eigenvalues sorted in descending order (`compute_eigenmodes()`, `puek.rs:86-114`).
-5. Store the top-K eigenvalues with a similarity threshold from `SecurityProfile` (`puek.rs:35-57`): SCIF (0.98), Office (0.85), Home (0.75), or Custom.
+1. Capture complex-valued CSI data across $M$ frames (rows) and $K$ subcarriers (columns), forming matrix $\mathbf{C} \in \mathbb{C}^{M \times K}$.
+2. Perform SVD: $\mathbf{C} = \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^H$, obtaining right singular vectors $\mathbf{V}$ (`compute_eigenmodes()`, `puek.rs:86-114`).
+3. Store the top-$d$ right singular vectors $\mathbf{V}_{\mathrm{ref}} = [\mathbf{v}_1, \ldots, \mathbf{v}_d]$ with a similarity threshold from `SecurityProfile` (`puek.rs:35-57`): Standard (0.75), Elevated (0.85), High (0.95), Military (0.98), or Custom.
 
 Verification (`PuekVerifier::verify_and_derive()`, `puek.rs:178-217`):
 
-1. Capture fresh CSI data from the same location.
-2. Compute fresh eigenvalues via SVD.
-3. Compute cosine similarity between enrolled and fresh eigenvalue vectors (`cosine_similarity()`, `puek.rs:140-161`).
+1. Capture fresh complex-valued CSI data from the same location.
+2. Compute fresh right singular vectors $\mathbf{V}_{\mathrm{new}}$ via SVD.
+3. Compute subspace similarity $s = \frac{1}{d}\sum_{i=1}^{d}|\langle \mathbf{v}_{\mathrm{ref},i}, \mathbf{v}_{\mathrm{new},i}\rangle|^2$ (`cosine_similarity()`, `puek.rs:140-161`).
 4. If similarity >= threshold: derive a 32-byte key via HKDF-SHA256 using enrolled eigenmodes as input keying material, with info string `zipminator-puek-v1` (`puek.rs:16`).
 5. If similarity < threshold: return `EnvironmentMismatch` error.
 
@@ -210,26 +208,24 @@ WiFi CSI Frame (56 subcarriers, 802.11n HT20)
 ENROLLMENT                          VERIFICATION
 ===========                         ============
 
-CSI magnitudes                      Fresh CSI magnitudes
-(frames x subcarriers)              (frames x subcarriers)
+Complex CSI matrix C                Fresh CSI matrix C'
+(M frames x K subcarriers)          (M' frames x K subcarriers)
   |                                   |
   v                                   v
-Center data (subtract means)        Center data
+SVD: C = U Sigma V^H               SVD: C' = U' Sigma' V'^H
   |                                   |
   v                                   v
-Covariance matrix: X^T * X         Covariance matrix: X^T * X
-  |                                   |
-  v                                   v
-SVD -> eigenvalues (desc.)          SVD -> eigenvalues (desc.)
+Right singular vectors V            Right singular vectors V'
   |                                   |
   v                                   |
-Store top-K eigenmodes              |
+Store top-d vectors V_ref           |
 + threshold (0.75-0.98)            |
   |                                   |
   +------------+----------------------+
                |
                v
-      cosine_similarity(enrolled, fresh)
+      subspace_similarity(V_ref, V_new)
+      s = (1/d) * sum |<v_ref_i, v_new_i>|^2
                |
                +--- >= threshold ---> HKDF-SHA256 ---> DerivedKey (32B)
                |
