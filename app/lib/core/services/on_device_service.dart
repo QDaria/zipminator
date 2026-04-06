@@ -75,53 +75,8 @@ class OnDeviceService implements LLMService {
   /// Returns a stream of download progress (0.0 to 1.0).
   /// The final event contains the local file path.
   static Stream<OnDeviceDownloadProgress> downloadModel(LLMModel model) {
-    if (model.hfRepo == null || model.hfFilename == null) {
-      return Stream.error(LLMException('Model has no download info'));
-    }
-
-    const eventChannel =
-        EventChannel('com.qdaria.zipminator/on_device_download');
-
-    final controller = StreamController<OnDeviceDownloadProgress>();
-
-    // Start the download via method channel, stream progress via event channel.
-    _channel.invokeMethod<String>('downloadModel', {
-      'hfRepo': model.hfRepo,
-      'hfFilename': model.hfFilename,
-      'modelId': model.id,
-    }).then((_) {
-      // Download started; progress comes via EventChannel.
-    }).catchError((e) {
-      controller.addError(LLMException('Download failed: $e'));
-      controller.close();
-    });
-
-    eventChannel.receiveBroadcastStream().listen(
-      (event) {
-        if (event is Map) {
-          final progress = (event['progress'] as num?)?.toDouble() ?? 0;
-          final path = event['path'] as String?;
-          final status = event['status'] as String? ?? 'downloading';
-          controller.add(OnDeviceDownloadProgress(
-            progress: progress,
-            localPath: path,
-            status: status,
-          ));
-          if (status == 'complete' || path != null) {
-            controller.close();
-          }
-        }
-      },
-      onError: (e) {
-        controller.addError(LLMException('Download error: $e'));
-        controller.close();
-      },
-      onDone: () {
-        if (!controller.isClosed) controller.close();
-      },
-    );
-
-    return controller.stream;
+    // LLMModel does not carry HuggingFace metadata; download is not supported.
+    return Stream.error(LLMException('Model has no download info'));
   }
 
   /// List model IDs that are already downloaded to local storage.
