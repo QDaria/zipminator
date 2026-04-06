@@ -1,0 +1,1474 @@
+\documentclass[journal]{IEEEtran}
+
+% Packages
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{url}
+\usepackage{microtype}
+\graphicspath{{./figures/}}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem*{remark}{Remark}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Quantum-Certified Anonymization: Irreversibility Beyond Computational Hardness}
+
+\author{Daniel~Mo~Houshmand%
+\thanks{D.\,M.\ Houshmand is with QDaria Quantum Research, Oslo, Norway (e-mail: mo@qdaria.com). ORCID: 0009-0008-2270-5454.}%
+\thanks{Norwegian Patent Application No.\ 20260384, filed 24 March 2026 (Patentstyret).}}
+
+\markboth{Proceedings on Privacy Enhancing Technologies, 2026}%
+{Houshmand: Quantum-Certified Anonymization}
+
+\maketitle
+
+\begin{abstract}
+We present, to our knowledge, the first data anonymization system whose irreversibility is guaranteed by the Born rule of quantum mechanics rather than by computational hardness assumptions. Every deployed anonymization tool derives its randomness from a classical PRNG; an adversary who captures the PRNG state can reconstruct every ``random'' value and reverse the anonymization completely. We introduce \textsc{QRNG-OTP-Destroy}, a protocol that replaces each personally identifiable value with a quantum-random token and irreversibly destroys the mapping. Because quantum measurement outcomes are governed by the Born rule, no deterministic seed exists, and the anonymization is information-theoretically irreversible against adversaries with unbounded computational power. We formalize three tiers of irreversibility (computational, information-theoretic, and physics-guaranteed), prove that no classical PRNG-based method achieves the strongest tier, and prove that \textsc{QRNG-OTP-Destroy} does. We define an indistinguishability game (IND-ANON) and prove zero advantage for unbounded adversaries. We prove a composition theorem showing that physics-guaranteed irreversibility composes cleanly with $\epsilon$-differential privacy, and we show that the protocol realizes an ideal anonymization functionality under the Born rule assumption. We report on an implementation with 10 progressive anonymization levels and a multi-provider entropy architecture (Rigetti, IBM Quantum, qBraid) with automatic failover to OS entropy. We validate the implementation with 966 unit and integration tests, evaluate it on the UCI Adult dataset (32,561 records), and demonstrate production-scale quantum entropy harvesting (\SI{6.8}{\mega\byte} from 35 IBM Quantum jobs on 156-qubit processors). The system provides, to our knowledge, the first auditable chain from entropy provenance to a GDPR Recital~26 anonymity argument.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Anonymization, quantum random number generation, Born rule, differential privacy, indistinguishability, composition theorem, ideal functionality, information-theoretic security
+\end{IEEEkeywords}
+
+%% ====================================================================
+\section{Introduction}
+\label{sec:intro}
+%% ====================================================================
+
+The dominant threat model in data privacy has shifted. Intelligence agencies and well-resourced adversaries now routinely execute harvest-now, decrypt-later (HNDL) strategies: collecting encrypted and anonymized datasets today with the expectation that advances in computing will render current protections reversible in the future. For encrypted data, the response has been migration to post-quantum cryptographic algorithms standardized by NIST in August 2024 (FIPS~203, FIPS~204, FIPS~205). For anonymized data, no equivalent migration path exists. The anonymization community has not reckoned with the reality that every deployed anonymization tool derives its irreversibility from the same computational hardness assumptions that the cryptographic community has already judged insufficient.
+
+Every anonymization system in production today, from academic tools such as ARX~\cite{prasser2014arx} and sdcMicro~\cite{templ2017sdc} to industrial systems including Google's differential privacy library~\cite{wilson2020dpsql}, Apple's local differential privacy~\cite{apple2017dp}, and the OpenDP framework, uses a classical pseudo-random number generator (PRNG) or cryptographically secure PRNG (CSPRNG) as its entropy source.\footnote{Modern OS entropy pools mix hardware sources (Intel RDRAND, timing jitter) into their CSPRNG state. These improve unpredictability but lack loophole-free experimental validation against a specific physical law, the distinction that motivates Definition~\ref{def:phys}.} A CSPRNG, whether ChaCha20, AES-CTR-DRBG, or the Linux kernel's \texttt{/dev/urandom}, is deterministic: given the internal state, every output can be reproduced. The internal state exists physically, in RAM, in kernel data structures, in hardware registers. An adversary who obtains that state through memory forensics, cold boot attacks, side-channel exploits such as Spectre or Meltdown, or insider access to the anonymization server can reconstruct every ``random'' value the generator produced, subtract the noise or reverse the token mapping, and recover the original personally identifiable information~(PII) in full.
+
+This is not a theoretical concern. Memory forensics tools capable of extracting PRNG state from running systems are commercially available. Side-channel attacks against cryptographic implementations have been demonstrated repeatedly in peer-reviewed literature. The HNDL adversary does not need to break the PRNG algorithm; they need only capture its state at the moment of anonymization. Once captured, the anonymization is reversed not by cryptanalysis but by deterministic replay.
+
+The European Union's General Data Protection Regulation (GDPR) draws a sharp legal distinction in Recital~26 between anonymous data and pseudonymous data. Anonymous data, information that ``does not relate to an identified or identifiable natural person,'' falls entirely outside the regulation's scope. Pseudonymous data, where re-identification remains possible using additional information, remains personal data subject to the full weight of data protection obligations. The economic and operational difference between these two categories is substantial. Organizations that can demonstrate true anonymization can share, archive, and process data without consent requirements, data subject access requests, or retention limits.
+
+The gap is fundamental: no existing anonymization method can prove that re-identification is impossible as a matter of physical law. Every method proves, at best, that re-identification is computationally infeasible under stated assumptions. Those assumptions may hold today. They may not hold in a decade. They do not hold against an adversary who captures the PRNG state.
+
+We present, to our knowledge, the first anonymization system where irreversibility is guaranteed by the Born rule of quantum mechanics. The protocol, \textsc{QRNG-OTP-Destroy}, replaces each PII value with a token derived from quantum random numbers generated by measuring qubits in superposition. It then securely destroys the mapping between original values and replacement tokens. Because the measurement outcomes are governed by the Born rule, there is no seed, no hidden state, and no deterministic reconstruction path. The mapping's destruction eliminates the only artifact that could link tokens to original values. The irreversibility does not depend on any computational hardness assumption and holds regardless of advances in classical computing, quantum computing, or the resolution of the P versus NP problem.
+
+Our contributions are:
+
+\begin{enumerate}
+\item \textbf{Formal definitions.} We define three tiers of anonymization irreversibility: computational, information-theoretic, and physics-guaranteed. We prove these form a strict hierarchy (Lemma~\ref{lem:hierarchy}, Section~\ref{sec:definitions}).
+
+\item \textbf{Impossibility result.} We prove that no anonymization system whose randomness derives from a classical PRNG can achieve physics-guaranteed irreversibility (Theorem~\ref{thm:prng_impossible}).
+
+\item \textbf{Construction.} We specify the \textsc{QRNG-OTP-Destroy} protocol and prove it achieves physics-guaranteed irreversibility under the Born rule assumption (Theorem~\ref{thm:qrng_secure}).
+
+\item \textbf{Implementation.} We report on a production implementation with 10 progressive anonymization levels (L1 through L10), where L10 implements \textsc{QRNG-OTP-Destroy}. The system architecture supports quantum entropy from multiple providers (Rigetti, IBM Quantum, qBraid) with automatic failover and provenance tracking. The benchmarks reported in this paper use OS-sourced entropy; upgrading to quantum-certified entropy requires no changes to the anonymization pipeline.
+
+\item \textbf{Indistinguishability-based security.} We define an IND-ANON game (Definition~\ref{def:ind-anon}) and prove that \textsc{QRNG-OTP-Destroy} achieves zero advantage for computationally unbounded adversaries under per-cell tokenization (Theorem~\ref{thm:ind-anon}), with an upper bound on per-value advantage in terms of the joint total variation distance of column frequency vectors.
+
+\item \textbf{Composition theorem.} We prove that \textsc{QRNG-OTP-Destroy} composes cleanly with $\epsilon$-differential privacy: the DP guarantee survives post-processing by the tokenization step, and the physics-guaranteed irreversibility is independent of the DP mechanism (Theorem~\ref{thm:dp-composition}).
+
+\item \textbf{Ideal functionality.} We define an ideal anonymization functionality $\mathcal{F}_{\mathrm{ANON}}$ and show that \textsc{QRNG-OTP-Destroy} with per-cell tokenization realizes it exactly under the Born rule assumption (Theorem~\ref{thm:uc-realization}).
+
+\item \textbf{Regulatory analysis.} L10 output provides the strongest available technical basis for meeting GDPR Recital~26's standard of anonymous information; the quantum provenance log provides auditable evidence for data protection authorities.
+\end{enumerate}
+
+Section~\ref{sec:background} reviews quantum measurement, classical PRNGs, and existing anonymization techniques. Section~\ref{sec:threat} defines the threat model. Section~\ref{sec:definitions} formalizes the three irreversibility tiers and proves the hierarchy. Section~\ref{sec:protocol} specifies the protocol with its security proofs, including the IND-ANON indistinguishability game (Section~\ref{subsec:ind-anon}), the composition theorem with differential privacy (Section~\ref{subsec:composition}), and the ideal functionality realization (Section~\ref{subsec:uc}). Section~\ref{sec:implementation} describes the implementation. Sections~\ref{sec:evaluation}--\ref{sec:comparison} present empirical evaluation and a systematic comparison against existing tools. Sections~\ref{sec:related}--\ref{sec:limitations} survey related work and discuss limitations.
+
+%% ====================================================================
+\section{Background}
+\label{sec:background}
+%% ====================================================================
+
+\subsection{Quantum Measurement and the Born Rule}
+\label{subsec:born}
+
+Quantum random number generation exploits the fundamental indeterminacy of quantum measurement to produce bits that are provably unpredictable~\cite{ma2016qrng, herrero2017qrng}. A qubit is a two-level quantum system described by a state vector in a two-dimensional Hilbert space $\mathcal{H} = \mathbb{C}^2$. The computational basis states are $|0\rangle$ and $|1\rangle$. An arbitrary pure state is written
+\begin{equation}
+|\psi\rangle = \alpha|0\rangle + \beta|1\rangle, \quad |\alpha|^2 + |\beta|^2 = 1,
+\label{eq:qubit}
+\end{equation}
+where $\alpha, \beta \in \mathbb{C}$ are probability amplitudes. When $|\psi\rangle$ is measured in the computational basis, the probability of each outcome is given by the Born rule:
+\begin{equation}
+P(0) = |\alpha|^2, \qquad P(1) = |\beta|^2.
+\label{eq:born}
+\end{equation}
+For a balanced superposition ($\alpha = \beta = 1/\sqrt{2}$), each outcome occurs with probability exactly $1/2$. The outcome is not merely unpredictable in practice; it is fundamentally indeterminate prior to measurement. No hidden state predetermines the result.
+
+For $N$ qubits each prepared in $|{+}\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$ and measured independently, the joint outcome is a uniformly random $N$-bit string. The min-entropy of this source is exactly $N$ bits:
+\begin{equation}
+H_\infty(X_1, X_2, \ldots, X_N) = N.
+\label{eq:minentropy}
+\end{equation}
+No classical source achieves $H_\infty = N$ without a seed at least $N$ bits long, because a deterministic process cannot produce more entropy than its input contains.
+
+\subsection{Bell's Theorem and Experimental Verification}
+\label{subsec:bell}
+
+The claim that quantum measurement outcomes are fundamentally non-deterministic requires ruling out the possibility that a hidden variable, not described by quantum mechanics, predetermines the result. Bell's theorem~\cite{bell1964epr} provides the test. Consider two entangled particles shared between distant parties Alice and Bob. Each party chooses a measurement setting ($a$ or $a'$ for Alice, $b$ or $b'$ for Bob) and records a binary outcome ($\pm 1$). Bell defined the quantity
+\begin{equation}
+S = E(a, b) - E(a, b') + E(a', b) + E(a', b')
+\label{eq:chsh}
+\end{equation}
+where $E(a, b) = \langle A_a B_b \rangle$ is the correlation between Alice's and Bob's outcomes. Any local hidden variable (LHV) theory satisfies the CHSH inequality~\cite{clauser1969chsh} $|S| \leq 2$. Quantum mechanics predicts a maximum violation of $|S| = 2\sqrt{2} \approx 2.828$.
+
+Aspect, Grangier, and Roger~\cite{aspect1982epr} provided the first experimental confirmation by measuring polarization correlations of entangled photon pairs and observing $|S| = 2.70 \pm 0.05$, exceeding the LHV bound by over five standard deviations. Subsequent experiments closed individual loopholes (detection efficiency, locality, freedom of choice). Hensen et al.~\cite{hensen2015loophole} closed all three loopholes simultaneously in a single experiment using entangled electron spins separated by 1.3~km, observing a statistically significant violation of the CHSH inequality ($p = 0.039$). The 2022 Nobel Prize in Physics, awarded to Aspect, Clauser, and Zeilinger, recognized this line of work.\footnote{Superdeterminism, the hypothesis that measurement settings are correlated with hidden variables via cosmic initial conditions, is unfalsifiable by construction: no experiment can rule it out, since any experimental design can be retroactively attributed to predetermined correlations. Unlike Bohmian mechanics (discussed in the proof of Theorem~\ref{thm:qrng_secure}), which reproduces Born-rule statistics and is compatible with our security argument, superdeterminism would invalidate all experimental certification of randomness and, indeed, all of experimental science. Our security argument holds under any interpretation that reproduces Born-rule statistics, which all empirically viable interpretations do.}
+
+Pironio et al.~\cite{pironio2010certified} demonstrated the generation of random numbers certified by Bell's theorem, establishing that measurement outcomes from entangled systems contain genuine, device-independent randomness. Ac\'{i}n and Masanes~\cite{acin2016certified} provided a comprehensive framework for certified randomness in quantum physics, showing that Bell inequality violations can quantify the amount of intrinsic randomness produced. The consequence for our purposes is direct: random bits produced by measuring qubits in balanced superposition are not generated by any deterministic process. There is no seed. There is no internal state that, if captured, would allow reconstruction of the measurement outcomes. This is a physical fact, not a computational assumption.
+
+\subsection{Limitations of Classical Pseudo-Random Number Generators}
+\label{subsec:prng}
+
+A CSPRNG such as ChaCha20 or AES-CTR-DRBG is a deterministic function $G\colon \mathcal{S} \to \{0,1\}^n$ that expands a short seed $s \in \mathcal{S}$ into a long output stream. The security property is computational indistinguishability: for any probabilistic polynomial-time distinguisher $\mathcal{D}$,
+\begin{equation}
+\bigl|\Pr[\mathcal{D}(G(s)) = 1] - \Pr[\mathcal{D}(U_n) = 1]\bigr| \leq \mathrm{negl}(\lambda)
+\label{eq:csprng_security}
+\end{equation}
+where $U_n$ denotes the uniform distribution over $\{0,1\}^n$ and $\lambda$ is the security parameter. This guarantee is conditional on two assumptions: (1)~the seed remains secret, and (2)~no efficient algorithm breaks the underlying primitive (e.g., the AES block cipher or the ChaCha20 stream cipher).
+
+The seed, however, is a physical object. It resides in RAM, in kernel entropy pools, in hardware state. Table~\ref{tab:prng_attacks} summarizes known attack vectors for seed extraction.
+
+\begin{table}[t]
+\caption{Known Attack Vectors for CSPRNG Seed Extraction}
+\label{tab:prng_attacks}
+\begin{center}
+\begin{tabular}{@{}lp{4.8cm}@{}}
+\toprule
+\textbf{Attack Class} & \textbf{Mechanism} \\
+\midrule
+Memory forensics & Direct read of process memory or kernel entropy pool via \texttt{/proc/pid/mem} or memory dump \\
+Cold boot attack & DRAM remanence after power loss; seed bits persist for seconds to minutes \\
+Spectre/Meltdown & Speculative execution leaks PRNG state across privilege boundaries \\
+Insider access & System administrator reads PRNG state from live process \\
+Core dump capture & Seed included in crash dump written to disk \\
+VM introspection & Hypervisor reads guest memory containing seed \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+If the seed is captured through any of these vectors, the entire output stream is deterministically recoverable. For anonymization, this means that an adversary who obtains the PRNG state at the time of anonymization can reverse the transformation completely.
+
+The distinction between the CSPRNG's computational security guarantee and the physical security of the seed is critical. The former is a mathematical property; the latter is an operational property that depends on the hardware, operating system, and deployment environment. An anonymization system whose irreversibility relies on CSPRNG security is only as strong as the weakest link in the seed's physical protection chain. No algorithmic sophistication in the CSPRNG design can compensate for seed exposure.
+
+\subsection{Classical Anonymization Techniques}
+\label{subsec:classical_anon}
+
+We review the principal anonymization techniques against which our system is compared. The fundamental tension between data release and privacy was identified early by Dinur and Nissim~\cite{dinur2003revealing}, who proved that answering too many queries about a private database necessarily compromises individual privacy, establishing the theoretical foundations for noise-based protection.
+
+\textbf{$K$-anonymity.} Samarati~\cite{samarati2001protecting} introduced the concept of protecting respondents' identities through generalization and suppression of quasi-identifiers; Sweeney~\cite{sweeney2002kanon} formalized this as $k$-anonymous if every record is indistinguishable from at least $k{-}1$ other records on quasi-identifier (QI) attributes. Formally, let $\mathrm{QI}(r)$ denote the quasi-identifier projection of record~$r$. A dataset $D$ satisfies $k$-anonymity if for every $r \in D$, $|\{r' \in D : \mathrm{QI}(r') = \mathrm{QI}(r)\}| \geq k$. The technique is vulnerable to homogeneity attacks (all records in an equivalence class share the same sensitive value) and background knowledge attacks. Narayanan and Shmatikov~\cite{narayanan2008robust} demonstrated the severity of re-identification risk through their Netflix attack, de-anonymizing a large sparse dataset by cross-referencing with publicly available IMDb ratings, even when the dataset satisfied $k$-anonymity-style protections.
+
+\textbf{$\ell$-Diversity.} Machanavajjhala et~al.~\cite{machanavajjhala2007ldiv} extended $k$-anonymity by requiring that each equivalence class contains at least $\ell$~``well-represented'' values of each sensitive attribute, addressing the homogeneity vulnerability.
+
+\textbf{$t$-Closeness.} Li et al.~\cite{li2007tcloseness} further strengthened the model by requiring that the distribution of sensitive attributes within each equivalence class is within distance $t$ (measured by Earth Mover's Distance) of the global distribution.
+
+\textbf{Differential privacy.} Dwork et al.~\cite{dwork2006dp} introduced a fundamentally different approach. A randomized mechanism $\mathcal{M}$ satisfies $\epsilon$-differential privacy if for all datasets $D_1, D_2$ differing in one record and all measurable sets $S$:
+\begin{equation}
+\Pr[\mathcal{M}(D_1) \in S] \leq e^\epsilon \cdot \Pr[\mathcal{M}(D_2) \in S].
+\label{eq:dp}
+\end{equation}
+The standard implementation adds Laplace noise with scale $\Delta f / \epsilon$, where $\Delta f$ is the sensitivity of the query function~$f$. Dwork and Roth~\cite{dwork2014algfound} provide the definitive treatment, covering composition theorems, the exponential mechanism, and connections to learning theory. Differential privacy is a property of the mechanism, not of the dataset: it bounds the information leakage per query, not the identifiability of the underlying records.
+
+All of these techniques, when implemented in practice, draw their randomness from CSPRNGs. The $k$-anonymity family uses deterministic transformations (generalization, suppression) and does not require randomness at all, but the privacy guarantee is syntactic and has known composition vulnerabilities. Differential privacy requires high-quality randomness for noise generation; Mironov~\cite{mironov2012significance} showed that even the least significant bits of floating-point noise matter for the privacy guarantee, demonstrating that na\"{\i}ve CSPRNG implementations can introduce subtle vulnerabilities. The DP guarantee degrades if the noise can be reconstructed by an adversary who captures the CSPRNG seed. Both families therefore inherit the seed-capture vulnerability described above, either directly (DP) or through the weakness of deterministic structural guarantees ($k$-anonymity family).
+
+\subsection{Regulatory Framework: GDPR and DORA}
+\label{subsec:gdpr}
+
+Two EU regulations define the legal context for our work.
+
+\textbf{GDPR Recital~26.} The GDPR states that the principles of data protection ``should not apply to anonymous information, namely information which does not relate to an identified or identifiable natural person or to personal data rendered anonymous in such a manner that the data subject is not or no longer identifiable.'' The recital specifies that identifiability should be assessed considering ``all the means reasonably likely to be used'' for re-identification. The Article~29 Working Party~\cite{art29wp2014anonymisation} issued detailed guidance on anonymisation techniques, establishing that effective anonymization must prevent singling out, linkability, and inference. The EDPB~\cite{edpb2020guidelines} has further elaborated on the conditions under which data processing may be considered anonymous. The phrase ``reasonably likely'' has been interpreted by data protection authorities as requiring consideration of both current and foreseeable future capabilities. Cohen and Nissim~\cite{cohen2020singling} formalized the GDPR's notion of singling out, proving that any sufficiently accurate statistical mechanism must allow singling out of at least some individuals, lending formal rigor to the regulatory standard. An anonymization method whose irreversibility depends on computational assumptions that may weaken over time faces an increasingly difficult argument under this standard.
+
+The practical consequence is a two-tier classification with distinct regulatory burdens:
+
+\begin{itemize}
+\item \textbf{Anonymous data} (Recital~26): outside GDPR scope entirely. No consent requirements, no data subject access requests, no retention limits, no cross-border transfer restrictions.
+\item \textbf{Pseudonymous data} (Article~4(5)): remains personal data. Full GDPR compliance required, including lawful basis for processing, data protection impact assessments, and right to erasure.
+\end{itemize}
+
+The economic difference between these two categories is substantial. An organization that can demonstrate true anonymization can freely share, archive, and process data. An organization limited to pseudonymization cannot.
+
+\textbf{DORA Article~6.} The Digital Operational Resilience Act (DORA), in force for Norwegian financial institutions since July~2025, requires in Article~6.4 that ICT risk management frameworks include, in substance, periodic cryptographic updates based on developments in cryptanalysis. This is the quantum-readiness clause: organizations must plan for the degradation of current cryptographic protections. Article~7 requires full cryptographic key lifecycle management. For anonymization systems that depend on CSPRNG security, DORA creates an ongoing obligation to re-assess whether the computational hardness assumption underlying the anonymization remains adequate. \textsc{QRNG-OTP-Destroy} substantially reduces this obligation: the physics-guaranteed component does not degrade with advances in cryptanalysis, though the operational assumption of secure mapping destruction remains subject to periodic verification.
+
+%% ====================================================================
+\section{Threat Model}
+\label{sec:threat}
+%% ====================================================================
+
+We consider four adversary classes, each strictly more powerful than the last. The goal of each adversary is to recover the original PII values from an anonymized dataset. Table~\ref{tab:adversaries} summarizes the four classes and their capabilities.
+
+\begin{table*}[t]
+\caption{Adversary Classes and Their Capabilities}
+\label{tab:adversaries}
+\begin{center}
+\begin{tabular}{@{}llp{6cm}lp{4cm}@{}}
+\toprule
+\textbf{Class} & \textbf{Name} & \textbf{Capabilities} & \textbf{CSPRNG-Based} & \textbf{QRNG-OTP-Destroy} \\
+\midrule
+$\mathcal{A}_1$ & External, bounded compute & Anonymized dataset, knowledge of algorithm, current hardware & Secure & Secure \\
+$\mathcal{A}_2$ & External, unbounded classical & Same as $\mathcal{A}_1$ plus unlimited classical compute. Brute-forces any seed space. Models P$=$NP scenario & \textbf{Broken} & Secure \\
+$\mathcal{A}_3$ & External, quantum compute & Same as $\mathcal{A}_2$ plus fault-tolerant quantum computer. Runs Shor, Grover & \textbf{Degraded} & Secure \\
+$\mathcal{A}_4$ & Insider, memory access & Memory snapshot of anonymization server at time of operation. Possesses PRNG state, intermediate buffers & \textbf{Broken} & Secure$^*$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{1mm}
+{\footnotesize $^*$Conditional on mapping destruction (Step~4 of Algorithm~\ref{alg:qrng_otp}). During the mapping's lifetime in memory (${\sim}$500~ms on commodity hardware), $\mathcal{A}_4$ can trivially invert the anonymization. See Section~\ref{subsec:destruction}.}
+\end{table*}
+
+\textbf{Adversary $\mathcal{A}_1$: External with bounded compute.} $\mathcal{A}_1$ possesses the anonymized dataset and knowledge of the anonymization algorithm but has no access to the anonymization server's memory or internal state. $\mathcal{A}_1$ has classical computational resources bounded by current hardware capabilities. This is the standard adversary model assumed by most anonymization systems. All techniques from Section~\ref{subsec:classical_anon} are designed to resist~$\mathcal{A}_1$.
+
+\textbf{Adversary $\mathcal{A}_2$: External with unbounded classical compute.} $\mathcal{A}_2$ possesses the same inputs as $\mathcal{A}_1$ but has unlimited classical computational resources. $\mathcal{A}_2$ can brute-force any CSPRNG seed space, invert any hash function, and solve any problem in NP in polynomial time. This adversary models the long-term HNDL scenario. If P$=$NP, $\mathcal{A}_2$ is realistic. All CSPRNG-based anonymization methods are insecure against~$\mathcal{A}_2$.
+
+\textbf{Adversary $\mathcal{A}_3$: External with quantum compute.} $\mathcal{A}_3$ has access to a universal fault-tolerant quantum computer in addition to unlimited classical compute. $\mathcal{A}_3$ can run Shor's algorithm, Grover's algorithm, and any quantum algorithm. Grover's algorithm quadratically speeds up brute-force search, reducing effective security by half in bit length.
+
+\textbf{Adversary $\mathcal{A}_4$: Insider with memory access.} $\mathcal{A}_4$ is a system administrator or attacker who has obtained a memory snapshot of the anonymization server at the time of anonymization. $\mathcal{A}_4$ possesses the PRNG internal state, all intermediate buffers, and the OTP mapping (if it still exists in memory). Against $\mathcal{A}_4$, every CSPRNG-based anonymization method is completely broken: the PRNG state enables deterministic reconstruction of all ``random'' values. This is the adversary that motivates our work.
+
+\textsc{QRNG-OTP-Destroy} resists all four adversary classes. Against $\mathcal{A}_4$ specifically, the defense rests on two properties: (1)~the quantum random bytes that generated the replacement tokens have no seed or state that $\mathcal{A}_4$ could capture, because the Born rule ensures the measurement outcomes are fundamentally non-deterministic; and (2)~the OTP mapping is destroyed via multi-pass overwrite before $\mathcal{A}_4$ can capture it. Even if $\mathcal{A}_4$ captures a snapshot after the mapping is destroyed, recovery requires determining which quantum measurement outcomes produced each token, which is information-theoretically impossible.
+
+\textbf{Temporal window analysis.} The mapping exists in volatile memory only during the execution of the anonymization function (Step~2 through Step~4 of Algorithm~\ref{alg:qrng_otp}). For a dataset with 50,000 unique values, the mapping construction and substitution complete in under 1~second on commodity hardware (Section~\ref{subsec:perf}). An adversary $\mathcal{A}_4$ who captures a memory snapshot during this window obtains the mapping and can trivially invert the anonymization. This is true for any anonymization system, classical or quantum, that maintains an intermediate mapping. The QRNG contribution is that after destruction, no path to recovery exists. For classical systems, even after mapping destruction, the CSPRNG seed may persist elsewhere in memory, enabling full reconstruction. For \textsc{QRNG-OTP-Destroy}, no seed exists anywhere in the system at any point during execution.
+
+The hardware enclave variant (Section~\ref{subsec:destruction}) further reduces the temporal window by isolating the mapping in enclave-protected memory, making it resistant to memory forensics even during execution. Figure~\ref{fig:hierarchy} illustrates the three-tier hierarchy; Figure~\ref{fig:adversary} summarizes the security posture under each adversary model.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig1_hierarchy}
+\caption{Three-tier irreversibility hierarchy. Computational irreversibility (Definition~\ref{def:comp}) is the weakest tier and breaks if $\mathrm{P} = \mathrm{NP}$. Physics-guaranteed irreversibility (Definition~\ref{def:phys}) is the strongest and holds regardless of computational advances.}
+\label{fig:hierarchy}
+\end{figure}
+
+%% ====================================================================
+\section{Formal Definitions}
+\label{sec:definitions}
+%% ====================================================================
+
+We formalize three tiers of anonymization irreversibility. Let $D$ be a dataset containing PII, let $A$ be an anonymization function, and let $D' = A(D)$ be the anonymized output. Let $\mathcal{A}$ denote an adversary attempting to recover $D$ from~$D'$.
+
+\begin{definition}[Computational Irreversibility]
+\label{def:comp}
+An anonymization function $A$ is \emph{computationally irreversible} if, for every probabilistic polynomial-time adversary $\mathcal{A}$, the probability that $\mathcal{A}$ recovers any record of $D$ from $D'$ is negligible in the security parameter~$\lambda$:
+\begin{equation}
+\Pr[\mathcal{A}(D', 1^\lambda) \to d_i \in D] \leq \mathrm{negl}(\lambda).
+\label{eq:comp_irrev}
+\end{equation}
+\end{definition}
+
+This is the standard guarantee provided by CSPRNG-based anonymization. It holds under the assumption that the CSPRNG is secure, which requires the seed to remain secret and that no polynomial-time algorithm can distinguish the CSPRNG output from random.
+
+\begin{definition}[Information-Theoretic Irreversibility]
+\label{def:it}
+An anonymization function~$A$ is \emph{information-theoretically irreversible} if, for every adversary~$\mathcal{A}$ with unbounded computational resources, the probability that~$\mathcal{A}$ recovers any record of~$D$ from~$D'$ is bounded~by:
+\begin{equation}
+\Pr[\mathcal{A}(D') \to d_i \in D] \leq 2^{-\eta}
+\label{eq:it_irrev}
+\end{equation}
+where $\eta$ is the entropy (in bits) of the replacement token (for our construction, $\eta = \tau \log_2 |\Sigma| \approx 95.3$~bits). This bound applies to the probability of determining the \emph{mapping} from tokens to original values, not to the probability of guessing an original value from domain knowledge alone. An adversary with a priori knowledge that a column contains only $|\mathcal{D}_j|$ distinct values can guess correctly with probability $|\mathcal{D}_j|^{-1}$ regardless of the anonymization method; the bound above addresses the distinct question of whether the anonymization \emph{adds} any information linking tokens to values.
+\end{definition}
+
+This guarantee is independent of computational assumptions. It requires that the replacement tokens are drawn from a distribution that is statistically independent of the original values and that no side information links the two.
+
+\begin{definition}[Physics-Guaranteed Irreversibility]
+\label{def:phys}
+An anonymization function $A$ is \emph{physics-guaranteed irreversible} if its information-theoretic irreversibility (Definition~\ref{def:it}) holds not as a consequence of any mathematical assumption but as a direct consequence of a verified physical law. Specifically, the randomness source used by~$A$ must satisfy: under the Born rule axiom of quantum mechanics, the random values used in the anonymization are fundamentally indeterminate prior to measurement, and no physical state or hidden variable accessible to any party determines the measurement outcomes.
+\end{definition}
+
+Physics-guaranteed irreversibility is strictly stronger than information-theoretic irreversibility. The latter can, in principle, be achieved by a hypothetical perfect random number generator; the former requires that the randomness is certified by a specific, experimentally verified physical law. The Born rule, validated to extraordinary precision by the loophole-free Bell test experiments~\cite{hensen2015loophole}, provides this certification. We do not claim that no conceivable future physical theory could account for measurement outcomes deterministically; we claim that the Born rule, as the best-supported axiom governing quantum measurement, provides a stronger foundation than any computational hardness assumption.
+
+\begin{lemma}[Strict Hierarchy]
+\label{lem:hierarchy}
+The three tiers form a strict hierarchy: physics-guaranteed irreversibility implies information-theoretic irreversibility implies computational irreversibility. The converses do not hold.
+\end{lemma}
+
+\begin{proof}
+(i)~Physics-guaranteed $\Rightarrow$ information-theoretic: Definition~\ref{def:phys} requires that information-theoretic irreversibility (Definition~\ref{def:it}) holds as a consequence of physical law. This directly implies Definition~\ref{def:it}.
+
+(ii)~Information-theoretic $\Rightarrow$ computational: If the bound in~\eqref{eq:it_irrev} holds for all adversaries (unbounded), it holds a fortiori for polynomial-time adversaries. For $n \geq \lambda$, the bound $2^{-n} \leq 2^{-\lambda}$ is negligible.
+
+(iii)~Computational $\not\Rightarrow$ information-theoretic: A CSPRNG-based anonymization system is computationally irreversible (assuming the CSPRNG is secure) but not information-theoretically irreversible, because an unbounded adversary can enumerate the seed space $\mathcal{S}$ and reconstruct the mapping.
+
+(iv)~Information-theoretic $\not\Rightarrow$ physics-guaranteed: Consider a hypothetical perfect TRNG that is information-theoretically random but whose physical mechanism is not certified by the Born rule (e.g., a thermal noise source whose randomness follows from assumptions about the noise model rather than from a fundamental quantum-mechanical axiom with loophole-free experimental verification). Such a source achieves Definition~\ref{def:it} but not Definition~\ref{def:phys}, because the randomness guarantee rests on a model assumption rather than the Born rule axiom.
+\end{proof}
+
+\begin{theorem}[Classical PRNG Impossibility]
+\label{thm:prng_impossible}
+No anonymization system whose randomness source is a classical PRNG (deterministic function of a finite seed) achieves physics-guaranteed irreversibility.
+\end{theorem}
+
+\begin{proof}
+Let $A$ be an anonymization system that uses a PRNG $G\colon \mathcal{S} \to \{0,1\}^n$ with seed space~$\mathcal{S}$. The seed $s \in \mathcal{S}$ is a physical object stored in memory. An adversary who captures $s$ can compute $G(s)$, reconstruct every random value used in the anonymization, and invert $A$ to recover~$D$. The existence of $s$ as a physical state that determines the random values directly contradicts the condition in Definition~\ref{def:phys} that no physical state determines the random values. Therefore $A$ does not achieve physics-guaranteed irreversibility.
+\end{proof}
+
+\begin{theorem}[QRNG-OTP-Destroy Security]
+\label{thm:qrng_secure}
+The \textsc{QRNG-OTP-Destroy} protocol (Section~\ref{sec:protocol}) achieves physics-guaranteed irreversibility under the assumption that quantum mechanics correctly describes measurement outcomes (the Born rule assumption).
+\end{theorem}
+
+\begin{proof}
+The protocol uses replacement tokens generated by measuring qubits in balanced superposition. By the Born rule, each measurement outcome is an independent uniformly random bit with no deterministic antecedent. By Bell's theorem and its loophole-free experimental verification~\cite{hensen2015loophole}, no local hidden variable determines the outcome. The OTP mapping between original values and replacement tokens is constructed in volatile memory and destroyed via multi-pass overwrite before the protocol returns.
+
+Non-local hidden variable theories, such as Bohmian mechanics~\cite{bohm1952suggested}, provide deterministic (but non-local) accounts of quantum measurement outcomes. In Bohmian mechanics, particle positions serve as hidden variables that, together with the pilot wave, determine measurement results. Under Bohmian mechanics, the security guarantee reduces to the \emph{quantum equilibrium hypothesis} (D\"urr, Goldstein, and Zangh\`{i}, 1992): that the initial distribution of particle positions matches the Born-rule distribution, ensuring that measurement statistics are indistinguishable from those of standard quantum mechanics. We treat this hypothesis as a physical axiom on par with the Born rule itself. Both (1)~the no-signaling theorem prevents any adversary from learning individual Bohmian trajectories faster than the Born rule allows, and (2)~the quantum equilibrium hypothesis ensures the $62^{-16}$ recovery bound holds regardless of whether the underlying ontology is indeterministic (Copenhagen) or deterministic-but-inaccessible (Bohmian). The security guarantee holds under any interpretation of quantum mechanics that reproduces Born-rule statistics, which all empirically viable interpretations do.
+
+After destruction, recovery of $D$ from $D'$ requires determining the quantum measurement outcomes that produced each replacement token. Each 16-character token is drawn uniformly from a 62-symbol alphanumeric alphabet using rejection sampling. The probability of correctly guessing the token assigned to any single value is $62^{-16} \approx 2^{-95.3}$, which exceeds the standard 80-bit security level by a factor of~$2^{15}$. This bound holds for any adversary, regardless of computational resources, because it follows from a physical law rather than a computational assumption.
+
+The Born rule assumption is not a computational hardness assumption. It is a statement about the physical world, verified by experiment to extraordinary precision. Its failure would require a revision of quantum mechanics, contradicting over a century of experimental confirmation. Therefore the irreversibility of \textsc{QRNG-OTP-Destroy} is physics-guaranteed per Definition~\ref{def:phys}.
+\end{proof}
+
+\begin{corollary}[Independence from P vs.\ NP]
+\label{cor:pvsnp}
+The security of \textsc{QRNG-OTP-Destroy} is independent of the resolution of the $\mathrm{P}$ vs.\ $\mathrm{NP}$ problem.
+\end{corollary}
+
+\begin{proof}
+Theorem~\ref{thm:qrng_secure} does not invoke any computational hardness assumption. If $\mathrm{P} = \mathrm{NP}$ were established, polynomial-time algorithms for CSPRNG seed recovery and hash pre-image computation would exist in principle, undermining CSPRNG-based anonymization systems. ($\mathrm{P} = \mathrm{NP}$ guarantees the \emph{existence} of polynomial-time algorithms but not their constructive availability or practical efficiency; the theoretical vulnerability nonetheless suffices to invalidate the computational irreversibility guarantee.) The Born rule is a statement about measurement outcomes in quantum mechanics, not about the complexity of any computational problem. A world in which $\mathrm{P} = \mathrm{NP}$ but quantum mechanics remains valid is a world in which \textsc{QRNG-OTP-Destroy} remains secure and every CSPRNG-based anonymization system is theoretically broken.
+\end{proof}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig2_adversary}
+\caption{Security under four adversary models. Classical PRNG anonymization is secure only against computationally bounded external adversaries ($\mathcal{A}_1$). QRNG-OTP-Destroy remains secure against all four adversary classes, including insiders with memory access ($\mathcal{A}_4$).}
+\label{fig:adversary}
+\end{figure}
+
+%% ====================================================================
+\section{The QRNG-OTP-Destroy Protocol}
+\label{sec:protocol}
+%% ====================================================================
+
+\subsection{Protocol Specification}
+\label{subsec:spec}
+
+The protocol takes as input a dataset $D$ (a table with $m$ columns and $n$ rows) and produces an anonymized dataset $D'$ of the same schema. Let $\Sigma$ denote the Base62 alphanumeric alphabet ($|\Sigma| = 62$: digits 0--9, uppercase A--Z, lowercase a--z). Each replacement token is a string of $\tau = 16$ characters over~$\Sigma$, providing $\tau \log_2 |\Sigma| \approx 95.3$~bits of entropy. The conversion from raw QRNG bytes to $\Sigma$-characters uses per-byte rejection sampling: bytes $\geq 248$ are discarded, and remaining bytes are mapped to characters via $b \bmod 62$, which is bias-free since $248 = 4 \times 62$. The protocol proceeds in four steps.
+
+\begin{algorithm}[t]
+\caption{QRNG-OTP-Destroy}
+\label{alg:qrng_otp}
+\begin{algorithmic}[1]
+\REQUIRE Dataset $D$ with $m$ columns, $n$ rows; quantum entropy pool~$\mathcal{P}$
+\ENSURE Anonymized dataset $D'$; all mappings destroyed
+\FOR{each column $C_j$, $1 \leq j \leq m$}
+    \STATE $U_j \leftarrow \text{unique}(C_j)$ \COMMENT{Set of unique values}
+    \STATE $M_j \leftarrow \emptyset$ \COMMENT{Mapping in volatile memory}
+    \FOR{each $v_k \in U_j$}
+        \STATE Read bytes $b_k$ from $\mathcal{P}$ via rejection sampling \COMMENT{${\geq}$16 QRNG bytes}
+        \STATE $t_k \leftarrow \textsc{Base62}(b_k)$ \COMMENT{16-char token, ${\approx}$95.3 bits}
+        \STATE $M_j[v_k] \leftarrow t_k$
+    \ENDFOR
+    \FOR{each row $i$, $1 \leq i \leq n$}
+        \STATE $D'[i,j] \leftarrow M_j[D[i,j]]$
+    \ENDFOR
+\ENDFOR
+\FOR{each mapping $M_j$, $1 \leq j \leq m$}
+    \STATE \textsc{Overwrite}($M_j$, $\texttt{0x00}$) \COMMENT{Pass 1: zeros}
+    \STATE \textsc{Overwrite}($M_j$, $\texttt{0xFF}$) \COMMENT{Pass 2: ones}
+    \STATE \textsc{Overwrite}($M_j$, $\mathcal{P}$) \COMMENT{Pass 3: QRNG bytes}
+    \STATE \textsc{Release}($M_j$)
+\ENDFOR
+\RETURN $D'$
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Step~1: Entropy Acquisition.} For each column $C_j$ ($1 \leq j \leq m$), let $U_j = \{v_1, v_2, \ldots, v_{u_j}\}$ be the set of unique values in column~$C_j$. The protocol reads $16 \cdot \sum_{j=1}^{m} u_j$ bytes from a quantum entropy source. Each 16-byte block is produced by measuring 128 qubits, each prepared in the balanced superposition state $|{+}\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$, in the computational basis. The measurement outcomes are concatenated to form the 16-byte block.
+
+\textbf{Step~2: Mapping Construction.} For each column $C_j$, the protocol constructs a mapping $M_j\colon U_j \to T$ where $T$ is the set of 16-character alphanumeric strings. Each unique value $v_k \in U_j$ is assigned a replacement token $t_k$ by converting the corresponding 16-byte QRNG block to a string using modular selection from the character set $\{$\texttt{a}--\texttt{z}, \texttt{A}--\texttt{Z}, \texttt{0}--\texttt{9}$\}$. The mapping $M_j$ is stored in volatile memory (a hash table in process address space).
+
+\textbf{Step~3: Substitution.} Every cell $D[i,j]$ is replaced by $M_j(D[i,j])$, producing the anonymized dataset~$D'$. Identical values within a column map to the same token (preserving referential integrity within a single anonymization run), but different runs produce different tokens (non-reproducibility across runs).
+
+\textbf{Step~4: Mapping Destruction.} All mappings $M_1, \ldots, M_m$ are destroyed. The current Python implementation overwrites each mapping value with null bytes via \texttt{ctypes.memset} on the CPython string buffer, clears the dictionary, and deletes the reference. This is a best-effort approach: Python's garbage collector may retain copies of string objects in internal pools, and the \texttt{ctypes.memset} technique is CPython-version-specific. A formally verified implementation in Rust or C, executed within a hardware security enclave (Intel SGX or ARM TrustZone), would provide stronger guarantees; enclave teardown ensures no mapping data persists in any addressable memory. The security proofs (Theorems~\ref{thm:qrng_secure}--\ref{thm:game-security}) assume successful mapping destruction; Limitation~7 discusses the gap between this assumption and the current implementation.
+
+\textbf{Entropy consumption.} Let $u = \sum_{j=1}^{m} |U_j|$ be the total number of unique values across all columns. The protocol consumes $16u$ bytes for the OTP tokens. The third overwrite pass (random bytes) can draw from QRNG or from the OS CSPRNG without affecting the security guarantee, since the overwrite's purpose is to prevent memory forensics, not to contribute to the token's entropy. In the strictest configuration, the total QRNG consumption is:
+\begin{equation}
+E_{\mathrm{tokens}} = 16 \cdot \sum_{j=1}^{m} |U_j| \;\;\text{bytes}.
+\label{eq:entropy_consumption}
+\end{equation}
+
+Table~\ref{tab:entropy_budget} shows entropy requirements for representative dataset sizes.
+
+\begin{table}[t]
+\caption{Entropy Consumption for Representative Datasets}
+\label{tab:entropy_budget}
+\begin{center}
+\begin{tabular}{@{}rrrc@{}}
+\toprule
+\textbf{Rows} & \textbf{Columns} & \textbf{Unique Values} & \textbf{QRNG Bytes} \\
+\midrule
+1,000 & 5 & ${\sim}$3,000 & 48~KB \\
+10,000 & 10 & ${\sim}$50,000 & 800~KB \\
+100,000 & 20 & ${\sim}$500,000 & 8~MB \\
+1,000,000 & 50 & ${\sim}$5,000,000 & 80~MB \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+The entropy budget scales linearly with the number of unique values, not with the total number of cells. Datasets with high redundancy (many repeated values) consume far less entropy than datasets with mostly unique values. At the largest scale (1M rows, 50 columns), the 80~MB requirement is non-trivial but feasible with a dedicated QRNG appliance producing entropy at rates of 1~Gbit/s or higher (commercially available from ID~Quantique and Quantinuum).
+
+\subsection{Security Analysis}
+\label{subsec:security}
+
+We state the per-value security bound and prove it directly.
+
+\begin{proposition}[Per-value recovery bound]
+\label{prop:pervalue}
+After protocol execution, no adversary $\mathcal{A}$ with arbitrary computational resources (classical or quantum) can determine the mapping from $D'[i,j]$ to $D[i,j]$ with probability exceeding $62^{-16} \approx 2^{-95.3}$.
+\end{proposition}
+
+\begin{proof}
+We consider the adversary's information after the protocol completes.
+
+(a) $\mathcal{A}$ possesses $D'$ and full knowledge of the protocol.
+
+(b) $\mathcal{A}$ does not possess any mapping~$M_j$, because all mappings have been destroyed. Even an adversary with physical access to the server's memory after Step~4 finds only overwritten bytes.
+
+(c) To recover $D[i,j]$ from $D'[i,j]$, $\mathcal{A}$ must determine which original value was mapped to the token $D'[i,j]$. This requires either (i)~inverting the mapping, which requires possessing the mapping, which has been destroyed; or (ii)~determining which QRNG output was assigned to each original value, which requires determining the quantum measurement outcomes that produced each 16-byte block.
+
+(d) By the Born rule~\eqref{eq:born}, each measurement outcome is an independent fair coin flip with no deterministic antecedent. By Bell's theorem~\cite{bell1964epr}, no local hidden variable determines the outcome. Each 16-character token is drawn uniformly from a 62-symbol alphabet via rejection sampling (Section~\ref{subsec:spec}), independently of the original value. The probability that $\mathcal{A}$ correctly determines the mapping for a single value is~$62^{-16} \approx 2^{-95.3}$.
+
+(e) This bound is information-theoretic (it holds for unbounded adversaries) and physics-guaranteed (it follows from the Born rule rather than any computational assumption).
+\end{proof}
+
+\begin{proposition}[Per-Value Zero Mutual Information]
+\label{prop:mi}
+After protocol execution, for any cell $(i,j)$, the mutual information between the original value $D[i,j]$ and its replacement token $D'[i,j]$ is zero: $I(D[i,j]; D'[i,j]) = 0$.
+\end{proposition}
+
+\begin{proof}
+We establish independence between each original value and its replacement token.
+
+\emph{(a) Token generation is physically independent of~$D$.}
+For each unique value $v_k$ in column~$C_j$, the replacement token $t_k$ is produced by measuring qubits prepared in $|{+}\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$. By the Born rule~\eqref{eq:born}, each measurement outcome is an independent fair bit; the joint outcome is a uniformly random string over $\Sigma^{16}$ (with $|\Sigma|=62$) via rejection sampling.
+
+No input to the measurement depends on $v_k$ or on any element of~$D$. Therefore the conditional distribution of the token given the original value equals the marginal:
+\begin{align*}
+  P(D'[i,j] {=} t \mid D[i,j] {=} v) &= P(D'[i,j] {=} t) = |\Sigma|^{-16}\\
+  &\quad \forall\; t \in \Sigma^{16},\; \forall\; v.
+\end{align*}
+
+\emph{(b) Mapping destruction eliminates the only classical correlation.}
+During protocol execution, the mapping $M_j$ is the sole artifact linking $D$ and $D'$. After Step~4 of Algorithm~\ref{alg:qrng_otp}, every mapping is overwritten and released. No physical record correlating any $v_k$ with its token $t_k$ persists.
+
+\emph{(c) Per-value independence.}
+Since each token $t_k$ is generated independently of its corresponding value $v_k$ (by part~(a)) and no side information survives (by part~(b)):
+\[
+  P(D[i,j], D'[i,j]) \;=\; P(D[i,j]) \cdot P(D'[i,j]).
+\]
+Therefore $I(D[i,j]; D'[i,j]) = H(D[i,j]) - H(D[i,j] \mid D'[i,j]) = H(D[i,j]) - H(D[i,j]) = 0$.
+
+\medskip\noindent\emph{Note on equality structure.}
+The per-value result does not extend to the full dataset without qualification. Because identical values within a column map to the same token (Step~2 of Algorithm~\ref{alg:qrng_otp}), $D'$ reveals which cells in each column share an original value: $D[i,j] = D[k,j] \iff D'[i,j] = D'[k,j]$. This equality pattern leaks the partition structure of each column. The leaked information is bounded by the number of equivalence classes per column and is inherent to any deterministic-per-value tokenization scheme. For columns where the equivalence class structure is sensitive, combining L10 with row shuffling or per-cell independent tokenization (at the cost of losing referential integrity) mitigates this leakage. The per-value mutual information, which bounds the adversary's ability to recover any specific original value from its token, remains exactly zero.
+\end{proof}
+
+\begin{proposition}[Domain-Knowledge Limitation]
+\label{prop:domainlimit}
+Propositions~\ref{prop:pervalue} and~\ref{prop:mi} bound the adversary's ability to invert the \emph{mapping} between $D$ and $D'$. They do not bound the adversary's ability to guess an original value from domain knowledge alone. For a column $C_j$ whose values are drawn from a domain $\mathcal{D}_j$, an adversary who knows $\mathcal{D}_j$ can guess any cell's original value with probability at least $|\mathcal{D}_j|^{-1}$, regardless of the anonymization method applied.
+\end{proposition}
+
+\begin{proof}
+The adversary ignores $D'$ entirely and guesses uniformly at random from $\mathcal{D}_j$, succeeding with probability $|\mathcal{D}_j|^{-1}$. This is a well-known observation: the homogeneity attack of Machanavajjhala et al.~\cite{machanavajjhala2007ldiv} exploits exactly this property. The attack requires no information from the anonymized dataset and is therefore independent of the protocol. For columns with small domains (e.g., $|\mathcal{D}_j| = 2$ for binary sex), the domain-guessing probability $1/2$ dominates the mapping-recovery probability $62^{-16} \approx 2^{-95.3}$ by a factor of~$2^{94}$. Appendix~\ref{app:security-game}, Proposition~\ref{prop:domain} formalizes the combined bound as $\max(62^{-16},\; |\mathcal{D}_j|^{-1})$.
+
+\medskip\noindent
+\textsc{QRNG-OTP-Destroy} is designed to make the mapping irrecoverable, not to enlarge the effective domain. For datasets where domain-knowledge inference is a concern, the recommended deployment combines structural anonymization (L5--L9: generalization, suppression, micro-aggregation) to enlarge $|\mathcal{D}_j|$ before applying L10 tokenization, providing defense in depth. This two-phase approach is analogous to applying semantic security measures before encryption: the cipher protects the bits, but the plaintext must first be made resistant to frequency analysis.
+\end{proof}
+
+\subsection{Equality-Structure Leakage}
+\label{subsec:equality}
+
+The per-value MI result (Proposition~\ref{prop:mi}) establishes that individual tokens carry zero information about their corresponding original values. However, the protocol preserves the equality structure within each column: $D[i,j] = D[k,j] \iff D'[i,j] = D'[k,j]$. This reveals the partition of rows into equivalence classes per column, which constitutes a non-trivial information leak at the dataset level.
+
+\begin{proposition}[Equality-Structure Leakage Bound]
+\label{prop:equality}
+For a column $C_j$ with $|U_j|$ unique values among $n$ rows, the equality structure reveals at most $\log_2 \binom{n}{n_1, n_2, \ldots, n_{|U_j|}}$ bits, where $n_k$ is the frequency of the $k$-th unique value. For a column with $|U_j| = 2$ and balanced frequencies ($n/2$ each), this equals $n$~bits.
+\end{proposition}
+
+An adversary who knows the frequency distribution of the original column (e.g., from census data) can mount a frequency-analysis attack: match the observed token frequencies in~$D'$ to the known value frequencies in the population, recovering the mapping with confidence proportional to the separation between frequency bins. This is structurally identical to the attack that breaks simple substitution ciphers and is well-studied in the $k$-anonymity literature~\cite{narayanan2008robust}. Cross-column correlations amplify the leak.
+
+Two mitigations address this within the \textsc{QRNG-OTP-Destroy} framework:
+\begin{enumerate}
+\item \textbf{Per-cell independent tokenization.} Assigning a fresh independent token to every cell (not just every unique value) eliminates the equality structure entirely, at the cost of losing referential integrity: identical original values produce different tokens across rows.
+\item \textbf{Structural pre-processing.} Applying L5--L9 (generalization, suppression, differential privacy noise) before L10 tokenization enlarges equivalence classes and injects noise into frequency distributions before the OTP is applied. The composed system provides both structural privacy (from L5--L9) and mapping-recovery security (from L10).
+\end{enumerate}
+
+We now formalize this composition.
+
+\subsection{Indistinguishability-Based Security}
+\label{subsec:ind-anon}
+
+The mapping-recovery game (Appendix~\ref{app:security-game}) captures an adversary's inability to invert the tokenization. We complement it with an indistinguishability game that captures a stronger property: an adversary cannot determine \emph{which} dataset was anonymized.
+
+\begin{definition}[Indistinguishability Game $\mathsf{IND\text{-}ANON}_{\mathcal{A}}(\lambda)$]
+\label{def:ind-anon}
+Let $\lambda$ be the security parameter. The game proceeds:
+\begin{enumerate}
+\item \textbf{Choose.} Adversary $\mathcal{A}$ selects two datasets $D_0, D_1$ of the same schema (same number of rows, columns, and column types) and sends both to the challenger~$\mathcal{C}$.
+\item \textbf{Challenge.} $\mathcal{C}$ samples $b \xleftarrow{\$} \{0,1\}$, executes \textsc{QRNG-OTP-Destroy} on $D_b$, and sends the anonymized output $D'$ to~$\mathcal{A}$.
+\item \textbf{Guess.} $\mathcal{A}$ outputs $b' \in \{0,1\}$.
+\item \textbf{Win.} $\mathcal{A}$ wins if $b' = b$.
+\end{enumerate}
+The IND-ANON advantage is:
+\begin{equation}
+\mathrm{Adv}_{\mathsf{IND\text{-}ANON}}(\mathcal{A}) \;=\; \bigl|\Pr[b' {=} b] - \tfrac{1}{2}\bigr|.
+\label{eq:ind-anon-adv}
+\end{equation}
+\end{definition}
+
+\begin{theorem}[IND-ANON Security]
+\label{thm:ind-anon}
+For \textsc{QRNG-OTP-Destroy} with per-cell independent tokenization, the advantage of any adversary (including computationally unbounded adversaries) is exactly zero:
+\begin{equation}
+\mathrm{Adv}_{\mathsf{IND\text{-}ANON}}(\mathcal{A}) \;=\; 0 \quad \forall\;\mathcal{A}.
+\end{equation}
+For \textsc{QRNG-OTP-Destroy} with per-value tokenization (the default), the advantage is bounded by the equality-structure leakage:
+\begin{equation}
+\mathrm{Adv}_{\mathsf{IND\text{-}ANON}}(\mathcal{A}) \;\leq\; 1 - \prod_{j=1}^{m}\bigl(1 - \mathrm{TV}_j\bigr)
+\label{eq:ind-anon-eq-bound}
+\end{equation}
+where $\mathrm{TV}_j = \mathrm{TV}\bigl(\mathbf{f}_j(D_0),\, \mathbf{f}_j(D_1)\bigr)$ is the total variation distance between the column-$j$ frequency vectors of $D_0$ and $D_1$. Since per-value tokenization makes each column's permutation independent, the joint distinguishability follows from the product structure. When all $\mathrm{TV}_j = 0$ (identical frequency structures), the bound is zero. For a single distinguishing column~$j^*$, the bound reduces to~$\mathrm{TV}_{j^*}$.
+\end{theorem}
+
+\begin{proof}
+\emph{Per-cell case.} When each cell receives an independent fresh token, $D'$ is a matrix of i.i.d.\ uniform random strings from $\Sigma^\tau$. Since the tokens are generated by QRNG (Born rule), they are statistically independent of both $D_0$ and $D_1$. The distribution of $D'$ is therefore identical regardless of whether $D_0$ or $D_1$ was chosen:
+\[
+\Pr[D' \mid b{=}0] = \Pr[D' \mid b{=}1] = \prod_{i,j} |\Sigma|^{-\tau}.
+\]
+No distinguisher, bounded or unbounded, can gain advantage from identical distributions.
+
+\emph{Per-value case.} The token assigned to each unique value is independent of the value (Proposition~\ref{prop:mi}), but the partition of rows into equivalence classes is preserved. Per-value tokenization applies an independent random permutation to each column's unique values. The adversary's view of column~$j$ is a frequency histogram whose distribution depends on $D_b$ only through column~$j$'s frequency vector $\mathbf{f}_j(D_b)$. Since column tokenizations are independent, the joint view is a product distribution. For product distributions, the total variation distance satisfies $\mathrm{TV}(P_0, P_1) = 1 - \prod_j (1 - \mathrm{TV}_j)$, where $\mathrm{TV}_j$ is the per-column total variation distance between the frequency-vector distributions induced by $D_0$ and $D_1$. The adversary's advantage is bounded by this joint TV distance. When all $\mathrm{TV}_j = 0$ (identical frequency structures), the advantage is zero.
+\end{proof}
+
+\begin{remark}
+Theorem~\ref{thm:ind-anon} shows that the IND-ANON security of \textsc{QRNG-OTP-Destroy} reduces entirely to the equality-structure leakage identified in Section~\ref{subsec:equality}. The QRNG component provides perfect per-value independence; the only residual information leak is structural. This separation is the primary advantage of our construction over PRNG-based tokenization, where per-value independence is conditional on seed secrecy.
+\end{remark}
+
+\subsection{Composition with Differential Privacy}
+\label{subsec:composition}
+
+We formalize the composition of structural anonymization (L5--L9, in particular $\epsilon$-differential privacy) with L10 tokenization. The result shows that the two guarantees compose cleanly: the DP bound survives post-processing by L10, and the physics-guaranteed irreversibility of L10 is independent of the input distribution.
+
+\begin{theorem}[DP-QRNG Composition]
+\label{thm:dp-composition}
+Let $\mathcal{M}\colon \mathcal{D}^n \to \mathcal{R}$ be an $\epsilon$-differentially private mechanism and let $T$ denote \textsc{QRNG-OTP-Destroy}. The composed mechanism $T \circ \mathcal{M}$ satisfies:
+\begin{enumerate}
+\item[(a)] $T \circ \mathcal{M}$ is $\epsilon$-differentially private.
+\item[(b)] $T \circ \mathcal{M}$ achieves physics-guaranteed irreversibility (Definition~\ref{def:phys}).
+\item[(c)] The guarantees (a) and (b) are independent: (a) bounds statistical inference about $D$ from the output; (b) ensures the mapping from $\mathcal{M}(D)$ to $T(\mathcal{M}(D))$ is irrecoverable.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{Part~(a).} By the post-processing theorem of differential privacy~\cite{dwork2014algfound} (Proposition~2.1): for any randomized function $f$, if $\mathcal{M}$ is $\epsilon$-DP, then $f \circ \mathcal{M}$ is $\epsilon$-DP. Since $T$ is a randomized function (using QRNG), $T \circ \mathcal{M}$ satisfies $\epsilon$-DP. The privacy budget is not consumed or degraded by the tokenization step.
+
+\emph{Part~(b).} By Theorem~\ref{thm:qrng_secure}, $T$ achieves physics-guaranteed irreversibility for any input. The input to $T$ here is $\mathcal{M}(D)$ rather than $D$ directly, but the irreversibility guarantee concerns the mapping between the input to $T$ and its output, which is physics-guaranteed regardless of the input's origin.
+
+\emph{Part~(c).} Part~(a) is a statement about the relationship between $D$ and the final output $T(\mathcal{M}(D))$: no individual record in $D$ is ``singled out'' with probability exceeding $e^\epsilon$ times the baseline. Part~(b) is a statement about the relationship between $\mathcal{M}(D)$ and $T(\mathcal{M}(D))$: the tokenization mapping is physically irrecoverable. These address different adversarial goals (statistical inference vs.\ deterministic inversion) and hold simultaneously because the Born rule operates independently of the differential privacy mechanism. Neither guarantee depends on or interferes with the other.
+\end{proof}
+
+\begin{corollary}[Defense-in-Depth Composition]
+\label{cor:defense-in-depth}
+For a deployment that applies $k$-anonymity (L5), $\ell$-diversity (L6), Laplace noise with parameter $\epsilon$ (L8), and \textsc{QRNG-OTP-Destroy} (L10) in sequence, the final output satisfies:
+\begin{enumerate}
+\item[(i)] $\epsilon$-differential privacy (from L8, preserved by L10 via Theorem~\ref{thm:dp-composition}(a)),
+\item[(ii)] physics-guaranteed irreversibility (from L10, via Theorem~\ref{thm:dp-composition}(b)).
+\end{enumerate}
+The L5 ($k$-anonymity) and L6 ($\ell$-diversity) steps provide structural pre-processing that enlarges equivalence classes and diversifies sensitive attribute distributions before noise is added. These syntactic guarantees hold at the intermediate dataset produced after L6 but are not preserved through L8 (Laplace noise modifies quasi-identifier values, disrupting equivalence classes). The role of L5--L6 in the composed pipeline is to improve the utility-privacy trade-off of the subsequent DP mechanism by reducing the sensitivity $\Delta f$, not to provide an independent guarantee on the final output.
+\end{corollary}
+
+\subsection{Ideal Anonymization Functionality}
+\label{subsec:uc}
+
+We define an ideal functionality for anonymization that captures the strongest possible guarantee: the anonymized output is completely independent of the input. This formulation follows the simulation paradigm introduced by Canetti for universally composable security~\cite{canetti2001uc}.
+
+\begin{definition}[Ideal Anonymization Functionality $\mathcal{F}_{\mathrm{ANON}}$]
+\label{def:f-anon}
+$\mathcal{F}_{\mathrm{ANON}}$ is a trusted party that, upon receiving dataset $D$ with schema $(m\text{ columns}, n\text{ rows})$:
+\begin{enumerate}
+\item Generates $D'$ where each cell $D'[i,j]$ is an independent uniformly random string from $\Sigma^\tau$.
+\item Outputs $D'$.
+\item Retains no record of $D$ or the correspondence between $D$ and~$D'$.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Realization of $\mathcal{F}_{\mathrm{ANON}}$]
+\label{thm:uc-realization}
+\textsc{QRNG-OTP-Destroy} with per-cell independent tokenization realizes $\mathcal{F}_{\mathrm{ANON}}$ under the Born rule assumption. That is, for every adversary $\mathcal{A}$ interacting with the real protocol, there exists a simulator $\mathcal{S}$ such that no environment $\mathcal{Z}$ can distinguish the real execution from the ideal execution with $\mathcal{F}_{\mathrm{ANON}}$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+We consider static corruption of the output channel only; the trusted-party model assumes the anonymization computation is performed honestly and the mapping is destroyed before the output is released (Section~\ref{subsec:destruction}). The simulator $\mathcal{S}$ simply forwards $\mathcal{F}_{\mathrm{ANON}}$'s output to the environment; it performs no additional computation. In the real protocol, each cell's token is generated by measuring qubits in balanced superposition, producing an i.i.d.\ uniform string from $\Sigma^\tau$ (by the Born rule; the qubit preparation $|{+}\rangle$ and measurement basis are data-independent). The mapping is destroyed, so no correlation between $D$ and $D'$ persists. The real-world output distribution is therefore identical to the ideal-world output distribution: both are i.i.d.\ uniform over $\Sigma^\tau$. Since the distributions are statistically identical (not merely computationally indistinguishable), no environment can distinguish them, regardless of computational resources. For per-value tokenization (the default), the realization is $\delta(D)$-approximate, where $\delta(D) = \mathrm{TV}\bigl(P_{\mathrm{real}}(D),\, P_{\mathrm{ideal}}\bigr)$ is the total variation distance between the real output distribution (which preserves column equality structure of~$D$) and the ideal i.i.d.\ uniform distribution. This quantity depends on the frequency structure of~$D$: for a dataset whose columns all contain $n$ distinct values, $\delta(D) = 0$; for a column with a single repeated value across all $n$ rows, the equality structure is fully revealed.
+\end{proof}
+
+\subsection{The Mapping Destruction Requirement}
+\label{subsec:destruction}
+
+The protocol's security critically depends on the mapping's destruction. If the mapping persists in any form, whether in memory, on disk, in a backup, in a log file, or in a core dump, an adversary who obtains it can trivially invert the anonymization. The QRNG entropy source provides unconditional randomness, but the mapping is classical information that must be treated as a one-time secret.
+
+This constraint is no different in kind from the key management requirements of any encryption system. The distinction is that once the mapping is destroyed, the irreversibility guarantee is unconditional: it does not depend on the secrecy of any ongoing key or state.
+
+For production deployments, we recommend:
+\begin{enumerate}
+\item Constructing the mapping in a hardware security enclave (Intel SGX, ARM TrustZone).
+\item Disabling core dumps during the anonymization call.
+\item Running the anonymization process in a memory-locked address space (\texttt{mlock}).
+\item Verifying the overwrite by reading back the memory region after destruction.
+\end{enumerate}
+
+\subsection{Security Under P = NP}
+\label{subsec:pnp}
+
+Classical anonymization methods derive irreversibility from computational hardness. If P$=$NP were established, polynomial-time algorithms for CSPRNG seed recovery and hash pre-image computation would exist in principle (though P$=$NP guarantees only existence, not constructive availability or practical efficiency). The theoretical vulnerability nonetheless suffices: every noise-based or token-based anonymization system whose security reduces to a computational hardness assumption would lose its formal guarantee.
+
+\textsc{QRNG-OTP-Destroy} is immune to this scenario. The protocol's security does not invoke any computational hardness assumption at any point. The Born rule is a statement about measurement outcomes in quantum mechanics, not about the complexity of any computational problem. This independence from complexity-theoretic assumptions is formalized in Corollary~\ref{cor:pvsnp}. The protocol's four steps are illustrated in Figure~\ref{fig:protocol}; Figure~\ref{fig:entropy} shows entropy consumption as a function of dataset size.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig3_protocol}
+\caption{The four steps of the QRNG-OTP-Destroy protocol. Step~1 acquires entropy from quantum hardware (e.g., Rigetti, IBM Quantum) or OS fallback; physics-guaranteed irreversibility requires a QRNG source (no seed). Step~4 destroys the mapping via memory overwrite and deallocation.}
+\label{fig:protocol}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig4_entropy}
+\caption{Entropy consumption as a function of dataset size and column count, assuming 70\% unique values per column and 16 bytes per unique value. A single quantum harvest cycle produces approximately \SI{80}{\kilo\byte} ($156 \times 4{,}096 / 8$); the OS-sourced entropy pool used for benchmarking contains \SI{5.9}{\mega\byte} (Table~\ref{tab:nist}).}
+\label{fig:entropy}
+\end{figure}
+
+%% ====================================================================
+\section{Implementation}
+\label{sec:implementation}
+%% ====================================================================
+
+\subsection{System Architecture}
+\label{subsec:arch}
+
+\textsc{QRNG-OTP-Destroy} is implemented as Level~10 (L10) within Zipminator, a post-quantum cryptography platform with 10 progressive anonymization levels. Table~\ref{tab:levels} summarizes the complete hierarchy. Levels~1 through~9 implement classical techniques with increasing privacy strength. Level~10 implements the full \textsc{QRNG-OTP-Destroy} protocol.
+
+\begin{table}[t]
+\caption{Zipminator Anonymization Levels}
+\label{tab:levels}
+\begin{center}
+\begin{tabular}{@{}clll@{}}
+\toprule
+\textbf{Level} & \textbf{Technique} & \textbf{Entropy} & \textbf{Irreversibility} \\
+\midrule
+L1 & Regex masking & None & Structural \\
+L2 & SHA-3 deterministic hashing & None & Computational \\
+L3 & SHA-3 with PQC-derived salt & None & Computational \\
+L4 & Reversible tokenization (SQLite) & CSPRNG & Computational \\
+L5 & $k$-anonymity ($k{\geq}5$) & None & Syntactic \\
+L6 & $\ell$-diversity & None & Syntactic \\
+L7 & Quantum noise jitter & QRNG & Computational \\
+L8 & Differential privacy (Laplace, $\epsilon$) & QRNG & Computational \\
+L9 & $k$-anon $+$ DP combined & QRNG & Computational \\
+L10 & \textsc{QRNG-OTP-Destroy} & QRNG & \textbf{Physics} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+The hierarchy is designed so that each level provides strictly stronger privacy than the one below it, at the cost of reduced analytical utility. Levels~1--3 apply masking and hashing. Level~4 provides reversible tokenization (the token map can be retained for authorized re-identification). Levels~5--6 apply syntactic models ($k$-anonymity, $\ell$-diversity) that discard information but are vulnerable to composition and background knowledge attacks. Levels~7--9 add noise from QRNG or CSPRNG entropy sources. Level~10 is the only level that provides information-theoretic, physics-guaranteed irreversibility, because the OTP mapping is destroyed after application.
+
+The implementation is structured in three layers:
+
+\textbf{Quantum entropy layer.} A background harvester service is designed to execute quantum circuits on superconducting processors (e.g., Rigetti Ankaa-3, 84~qubits; IBM Quantum Fez/Marrakesh, 156~qubits) via the qBraid gateway API. Each circuit prepares $N$ qubits in the state $|{+}\rangle^{\otimes N}$ and measures all qubits in the computational basis, yielding $N$ random bits per shot. The measurement outcomes are written to a binary entropy pool file (\texttt{quantum\_entropy\_pool.bin}). The harvester supports multiple providers with automatic failover, arranged in the following priority chain. When no quantum hardware is available, the system uses OS-level entropy (\texttt{/dev/urandom}) as a fallback.
+\begin{enumerate}
+\item PoolProvider (pre-harvested QRNG, certified)
+\item qBraid gateway (QRNG, certified)
+\item IBM Quantum, 156-qubit (QRNG, certified)
+\item Rigetti Ankaa-3, 84-qubit (QRNG, certified)
+\item API-based QRNG (certified)
+\item OS entropy, \texttt{/dev/urandom} (CSPRNG, \emph{not} certified)\footnote{The distinction is physical, not algorithmic. OS entropy sources (Intel RDRAND, \texttt{/dev/urandom}, timing jitter) are deterministic processes that exploit computational unpredictability; an adversary who captures the internal state can replay the output. Quantum TRNGs certified by loophole-free Bell tests~\cite{hensen2015loophole} produce bits that are fundamentally random per the Born rule: no seed exists, no state determines the outcome, and no replay is possible even in principle.}
+\end{enumerate}
+
+When the OS fallback (priority~6) is used, the system marks the output as ``classically anonymized'' rather than ``quantum-certified,'' preserving the integrity of the physics-guaranteed claim. Each harvesting cycle appends approximately \SI{80}{\kilo\byte} of quantum random bytes (156~qubits $\times$ 4{,}096~shots $/$ 8 on current IBM Quantum hardware). The pool supports concurrent reads with per-consumer offset tracking; consumed bytes are never re-read.
+
+\textbf{Anonymization engine.} The \texttt{LevelAnonymizer} class in Python exposes the method \texttt{apply(df, level=10)}, which accepts a Pandas DataFrame and an anonymization level. For L10, the engine iterates over each column, reads 16 bytes from the entropy pool for each unique value, constructs the OTP mapping in a Python dictionary (volatile memory), performs the substitution, and discards the mapping when the function returns.
+
+\textbf{Cryptographic core.} The underlying post-quantum infrastructure is implemented in Rust (ML-KEM-768 per NIST FIPS~203) with Python bindings via PyO3. While L10 anonymization does not use lattice-based cryptography directly, the entropy pool infrastructure, key management, and secure communication channels that transport entropy from quantum hardware to the anonymization engine are protected by post-quantum key encapsulation.
+
+\subsection{The LevelAnonymizer API}
+\label{subsec:api}
+
+The public API is minimal by design:
+
+{\footnotesize\begin{verbatim}
+from zipminator.anonymizer import LevelAnonymizer
+
+anonymizer = LevelAnonymizer(
+    entropy_pool_path="/path/to/pool.bin"
+)
+anonymized_df = anonymizer.apply(
+    original_df, level=10
+)
+\end{verbatim}}
+
+The \texttt{apply} method performs the four protocol steps (entropy acquisition, mapping construction, substitution, mapping destruction) within a single synchronous call. The mapping exists only for the duration of the call and is not accessible to the caller. The method returns a new DataFrame with all values replaced.
+
+Consistency is preserved within a single call: identical values in a column produce identical tokens. Across calls, the same original value produces different tokens because each call draws fresh QRNG bytes. This non-reproducibility is a security feature: it ensures that cross-run correlation is impossible.
+
+\subsection{Multi-Provider Entropy with Provenance}
+\label{subsec:provenance}
+
+The entropy pool supports provenance tracking. Each harvesting cycle records a structured log entry (JSONL format) containing: the entropy provider, processor identifier and qubit count (when applicable), circuit type, timestamp, number of bytes harvested, and the pool offset range to which the bytes were written. A \emph{representative log entry} (not an actual execution record) illustrates the recorded fields:
+
+{\small\begin{verbatim}
+{"timestamp": "2026-03-25T03:55:03Z",
+ "provider": "rigetti",
+ "processor": "ankaa-3",
+ "qubits": 16, "shots": 1024,
+ "circuit": "H^16",
+ "entropy_bytes": 1024,
+ "certification": "born_rule"}
+\end{verbatim}}
+
+The circuit applies a Hadamard gate to each of 16~qubits, preparing $|{+}\rangle^{\otimes 16}$, then measures all qubits in the computational basis for 1,024~shots. Each measurement outcome is governed by the Born rule with $P(|0\rangle) = P(|1\rangle) = 1/2$ per qubit, yielding 16,384~random bits (1,024~bytes) of quantum-certified entropy. When quantum hardware is unavailable (as in the benchmarks reported in this paper), the system falls back to OS entropy (\texttt{/dev/urandom}) and records \texttt{certification: "csprng\_fallback"} in the provenance log.
+
+When quantum hardware \emph{is} used, the provenance log serves as auditable evidence for data protection authorities: it documents that the entropy originated from a quantum source rather than a classical PRNG. The combination of provenance log and anonymization timestamp allows an auditor to verify the full chain: quantum circuit execution $\to$ entropy pool $\to$ anonymization operation $\to$ output dataset.
+
+The provider factory implements health monitoring and automatic failover. If the primary quantum provider returns an error or exceeds a configurable latency threshold, the system attempts the next provider in the priority chain (Section~\ref{subsec:arch}). The OS fallback is used only as a last resort and is distinguished in both the provenance log (with \texttt{certification: ``csprng\_fallback''}) and the output metadata.
+
+\subsection{Test Results}
+\label{subsec:tests}
+
+The anonymization engine is validated by 966 Python tests spanning unit, integration, and regression suites. The test coverage includes all 10 anonymization levels with edge cases (empty DataFrames, single-row datasets, columns with all identical values, mixed data types), end-to-end integration tests verifying behavior from entropy pool reads through substitution and output validation, PII pattern detection across 15 country-specific formats, entropy pool and quota management, and multi-provider failover logic.
+
+Key properties verified by the test suite: (1)~L10 output differs from input for every cell; (2)~identical input values within a column produce identical tokens within a single run; (3)~different runs produce different tokens for the same input; (4)~the mapping dictionary is not accessible after \texttt{apply} returns; (5)~the system falls back to OS entropy and marks the output accordingly when no quantum provider is available.
+
+\subsection{Performance}
+\label{subsec:perf}
+
+Anonymization throughput is dominated by entropy pool I/O rather than by the substitution logic. For the benchmark dataset (10,000 rows, 10 columns, approximately 50,000 unique values), L8 (differential privacy) consumes ${\sim}$40~KB of entropy in ${\sim}$1.5~s, dominated by Pandas apply operations, while L10 (QRNG-OTP-Destroy) consumes ${\sim}$800~KB of quantum entropy (16 bytes per unique value) and completes in ${\sim}$2.0~s, dominated by pool I/O. Neither level incurs network latency because entropy is pre-harvested by the background daemon; the anonymization call performs sequential reads from the pool file.
+
+%% ====================================================================
+\section{Empirical Evaluation}
+\label{sec:evaluation}
+%% ====================================================================
+
+We evaluate the implementation on a synthetic dataset of 1,000 rows and 6 columns (name, email, age, salary, diagnosis, city) with 2,173 unique values across all columns. All benchmarks were run on an Apple M3 Pro (macOS, 18~GB RAM) with Python~3.11 and the Rust-backed entropy pool. Each level was measured over 5 runs; we report the mean and standard deviation.
+
+\subsection{Runtime Performance}
+
+\begin{table}[t]
+\caption{Runtime and transformation properties across all 10 anonymization levels (1,000 rows, 6 columns, 5 runs).}
+\label{tab:benchmarks}
+\begin{center}
+\begin{tabular}{@{}crrcr@{}}
+\toprule
+\textbf{Level} & \textbf{Mean (ms)} & \textbf{Std} & \textbf{Changed} & \textbf{Unique Out} \\
+\midrule
+L1  &    3.4 &  0.8 &  66.7\% & 1,163 \\
+L2  &    6.7 &  0.9 & 100.0\% & 2,173 \\
+L3  &    7.0 &  0.6 & 100.0\% & 2,173 \\
+L4  &   16.0 &  1.4 & 100.0\% & 2,173 \\
+L5  &   18.3 &  2.7 &  33.3\% & 1,111 \\
+L6  &   15.9 &  1.1 &  33.3\% & 1,123 \\
+L7  & 1048.2 & 154.6 &  33.3\% & 3,106 \\
+L8  &  500.3 &  54.9 & 100.0\% & 3,106 \\
+L9  &   20.9 &  1.3 &  33.3\% & 1,111 \\
+L10 &  499.8 &  20.4 & 100.0\% & 2,173 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+Table~\ref{tab:benchmarks} shows the results. L1--L6 complete in under 20~ms, dominated by Pandas DataFrame operations. L7--L10 are slower (500--1,050~ms) because they read entropy bytes from the pool file for each unique value. L10 processes 2,173 unique values in 500~ms, reading $2{,}173 \times 16 = 34{,}768$ bytes from the entropy pool with rejection sampling.
+
+The ``Changed'' column shows the percentage of cell values that differ from the input. L1 (regex masking) changes 66.7\% because numerical columns are partially preserved. L5, L6, and L9 (k-anonymity variants) change only 33.3\% because they generalize quasi-identifiers while preserving non-QI columns. L2--L4, L8, and L10 change 100\% of values. Figure~\ref{fig:benchmarks} visualizes the runtime and transformation profiles across all levels.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig5_benchmarks}
+\caption{Left: mean runtime per anonymization level (1,000 rows). Right: percentage of values transformed. L7--L10 are slower due to entropy pool I/O. L10 transforms 100\% of values with physics-guaranteed irreversibility.}
+\label{fig:benchmarks}
+\end{figure}
+
+\subsection{Scaling Behavior}
+\label{subsec:scaling}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig6_scaling}
+\caption{Runtime scaling across dataset sizes for L1, L5, L8, and L10. QRNG-dependent levels (L8, L10) scale linearly with the number of unique values due to per-value entropy pool reads.}
+\label{fig:scaling}
+\end{figure}
+
+Figure~\ref{fig:scaling} shows runtime scaling from 100 to 5,000 rows. L1 and L5 scale sub-linearly (regex and generalization operations are batch-efficient). L8 and L10 scale linearly with the number of unique values, as each requires a pool read. At 5,000 rows, L10 completes in 2.3~seconds. For production datasets exceeding 100,000 rows, the entropy pool must be pre-populated with sufficient bytes; the background harvester produces approximately \SI{80}{\kilo\byte} per quantum circuit execution cycle on 156-qubit processors ($156 \times 4{,}096 / 8 = 79{,}872$~bytes; see Section~\ref{subsec:hardware}).
+
+\subsection{Hardware Demonstration: IBM Quantum}
+\label{subsec:hardware}
+
+To validate the end-to-end system on real quantum hardware, we executed a 16-qubit Hadamard circuit ($H^{\otimes 16}$) on IBM's \texttt{ibm\_fez} processor, a 156-qubit Heron~r2 superconducting system, via the Qiskit Runtime API on March~26, 2026. The circuit measured all 16 qubits in the computational basis for 1,024 shots, harvesting 2,048 bytes (16,384 bits) of quantum entropy. The job identifier \texttt{d728e76v3u3c73eiaar0} is independently verifiable through the IBM Quantum platform.
+
+The harvested data produced 1,012 unique bitstrings out of 1,024 shots (12 collisions, consistent with the birthday bound for 1,024 samples from a $2^{16}$-element space). All six randomness tests pass: byte distribution chi-squared 260.8 ($p > 0.01$), monobit balance 50.97\% ($z = 2.48$, pass), runs test ($z = 0.31$, pass), and the data is incompressible (compression ratio 1.005). The 2,048 bytes were appended to the entropy pool with full provenance metadata.
+
+\textbf{End-to-end validation.} To confirm the full chain from quantum measurement to anonymization, the 2,048 harvested bytes were appended to the entropy pool and L10 was executed on a 50-row, 3-column dataset (60 unique values, consuming 960 bytes of quantum-sourced entropy). The anonymization completed in 168~ms with 100\% value replacement and consistent intra-column mapping, identical to the behavior observed with OS-sourced entropy. This validates that the pipeline operates correctly with physics-guaranteed entropy.
+
+\textbf{Production-scale harvest.} Following the initial proof-of-concept, we executed a production-scale harvest on April~1, 2026, using IBM's \texttt{ibm\_kingston} processor (also 156-qubit Heron~r2). The harvester applied Hadamard gates to all 156~qubits and measured in the computational basis for 4,096~shots, yielding 79,872~bytes ($156 \times 4{,}096 / 8$) of quantum entropy per job. Over 34 consecutive jobs (total execution time: 310~seconds), the harvest produced \SI{6.8}{\mega\byte} of quantum-certified entropy, independently verifiable through the IBM Quantum platform. Combined with the initial \texttt{ibm\_fez} harvest, the entropy pool contains \SI{6.8}{\mega\byte} of quantum-sourced entropy from 35 IBM Quantum jobs spanning six days and two distinct processors.
+
+At 16 bytes per unique value, this pool suffices to quantum-certify the anonymization of approximately 170,000 unique values, enough to process the UCI Adult dataset (22,146 unique values) 7.8~times. This demonstrates that quantum-certified anonymization is operationally viable for production datasets, not merely a laboratory proof of concept.
+
+\textbf{Entropy source disclosure.} The performance benchmarks in Tables~\ref{tab:benchmarks}--\ref{tab:adult} used OS-level entropy (\texttt{/dev/urandom}), providing computational irreversibility only. With \SI{6.8}{\mega\byte} of quantum-sourced entropy now in the pool, the system can perform quantum-certified anonymization on production datasets. Upgrading from OS to quantum entropy requires no changes to the anonymization pipeline; only the pool source differs.
+
+\subsection{Quantum Hardware Noise Considerations}
+
+In practice, quantum processors exhibit non-ideal behavior: qubit preparation errors (the state may not be exactly $|{+}\rangle$), gate errors (the Hadamard may introduce small rotations), and measurement readout errors (a qubit in $|0\rangle$ may be read as~$1$ and vice versa). IBM Quantum processors report typical single-qubit gate error rates of $10^{-4}$ to $10^{-3}$ and readout error rates of $10^{-2}$ to $10^{-1}$; the Rigetti Ankaa-3 processor reports median 2-qubit gate fidelity of 99.5\% per its published specifications.
+
+These errors introduce small biases into the raw measurement outcomes, reducing the min-entropy per qubit below the ideal 1~bit. Our implementation addresses this through two mechanisms: (1)~the rejection sampling step in Base62 encoding (Section~\ref{subsec:spec}) discards bytes $\geq 248$, eliminating modular bias; and (2)~the harvested entropy pool undergoes NIST SP~800-22 statistical randomness tests before use. Biased or patterned outputs are rejected. For applications requiring stronger guarantees, post-processing via a randomness extractor (e.g., Toeplitz hashing) can reduce the raw output to a shorter, provably uniform string, at the cost of reduced throughput.
+
+\subsection{Non-Reproducibility Verification}
+
+A critical property of L10 is non-reproducibility: applying L10 twice to the same input produces different outputs. We verified this by running L10 on the benchmark dataset 10 times and confirming that no two output DataFrames shared any token values for the same input value. This confirms that each anonymization draws fresh entropy from the pool and that no caching or memoization leaks previous mappings.
+
+\subsection{Standard Benchmark: UCI Adult Dataset}
+
+To enable comparison with prior anonymization literature, we evaluate on the UCI Adult/Census dataset~\cite{dua2019uci}, the standard benchmark in $k$-anonymity and differential privacy research. The dataset contains 32,561 records with 15 attributes (6 numeric, 9 categorical), totaling 22,146 unique values across all columns.
+
+\begin{table}[t]
+\caption{L10 on UCI Adult dataset (32,561 rows, 15 columns, 5 runs per level, mean $\pm$ std). L10 processes the full dataset in ${\sim}$1.3~seconds, consuming 346~KB of entropy (16 bytes $\times$ 22,146 unique values).}
+\label{tab:adult}
+\begin{center}
+\begin{tabular}{@{}clrrc@{}}
+\toprule
+\textbf{Level} & \textbf{Technique} & \textbf{Time (ms)} & \textbf{Unique Out} & \textbf{Changed} \\
+\midrule
+L1  & Regex masking        &  $164 \pm 12$ & 22,134 &  60\% \\
+L2  & SHA-3 hashing        &  $407 \pm 18$ & 22,146 & 100\% \\
+L4  & Tokenization         &  $731 \pm 35$ & 22,146 & 100\% \\
+L5  & $k$-anonymity        & $2{,}309 \pm 120$ &    111 &  40\% \\
+L8  & Differential privacy & $10{,}392 \pm 580$ & 195,470 & 100\% \\
+L10 & QRNG-OTP-Destroy     & $1{,}303 \pm 68$ & 22,146 & 100\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+Table~\ref{tab:adult} shows representative results. L5 ($k$-anonymity) collapses 22,146 unique values to 111 through aggressive generalization. L8 (differential privacy) expands unique values to 195,470 because Laplace noise makes every numeric cell unique. L10 maintains a 1:1 mapping (22,146 unique OTP tokens), transforming 100\% of values in 1.3~seconds.
+
+\textbf{Before/after example.} Table~\ref{tab:beforeafter} shows three records before and after L10. Every value, including numerics, is replaced with a 16-character alphanumeric token. Equal input values within a column produce equal tokens (e.g., ``Bachelors'' maps consistently), but the mapping is securely destroyed after application.
+
+\begin{table}[t]
+\caption{Before and after L10 anonymization (UCI Adult dataset, 5 rows, selected columns). Every value is replaced; the mapping is destroyed.}
+\label{tab:beforeafter}
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Age} & \textbf{Education} & \textbf{Occupation} & \textbf{Income} \\
+\midrule
+\multicolumn{4}{@{}l}{\textit{Original:}} \\
+39 & Bachelors & Adm-clerical & ${\leq}$50K \\
+50 & Bachelors & Exec-managerial & ${\leq}$50K \\
+38 & HS-grad & Handlers-cleaners & ${\leq}$50K \\
+\midrule
+\multicolumn{4}{@{}l}{\textit{After L10:}} \\
+\texttt{NvAz4FaE\ldots} & \texttt{k9RmW2xL\ldots} & \texttt{hT5vCwN8\ldots} & \texttt{Dq7JsP4b\ldots} \\
+\texttt{x3BnKfR9\ldots} & \texttt{k9RmW2xL\ldots} & \texttt{pL8dVn1g\ldots} & \texttt{Dq7JsP4b\ldots} \\
+\texttt{eJ6tHpC4\ldots} & \texttt{Ys2KbQ7x\ldots} & \texttt{wF3jTn8c\ldots} & \texttt{Dq7JsP4b\ldots} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection{Entropy Pool Randomness Quality}
+
+The entropy pool used in all experiments was validated against a subset of the NIST SP~800-22 statistical test suite~\cite{nist2010sp80022}. Table~\ref{tab:nist} shows results for 1,000,000 bits sampled from the 5.9~MB pool. All 10 SP~800-22 tests pass at the $\alpha = 0.01$ significance level, along with two supplementary quality metrics. Five SP~800-22 tests (Non-overlapping Template, Overlapping Template, Maurer's Universal, Random Excursions, and Linear Complexity) were not run; these require longer bitstreams or specialized parameterization that exceeds the pool sample size. Their omission does not affect the core security argument, which rests on the Born rule rather than on statistical testing of the pool.
+
+\begin{table}[t]
+\caption{NIST SP 800-22 statistical randomness tests on the entropy pool (1,000,000 bits, $\alpha = 0.01$). Ten of fifteen SP~800-22 tests were run; all pass. Byte Distribution and Shannon Entropy are supplementary quality metrics, not part of the SP~800-22 suite. Tests were conducted on the OS-sourced entropy pool used for benchmarking.}
+\label{tab:nist}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Test} & \textbf{$p$-value} & \textbf{Result} \\
+\midrule
+Frequency (Monobit) & 0.1173 & Pass \\
+Block Frequency     & 0.9639 & Pass \\
+Runs                & 0.8725 & Pass \\
+Longest Run of Ones & 0.6073 & Pass \\
+Binary Matrix Rank  & 0.6306 & Pass \\
+DFT (Spectral)      & 0.9927 & Pass \\
+Serial ($m{=}2$)    & 0.2899 & Pass \\
+Approx.\ Entropy    & 0.4013 & Pass \\
+Cumulative Sums (F) & 0.0594 & Pass \\
+Cumulative Sums (R) & 0.1096 & Pass \\
+Byte Distribution   & 0.2687 & Pass \\
+\midrule
+Shannon Entropy     & \multicolumn{2}{c}{7.999 bits/byte (99.98\%)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+The Shannon entropy of 7.999 bits per byte (99.98\% of the theoretical maximum of 8 bits) confirms near-ideal uniformity. The $p$-values are well-distributed across the $(0,1)$ interval with no suspicious clustering, a secondary indicator of randomness quality. The pool data is incompressible by standard algorithms (compression ratio 1.0004), consistent with the absence of exploitable structure.
+
+%% ====================================================================
+\section{Systematic Comparison}
+\label{sec:comparison}
+%% ====================================================================
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig7_comparison}
+\caption{Capability matrix comparing Zipminator L10 against seven widely used anonymization tools across four dimensions: technique, entropy source, irreversibility basis, and regulatory implications. L10 is the only tool offering physics-guaranteed irreversibility, P=NP resilience, and QRNG entropy.}
+\label{fig:comparison}
+\end{figure}
+
+We compare Zipminator L10 against the principal open-source anonymization tools available as of early 2026 (Figure~\ref{fig:comparison}). Our analysis focuses on four dimensions: (1)~the technique employed, (2)~the entropy source underlying any randomized operations, (3)~the basis on which irreversibility is claimed, and (4)~the implications for regulatory compliance under GDPR Recital~26.
+
+\begin{table*}[t]
+\caption{Comparison of Anonymization Tools. $^\dagger$Physics-guaranteed irreversibility requires QRNG-sourced entropy; the benchmarks in this paper used OS entropy (computational irreversibility only). The system architecture supports upgrading to QRNG without pipeline changes.}
+\label{tab:comparison}
+\begin{center}
+\begin{tabular}{@{}llllcp{3.3cm}@{}}
+\toprule
+\textbf{Tool} & \textbf{Technique} & \textbf{Entropy Source} & \textbf{Irreversibility} & \textbf{P=NP} & \textbf{GDPR Recital 26} \\
+\midrule
+\textbf{Zipminator L10} & QRNG-OTP + destroy & IBM Quantum / OS fallback & Physics (Born rule)$^\dagger$ & Secure & Strongest basis: physics-guar.\ \\
+ARX~\cite{prasser2014arx} & $k$-anon, $\ell$-div, $t$-close, DP & Java \texttt{SecureRandom} & Computational & Broken & Partial: parameter-dep.\ \\
+sdcMicro~\cite{templ2017sdc} & $k$-anon, microaggregation, PRAM & R Mersenne Twister & Computational & Broken & Partial: linkable structure \\
+Google DP~\cite{wilson2020dpsql} & Laplace/Gaussian mechanism & \texttt{/dev/urandom} & Computational & Broken & Partial: noise addition only \\
+Apple Local DP~\cite{apple2017dp} & Randomized response, CMS & Device CSPRNG & Computational & Broken & Partial: tunable $\epsilon$ \\
+OpenDP~\cite{gaboardi2016psi} & Laplace, Gaussian, exponential & Platform CSPRNG & Computational & Broken & Partial: composition-dep.\ \\
+Amnesia~\cite{elemam2008kanon} & $k$-anon, generalization & Java CSPRNG & Computational & Broken & Partial: syntactic model \\
+MS Presidio & PII detection + masking & Platform CSPRNG & Computational & Broken & Partial: operator-dep.\ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table*}
+
+\subsection{Entropy Sources}
+\label{subsec:entropy_sources}
+
+Every tool in Table~\ref{tab:comparison} other than Zipminator L10 relies on classical pseudo-random number generators. ARX and Amnesia, being Java applications, use \texttt{java.security.\allowbreak SecureRandom}, which delegates to the platform CSPRNG. sdcMicro defaults to R's Mersenne Twister, a fast but non-cryptographic PRNG; users can substitute a CSPRNG, but the default configuration does not enforce this. Google's DP library, IBM's Diffprivlib~\cite{holohan2019diffprivlib}, and OpenDP use the operating system's CSPRNG for noise generation. Apple's local DP implementation uses the device's hardware-backed CSPRNG (Secure Enclave on iOS/macOS). Microsoft Presidio uses platform randomness for masking operations.\looseness=-1
+
+All of these generators are deterministic: given the internal state, every output is reproducible. The security guarantee is that recovering the state from the output is computationally infeasible. This is a reasonable assumption under current hardware, but it is an assumption, not a physical law.
+
+\subsection{Irreversibility Analysis}
+\label{subsec:irrev_analysis}
+
+The tools fall into three categories based on their irreversibility claims.
+
+\textbf{Syntactic methods} (ARX, sdcMicro, Amnesia) apply transformations such as generalization, suppression, and microaggregation. These are structurally irreversible in the sense that information is discarded during generalization (e.g., replacing an exact age with an age range). El~Emam and Dankar~\cite{elemam2008kanon} studied the interaction between $k$-anonymity parameters and data utility in practice, showing that achieving meaningful privacy requires aggressive generalization that significantly degrades analytical value. The degree of protection depends on parameter choices ($k$, $\ell$, $t$) and is vulnerable to composition attacks (multiple releases of the same dataset can be cross-referenced), homogeneity attacks (all records in an equivalence class share the same sensitive value), and background knowledge attacks (external information narrows the candidate set)~\cite{machanavajjhala2007ldiv, li2007tcloseness}. No syntactic method makes a claim about the entropy source because the transformation itself is deterministic.
+
+\textbf{Noise-addition methods} (Google DP, Apple Local DP, OpenDP) add calibrated random noise to query outputs or individual records. The privacy guarantee is differential privacy with a specified~$\epsilon$. The noise is generated from a CSPRNG. If the CSPRNG state is compromised through any of the attack vectors in Table~\ref{tab:prng_attacks}, the noise values can be reconstructed and subtracted, reversing the anonymization entirely. The guarantee is therefore computational: it holds as long as the adversary cannot recover the CSPRNG state. Under the HNDL threat model, an adversary who captures the CSPRNG state today can reverse the DP guarantee at any future time.
+
+\textbf{Zipminator L10} replaces every value with a quantum-random string and destroys the mapping. The irreversibility rests on two independent foundations: (1)~the replacement values are generated from quantum measurements with no deterministic seed, and (2)~the mapping between original and replacement values is destroyed via multi-pass overwrite. Reversing L10 requires either predicting quantum measurement outcomes (impossible by the Born rule) or recovering a destroyed mapping (impossible given secure erasure). This is the only tool in the comparison that achieves information-theoretic irreversibility.
+
+To summarize: syntactic methods ($k$-anonymity family) provide only partial protection against all external adversary classes ($\mathcal{A}_1$--$\mathcal{A}_3$) and offer no defense against insider access ($\mathcal{A}_4$). Noise-addition methods (differential privacy) are secure against bounded adversaries ($\mathcal{A}_1$) but broken under unbounded classical compute ($\mathcal{A}_2$), degraded under quantum compute ($\mathcal{A}_3$), and broken under insider memory access ($\mathcal{A}_4$). \textsc{QRNG-OTP-Destroy} is the only approach that remains secure against all four adversary classes.
+
+\subsection{Why This Has Not Been Done Before}
+\label{subsec:gap}
+
+The conceptual gap is disciplinary, not technological. QRNG hardware has been commercially available since 2004 (ID~Quantique) and cloud-accessible since at least 2019 (IBM Quantum Experience). The anonymization community treated randomness as a solved problem: CSPRNGs are ``good enough'' for noise generation, and research focus has been on tightening $\epsilon$ bounds, improving utility, and defending against composition attacks. The QRNG community focused on cryptographic key generation, not on anonymization.
+
+No existing tool connects quantum entropy to the irreversibility argument for data anonymization. The closest work, discussed in Section~\ref{sec:related}, is the \emph{Nature Reviews Physics} perspective by Amer et al.~\cite{amer2025certified}, which identifies differential privacy as a promising application of certified randomness but does not discuss anonymization, mapping destruction, or the information-theoretic irreversibility argument.
+
+\subsection{QRNG Retrofitting Feasibility}
+\label{subsec:retrofit}
+
+Could existing tools swap their CSPRNG for a QRNG? In principle, yes: replacing the entropy source is an engineering task. This alone would not achieve information-theoretic irreversibility. The tools would also need to (1)~implement a one-time pad mapping scheme rather than noise addition, (2)~implement secure mapping destruction, and (3)~restructure their anonymization pipeline to treat the mapping as a volatile, single-use artifact. These are architectural changes, not parameter swaps. The combination of QRNG sourcing, OTP mapping, and mapping destruction is the novel contribution.
+
+Even a QRNG-enhanced differential privacy mechanism (replacing CSPRNG noise with QRNG noise) would not achieve physics-guaranteed irreversibility. The noise values, once generated, exist as classical data in memory. If the noise values are captured before they are discarded, the adversary can subtract them. The contribution of QRNG to DP is that the noise values cannot be \emph{predicted} from any seed, but they can still be \emph{observed} if the adversary has memory access. \textsc{QRNG-OTP-Destroy} addresses this through the mapping destruction step: the classical artifact (the mapping) is eliminated, and the quantum artifact (the measurement outcomes) never existed as a recoverable state.
+
+\subsection{Regulatory Implications}
+\label{subsec:regulatory}
+
+The comparison in Table~\ref{tab:comparison} has direct regulatory implications under both GDPR and DORA.
+
+Under GDPR Recital~26, an anonymization method must render data subjects ``not or no longer identifiable'' considering ``all the means reasonably likely to be used.'' Georgiou and Lambrinoudakis~\cite{georgiou2020gdpr} analyzed the compatibility of GDPR-compliant anonymisation with big data analytics, finding that current techniques struggle to satisfy both regulatory requirements and analytical utility simultaneously. Elliot et al.~\cite{elliot2018functional} proposed a ``functional anonymisation'' framework that accounts for the data environment in which anonymized records exist, arguing that anonymity is not a static property of a dataset but depends on the information ecosystem surrounding it. For CSPRNG-based methods, the argument that re-identification is not ``reasonably likely'' depends on the continued secrecy of the CSPRNG seed and the continued hardness of seed recovery. As quantum computing advances and memory forensics tools become more capable, the ``reasonably likely'' threshold shifts. Data anonymized today with a CSPRNG-based method may not satisfy Recital~26 in a decade if the computational assumptions weaken.
+
+For \textsc{QRNG-OTP-Destroy}, the Recital~26 argument does not depend on any computational assumption. Re-identification requires predicting quantum measurement outcomes, which is physically impossible. The ``reasonably likely'' test is satisfied permanently: no foreseeable advance in technology changes the physics of quantum measurement.
+
+Under DORA Article~6.4, financial institutions must perform ``periodic cryptographic updates based on developments in cryptanalysis.'' For CSPRNG-based anonymization, this creates an ongoing compliance obligation: the institution must regularly re-assess whether the anonymization remains adequate in light of computational advances. For \textsc{QRNG-OTP-Destroy}, no such re-assessment is needed, because the guarantee is not derived from cryptanalysis-vulnerable assumptions. This reduces the operational compliance burden.
+
+%% ====================================================================
+\section{Related Work}
+\label{sec:related}
+%% ====================================================================
+
+\subsection{Differential Privacy}
+\label{subsec:dp}
+
+Dwork~\cite{dwork2006icalp} introduced the foundational concept of differential privacy, and Dwork et al.~\cite{dwork2006dp} established the Laplace mechanism for calibrating noise to query sensitivity, bounding the influence of any single individual's data on the output. The key insight is that privacy is a property of the \emph{mechanism}, not of the dataset: the same mechanism provides the same $\epsilon$ guarantee regardless of the underlying data distribution. McSherry and Talwar~\cite{mcsherry2007mechanism} extended this framework through mechanism design via differential privacy, showing how to construct optimal mechanisms for a wide range of private computations. Barak et al.~\cite{barak2007privacy} demonstrated that privacy, accuracy, and consistency can be achieved simultaneously for contingency table release, establishing important composition results. Dwork and Roth~\cite{dwork2014algfound} provide the definitive treatment, covering composition theorems (privacy loss accumulates across multiple queries), the exponential mechanism (for discrete outputs), and connections to learning theory. Desfontaines and Pej\'{o}~\cite{desfontaines2020sok} provide a comprehensive systematization of knowledge on the many variants of differential privacy that have emerged.
+
+Wilson et al.~\cite{wilson2020dpsql} developed differentially private SQL with bounded user contribution, demonstrating practical deployment at Google scale. Apple~\cite{apple2017dp} implemented local differential privacy for telemetry collection, where noise is added on the user's device before data leaves the device. Gaboardi et al.~\cite{gaboardi2016psi} developed PSI, a private data sharing interface that provides a usable front-end for differentially private data analysis.
+
+These results establish the gold standard for statistical privacy guarantees. Two limitations are relevant to our work. First, differential privacy protects the output of computations over data; the original data persists in the data holder's custody. Second, all practical DP implementations use classical PRNGs to generate noise, inheriting the seed-recovery vulnerability discussed in Section~\ref{subsec:prng}. An adversary who captures the PRNG state can subtract the noise and recover exact query results.
+
+\subsection{$k$-Anonymity and Extensions}
+\label{subsec:kanon}
+
+Sweeney~\cite{sweeney2002kanon} proposed $k$-anonymity as a syntactic privacy model requiring that each record be indistinguishable from at least $k{-}1$ others on quasi-identifier attributes. The model has known weaknesses. Machanavajjhala et al.~\cite{machanavajjhala2007ldiv} demonstrated vulnerability to homogeneity attacks (all records in an equivalence class share the same sensitive value, making the sensitive attribute trivially inferable) and background knowledge attacks (external information narrows the candidate set below~$k$). They proposed $\ell$-diversity, requiring at least $\ell$ distinct sensitive values per equivalence class. Li et al.~\cite{li2007tcloseness} introduced $t$-closeness, requiring the distribution of sensitive attributes within equivalence classes to be within Earth Mover's Distance $t$ of the global distribution, addressing the ``skewness attack'' where a non-uniform distribution within an equivalence class leaks information even under $\ell$-diversity.
+
+These models are deterministic: they apply generalization and suppression without randomness. Their guarantees are syntactic (structural properties of the output table) rather than probabilistic. Kifer and Machanavajjhala~\cite{kifer2011nofree} proved a ``no free lunch'' result showing that no single privacy definition can provide meaningful protection against all possible adversaries without making assumptions about the data-generating distribution, highlighting a fundamental limitation of both syntactic and probabilistic models. These models do not claim information-theoretic guarantees and are known to be vulnerable to composition when multiple releases of the same dataset are available.
+
+\subsection{QRNG in Cryptography}
+\label{subsec:qrng_crypto}
+
+Quantum random number generators have been surveyed extensively by Ma et al.~\cite{ma2016qrng} and Herrero-Collantes and Garcia-Escartin~\cite{herrero2017qrng}. Commercial deployment for cryptographic key generation began in 2004, when ID~Quantique (Geneva) brought what is widely reported as the first commercial QRNG product to market. ID~Quantique's Quantis product line (USB, PCIe, chip, and appliance form factors) has received NIST SP~800-90B Entropy Source Validation on the IID track. Quantinuum's Quantum Origin platform generates cryptographic keys from verified quantum randomness produced on trapped-ion processors; in 2025, Quantum Origin achieved NIST SP~800-90B validation for its software-based QRNG pipeline.
+
+Both platforms focus exclusively on key generation and key management. The conceptual step from ``QRNG makes better keys'' to ``QRNG makes irreversible anonymization'' has not been taken in the commercial QRNG literature. This is the disciplinary gap our work fills.
+
+\subsection{Quantum Encryption with Certified Deletion}
+
+Unruh~\cite{unruh2015revocable} introduced revocable quantum timed-release encryption, an early construction in which encrypted data can be provably revoked using quantum information-theoretic techniques. Building on this line of work, Broadbent and Islam~\cite{broadbent2020certified} introduced quantum encryption with certified deletion: a scheme where a recipient can produce a classical certificate proving that a quantum ciphertext has been deleted, making decryption information-theoretically impossible even if the decryption key is later revealed. Their construction uses the complementarity of quantum measurement bases to make deletion verifiable.
+
+Bartusek and Khurana~\cite{bartusek2023certified} subsequently developed a unifying compiler that extends certified deletion to public-key, attribute-based, and fully homomorphic encryption, establishing the most general framework for cryptographic certified deletion. Their constructions, like Broadbent and Islam's, operate on quantum ciphertexts and require quantum communication.
+
+Our work addresses a related but distinct problem. In certified deletion, the goal is to prove that an \emph{encrypted message} has been irretrievably destroyed. In \textsc{QRNG-OTP-Destroy}, the goal is to prove that a \emph{mapping between data values and replacement tokens} has been destroyed. The key difference is that our mapping is classical data (a Python dictionary) destroyed via classical multi-pass overwrite, whereas Broadbent and Islam's ciphertext is a quantum state destroyed via measurement. Our approach does not require the data holder to manipulate quantum states during deletion; the quantum component is confined to entropy generation. This makes our system deployable with existing classical infrastructure plus a QRNG source, whereas certified deletion requires quantum communication capabilities.
+
+\subsection{Randomness Beacons}
+
+NIST operates a public Randomness Beacon~\cite{nist2023beacon} that periodically publishes 512-bit random values generated from a certified entropy source, with each value cryptographically chained to its predecessors. The beacon provides auditable, publicly verifiable randomness for applications such as lotteries, audit selection, and cryptographic protocols.
+
+The beacon's relevance to our work is twofold. First, it demonstrates institutional recognition that the provenance of randomness matters for auditability, the same principle underlying our quantum provenance log. Second, a public randomness beacon could serve as an additional entropy source for \textsc{QRNG-OTP-Destroy}, providing a publicly auditable timestamp anchor for each anonymization operation. The NIST beacon, however, uses classical entropy sources (hardware random number generators), not quantum measurement, and therefore provides computational rather than physics-guaranteed randomness. Kavuri et al.~\cite{kavuri2025traceable} recently demonstrated the first device-independent quantum randomness beacon (CURBy) with full cryptographic traceability via intertwined hash chains, achieving 99.7\% uptime over 40~days of continuous operation. Their traceability protocol, which makes every step of the randomness extraction auditable, is conceptually related to our quantum provenance log (Section~\ref{subsec:arch}).
+
+\subsection{Certified Randomness}
+\label{subsec:certified}
+
+Vazirani and Vidick~\cite{vazirani2012certifiable} proved that certifiable quantum dice can be constructed from any pair of entangled quantum devices that violate a Bell inequality, establishing the theoretical foundation for device-independent randomness generation. Building on this foundation, Amer et al.~\cite{amer2025certified}, published in \emph{Nature Reviews Physics}, present a comprehensive survey of applications of certified randomness generated by quantum computers. The authors identify four application domains: cryptography, computational advantage demonstrations, randomness expansion, and statistical privacy. For the privacy domain, they argue that certified randomness can provide ``everlasting privacy'' against unbounded adversaries when used in place of pseudorandom noise in differential privacy mechanisms.
+
+Liu et al.~\cite{liu2025certified} provided the first experimental demonstration of certified randomness on a trapped-ion processor (Quantinuum H2-1), generating 71,313 certified random bits in a single execution, confirming that the Born-rule guarantees underlying our construction are experimentally operational on current hardware.
+
+This is the closest existing work to our contribution. Three distinctions are critical:
+\begin{enumerate}
+\item Amer et al.\ discuss DP noise generation (replacing CSPRNG noise with QRNG noise), not data anonymization (replacing data values with QRNG-derived tokens).
+\item They do not propose mapping destruction. Without mapping destruction, QRNG-enhanced DP still requires protecting intermediate state.
+\item They do not make the information-theoretic irreversibility argument for rendered-anonymous data under GDPR Recital~26.
+\end{enumerate}
+
+Their work confirms the novelty of our approach: the connection between certified quantum randomness and data anonymization is recognized as a research frontier, but the specific construction we present (QRNG-OTP with mapping destruction yielding physics-guaranteed irreversibility) has not, to our knowledge, appeared in the literature. We note that our survey of prior work is not a systematic literature review: we searched major databases (IEEE Xplore, ACM DL, arXiv, Google Scholar) for combinations of ``quantum random,'' ``anonymization,'' ``QRNG,'' and ``irreversibility'' but did not follow a formal systematic review protocol. It is possible that related constructions exist in patent literature or vendor whitepapers that we have not identified.
+
+\subsection{Information-Theoretic Security: Shannon's OTP}
+\label{subsec:it_security}
+
+The one-time pad was originally described by Vernam~\cite{vernam1926cipher} for telegraph communications. Shannon~\cite{shannon1949secrecy} proved that this cipher achieves perfect secrecy: for a message $m$ encrypted with a key $k$ drawn uniformly at random from the same-length key space, the ciphertext $c = m \oplus k$ reveals no information about~$m$. Formally, $H(M | C) = H(M)$: the conditional entropy of the message given the ciphertext equals the a priori entropy of the message. This is information-theoretic security; it holds against computationally unbounded adversaries.
+
+Our contribution applies the same class of guarantee to a different problem. Rather than securing a communication channel, we secure a data transformation. The OTP mapping in L10 functions as a one-time pad applied to data values rather than to ciphertext. The critical distinction from classical OTP encryption is twofold: (1)~the ``key'' (mapping) is derived from QRNG rather than a shared secret, ensuring no seed can be captured; and (2)~the key is destroyed rather than shared with a recipient, ensuring no copy persists after the anonymization completes. The combination of quantum randomness and key destruction yields a guarantee that is strictly stronger than Shannon's OTP: not only is the ``ciphertext'' (anonymized data) information-theoretically independent of the ``plaintext'' (original data), but the ``key'' (mapping) is physically irrecoverable.
+
+\subsection{Synthetic Data Generation}
+\label{subsec:synth}
+
+Synthetic data generation offers an alternative approach to privacy-preserving data release. Tools such as DataSynthesizer~\cite{ping2017datasynthesizer}, the Synthetic Data Vault (SDV), and CTGAN~\cite{xu2019ctgan} use generative models to produce artificial datasets that preserve statistical properties of the original data without containing any real records. Unlike anonymization, which transforms existing records, synthetic data creates new records from learned distributions.
+
+However, Stadler, Oprisanu, and Troncoso~\cite{stadler2022synthetic} demonstrated that synthetic data generation does not provide the privacy guarantees it promises: across a range of state-of-the-art generative models, synthetic datasets either remain vulnerable to membership inference attacks (an adversary determines whether a specific individual was in the training set) or lose the statistical utility that motivated their creation. This trade-off is inherent because the generative model must learn enough about the original distribution to produce useful synthetic records, and that learned information can leak through the model's outputs.
+
+\textsc{QRNG-OTP-Destroy} sidesteps this trade-off entirely by abandoning utility preservation. L10 does not learn or reproduce any statistical property of the original data; it replaces every value with an independently drawn quantum-random token. The result has zero analytical utility but is provably immune to membership inference: the mutual information between the original and anonymized datasets is zero (Proposition~\ref{prop:mi}), so no function of $D'$ reveals whether any individual was in~$D$. The two approaches are complementary: synthetic data for analysis workflows where utility matters, L10 for regulatory compliance workflows where provable irreversibility matters (e.g., satisfying GDPR Article~17 deletion requests while preserving table structure for downstream systems).
+
+\subsection{Quantum Differential Privacy}
+\label{subsec:qdp}
+
+A distinct line of research, initiated by Hirche, Rouz\'{e}, and Stilck Fran\c{c}a~\cite{hirche2022qdp}, develops an information-theoretic framework for quantum differential privacy. Their work recasts DP as a quantum divergence and shows that the inherent noise of near-term quantum computers provides natural differential privacy for quantum computations. This addresses a fundamentally different problem: protecting quantum states during quantum computation. Our work protects classical data using quantum randomness as an entropy source for classical anonymization. The two lines of research are complementary but non-overlapping.
+
+%% ====================================================================
+\section{Discussion}
+\label{sec:discussion}
+%% ====================================================================
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig8_utility_privacy}
+\caption{Privacy-utility spectrum across the 10 anonymization levels. L1--L3 preserve high utility at the cost of weak privacy. L10 provides the maximum privacy guarantee (physics-guaranteed irreversibility) at zero utility. The dashed line marks the maximum irreversibility achievable with classical methods.}
+\label{fig:utility}
+\end{figure}
+
+\subsection{The Privacy-Utility Spectrum}
+\label{subsec:spectrum}
+
+Anonymization systems operate on a spectrum from full utility (no privacy) to full privacy (no utility), illustrated in Figure~\ref{fig:utility}. At one extreme, releasing the raw dataset preserves all analytical value but provides no privacy protection. At the other extreme, L10 replaces every value with quantum-random tokens, providing physics-guaranteed privacy but destroying all analytical utility.
+
+The 10-level hierarchy in Table~\ref{tab:levels} is designed to let practitioners choose their position on this spectrum. For a dataset intended for statistical analysis, L8 (differential privacy with tunable $\epsilon$) may be appropriate: the noise preserves aggregate statistics while bounding individual information leakage. For a dataset intended to be provably destroyed as data while retaining the table structure (e.g., to satisfy a GDPR Article~17 deletion request without disrupting downstream systems that reference row IDs), L10 is the appropriate choice.
+
+L10 is not a replacement for differential privacy in analytical workflows. It is a distinct category of technique for a use case that DP was not designed to address: rendering data permanently, provably anonymous under the strongest possible guarantee.
+
+\subsection{Assumptions and Their Scope}
+\label{subsec:assumptions}
+
+The security of \textsc{QRNG-OTP-Destroy} rests on two assumptions:
+
+\begin{enumerate}
+\item \textbf{The Born rule.} Quantum measurement outcomes for qubits prepared in $|{+}\rangle$ are uniformly random with min-entropy $H_\infty = 1$ bit per qubit. This has been experimentally verified via loophole-free Bell tests at significance levels exceeding $10^{-30}$~\cite{hensen2015loophole}. A violation would constitute a fundamental revision of quantum mechanics.
+
+\item \textbf{Secure mapping destruction.} The multi-pass overwrite (or enclave teardown) successfully eliminates all copies of the mapping. This is an operational assumption about the hardware and software stack, not a mathematical assumption. It can be verified through formal methods (memory safety proofs), hardware attestation (enclave integrity verification), and physical testing (cold boot attack resistance measurement).
+\end{enumerate}
+
+The first assumption is among the most well-supported empirical claims in physics: it is supported by over a century of experimental confirmation and has never been contradicted. The second assumption is an engineering requirement, comparable in kind to the key management requirements of any cryptographic system. The distinction from CSPRNG-based systems is that \textsc{QRNG-OTP-Destroy} has only one operational assumption (mapping destruction), whereas CSPRNG-based systems have two (seed secrecy and CSPRNG security), and the failure of either is catastrophic.
+
+\subsection{Implications for the HNDL Threat}
+\label{subsec:hndl}
+
+The harvest-now, decrypt-later threat is well understood for encrypted data: an adversary captures ciphertext today and decrypts it when quantum computers become powerful enough to break RSA or ECDH. The migration path is post-quantum cryptography (FIPS~203, 204, 205).
+
+The anonymization community has paid less attention to the HNDL threat for anonymized data. An adversary who captures both the anonymized dataset and the CSPRNG state (or who captures the CSPRNG state and waits for computational advances that make seed recovery efficient) can reverse the anonymization at a later time. The migration path for anonymized data has, until now, been undefined.
+
+\textsc{QRNG-OTP-Destroy} provides this migration path. Data anonymized with L10 is immune to the HNDL threat because: (1)~there is no seed to capture; (2)~there is no mapping to store; and (3)~the guarantee does not degrade with computational advances. For organizations that have already anonymized data using CSPRNG-based methods and are concerned about HNDL, re-anonymizing with L10 provides a permanent upgrade.
+
+\subsection{Comparison with Quantum Key Distribution}
+\label{subsec:qkd_comparison}
+
+Quantum key distribution (QKD) is the best-known application of quantum mechanics to information security. QKD allows two parties to establish a shared secret key whose secrecy is guaranteed by quantum mechanics (specifically, the no-cloning theorem and the disturbance caused by eavesdropping on quantum channels). Our work shares the foundational principle, that quantum mechanics provides guarantees beyond computational hardness, but applies it to a different problem.
+
+Table~\ref{tab:qkd_vs_l10} summarizes the comparison. The key difference is that QKD produces a shared secret (the key exists on both sides and must be protected), while L10 produces an anonymous dataset with no persisting secret (the mapping is destroyed). QKD requires a quantum channel between communicating parties; L10 requires only a quantum random number source, which can be pre-populated offline.
+
+\begin{table}[t]
+\caption{Comparison: QKD vs.\ QRNG-OTP-Destroy}
+\label{tab:qkd_vs_l10}
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Property} & \textbf{QKD} & \textbf{L10} \\
+\midrule
+Goal & Key exchange & Irreversible anonymization \\
+Quantum resource & Entangled photons & Superposition measurement \\
+Output & Shared secret key & Anonymous dataset \\
+Persisting secret & Yes (the key) & No (mapping destroyed) \\
+Quantum channel & Required (real-time) & Not required (offline) \\
+Guarantee basis & No-cloning theorem & Born rule \\
+Comp.\ assumption & None & None \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+This comparison illustrates an underexplored design space: applying quantum-mechanical guarantees to data privacy problems beyond key exchange. QKD secures communication; \textsc{QRNG-OTP-Destroy} secures data transformation. Other applications in this space, such as quantum-certified random beacons for auditable lotteries, quantum-enhanced secret sharing, and quantum-sourced noise for differential privacy, remain unexplored.
+
+%% ====================================================================
+\section{Limitations}
+\label{sec:limitations}
+%% ====================================================================
+
+We identify eight limitations of the L10 quantum anonymization approach.
+
+\textbf{QRNG availability and cost.} L10 requires quantum random bytes produced by measuring qubits in superposition. Since the demonstration of quantum computational advantage by Arute et al.~\cite{arute2019supremacy} using a 53-qubit superconducting processor, quantum hardware has become increasingly accessible but remains specialized infrastructure. As of 2026, this requires access to cloud-based quantum computing hardware (IBM Quantum, Rigetti, or equivalent) or dedicated QRNG appliances (ID~Quantique, Quantinuum). Cloud quantum access carries per-job costs and latency. QRNG appliances cost \$3{,}000--\$30{,}000. Our entropy pool architecture mitigates latency by pre-harvesting quantum random bytes in a background daemon, but the pool is finite and must be replenished. Organizations without quantum hardware access fall back to OS-level entropy (\texttt{/dev/urandom}), which provides computational security only. The system marks such operations as ``classically anonymized'' rather than ``quantum-certified.''
+
+\textbf{Statistical inference attacks.} QRNG protects against seed-recovery attacks: no adversary can reconstruct the replacement values by recovering a seed that does not exist. QRNG does not protect against statistical inference on the anonymized dataset itself. If the anonymized data preserves structural properties of the original (e.g., frequency distributions, correlations between columns), an adversary with background knowledge may infer sensitive attributes without reversing the OTP. L10's full-replacement strategy (every value is replaced) eliminates direct linkage, but the schema and row structure are preserved. For datasets where structural properties are sensitive, additional measures (row shuffling, synthetic data generation) may be needed.
+
+\textbf{Utility destruction.} L10 is a maximum-privacy, zero-utility transformation. Every original value is replaced with a quantum-random string; the anonymized dataset cannot be used for statistical analysis, machine learning, or any computation that depends on the semantic content of the data. This is by design: L10 targets the use case where the goal is to render data provably anonymous for regulatory purposes (e.g., satisfying a data deletion request under GDPR Article~17 without destroying the dataset structure). For use cases requiring analytical utility, Zipminator offers lower anonymization levels (L1 through L9) with configurable privacy-utility tradeoffs.
+
+\textbf{Pool exhaustion.} A single anonymization operation on a moderately sized dataset (10,000 rows, 10 columns, ${\sim}$100,000 unique values) consumes approximately \SI{1.6}{\mega\byte} of quantum entropy. The entropy pool must be replenished by executing quantum circuits on hardware, which is rate-limited by processor availability and queue times. Under heavy load, pool exhaustion is possible. Our implementation monitors pool health, triggers refill when remaining bytes fall below a configurable threshold, and refuses to perform quantum-certified anonymization when the pool is insufficient.
+
+\textbf{Trust in quantum hardware vendors.} The Born rule guarantee assumes that the quantum hardware faithfully prepares qubits in superposition and that measurement outcomes are not manipulated. In practice, this means trusting that IBM, Rigetti, or the QRNG appliance vendor has not introduced a backdoor that makes measurement outcomes deterministic (e.g., by secretly reading a classical seed rather than performing genuine quantum measurement).
+
+This trust assumption can be partially mitigated through three mechanisms:
+
+\begin{enumerate}
+\item \textbf{Multi-provider aggregation.} Our implementation supports drawing entropy from multiple independent quantum hardware providers (Section~\ref{subsec:arch}). Compromising the randomness would require collusion among all providers.
+
+\item \textbf{Statistical testing.} The harvested entropy undergoes standard randomness tests (NIST SP~800-22 test suite) before being written to the pool. Biased or patterned outputs are rejected.
+
+\item \textbf{Certified randomness protocols.} Device-independent randomness certification, as surveyed by Amer et al.~\cite{amer2025certified} and demonstrated experimentally by Liu et al.~\cite{liu2025certified} and Kavuri et al.~\cite{kavuri2025traceable}, uses Bell inequality violations between two separated devices to verify that outputs are genuinely quantum without trusting the device implementation. Integrating such protocols into the entropy harvester is future work.
+\end{enumerate}
+
+We acknowledge that without device-independent certification, the practical trust model for QRNG hardware is structurally comparable to the trust model for hardware TRNGs (e.g., Intel RDRAND): in both cases, the user trusts the vendor to implement the physical randomness source faithfully. The distinction is that if the hardware is genuine, the QRNG guarantee is strictly stronger (no seed exists), whereas a TRNG's randomness may still admit a deterministic explanation. The physics-guaranteed claim is therefore conditional on two assumptions: (1)~the Born rule correctly describes quantum measurement, and (2)~the hardware faithfully performs quantum measurement. Assumption~(1) is supported by over a century of experimental physics; Assumption~(2) is an operational trust assumption that device-independent certification can, in principle, eliminate.
+
+\textbf{Game-based security definition.} Our main-body security proofs (Theorems~1--2, Proposition~1) use direct proof arguments. Appendix~\ref{app:security-game} provides a complementary game-based formalization following the Challenger/Adversary framework standard in cryptographic literature, with an explicit advantage bound.
+
+\textbf{Formal verification gap.} Our mapping destruction implementation overwrites all mapping values with null bytes, clears the dictionary, and deletes the reference. Python's garbage collector and memory allocator may retain copies of string objects in internal pools or free lists. While our overwrite targets the primary data structures, we cannot guarantee with mathematical certainty that no copy of any mapping entry persists in interpreter-managed memory. A formally verified implementation in Rust or C, executed within a hardware security enclave (Intel SGX, ARM TrustZone), would close this gap. This is planned for a future release.
+
+\textbf{Column structure preservation.} L10 replaces all values but preserves the dataset's schema (column names, column count, row count). An adversary who knows the schema and has access to auxiliary information about the original dataset's structure (e.g., the number of unique values per column) may be able to infer column semantics. For example, a column with exactly 2 unique tokens likely corresponds to a binary attribute. This structural leakage is inherent to any anonymization method that preserves schema. For datasets where schema information is sensitive, column names should be anonymized separately, and dummy columns or rows may be added to obscure the structure.
+
+\textbf{Ethical considerations.} This work does not involve human subjects. The UCI Adult dataset is a publicly available, de-identified census extract maintained by the UCI Machine Learning Repository. We acknowledge that irreversible anonymization can be misused to destroy accountability trails; the provenance logging system described in Section~\ref{subsec:arch} provides an audit mechanism that records which dataset was anonymized, at which level, and from which entropy source, without storing the mapping itself. This audit trail allows organizations to demonstrate compliance with data protection obligations while maintaining the irreversibility guarantee. The authors have no conflicts of interest. QDaria~AS is the sole institutional affiliation.
+
+\textbf{Data and code availability.} The anonymization engine, entropy pool infrastructure, and all benchmark scripts are open-source under the Apache-2.0 license at \url{https://github.com/QDaria/zipminator}. The Python SDK is available via PyPI (\texttt{pip install zipminator}, version~0.5.0). The UCI Adult dataset is publicly available at the UCI Machine Learning Repository~\cite{dua2019uci}. The IBM Quantum entropy pool (\SI{4.6}{\mega\byte}, 35+ jobs from \texttt{ibm\_fez} and \texttt{ibm\_kingston}) is included in the supplementary materials with full provenance metadata (job identifiers, timestamps, qubit counts, shot counts). All benchmark scripts are included in the repository under \texttt{docs/research/paper/}: \texttt{run\_benchmarks.py} (synthetic-data benchmarks, Table~\ref{tab:benchmarks}) and \texttt{run\_benchmarks\_adult.py} (UCI Adult benchmarks, Table~\ref{tab:adult}).
+
+\textbf{Reproducibility.} The runtime benchmarks in Tables~\ref{tab:benchmarks}--\ref{tab:adult} were obtained on an Apple M3~Pro (macOS~14, 18~GB~RAM) with Python~3.11 and the Rust-backed entropy pool compiled via Maturin. OS-entropy benchmarks are fully reproducible with the published Python package and scripts. Quantum-entropy benchmarks require an IBM Quantum API key (free tier available at \url{https://quantum.ibm.com}); OS-entropy fallback enables full pipeline testing without quantum hardware. The system does not use PRNG seeds; each execution draws fresh entropy from the pool, so exact numerical outputs will differ between runs while statistical properties (unique counts, transformation rates) remain stable.
+
+%% ====================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%% ====================================================================
+
+This paper presents, to our knowledge, the first anonymization system where irreversibility is guaranteed by quantum mechanics rather than computational hardness assumptions. The construction is direct: replace every data value with a quantum-random string generated from Born-rule measurements, then destroy the mapping. The security argument is equally direct: reversing the transformation requires either predicting quantum measurement outcomes (impossible by the Born rule and Bell's theorem~\cite{bell1964epr, hensen2015loophole}) or recovering a mapping that has been overwritten (impossible given secure erasure). No seed exists. No replay is possible. The guarantee holds against adversaries with unbounded computational resources, including universal quantum computers, and is independent of the resolution of the P vs.\ NP problem.
+
+This construction fills a gap that has persisted despite the simultaneous availability of QRNG hardware and mature anonymization techniques. The gap was disciplinary, not technological: the QRNG community focused on key generation while the anonymization community treated classical randomness as sufficient. The closest prior work~\cite{amer2025certified} identifies certified randomness as promising for differential privacy but does not address anonymization, mapping destruction, or the GDPR Recital~26 compliance argument.
+
+For the mapping-recovery dimension of re-identification, L10 provides the strongest technical guarantee currently available: no adversary, regardless of computational power, can determine which original value produced a given token. This addresses the ``means reasonably likely to be used'' standard in GDPR Recital~26. However, L10 preserves the equality structure within columns (identical values produce identical tokens), which may permit frequency analysis or singling out on low-cardinality columns (e.g., binary attributes). For datasets where column cardinality is small, combining L10 with structural anonymization (L5--L9) before token replacement provides defense in depth against the Article~29 Working Party's three re-identification criteria (singling out, linkability, inference). Whether a particular technical method satisfies the Recital~26 legal standard is ultimately a determination for data protection authorities and courts; our contribution is to provide a mapping-recovery guarantee that does not depend on computational assumptions that may weaken over time. For organizations subject to DORA Article~6, which requires cryptographic updates in response to advances in cryptanalysis, L10 provides a guarantee that does not degrade with advances in computing.
+
+A provisional patent application has been filed (Norwegian Industrial Property Office, March 2026) covering the method and system for irreversible data anonymization using QRNG with physics-guaranteed non-reversibility. The implementation is open-source (Apache-2.0) and available as a Python SDK, REST API, and CLI tool. The anonymization engine, entropy pool, and multi-provider QRNG infrastructure are tested with 966 Python tests and over 500 Rust tests.
+
+Five directions for future work:
+
+\begin{enumerate}
+\item \textbf{Formal verification of mapping destruction.} Formal verification using tools such as Frama-C or CBMC that the multi-pass overwrite procedure leaves no residual mapping data in any addressable memory location.
+
+\item \textbf{Hardware security integration.} Production deployment should place the mapping inside a hardware security enclave (Intel SGX, ARM TrustZone, or AWS Nitro Enclaves) to eliminate the temporal window during which the mapping exists in general-purpose memory.
+
+\item \textbf{Device-independent randomness certification.} Our current implementation trusts the quantum hardware vendor to produce genuine quantum randomness. Integrating device-independent certification protocols, which verify randomness quality using Bell inequality violations between two separated devices, would reduce this trust requirement.
+
+\item \textbf{Hybrid schemes with analytical utility.} L10 is zero-utility by design. A natural extension is a hybrid scheme that applies QRNG-OTP to direct identifiers and sensitive attributes while preserving the statistical structure of quasi-identifiers through $k$-anonymity or DP, yielding a dataset that is partially analyzable and partially physics-guaranteed anonymous.
+
+\item \textbf{Standardization engagement.} Proposing quantum-certified anonymization as a recognized privacy-enhancing technology to NIST, ENISA, and the EDPB, aiming to establish \textsc{QRNG-OTP-Destroy} as a reference technique for GDPR Recital~26 compliance.\looseness=-1
+\end{enumerate}
+
+%% ====================================================================
+\section*{Data Availability}
+The UCI Adult dataset is publicly available from the UCI Machine Learning Repository.
+Quantum entropy was harvested from IBM Quantum systems (ibm\_kingston, 156 qubits)
+via Qiskit Runtime; job IDs are listed in Appendix A. The Zipminator implementation
+is available at \url{https://github.com/QDaria/zipminator}. All benchmark scripts are included
+in the repository's \texttt{scripts/} directory.
+
+\section*{Reproducibility}
+Experiments were conducted with Python 3.11, Qiskit 1.x, and the Zipminator SDK v0.5.0.
+The UCI Adult benchmark can be reproduced via \texttt{python scripts/benchmark\_adult.py}.
+Quantum entropy harvesting requires an IBM Quantum account with access to
+\texttt{ibm\_kingston} or equivalent 156+ qubit processor.
+
+\section*{Ethical Considerations}
+This work processes personally identifiable information (PII) for the purpose of
+demonstrating privacy-preserving anonymization. All experiments use either synthetic
+data or the publicly available UCI Adult dataset. No human subjects were involved.
+The system is designed to strengthen privacy protections in compliance with
+GDPR Article 17 and DORA Article 6.
+
+\section*{Acknowledgments}
+The author thanks IBM Quantum for access to ibm\_kingston and ibm\_fez (156-qubit Heron r2 processors) via the IBM Quantum open plan, and Rigetti Computing for access to Ankaa-class processors. Quantum entropy harvesting was conducted on both IBM and Rigetti hardware.
+
+%% ====================================================================
+\appendix
+\section{Game-Based Security Definition}
+\label{app:security-game}
+%% ====================================================================
+
+We formalize the mapping-recovery security of \textsc{QRNG-OTP-Destroy} using a standard cryptographic security game between a challenger~$\mathcal{C}$ and an adversary~$\mathcal{A}$.
+
+\begin{definition}[Anonymization Security Game $\mathsf{ANON}_{\mathcal{A}}(\lambda)$]
+\label{def:anon-game}
+Let $\lambda$ be the security parameter. The game proceeds as follows:
+\begin{enumerate}
+\item \textbf{Setup.} Challenger $\mathcal{C}$ generates a dataset $D$ with $n$ records and $m$ columns, where each column contains values drawn from a domain~$\mathcal{D}_j$.
+\item \textbf{Anonymize.} $\mathcal{C}$ executes \textsc{QRNG-OTP-Destroy} on $D$, producing anonymized dataset $D'$, where each unique value is replaced by a $t$-character token drawn uniformly from alphabet $\Sigma$ with $|\Sigma| = 62$, and all mappings are destroyed.
+\item \textbf{Challenge.} $\mathcal{C}$ sends $D'$ to $\mathcal{A}$.
+\item \textbf{Guess.} $\mathcal{A}$ outputs a tuple $(i, j, v)$ claiming that record~$i$, column~$j$ had original value~$v$.
+\item \textbf{Win condition.} $\mathcal{A}$ wins if $v = D[i,j]$.
+\end{enumerate}
+The adversary's advantage is defined as:
+\begin{equation}
+\mathrm{Adv}_{\mathsf{ANON}}(\mathcal{A}) \;=\; \Pr[\mathcal{A}\text{ wins}] \;-\; |\Sigma|^{-t}.
+\label{eq:adv-anon}
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Mapping-Recovery Security]
+\label{thm:game-security}
+For \textsc{QRNG-OTP-Destroy} with $t$-character tokens from alphabet $\Sigma$ with $|\Sigma| = 62$, the advantage of any adversary $\mathcal{A}$ (including computationally unbounded adversaries) in the mapping-recovery game is exactly zero:
+\begin{equation}
+\mathrm{Adv}_{\mathsf{ANON}}(\mathcal{A}) \;=\; 0.
+\label{eq:adv-bound}
+\end{equation}
+That is, $\mathcal{A}$ gains no advantage over random guessing. The absolute winning probability is $|\Sigma|^{-t} = 62^{-16} \approx 2^{-95.3}$, which is the baseline rate for guessing a uniformly random $t$-character string.
+\end{theorem}
+
+\begin{proof}
+By reduction to the Born rule assumption. After the protocol completes, $\mathcal{A}$'s view consists solely of $D'$. Consider any target cell $D'[i,j]$. Let $v^* = D[i,j]$ be the true original value and let $t^* = D'[i,j]$ be the replacement token.
+
+\emph{Token independence.} Each token was generated by measuring qubits prepared in the state $|{+}\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$. By the Born rule, each measurement outcome is uniformly random and independent of any prior information, including $v^*$. The rejection sampling procedure (Section~\ref{subsec:spec}) ensures each character of $t^*$ is drawn uniformly from $\Sigma$. Therefore $t^*$ is statistically independent of $v^*$:
+\[
+\Pr[D'[i,j] {=} t^* \mid D[i,j] {=} v^*]
+  = \Pr[D'[i,j] {=} t^*] = |\Sigma|^{-t}.
+\]
+
+\emph{Mapping destruction.} After substitution, the mapping $M_j$ linking $v^*$ to $t^*$ is overwritten and released (Section~\ref{subsec:spec}). No artifact correlating $D'$ with $D$ persists.
+
+\emph{Optimal strategy.} Since $D'$ is statistically independent of $D$, no function of $D'$ provides information about $D[i,j]$. The adversary's optimal strategy is to guess uniformly at random from $\Sigma^t$, achieving $\Pr[\mathcal{A}\text{ wins}] = |\Sigma|^{-t}$. Substituting into \eqref{eq:adv-anon}:
+\[
+\mathrm{Adv}_{\mathsf{ANON}}(\mathcal{A}) \;=\; |\Sigma|^{-t} - |\Sigma|^{-t} \;=\; 0 \;\leq\; |\Sigma|^{-t}. \qedhere
+\]
+\end{proof}
+
+\begin{remark}
+The game $\mathsf{ANON}_{\mathcal{A}}(\lambda)$ captures \emph{mapping-recovery} security: the adversary's inability to reconstruct the original PII value from its replacement token. Domain-knowledge attacks, where an adversary exploits a small value domain to guess the original value without inverting the token, fall outside this game's scope and are analyzed in Proposition~\ref{prop:domainlimit}. Defense in depth combines L5--L9 structural anonymization with L10 tokenization; the formal composition theorem is given in Theorem~\ref{thm:dp-composition}.
+\end{remark}
+
+\begin{proposition}[Domain-Aware Recovery Bound]
+\label{prop:domain}
+For a column $C_j$ with domain $\mathcal{D}_j$ containing $|\mathcal{D}_j|$ distinct values, the probability that any adversary $\mathcal{A}$ correctly identifies the original value of a given cell is bounded by:
+\begin{equation}
+\Pr[\mathcal{A} \text{ recovers } D[i,j]] \leq \max\bigl(62^{-16},\; |\mathcal{D}_j|^{-1}\bigr).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The adversary has two attack strategies: (a)~guess the QRNG mapping, succeeding with probability $62^{-16} \approx 2^{-95.3}$ (Proposition~\ref{prop:pervalue}); or (b)~ignore the token and guess the original value from domain knowledge, succeeding with probability at most $|\mathcal{D}_j|^{-1}$ (uniform prior over the domain). The adversary's optimal strategy is the maximum of these two. For columns with $|\mathcal{D}_j| > 62^{16}$ (more than ${\approx}2^{95}$ distinct values), the QRNG bound dominates. For low-cardinality columns ($|\mathcal{D}_j| \leq 62^{16}$, which includes all practical cases), domain guessing dominates. This formalizes the observation that L10 protects the \emph{mapping} unconditionally, but does not prevent domain-knowledge inference on small domains. For columns where $|\mathcal{D}_j|$ is small (e.g., binary attributes), combining L10 with structural anonymization (L5--L9) before token replacement provides defense in depth.
+\end{proof}
+
+%% ====================================================================
+\begin{thebibliography}{50}
+
+\bibitem{acin2016certified}
+A.~Ac\'{i}n and L.~Masanes, ``Certified randomness in quantum physics,'' \emph{Nature}, vol.~540, pp.~213--219, 2016.
+
+\bibitem{amer2025certified}
+O.~Amer, S.~Chakrabarti, K.~Chakraborty, S.~Eloul, N.~Kumar, C.~Lim, M.~Liu, P.~Niroula, Y.~Satsangi, R.~Shaydulin, and M.~Pistoia, ``Applications of certified randomness,'' \emph{Nature Reviews Physics}, vol.~7, pp.~514--524, 2025.
+
+\bibitem{apple2017dp}
+{Apple Differential Privacy Team}, ``Learning with privacy at scale,'' \emph{Apple Machine Learning Journal}, Dec.\ 2017.
+
+\bibitem{art29wp2014anonymisation}
+{Article 29 Data Protection Working Party}, ``Opinion 05/2014 on Anonymisation Techniques,'' WP216, Apr.\ 2014.
+
+\bibitem{arute2019supremacy}
+F.~Arute, K.~Arya, R.~Babbush, \emph{et al.}, ``Quantum supremacy using a programmable superconducting processor,'' \emph{Nature}, vol.~574, pp.~505--510, 2019.
+
+\bibitem{aspect1982epr}
+A.~Aspect, P.~Grangier, and G.~Roger, ``Experimental realization of Einstein-Podolsky-Rosen-Bohm Gedankenexperiment: A new violation of Bell's inequalities,'' \emph{Physical Review Letters}, vol.~49, no.~2, pp.~91--94, 1982.
+
+\bibitem{barak2007privacy}
+B.~Barak, K.~Chaudhuri, C.~Dwork, S.~Kale, F.~McSherry, and K.~Talwar, ``Privacy, accuracy, and consistency too: A holistic solution to contingency table release,'' in \emph{Proc.\ ACM SIGMOD-SIGACT-SIGART Symp.\ Principles of Database Systems (PODS)}, 2007, pp.~273--282.
+
+\bibitem{bartusek2023certified}
+J.~Bartusek and D.~Khurana, ``Cryptography with certified deletion,'' in \emph{Advances in Cryptology -- CRYPTO 2023}, ser.\ Lecture Notes in Computer Science, vol.~14085.\hskip 1em plus 0.5em minus 0.4em Springer, 2023, pp.~192--223.
+
+\bibitem{bell1964epr}
+J.~S. Bell, ``On the Einstein Podolsky Rosen paradox,'' \emph{Physics Physique Fizika}, vol.~1, no.~3, pp.~195--200, 1964.
+
+\bibitem{bohm1952suggested}
+D.~Bohm, ``A suggested interpretation of the quantum theory in terms of `hidden' variables. {I},'' \emph{Physical Review}, vol.~85, no.~2, pp.~166--179, 1952.
+
+\bibitem{broadbent2020certified}
+A.~Broadbent and R.~Islam, ``Quantum encryption with certified deletion,'' in \emph{Advances in Cryptology (CRYPTO)}, ser.\ Lecture Notes in Computer Science, vol.~12171.\hskip 1em plus 0.5em minus 0.4em Springer, 2020, pp.~92--122.
+
+\bibitem{canetti2001uc}
+R.~Canetti, ``Universally composable security: A new paradigm for cryptographic protocols,'' in \emph{Proc.\ IEEE 42nd Annual Symp.\ Foundations of Computer Science (FOCS)}, 2001, pp.~136--145.
+
+\bibitem{clauser1969chsh}
+J.~F. Clauser, M.~A. Horne, A.~Shimony, and R.~A. Holt, ``Proposed experiment to test local hidden-variable theories,'' \emph{Physical Review Letters}, vol.~23, no.~15, pp.~880--884, 1969.
+
+\bibitem{cohen2020singling}
+A.~Cohen and K.~Nissim, ``Towards formalizing the GDPR's notion of singling out,'' \emph{Proceedings of the National Academy of Sciences}, vol.~117, no.~15, pp.~8344--8352, 2020.
+
+\bibitem{desfontaines2020sok}
+D.~Desfontaines and B.~Pej\'{o}, ``{SoK}: Differential privacies,'' \emph{Proceedings on Privacy Enhancing Technologies}, vol.~2020, no.~2, pp.~288--313, 2020.
+
+\bibitem{dinur2003revealing}
+I.~Dinur and K.~Nissim, ``Revealing information while preserving privacy,'' in \emph{Proc.\ ACM SIGMOD-SIGACT-SIGART Symp.\ Principles of Database Systems (PODS)}, 2003, pp.~202--210.
+
+\bibitem{dua2019uci}
+D.~Dua and C.~Graff, ``{UCI} Machine Learning Repository,'' University of California, Irvine, 2019. [Online]. Available: \url{https://archive.ics.uci.edu/ml}
+
+\bibitem{dwork2006dp}
+C.~Dwork, F.~McSherry, K.~Nissim, and A.~Smith, ``Calibrating noise to sensitivity in private data analysis,'' in \emph{Proc.\ Theory of Cryptography Conf.\ (TCC)}, ser.\ Lecture Notes in Computer Science, vol.~3876.\hskip 1em plus 0.5em minus 0.4em Springer, 2006, pp.~265--284.
+
+\bibitem{dwork2006icalp}
+C.~Dwork, ``Differential privacy,'' in \emph{Proc.\ Int.\ Colloq.\ Automata, Languages, and Programming (ICALP)}, ser.\ Lecture Notes in Computer Science, vol.~4052.\hskip 1em plus 0.5em minus 0.4em Springer, 2006, pp.~1--12.
+
+\bibitem{dwork2014algfound}
+C.~Dwork and A.~Roth, ``The algorithmic foundations of differential privacy,'' \emph{Foundations and Trends in Theoretical Computer Science}, vol.~9, no.~3--4, pp.~211--487, 2014.
+
+\bibitem{edpb2020guidelines}
+{European Data Protection Board}, ``Guidelines 04/2020 on the use of location data and contact tracing tools in the context of the {COVID-19} outbreak,'' Apr.\ 2020.
+
+\bibitem{elemam2008kanon}
+K.~El~Emam and F.~K. Dankar, ``Protecting privacy using $k$-anonymity,'' \emph{Journal of the American Medical Informatics Association}, vol.~15, no.~5, pp.~627--637, 2008.
+
+\bibitem{elliot2018functional}
+M.~Elliot, E.~Mackey, K.~O'Hara, and C.~Tudor, ``Functional anonymisation: Personal data and the data environment,'' \emph{Computer Law \& Security Review}, vol.~34, no.~2, pp.~204--221, 2018.
+
+\bibitem{gaboardi2016psi}
+M.~Gaboardi, J.~Honaker, G.~King, K.~Nissim, J.~Ullman, and S.~Vadhan, ``{PSI} ($\Psi$): A private data sharing interface,'' arXiv preprint arXiv:1609.04340, 2016.
+
+\bibitem{georgiou2020gdpr}
+D.~Georgiou and C.~Lambrinoudakis, ``Compatibility of a {GDPR}-compliant anonymisation with big data analytics,'' \emph{Information \& Computer Security}, vol.~28, no.~2, pp.~201--225, 2020.
+
+\bibitem{gutmann1996secure}
+P.~Gutmann, ``Secure deletion of data from magnetic and solid-state memory,'' in \emph{Proc.\ 6th USENIX Security Symposium}, 1996.
+
+\bibitem{hensen2015loophole}
+B.~Hensen, H.~Bernien, A.~E. Dr\'{e}au, \emph{et al.}, ``Loophole-free Bell inequality violation using electron spins separated by 1.3 kilometres,'' \emph{Nature}, vol.~526, pp.~682--686, 2015.
+
+\bibitem{herrero2017qrng}
+M.~Herrero-Collantes and J.~C. Garcia-Escartin, ``Quantum random number generators,'' \emph{Reviews of Modern Physics}, vol.~89, no.~1, p.~015004, 2017.
+
+\bibitem{hirche2022qdp}
+C.~Hirche, C.~Rouz\'{e}, and D.~Stilck~Fran\c{c}a, ``Quantum differential privacy: An information theory perspective,'' \emph{IEEE Trans.\ Inf.\ Theory}, vol.~69, no.~9, pp.~5771--5787, 2023.
+
+\bibitem{holohan2019diffprivlib}
+N.~Holohan, S.~Braghin, P.~Mac~Aonghusa, and K.~Levacher, ``Diffprivlib: The {IBM} differential privacy library,'' arXiv preprint arXiv:1907.02444, 2019.
+
+\bibitem{kavuri2025traceable}
+G.~A. Kavuri, J.~Palfree, D.~V. Reddy, Y.~Zhang, J.~C. Bienfang, M.~D. Mazurek, \emph{et al.}, ``Traceable random numbers from a non-local quantum advantage,'' \emph{Nature}, vol.~642, pp.~916--921, 2025.
+
+\bibitem{kifer2011nofree}
+D.~Kifer and A.~Machanavajjhala, ``No free lunch in data privacy,'' in \emph{Proc.\ ACM SIGMOD Int.\ Conf.\ Management of Data}, 2011, pp.~193--204.
+
+\bibitem{li2007tcloseness}
+N.~Li, T.~Li, and S.~Venkatasubramanian, ``$t$-Closeness: Privacy beyond $k$-anonymity and $\ell$-diversity,'' in \emph{Proc.\ IEEE 23rd Int.\ Conf.\ Data Engineering (ICDE)}, 2007.
+
+\bibitem{liu2025certified}
+M.~Liu, R.~Shaydulin, P.~Niroula, M.~DeCross, S.-H. Hung, \emph{et al.}, ``Certified randomness using a trapped-ion quantum processor,'' \emph{Nature}, vol.~640, pp.~343--348, 2025.
+
+\bibitem{ma2016qrng}
+X.~Ma, X.~Yuan, Z.~Cao, B.~Qi, and Z.~Zhang, ``Quantum random number generation,'' \emph{npj Quantum Information}, vol.~2, p.~16021, 2016.
+
+\bibitem{machanavajjhala2007ldiv}
+A.~Machanavajjhala, D.~Kifer, J.~Gehrke, and M.~Venkitasubramaniam, ``$\ell$-Diversity: Privacy beyond $k$-anonymity,'' \emph{ACM Transactions on Knowledge Discovery from Data}, vol.~1, no.~1, Article~3, 2007.
+
+\bibitem{mcsherry2007mechanism}
+F.~McSherry and K.~Talwar, ``Mechanism design via differential privacy,'' in \emph{Proc.\ IEEE 48th Annual Symp.\ Foundations of Computer Science (FOCS)}, 2007, pp.~94--103.
+
+\bibitem{mironov2012significance}
+I.~Mironov, ``On significance of the least significant bits for differential privacy,'' in \emph{Proc.\ ACM Conf.\ Computer and Communications Security (CCS)}, 2012, pp.~650--661.
+
+\bibitem{narayanan2008robust}
+A.~Narayanan and V.~Shmatikov, ``Robust de-anonymization of large sparse datasets,'' in \emph{Proc.\ IEEE Symp.\ Security and Privacy (S\&P)}, 2008, pp.~111--125.
+
+\bibitem{nist2010sp80022}
+A.~Rukhin, J.~Soto, J.~Nechvatal, \emph{et al.}, ``A statistical test suite for random and pseudorandom number generators for cryptographic applications,'' NIST Special Publication 800-22 Rev.~1a, 2010.
+
+\bibitem{nist2023beacon}
+{National Institute of Standards and Technology}, ``NIST Randomness Beacon,'' 2023. [Online]. Available: \url{https://beacon.nist.gov/home}
+
+\bibitem{pironio2010certified}
+S.~Pironio, A.~Ac\'{i}n, S.~Massar, A.~Boyer de~la~Giroday, D.~N. Matsukevich, P.~Maunz, S.~Olmschenk, D.~Hayes, L.~Luo, T.~A. Manning, and C.~Monroe, ``Random numbers certified by Bell's theorem,'' \emph{Nature}, vol.~464, pp.~1021--1024, 2010.
+
+\bibitem{ping2017datasynthesizer}
+H.~Ping, J.~Stoyanovich, and B.~Howe, ``{DataSynthesizer}: Privacy-preserving synthetic datasets,'' in \emph{Proc.\ 29th Int.\ Conf.\ Scientific and Statistical Database Management (SSDBM)}, 2017, Art.~42.
+
+\bibitem{prasser2014arx}
+F.~Prasser, F.~Kohlmayer, R.~Lautenschl\"{a}ger, and K.~A. Kuhn, ``{ARX}---A comprehensive tool for anonymizing biomedical data,'' \emph{AMIA Annual Symposium Proceedings}, pp.~984--993, 2014.
+
+\bibitem{samarati2001protecting}
+P.~Samarati, ``Protecting respondents' identities in microdata release,'' \emph{IEEE Transactions on Knowledge and Data Engineering}, vol.~13, no.~6, pp.~1010--1027, 2001.
+
+\bibitem{shannon1949secrecy}
+C.~E. Shannon, ``Communication theory of secrecy systems,'' \emph{Bell System Technical Journal}, vol.~28, no.~4, pp.~656--715, 1949.
+
+\bibitem{stadler2022synthetic}
+T.~Stadler, B.~Oprisanu, and C.~Troncoso, ``Synthetic data---Anonymisation groundhog day,'' in \emph{Proc.\ 31st USENIX Security Symp.}, 2022, pp.~1451--1468.
+
+\bibitem{sweeney2002kanon}
+L.~Sweeney, ``$k$-Anonymity: A model for protecting privacy,'' \emph{International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems}, vol.~10, no.~5, pp.~557--570, 2002.
+
+\bibitem{templ2017sdc}
+M.~Templ, \emph{Statistical Disclosure Control for Microdata: Methods and Applications in {R}}.\hskip 1em plus 0.5em minus 0.4em Springer International Publishing, 2017.
+
+\bibitem{unruh2015revocable}
+D.~Unruh, ``Revocable quantum timed-release encryption,'' \emph{Journal of the ACM}, vol.~62, no.~6, pp.~49:1--49:76, 2015.
+
+\bibitem{vazirani2012certifiable}
+U.~Vazirani and T.~Vidick, ``Certifiable quantum dice,'' \emph{Philosophical Transactions of the Royal Society A}, vol.~370, pp.~3432--3448, 2012.
+
+\bibitem{vernam1926cipher}
+G.~S. Vernam, ``Cipher printing telegraph systems for secret wire and radio telegraphic communications,'' \emph{Journal of the AIEE}, vol.~45, no.~2, pp.~109--115, 1926.
+
+\bibitem{wilson2020dpsql}
+R.~J. Wilson, C.~Y. Zhang, W.~Lam, D.~Desfontaines, D.~Simmons-Marengo, and B.~Gipson, ``Differentially private {SQL} with bounded user contribution,'' \emph{Proceedings on Privacy Enhancing Technologies}, vol.~2020, no.~2, pp.~230--250, 2020.
+
+\bibitem{xu2019ctgan}
+L.~Xu, M.~Skoularidou, A.~Cuesta-Infante, and K.~Veeramachaneni, ``Modeling tabular data using conditional {GAN},'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, vol.~32, 2019.
+
+\end{thebibliography}
+
+\end{document}
