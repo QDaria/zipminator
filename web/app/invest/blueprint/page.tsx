@@ -19,10 +19,20 @@ import { SectionCompetitors } from '@/components/blueprint/sections/SectionCompe
 import { SectionMarketSize } from '@/components/blueprint/sections/SectionMarketSize'
 import { SectionFloorMatters } from '@/components/blueprint/sections/SectionFloorMatters'
 
+const PASS = 'zip2026bp'
+const STORAGE_KEY = 'blueprint-pitch-auth'
+
 export default function BlueprintPage() {
+  const [authed, setAuthed] = useState(false)
+  const [input, setInput] = useState('')
+  const [passError, setPassError] = useState(false)
   const [scenario, setScenario] = useState<BpScenario>('moderate')
   const [activeId, setActiveId] = useState(SECTION_LIST[0].id)
   const observerRef = useRef<IntersectionObserver | null>(null)
+
+  useEffect(() => {
+    if (sessionStorage.getItem(STORAGE_KEY) === '1') setAuthed(true)
+  }, [])
 
   const handleIntersect = useCallback((entries: IntersectionObserverEntry[]) => {
     for (const entry of entries) {
@@ -46,6 +56,102 @@ export default function BlueprintPage() {
 
     return () => observerRef.current?.disconnect()
   }, [handleIntersect])
+
+  const handlePassSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (input === PASS) {
+      sessionStorage.setItem(STORAGE_KEY, '1')
+      setAuthed(true)
+    } else {
+      setPassError(true)
+      setInput('')
+    }
+  }
+
+  if (!authed) {
+    return (
+      <div
+        className="flex items-center justify-center"
+        style={{
+          width: '100vw',
+          height: '100vh',
+          background: '#020817',
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
+        <form
+          onSubmit={handlePassSubmit}
+          className="flex flex-col items-center gap-5 p-10 rounded-2xl"
+          style={{
+            background: 'rgba(167,139,250,0.04)',
+            border: '1px solid rgba(167,139,250,0.2)',
+            boxShadow: '0 0 40px rgba(167,139,250,0.08)',
+            minWidth: 340,
+          }}
+        >
+          <div className="flex flex-col items-center gap-1">
+            <span
+              className="text-xs font-mono tracking-widest uppercase text-red-400"
+              style={{ fontFamily: "'JetBrains Mono', monospace" }}
+            >
+              CONFIDENTIAL
+            </span>
+            <h1
+              className="text-2xl font-semibold text-slate-100"
+              style={{ fontFamily: "'Fraunces', Georgia, serif" }}
+            >
+              IP Valuation Blueprint
+            </h1>
+            <p className="text-slate-400 text-sm">Enter password to access</p>
+          </div>
+
+          <input
+            type="password"
+            value={input}
+            onChange={e => { setInput(e.target.value); setPassError(false) }}
+            autoFocus
+            placeholder="Password"
+            className="w-full px-4 py-3 rounded-lg text-sm text-slate-100 placeholder-slate-500 outline-none"
+            style={{
+              background: 'rgba(15,22,41,0.8)',
+              border: passError
+                ? '1.5px solid rgba(251,113,133,0.6)'
+                : '1px solid rgba(167,139,250,0.2)',
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
+          />
+
+          {passError && (
+            <p
+              className="text-rose-400 text-xs font-mono"
+              style={{ fontFamily: "'JetBrains Mono', monospace" }}
+            >
+              Wrong password. Try again.
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
+            style={{
+              background: 'rgba(167,139,250,0.9)',
+              color: '#020817',
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
+          >
+            Enter
+          </button>
+
+          <p className="text-slate-500 text-xs mt-2">
+            Need access?{' '}
+            <a href="mailto:mo@qdaria.com" className="text-violet-400 hover:underline">
+              mo@qdaria.com
+            </a>
+          </p>
+        </form>
+      </div>
+    )
+  }
 
   return (
     <>

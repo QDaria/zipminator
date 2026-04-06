@@ -175,6 +175,13 @@ export default function InvestPage() {
           >
             Enter
           </button>
+
+          <p className="text-slate-500 text-xs mt-2">
+            Need access?{' '}
+            <a href="mailto:mo@qdaria.com" className="text-cyan-400 hover:underline">
+              mo@qdaria.com
+            </a>
+          </p>
         </form>
       </div>
     )
