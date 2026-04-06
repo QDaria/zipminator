@@ -84,6 +84,12 @@ pub enum MessageType {
     AnomalyEvent = 0x03,
     /// Topology update: node_count(u16) + edge_count(u16) + node_ids + edges.
     TopologyUpdate = 0x04,
+    /// Presence proof: node_id(16B) + latitude(f64) + longitude(f64) + timestamp_ms(u64) + signature(64B).
+    PresenceProof = 0x05,
+    /// Vital auth challenge: node_id(16B) + challenge_nonce(32B) + breathing_rate(f32) + heart_rate(f32).
+    VitalAuthChallenge = 0x06,
+    /// EM canary alert: node_id(16B) + alert_level(u8) + frequency_hz(f64) + power_dbm(f64) + timestamp_ms(u64).
+    EmCanaryAlert = 0x07,
 }
 
 impl MessageType {
@@ -94,6 +100,9 @@ impl MessageType {
             0x02 => Ok(Self::VitalSigns),
             0x03 => Ok(Self::AnomalyEvent),
             0x04 => Ok(Self::TopologyUpdate),
+            0x05 => Ok(Self::PresenceProof),
+            0x06 => Ok(Self::VitalAuthChallenge),
+            0x07 => Ok(Self::EmCanaryAlert),
             other => Err(AttestationError::UnknownType(other)),
         }
     }
@@ -135,6 +144,34 @@ pub enum AttestationPayload {
         /// Edges as (source, destination) pairs referencing node_ids by index.
         edges: Vec<(NodeId, NodeId)>,
     },
+
+    /// Spatiotemporal presence proof from a mesh node.
+    PresenceProof {
+        node_id: NodeId,
+        latitude: f64,
+        longitude: f64,
+        timestamp_ms: u64,
+        /// Ed25519 or PQ signature over (node_id || lat || lon || ts).
+        signature: [u8; 64],
+    },
+
+    /// Vital-sign continuous authentication challenge.
+    VitalAuthChallenge {
+        node_id: NodeId,
+        challenge_nonce: [u8; 32],
+        breathing_rate: f32,
+        heart_rate: f32,
+    },
+
+    /// Electromagnetic canary alert (TEMPEST countermeasure).
+    EmCanaryAlert {
+        node_id: NodeId,
+        /// Alert severity: 1=low, 2=medium, 3=high, 4=critical.
+        alert_level: u8,
+        frequency_hz: f64,
+        power_dbm: f64,
+        timestamp_ms: u64,
+    },
 }
 
 impl AttestationPayload {
@@ -145,6 +182,9 @@ impl AttestationPayload {
             Self::VitalSigns { .. } => MessageType::VitalSigns,
             Self::AnomalyEvent { .. } => MessageType::AnomalyEvent,
             Self::TopologyUpdate { .. } => MessageType::TopologyUpdate,
+            Self::PresenceProof { .. } => MessageType::PresenceProof,
+            Self::VitalAuthChallenge { .. } => MessageType::VitalAuthChallenge,
+            Self::EmCanaryAlert { .. } => MessageType::EmCanaryAlert,
         }
     }
 
