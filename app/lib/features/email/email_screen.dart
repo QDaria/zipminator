@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +28,7 @@ class _EmailScreenState extends ConsumerState<EmailScreen>
 
   String _selfDestructValue = 'never';
   bool _sendSuccess = false;
+  List<PlatformFile> _attachments = [];
 
   /// Anonymization level for outgoing attachments: 0 = off, 1-10 = active.
   int _attachmentAnonymizationLevel = 0;
@@ -275,6 +277,64 @@ class _EmailScreenState extends ConsumerState<EmailScreen>
               .animate()
               .fadeIn(delay: 100.ms, duration: 400.ms)
               .slideY(begin: 0.05),
+          const SizedBox(height: 12),
+
+          // Attachments row
+          QuantumCard(
+            glowColor: _attachments.isNotEmpty
+                ? QuantumTheme.quantumCyan.withValues(alpha: 0.6)
+                : QuantumTheme.textSecondary.withValues(alpha: 0.3),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.attach_file,
+                        size: 20, color: QuantumTheme.quantumCyan),
+                    const SizedBox(width: 10),
+                    Text('Attachments',
+                        style: Theme.of(context).textTheme.bodyMedium),
+                    const Spacer(),
+                    TextButton.icon(
+                      onPressed: _pickAttachment,
+                      icon: const Icon(Icons.add, size: 16),
+                      label: const Text('Add'),
+                    ),
+                  ],
+                ),
+                if (_attachments.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: _attachments
+                        .map((f) => Chip(
+                              label: Text(f.name,
+                                  style: const TextStyle(fontSize: 12)),
+                              deleteIcon: const Icon(Icons.close, size: 14),
+                              onDeleted: () =>
+                                  setState(() => _attachments.remove(f)),
+                              avatar: Icon(Icons.insert_drive_file,
+                                  size: 14,
+                                  color: QuantumTheme.quantumCyan),
+                            ))
+                        .toList(),
+                  ),
+                  if (_attachmentAnonymizationLevel > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        'Attachments will be scanned and anonymized at L$_attachmentAnonymizationLevel before sending',
+                        style: TextStyle(
+                            fontSize: 11,
+                            color: QuantumTheme.quantumOrange),
+                      ),
+                    ),
+                ],
+              ],
+            ),
+          ).animate().fadeIn(delay: 150.ms, duration: 400.ms),
           const SizedBox(height: 12),
 
           // Self-destruct + options row
@@ -547,6 +607,19 @@ class _EmailScreenState extends ConsumerState<EmailScreen>
         ],
       ),
     );
+  }
+
+  Future<void> _pickAttachment() async {
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.custom,
+      allowedExtensions: [
+        'txt', 'csv', 'json', 'pdf', 'doc', 'docx', 'xlsx', 'png', 'jpg',
+      ],
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty) return;
+    setState(() => _attachments.addAll(result.files));
   }
 
   Future<void> _encryptAndSend() async {
