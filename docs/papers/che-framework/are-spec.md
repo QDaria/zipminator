@@ -194,10 +194,10 @@ Output: 253 mod 257 = 253
 Input:  x = 1
 Program: [(Natural, 137, Mul), (Natural, 149, Mul), (Natural, 163, Mul), (Natural, 173, Mul)], p = 257
 Trace:  step 1: 1 * 137 = 137
-         step 2: 137 * 149 = 20413 mod 256 = 189
-         step 3: 189 * 163 = 30807 mod 256 = 87
-         step 4: 87 * 173 = 15051 mod 256 = 203
-Output: 203 mod 257 = 203
+         step 2: 137 * 149 = 20413 mod 256 = 157
+         step 3: 157 * 163 = 25591 mod 256 = 231
+         step 4: 231 * 173 = 39963 mod 256 = 11
+Output: 11 mod 257 = 11
 ```
 
 ---
