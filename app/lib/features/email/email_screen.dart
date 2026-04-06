@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zipminator/core/providers/anonymizer_provider.dart';
 import 'package:zipminator/core/providers/crypto_provider.dart';
 import 'package:zipminator/core/providers/email_provider.dart';
+import 'package:zipminator/core/providers/pii_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
 
@@ -554,6 +556,70 @@ class _EmailScreenState extends ConsumerState<EmailScreen>
         const SnackBar(content: Text('Generate a keypair first')),
       );
       return;
+    }
+
+    // PII scan before sending
+    final piiNotifier = ref.read(piiProvider.notifier);
+    piiNotifier.scan(_bodyController.text);
+    final piiState = ref.read(piiProvider);
+
+    if (piiState.matches.isNotEmpty && mounted) {
+      final highCount =
+          piiState.matches.where((m) => m.sensitivity >= 4).length;
+      final action = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: QuantumTheme.surfaceCard,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.warning_amber_rounded,
+                  color: QuantumTheme.quantumOrange, size: 24),
+              const SizedBox(width: 10),
+              const Expanded(child: Text('PII Detected')),
+            ],
+          ),
+          content: Text(
+            '${piiState.matches.length} PII items found '
+            '($highCount high sensitivity).\n\n'
+            'Types: ${piiState.matches.map((m) => m.category).toSet().join(", ")}',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop('cancel'),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop('anonymize'),
+              child: Text(
+                'Anonymize & Send',
+                style: TextStyle(color: QuantumTheme.quantumOrange),
+              ),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop('send'),
+              style: FilledButton.styleFrom(
+                  backgroundColor: QuantumTheme.quantumRed),
+              child: const Text('Send Anyway'),
+            ),
+          ],
+        ),
+      );
+
+      if (action == 'cancel' || action == null) return;
+      if (action == 'anonymize') {
+        final anonNotifier = ref.read(anonymizerProvider.notifier);
+        final level = _attachmentAnonymizationLevel > 0
+            ? _attachmentAnonymizationLevel
+            : 5;
+        anonNotifier.setLevel(level);
+        anonNotifier.anonymize(_bodyController.text);
+        final anonState = ref.read(anonymizerProvider);
+        if (anonState.result != null) {
+          _bodyController.text = anonState.result!.anonymizedText;
+        }
+      }
     }
 
     setState(() => _sendSuccess = false);
