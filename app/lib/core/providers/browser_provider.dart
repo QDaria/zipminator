@@ -6,6 +6,10 @@ class BrowserState {
   final bool proxyActive;
   final bool canGoBack;
   final bool canGoForward;
+  final bool fingerprintProtection;
+  final bool cookieRotation;
+  final List<String> history;
+  final int historyIndex;
   final String? error;
 
   const BrowserState({
@@ -14,6 +18,10 @@ class BrowserState {
     this.proxyActive = true,
     this.canGoBack = false,
     this.canGoForward = false,
+    this.fingerprintProtection = true,
+    this.cookieRotation = true,
+    this.history = const ['https://zipminator.zip'],
+    this.historyIndex = 0,
     this.error,
   });
 
@@ -23,6 +31,10 @@ class BrowserState {
     bool? proxyActive,
     bool? canGoBack,
     bool? canGoForward,
+    bool? fingerprintProtection,
+    bool? cookieRotation,
+    List<String>? history,
+    int? historyIndex,
     String? error,
   }) =>
       BrowserState(
@@ -31,6 +43,11 @@ class BrowserState {
         proxyActive: proxyActive ?? this.proxyActive,
         canGoBack: canGoBack ?? this.canGoBack,
         canGoForward: canGoForward ?? this.canGoForward,
+        fingerprintProtection:
+            fingerprintProtection ?? this.fingerprintProtection,
+        cookieRotation: cookieRotation ?? this.cookieRotation,
+        history: history ?? this.history,
+        historyIndex: historyIndex ?? this.historyIndex,
         error: error,
       );
 }
@@ -41,7 +58,43 @@ class BrowserNotifier extends Notifier<BrowserState> {
 
   void navigate(String url) {
     final normalized = url.startsWith('http') ? url : 'https://$url';
-    state = state.copyWith(url: normalized, isLoading: true);
+    // Truncate forward history on new navigation
+    final newHistory = [
+      ...state.history.sublist(0, state.historyIndex + 1),
+      normalized,
+    ];
+    state = state.copyWith(
+      url: normalized,
+      isLoading: true,
+      history: newHistory,
+      historyIndex: newHistory.length - 1,
+      canGoBack: newHistory.length > 1,
+      canGoForward: false,
+    );
+  }
+
+  void goBack() {
+    if (state.historyIndex <= 0) return;
+    final newIndex = state.historyIndex - 1;
+    state = state.copyWith(
+      url: state.history[newIndex],
+      historyIndex: newIndex,
+      canGoBack: newIndex > 0,
+      canGoForward: true,
+      isLoading: true,
+    );
+  }
+
+  void goForward() {
+    if (state.historyIndex >= state.history.length - 1) return;
+    final newIndex = state.historyIndex + 1;
+    state = state.copyWith(
+      url: state.history[newIndex],
+      historyIndex: newIndex,
+      canGoBack: true,
+      canGoForward: newIndex < state.history.length - 1,
+      isLoading: true,
+    );
   }
 
   void onPageFinished() {
@@ -54,6 +107,15 @@ class BrowserNotifier extends Notifier<BrowserState> {
 
   void toggleProxy() {
     state = state.copyWith(proxyActive: !state.proxyActive);
+  }
+
+  void toggleFingerprint() {
+    state = state.copyWith(
+        fingerprintProtection: !state.fingerprintProtection);
+  }
+
+  void toggleCookieRotation() {
+    state = state.copyWith(cookieRotation: !state.cookieRotation);
   }
 }
 
