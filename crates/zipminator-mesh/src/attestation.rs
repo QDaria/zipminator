@@ -236,6 +236,32 @@ impl AttestationPayload {
                 }
                 buf
             }
+            Self::PresenceProof { node_id, latitude, longitude, timestamp_ms, signature } => {
+                let mut buf = Vec::with_capacity(16 + 8 + 8 + 8 + 64); // 104 bytes
+                buf.extend_from_slice(node_id);
+                buf.extend_from_slice(&latitude.to_le_bytes());
+                buf.extend_from_slice(&longitude.to_le_bytes());
+                buf.extend_from_slice(&timestamp_ms.to_le_bytes());
+                buf.extend_from_slice(signature);
+                buf
+            }
+            Self::VitalAuthChallenge { node_id, challenge_nonce, breathing_rate, heart_rate } => {
+                let mut buf = Vec::with_capacity(16 + 32 + 4 + 4); // 56 bytes
+                buf.extend_from_slice(node_id);
+                buf.extend_from_slice(challenge_nonce);
+                buf.extend_from_slice(&breathing_rate.to_le_bytes());
+                buf.extend_from_slice(&heart_rate.to_le_bytes());
+                buf
+            }
+            Self::EmCanaryAlert { node_id, alert_level, frequency_hz, power_dbm, timestamp_ms } => {
+                let mut buf = Vec::with_capacity(16 + 1 + 8 + 8 + 8); // 41 bytes
+                buf.extend_from_slice(node_id);
+                buf.push(*alert_level);
+                buf.extend_from_slice(&frequency_hz.to_le_bytes());
+                buf.extend_from_slice(&power_dbm.to_le_bytes());
+                buf.extend_from_slice(&timestamp_ms.to_le_bytes());
+                buf
+            }
         }
     }
 
@@ -334,6 +360,55 @@ impl AttestationPayload {
                     edges.push((src, dst));
                 }
                 Ok(Self::TopologyUpdate { node_ids, edges })
+            }
+            MessageType::PresenceProof => {
+                if data.len() != 104 {
+                    return Err(AttestationError::InvalidPayloadSize {
+                        msg_type: "PresenceProof",
+                        expected: 104,
+                        got: data.len(),
+                    });
+                }
+                let mut node_id = [0u8; 16];
+                node_id.copy_from_slice(&data[0..16]);
+                let latitude = f64::from_le_bytes(data[16..24].try_into().unwrap());
+                let longitude = f64::from_le_bytes(data[24..32].try_into().unwrap());
+                let timestamp_ms = u64::from_le_bytes(data[32..40].try_into().unwrap());
+                let mut signature = [0u8; 64];
+                signature.copy_from_slice(&data[40..104]);
+                Ok(Self::PresenceProof { node_id, latitude, longitude, timestamp_ms, signature })
+            }
+            MessageType::VitalAuthChallenge => {
+                if data.len() != 56 {
+                    return Err(AttestationError::InvalidPayloadSize {
+                        msg_type: "VitalAuthChallenge",
+                        expected: 56,
+                        got: data.len(),
+                    });
+                }
+                let mut node_id = [0u8; 16];
+                node_id.copy_from_slice(&data[0..16]);
+                let mut challenge_nonce = [0u8; 32];
+                challenge_nonce.copy_from_slice(&data[16..48]);
+                let breathing_rate = f32::from_le_bytes(data[48..52].try_into().unwrap());
+                let heart_rate = f32::from_le_bytes(data[52..56].try_into().unwrap());
+                Ok(Self::VitalAuthChallenge { node_id, challenge_nonce, breathing_rate, heart_rate })
+            }
+            MessageType::EmCanaryAlert => {
+                if data.len() != 41 {
+                    return Err(AttestationError::InvalidPayloadSize {
+                        msg_type: "EmCanaryAlert",
+                        expected: 41,
+                        got: data.len(),
+                    });
+                }
+                let mut node_id = [0u8; 16];
+                node_id.copy_from_slice(&data[0..16]);
+                let alert_level = data[16];
+                let frequency_hz = f64::from_le_bytes(data[17..25].try_into().unwrap());
+                let power_dbm = f64::from_le_bytes(data[25..33].try_into().unwrap());
+                let timestamp_ms = u64::from_le_bytes(data[33..41].try_into().unwrap());
+                Ok(Self::EmCanaryAlert { node_id, alert_level, frequency_hz, power_dbm, timestamp_ms })
             }
         }
     }
@@ -483,6 +558,50 @@ impl AttestationMessageBuilder {
         edges: Vec<(NodeId, NodeId)>,
     ) -> Self {
         self.payload = Some(AttestationPayload::TopologyUpdate { node_ids, edges });
+        self
+    }
+
+    /// Set the payload to a presence proof message.
+    pub fn presence_proof(
+        mut self,
+        node_id: NodeId,
+        latitude: f64,
+        longitude: f64,
+        timestamp_ms: u64,
+        signature: [u8; 64],
+    ) -> Self {
+        self.payload = Some(AttestationPayload::PresenceProof {
+            node_id, latitude, longitude, timestamp_ms, signature,
+        });
+        self
+    }
+
+    /// Set the payload to a vital auth challenge message.
+    pub fn vital_auth_challenge(
+        mut self,
+        node_id: NodeId,
+        challenge_nonce: [u8; 32],
+        breathing_rate: f32,
+        heart_rate: f32,
+    ) -> Self {
+        self.payload = Some(AttestationPayload::VitalAuthChallenge {
+            node_id, challenge_nonce, breathing_rate, heart_rate,
+        });
+        self
+    }
+
+    /// Set the payload to an EM canary alert message.
+    pub fn em_canary_alert(
+        mut self,
+        node_id: NodeId,
+        alert_level: u8,
+        frequency_hz: f64,
+        power_dbm: f64,
+        timestamp_ms: u64,
+    ) -> Self {
+        self.payload = Some(AttestationPayload::EmCanaryAlert {
+            node_id, alert_level, frequency_hz, power_dbm, timestamp_ms,
+        });
         self
     }
 
