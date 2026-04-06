@@ -11,39 +11,49 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseService {
   SupabaseService._();
 
-  static SupabaseClient get client => Supabase.instance.client;
+  static bool _initialized = false;
+
+  static SupabaseClient? get client =>
+      _initialized ? Supabase.instance.client : null;
 
   static const _callbackScheme = 'com.qdaria.zipminator';
   static const _redirectTo = '$_callbackScheme://login-callback';
 
   static Future<void> initialize() async {
     await dotenv.load(fileName: '.env');
+    final url = dotenv.env['SUPABASE_URL'];
+    final key = dotenv.env['SUPABASE_ANON_KEY'];
+    if (url == null || key == null || url.isEmpty || key.isEmpty) {
+      debugPrint('Supabase credentials missing in .env, skipping init');
+      return;
+    }
     await Supabase.initialize(
-      url: dotenv.env['SUPABASE_URL']!,
-      anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+      url: url,
+      anonKey: key,
       authOptions: const FlutterAuthClientOptions(
         authFlowType: AuthFlowType.pkce,
       ),
       debug: false,
     );
+    _initialized = true;
   }
 
-  static User? get currentUser => client.auth.currentUser;
+  static User? get currentUser => client?.auth.currentUser;
 
   static Stream<AuthState> get authStateChanges =>
-      client.auth.onAuthStateChange;
+      client?.auth.onAuthStateChange ?? const Stream.empty();
 
   static Future<AuthResponse> signInWithEmail(
     String email,
     String password,
   ) =>
-      client.auth.signInWithPassword(email: email, password: password);
+      client!.auth.signInWithPassword(email: email, password: password);
 
   static Future<AuthResponse> signUpWithEmail(
     String email,
     String password,
   ) =>
-      client.auth.signUp(email: email, password: password);
+      client!.auth.signUp(email: email, password: password);
 
   /// OAuth via ASWebAuthenticationSession (iOS) / browser (macOS).
   ///
@@ -52,7 +62,7 @@ class SupabaseService {
   /// both query-param and fragment-based callbacks correctly.
   static Future<AuthResponse> signInWithOAuthBrowser(
       OAuthProvider provider) async {
-    final oauthResponse = await client.auth.getOAuthSignInUrl(
+    final oauthResponse = await client!.auth.getOAuthSignInUrl(
       provider: provider,
       redirectTo: _redirectTo,
     );
@@ -68,7 +78,7 @@ class SupabaseService {
     // Let Supabase parse the full callback URL (handles code in query
     // params, fragments, error responses, and PKCE exchange).
     final uri = Uri.parse(resultUrl);
-    final sessionResponse = await client.auth.getSessionFromUrl(uri);
+    final sessionResponse = await client!.auth.getSessionFromUrl(uri);
     return AuthResponse(
       session: sessionResponse.session,
       user: sessionResponse.session.user,
@@ -96,7 +106,7 @@ class SupabaseService {
       throw const AuthException('Apple Sign In failed: no ID token');
     }
 
-    final response = await client.auth.signInWithIdToken(
+    final response = await client!.auth.signInWithIdToken(
       provider: OAuthProvider.apple,
       idToken: idToken,
       nonce: rawNonce,
@@ -109,7 +119,7 @@ class SupabaseService {
       final fullName =
           '${givenName ?? ''} ${familyName ?? ''}'.trim();
       try {
-        await client.auth.updateUser(UserAttributes(
+        await client!.auth.updateUser(UserAttributes(
           data: {
             'full_name': fullName,
             'given_name': givenName,
@@ -150,7 +160,7 @@ class SupabaseService {
     if (username != null) data['username'] = username;
     if (displayName != null) data['full_name'] = displayName;
     if (data.isEmpty) return;
-    await client.auth.updateUser(UserAttributes(data: data));
+    await client!.auth.updateUser(UserAttributes(data: data));
   }
 
   static String _generateNonce([int length = 32]) {
@@ -162,7 +172,7 @@ class SupabaseService {
 
   static Future<void> signOut() async {
     try {
-      await client.auth.signOut(scope: SignOutScope.local);
+      await client!.auth.signOut(scope: SignOutScope.local);
     } catch (_) {}
   }
 }

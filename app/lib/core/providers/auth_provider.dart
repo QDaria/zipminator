@@ -54,13 +54,16 @@ class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() {
     final user = SupabaseService.currentUser;
-    _listenToAuthChanges();
+    if (SupabaseService.client != null) {
+      _listenToAuthChanges();
+    }
     ref.onDispose(() => _sub?.cancel());
     if (user != null) _ensureUsername(user);
     return AuthState(user: user);
   }
 
   void _listenToAuthChanges() {
+    if (SupabaseService.client == null) return;
     _sub?.cancel();
     _sub = SupabaseService.authStateChanges.listen((data) {
       final user = data.session?.user;
