@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zipminator/core/providers/anonymizer_provider.dart';
 import 'package:zipminator/core/providers/pii_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
@@ -170,8 +171,10 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
   @override
   Widget build(BuildContext context) {
     final pii = ref.watch(piiProvider);
-    final notifier = ref.read(piiProvider.notifier);
-    final level = pii.selectedLevel;
+    final piiNotifier = ref.read(piiProvider.notifier);
+    final anon = ref.watch(anonymizerProvider);
+    final anonNotifier = ref.read(anonymizerProvider.notifier);
+    final level = anon.selectedLevel;
     final color = _levelColor(level);
 
     return GestureDetector(
@@ -214,11 +217,11 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                 ),
 
                 // ── 1. 10-Level Slider ─────────────────────────────────
-                _buildLevelSlider(context, pii, notifier, level, color),
+                _buildLevelSlider(context, pii, anonNotifier, level, color),
                 const SizedBox(height: 12),
 
                 // ── 2. Use-case chips ──────────────────────────────────
-                _buildUseCaseChips(notifier),
+                _buildUseCaseChips(piiNotifier),
                 const SizedBox(height: 12),
 
                 // ── 3. Compliance badges row ───────────────────────────
@@ -226,12 +229,12 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                 const SizedBox(height: 16),
 
                 // ── 4. PII Scanner card + file upload ──────────────────
-                _buildScannerCard(context, pii, notifier),
+                _buildScannerCard(context, pii, piiNotifier, anonNotifier, anon),
                 const SizedBox(height: 16),
 
                 // ── 5. Before/after split view ─────────────────────────
-                if (pii.redactedText != null) ...[
-                  _buildBeforeAfterSplit(context, pii),
+                if (anon.result != null) ...[
+                  _buildBeforeAfterSplit(context, anon),
                   const SizedBox(height: 16),
                 ],
 
@@ -273,7 +276,7 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
   Widget _buildLevelSlider(
     BuildContext context,
     PiiScanState pii,
-    PiiNotifier notifier,
+    AnonymizerNotifier anonNotifier,
     int level,
     Color color,
   ) {
@@ -396,7 +399,7 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                   if (!confirmed) return;
                   _l10Acknowledged = true;
                 }
-                notifier.setLevel(newLevel);
+                anonNotifier.setLevel(newLevel);
               },
             ),
           ),
@@ -547,6 +550,8 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
     BuildContext context,
     PiiScanState pii,
     PiiNotifier notifier,
+    AnonymizerNotifier anonNotifier,
+    AnonymizerState anon,
   ) {
     return QuantumCard(
       glowColor: QuantumTheme.quantumOrange,
@@ -643,10 +648,10 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: _controller.text.isNotEmpty
-                      ? () => notifier.redact(_controller.text)
+                      ? () => anonNotifier.anonymize(_controller.text)
                       : null,
                   icon: const Icon(Icons.shield),
-                  label: Text('Redact (L${pii.selectedLevel})'),
+                  label: Text('Redact (L${anon.selectedLevel})'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: QuantumTheme.quantumOrange,
                   ),
@@ -657,6 +662,7 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                 onPressed: () {
                   _controller.clear();
                   notifier.clear();
+                  anonNotifier.clear();
                   setState(() => _uploadedFileName = null);
                 },
                 child: const Text('Clear'),
@@ -670,7 +676,8 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
 
   // ── 5. Before/after split view ───────────────────────────────────────
 
-  Widget _buildBeforeAfterSplit(BuildContext context, PiiScanState pii) {
+  Widget _buildBeforeAfterSplit(BuildContext context, AnonymizerState anon) {
+    final result = anon.result!;
     return QuantumCard(
       glowColor: QuantumTheme.quantumGreen,
       child: Column(
@@ -682,7 +689,7 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                   color: QuantumTheme.quantumGreen, size: 20),
               const SizedBox(width: 8),
               Expanded(
-                child: Text('Before / After (L${pii.selectedLevel})',
+                child: Text('Before / After (L${anon.selectedLevel})',
                     style: Theme.of(context).textTheme.titleSmall),
               ),
               IconButton(
@@ -732,7 +739,7 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
               context,
               label: 'ORIGINAL',
               color: QuantumTheme.quantumOrange,
-              text: pii.inputText,
+              text: result.originalText,
             ),
             const SizedBox(height: 10),
 
@@ -753,9 +760,9 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
             // Redacted
             _splitPane(
               context,
-              label: 'REDACTED',
+              label: 'ANONYMIZED (L${result.level})',
               color: QuantumTheme.quantumGreen,
-              text: pii.redactedText ?? '',
+              text: result.anonymizedText,
             ),
           ],
         ],
