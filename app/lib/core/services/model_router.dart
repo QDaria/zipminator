@@ -106,7 +106,7 @@ class ModelRouter {
   }) {
     return kAvailableModels.where((m) {
       if (!m.freeTier) return false;
-      if (m.isOnDevice) return downloadedOnDeviceModels.contains(m.id);
+      if (m.provider.isLocal) return downloadedOnDeviceModels.contains(m.id);
       final key = apiKeys[m.provider];
       return key != null && key.isNotEmpty;
     }).toList();

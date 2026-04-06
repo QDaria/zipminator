@@ -333,7 +333,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // Per-provider API key tiles (skip on-device)
           for (final provider in LLMProvider.values)
-            if (!provider.isOnDevice)
+            if (!provider.isLocal)
               _ProviderApiKeyTile(
                 provider: provider,
                 color: _providerColors[provider] ?? QuantumTheme.quantumPurple,

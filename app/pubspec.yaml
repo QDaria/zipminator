@@ -65,6 +65,7 @@ dependencies:
   google_sign_in: ^7.2.0
   flutter_web_auth_2: ^5.0.1
   local_auth: ^2.3.0
+  url_launcher: ^6.2.0
 
 dependency_overrides:
   # Pin to avoid objective_c native asset crash on iOS 26.3

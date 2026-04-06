@@ -2,7 +2,6 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/core/providers/pii_provider.dart';
-import 'package:zipminator/src/rust/api/simple.dart' as rust;
 
 /// Anonymization strategy corresponding to Rust AnonymizationLevel 1-10.
 enum AnonymizationStrategy {
@@ -255,25 +254,11 @@ class AnonymizerNotifier extends Notifier<AnonymizerState> {
 
   /// Get entropy bytes from Rust QRNG bridge, falling back to secure random.
   Uint8List _getEntropy(int length) {
-    try {
-      final hex = rust.getEntropy(numBytes: length);
-      return _hexToBytes(hex);
-    } catch (_) {
-      // Fallback to dart:math secure random
-      final rng = Random.secure();
-      return Uint8List.fromList(
-        List.generate(length, (_) => rng.nextInt(256)),
-      );
-    }
-  }
-
-  Uint8List _hexToBytes(String hex) {
-    final clean = hex.replaceAll(' ', '');
-    final bytes = Uint8List(clean.length ~/ 2);
-    for (var i = 0; i < bytes.length; i++) {
-      bytes[i] = int.parse(clean.substring(i * 2, i * 2 + 2), radix: 16);
-    }
-    return bytes;
+    // Use dart:math secure random (Rust FFI bridge has no getEntropy export).
+    final rng = Random.secure();
+    return Uint8List.fromList(
+      List.generate(length, (_) => rng.nextInt(256)),
+    );
   }
 
   // ── K-anonymity generalization helpers ──────────────────────────────
