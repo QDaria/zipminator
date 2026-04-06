@@ -111,9 +111,21 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  bool _requireSupabase() {
+    if (SupabaseService.client == null) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Auth service not configured. Add Supabase credentials to .env',
+      );
+      return false;
+    }
+    return true;
+  }
+
   /// Email + password sign in.
   Future<void> signInWithEmail(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
+    if (!_requireSupabase()) return;
     try {
       final response = await SupabaseService.signInWithEmail(email, password);
       state = state.copyWith(
@@ -128,6 +140,7 @@ class AuthNotifier extends Notifier<AuthState> {
   /// Email + password sign up.
   Future<void> signUpWithEmail(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
+    if (!_requireSupabase()) return;
     try {
       final response = await SupabaseService.signUpWithEmail(email, password);
       if (response.session == null) {
@@ -146,6 +159,7 @@ class AuthNotifier extends Notifier<AuthState> {
   /// Native Apple Sign-In (system sheet, no browser).
   Future<void> signInWithApple() async {
     state = state.copyWith(isLoading: true, error: null);
+    if (!_requireSupabase()) return;
     try {
       final response = await SupabaseService.signInWithApple();
       state = state.copyWith(user: response.user, isLoading: false);
@@ -164,6 +178,7 @@ class AuthNotifier extends Notifier<AuthState> {
   /// Supabase's getSessionFromUrl for correct PKCE + fragment handling.
   Future<void> signInWithOAuth(OAuthProvider provider) async {
     state = state.copyWith(isLoading: true, error: null);
+    if (!_requireSupabase()) return;
     try {
       final response = await SupabaseService.signInWithOAuthBrowser(provider);
       state = state.copyWith(user: response.user, isLoading: false);
