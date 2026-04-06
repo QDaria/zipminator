@@ -15,6 +15,7 @@ COMPOSE_FILE = os.path.join(
 )
 
 API_URL = os.environ.get("ZIPMINATOR_API_URL", "http://localhost:8000")
+WS_URL = os.environ.get("ZIPMINATOR_WS_URL", "ws://localhost:8765")
 KEYDIR_URL = os.environ.get("ZIPMINATOR_KEYDIR_URL", "http://localhost:8080")
 
 
@@ -125,6 +126,17 @@ def async_api_client():
         pytest.skip(f"API server not reachable at {API_URL}")
     client = httpx.AsyncClient(base_url=API_URL, timeout=15)
     yield client
+
+
+@pytest.fixture(scope="session")
+def ws_url():
+    """WebSocket URL for the signaling server.
+
+    Defaults to ws://localhost:8765. Override with ZIPMINATOR_WS_URL env var.
+    Used by live-server integration tests (test_websocket_ratchet.py when run
+    against a deployed signaling server instead of in-process TestClient).
+    """
+    return WS_URL
 
 
 def _auth_header(token: str) -> dict:
