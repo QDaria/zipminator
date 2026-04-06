@@ -750,8 +750,15 @@ class RatchetNotifier extends Notifier<RatchetState> {
       return null;
     }
 
-    // Offline / demo fallback: schedule auto-reply.
-    _scheduleAutoReply();
+    // Offline: schedule demo auto-reply only when signaling is unreachable.
+    // In production (isLive was true but connection dropped), show an error.
+    if (!state.isLive) {
+      _scheduleAutoReply();
+    } else {
+      // Was live but disconnected mid-session: queue for retry
+      state = state.copyWith(
+          error: 'Signaling disconnected. Message queued for retry.');
+    }
 
     // Attempt Rust ratchet encryption (best-effort).
     if (state.sessionId != null && state.isConnected) {
