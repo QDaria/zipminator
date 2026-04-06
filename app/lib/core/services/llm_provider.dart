@@ -1,24 +1,23 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'on_device_service.dart';
 import 'openai_compatible_service.dart';
 
 /// Supported LLM providers.
 enum LLMProvider {
-  onDevice('On-Device', 'Google AI Edge'),
   gemini('Gemini', 'Google'),
   groq('Groq', 'Groq'),
   deepSeek('DeepSeek', 'DeepSeek'),
   mistral('Mistral', 'Mistral AI'),
   claude('Claude', 'Anthropic'),
-  openRouter('OpenRouter', 'OpenRouter');
+  openRouter('OpenRouter', 'OpenRouter'),
+  ollama('Ollama (Local)', 'Local');
 
   final String displayName;
   final String company;
   const LLMProvider(this.displayName, this.company);
 
-  /// Whether this provider runs entirely on-device (no network, no API key).
-  bool get isOnDevice => this == LLMProvider.onDevice;
+  /// Whether this provider runs locally and needs no API key.
+  bool get isLocal => this == LLMProvider.ollama;
 }
 
 /// Model metadata for UI display.
@@ -28,93 +27,16 @@ class LLMModel {
   final LLMProvider provider;
   final bool freeTier;
 
-  /// Size in bytes for on-device models (used for download UI).
-  final int? sizeBytes;
-
-  /// HuggingFace repo ID for on-device model downloads.
-  final String? hfRepo;
-
-  /// Filename within the HuggingFace repo.
-  final String? hfFilename;
-
-  /// Supported modalities (text, vision, audio, thinking).
-  final List<String> modalities;
-
   const LLMModel({
     required this.id,
     required this.displayName,
     required this.provider,
     this.freeTier = false,
-    this.sizeBytes,
-    this.hfRepo,
-    this.hfFilename,
-    this.modalities = const ['text'],
   });
-
-  /// Human-readable size string.
-  String get sizeLabel {
-    if (sizeBytes == null) return '';
-    final mb = sizeBytes! / (1024 * 1024);
-    if (mb >= 1024) return '${(mb / 1024).toStringAsFixed(1)} GB';
-    return '${mb.toStringAsFixed(0)} MB';
-  }
-
-  bool get isOnDevice => provider == LLMProvider.onDevice;
 }
 
-/// All available models grouped by provider. On-device first, then cloud.
+/// All available models grouped by provider. Free-tier models listed first.
 const kAvailableModels = <LLMModel>[
-  // On-Device (Google AI Edge Gallery / LiteRT-LM — no API key, 100% private)
-  LLMModel(
-    id: 'gemma-3-1b-it-q4',
-    displayName: 'Gemma 3 1B',
-    provider: LLMProvider.onDevice,
-    freeTier: true,
-    sizeBytes: 612368384, // ~584 MB
-    hfRepo: 'litert-community/Gemma3-1B-IT',
-    hfFilename: 'gemma3-1b-it-q4_0.litertlm',
-    modalities: ['text'],
-  ),
-  LLMModel(
-    id: 'gemma-4-e2b-it',
-    displayName: 'Gemma 4 E2B',
-    provider: LLMProvider.onDevice,
-    freeTier: true,
-    sizeBytes: 2791728742, // ~2.6 GB
-    hfRepo: 'litert-community/Gemma4-E2B-it',
-    hfFilename: 'gemma4-e2b-it.litertlm',
-    modalities: ['text', 'vision', 'audio', 'thinking'],
-  ),
-  LLMModel(
-    id: 'gemma-4-e4b-it',
-    displayName: 'Gemma 4 E4B',
-    provider: LLMProvider.onDevice,
-    freeTier: true,
-    sizeBytes: 3971973120, // ~3.7 GB
-    hfRepo: 'litert-community/Gemma4-E4B-it',
-    hfFilename: 'gemma4-e4b-it.litertlm',
-    modalities: ['text', 'vision', 'audio', 'thinking'],
-  ),
-  LLMModel(
-    id: 'gemma-3n-e2b-it',
-    displayName: 'Gemma 3n E2B',
-    provider: LLMProvider.onDevice,
-    freeTier: true,
-    sizeBytes: 3971973120, // ~3.7 GB
-    hfRepo: 'litert-community/Gemma3n-E2B-it',
-    hfFilename: 'gemma3n-e2b-it.litertlm',
-    modalities: ['text', 'vision', 'audio'],
-  ),
-  LLMModel(
-    id: 'deepseek-r1-distill-qwen-1.5b',
-    displayName: 'DeepSeek R1 1.5B',
-    provider: LLMProvider.onDevice,
-    freeTier: true,
-    sizeBytes: 1610612736, // ~1.5 GB
-    hfRepo: 'litert-community/DeepSeek-R1-Distill-Qwen-1.5B',
-    hfFilename: 'deepseek-r1-distill-qwen-1.5b.litertlm',
-    modalities: ['text'],
-  ),
   // Gemini (free tier, very capable)
   LLMModel(
       id: 'gemini-2.5-flash',
@@ -186,6 +108,27 @@ const kAvailableModels = <LLMModel>[
       id: 'meta-llama/llama-4-maverick',
       displayName: 'Llama 4 Maverick',
       provider: LLMProvider.openRouter),
+  // Ollama (local, no API key needed)
+  LLMModel(
+      id: 'llama3.2',
+      displayName: 'Llama 3.2',
+      provider: LLMProvider.ollama,
+      freeTier: true),
+  LLMModel(
+      id: 'mistral',
+      displayName: 'Mistral',
+      provider: LLMProvider.ollama,
+      freeTier: true),
+  LLMModel(
+      id: 'phi3',
+      displayName: 'Phi-3',
+      provider: LLMProvider.ollama,
+      freeTier: true),
+  LLMModel(
+      id: 'gemma2',
+      displayName: 'Gemma 2',
+      provider: LLMProvider.ollama,
+      freeTier: true),
 ];
 
 /// System prompt so Q-AI identifies correctly regardless of backend model.
@@ -203,6 +146,84 @@ abstract class LLMService {
     int maxTokens,
   });
   void dispose();
+}
+
+/// Ollama local LLM service.
+///
+/// Connects to a locally running Ollama instance at `http://localhost:11434`.
+/// No API key required; all inference runs on-device.
+class OllamaService implements LLMService {
+  static const _baseUrl = 'http://localhost:11434';
+  final http.Client _client;
+
+  OllamaService({http.Client? client}) : _client = client ?? http.Client();
+
+  @override
+  Future<String> sendMessage({
+    required String model,
+    required List<Map<String, String>> messages,
+    String? systemPrompt,
+    int maxTokens = 1024,
+  }) async {
+    final allMessages = <Map<String, String>>[];
+    if (systemPrompt != null) {
+      allMessages.add({'role': 'system', 'content': systemPrompt});
+    }
+    allMessages.addAll(messages);
+
+    final response = await _client.post(
+      Uri.parse('$_baseUrl/api/chat'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'model': model,
+        'messages': allMessages,
+        'stream': false,
+        'options': {'num_predict': maxTokens},
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw LLMException('Ollama error: HTTP ${response.statusCode}');
+    }
+
+    final parsed = jsonDecode(response.body);
+    final content = parsed['message']?['content'] as String?;
+    if (content == null || content.isEmpty) {
+      throw LLMException('No response from Ollama');
+    }
+    return content;
+  }
+
+  /// Check if Ollama is running locally.
+  static Future<bool> isAvailable() async {
+    try {
+      final response = await http.get(Uri.parse('$_baseUrl/api/tags'))
+          .timeout(const Duration(seconds: 2));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// List models currently pulled in the local Ollama instance.
+  static Future<List<String>> availableModels() async {
+    try {
+      final response = await http.get(Uri.parse('$_baseUrl/api/tags'))
+          .timeout(const Duration(seconds: 2));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final models = (data['models'] as List?)
+                ?.map((m) => m['name'] as String)
+                .toList() ??
+            [];
+        return models;
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  @override
+  void dispose() => _client.close();
 }
 
 /// Claude (Anthropic Messages API).
@@ -332,13 +353,13 @@ class OpenRouterService extends OpenAICompatibleService {
 /// Factory to create the right service for a provider.
 LLMService createLLMService(LLMProvider provider, String apiKey) =>
     switch (provider) {
-      LLMProvider.onDevice => OnDeviceService(),
       LLMProvider.claude => ClaudeService(apiKey: apiKey),
       LLMProvider.gemini => GeminiService(apiKey: apiKey),
       LLMProvider.groq => GroqService(apiKey: apiKey),
       LLMProvider.deepSeek => DeepSeekService(apiKey: apiKey),
       LLMProvider.mistral => MistralService(apiKey: apiKey),
       LLMProvider.openRouter => OpenRouterService(apiKey: apiKey),
+      LLMProvider.ollama => OllamaService(),
     };
 
 class LLMException implements Exception {

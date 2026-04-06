@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zipminator/core/providers/on_device_provider.dart';
 import 'package:zipminator/core/services/llm_provider.dart';
 
 class QaiMessage {
@@ -25,16 +24,15 @@ class QaiState {
 
   const QaiState({
     this.messages = const [],
-    this.selectedModel = 'gemma-3-1b-it-q4',
-    this.selectedProvider = LLMProvider.onDevice,
+    this.selectedModel = 'gemini-2.5-flash',
+    this.selectedProvider = LLMProvider.gemini,
     this.isLoading = false,
     this.apiKeys = const {},
     this.error,
   });
 
-  /// On-device provider never needs an API key.
   bool get hasApiKey {
-    if (selectedProvider.isOnDevice) return true;
+    if (selectedProvider.isLocal) return true;
     final key = apiKeys[selectedProvider];
     return key != null && key.isNotEmpty;
   }
@@ -115,23 +113,6 @@ class QaiNotifier extends Notifier<QaiState> {
       return;
     }
 
-    // On-device: check that a model is actually downloaded and loaded.
-    if (state.selectedProvider.isOnDevice) {
-      final onDevice = ref.read(onDeviceProvider);
-      if (!onDevice.isModelDownloaded(state.selectedModel)) {
-        state = state.copyWith(
-          error: 'Download the model first (tap the download button).',
-        );
-        return;
-      }
-      // Auto-activate if not already loaded.
-      if (onDevice.activeModelId != state.selectedModel) {
-        await ref
-            .read(onDeviceProvider.notifier)
-            .activateModel(state.selectedModel);
-      }
-    }
-
     final userMsg = QaiMessage(
       text: text,
       isUser: true,
@@ -144,11 +125,8 @@ class QaiNotifier extends Notifier<QaiState> {
     );
 
     try {
-      // On-device needs no API key; pass empty string.
-      final apiKey = state.selectedProvider.isOnDevice
-          ? ''
-          : state.currentApiKey!;
-      final service = createLLMService(state.selectedProvider, apiKey);
+      final service =
+          createLLMService(state.selectedProvider, state.currentApiKey ?? '');
       final apiMessages = state.messages
           .map((m) => {
                 'role': m.isUser ? 'user' : 'assistant',
@@ -156,7 +134,7 @@ class QaiNotifier extends Notifier<QaiState> {
               })
           .toList();
 
-      // Resolve display name for the system prompt.
+      // Resolve display name for the system prompt
       final modelInfo = kAvailableModels
           .where((m) => m.id == state.selectedModel)
           .firstOrNull;

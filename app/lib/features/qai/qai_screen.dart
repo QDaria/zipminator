@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zipminator/core/providers/comparison_provider.dart';
-import 'package:zipminator/core/providers/on_device_provider.dart';
 import 'package:zipminator/core/providers/pii_provider.dart';
 import 'package:zipminator/core/providers/qai_provider.dart';
 import 'package:zipminator/core/providers/voice_provider.dart';
@@ -24,14 +23,30 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
   final _scrollController = ScrollController();
 
   static const _providerColors = {
-    LLMProvider.onDevice: QuantumTheme.quantumGreen,
     LLMProvider.gemini: QuantumTheme.quantumBlue,
     LLMProvider.groq: QuantumTheme.quantumGreen,
     LLMProvider.deepSeek: QuantumTheme.quantumCyan,
     LLMProvider.mistral: QuantumTheme.quantumOrange,
     LLMProvider.claude: QuantumTheme.quantumPurple,
     LLMProvider.openRouter: Color(0xFFFF6D00),
+    LLMProvider.ollama: QuantumTheme.quantumGreen,
   };
+
+  /// Tracks whether the local Ollama server is reachable.
+  bool _ollamaAvailable = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkOllamaHealth();
+  }
+
+  Future<void> _checkOllamaHealth() async {
+    final available = await OllamaService.isAvailable();
+    if (mounted && available != _ollamaAvailable) {
+      setState(() => _ollamaAvailable = available);
+    }
+  }
 
   @override
   void dispose() {
@@ -121,47 +136,8 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
       body: GradientBackground(
         child: Column(
           children: [
-            // On-device privacy badge
-            if (qai.selectedProvider.isOnDevice)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                color: QuantumTheme.quantumGreen.withValues(alpha: 0.08),
-                child: Row(
-                  children: [
-                    Icon(Icons.shield_outlined,
-                        size: 16, color: QuantumTheme.quantumGreen),
-                    const SizedBox(width: 6),
-                    Text(
-                      '100% On-Device',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: QuantumTheme.quantumGreen,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'No data leaves your device',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: QuantumTheme.quantumGreen
-                                .withValues(alpha: 0.7),
-                          ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      'Google AI Edge',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: QuantumTheme.quantumGreen
-                                .withValues(alpha: 0.5),
-                            fontSize: 10,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-
-            // API key banner (cloud providers only)
-            if (!qai.selectedProvider.isOnDevice && !qai.hasApiKey)
+            // API key / Ollama status banner
+            if (!qai.hasApiKey)
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -176,6 +152,30 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                         'Set your ${qai.selectedProvider.displayName} API key in Settings to chat',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
+                    ),
+                  ],
+                ),
+              ),
+            if (qai.selectedProvider == LLMProvider.ollama && !_ollamaAvailable)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                color: QuantumTheme.quantumRed.withValues(alpha: 0.1),
+                child: Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded,
+                        size: 18, color: QuantumTheme.quantumRed),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Ollama not running. Start it with: ollama serve',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh, size: 16),
+                      onPressed: _checkOllamaHealth,
+                      tooltip: 'Retry connection',
                     ),
                   ],
                 ),
@@ -195,11 +195,16 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: ChoiceChip(
-                        avatar: Icon(
-                          _providerIcon(provider),
-                          size: 16,
-                          color: isSelected ? Colors.white : color,
-                        ),
+                        avatar: provider == LLMProvider.ollama
+                            ? _OllamaHealthDot(
+                                available: _ollamaAvailable,
+                                color: isSelected ? Colors.white : color,
+                              )
+                            : Icon(
+                                _providerIcon(provider),
+                                size: 16,
+                                color: isSelected ? Colors.white : color,
+                              ),
                         label: Text(provider.displayName),
                         selected: isSelected,
                         selectedColor: color.withValues(alpha: 0.3),
@@ -212,9 +217,14 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                           color: isSelected ? color : null,
                           fontWeight: isSelected ? FontWeight.w600 : null,
                         ),
-                        onSelected: (_) => ref
-                            .read(qaiProvider.notifier)
-                            .selectProvider(provider),
+                        onSelected: (_) {
+                          ref
+                              .read(qaiProvider.notifier)
+                              .selectProvider(provider);
+                          if (provider == LLMProvider.ollama) {
+                            _checkOllamaHealth();
+                          }
+                        },
                       ),
                     );
                   }).toList(),
@@ -231,85 +241,31 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                 child: Row(
                   children: qai.availableModels.map((model) {
                     final isSelected = qai.selectedModel == model.id;
-                    final onDevice = ref.watch(onDeviceProvider);
-                    final isDownloaded =
-                        model.isOnDevice && onDevice.isModelDownloaded(model.id);
-                    final isDownloading =
-                        onDevice.downloadingModelId == model.id;
-
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
-                        onLongPress: model.isOnDevice && isDownloaded
-                            ? () => _showModelActions(context, ref, model)
-                            : null,
-                        child: ChoiceChip(
-                          avatar: model.isOnDevice
-                              ? Icon(
-                                  isDownloaded
-                                      ? Icons.check_circle_outline
-                                      : isDownloading
-                                          ? Icons.downloading
-                                          : Icons.download_outlined,
-                                  size: 14,
-                                  color: isSelected
-                                      ? providerColor
-                                      : providerColor.withValues(alpha: 0.5),
-                                )
-                              : null,
-                          label: Text(
-                            model.isOnDevice
-                                ? '${model.displayName} (${model.sizeLabel})'
-                                : model.displayName,
-                          ),
-                          selected: isSelected,
-                          selectedColor: providerColor.withValues(alpha: 0.3),
-                          side: BorderSide(
-                            color: isSelected
-                                ? providerColor.withValues(alpha: 0.6)
-                                : providerColor.withValues(alpha: 0.15),
-                          ),
-                          labelStyle: TextStyle(
-                            color: isSelected ? providerColor : null,
-                            fontWeight: isSelected ? FontWeight.w600 : null,
-                            fontSize: 12,
-                          ),
-                          onSelected: (_) {
-                            ref.read(qaiProvider.notifier).selectModel(model.id);
-                            // Auto-trigger download if not yet available.
-                            if (model.isOnDevice && !isDownloaded && !isDownloading) {
-                              ref.read(onDeviceProvider.notifier).downloadModel(model);
-                            }
-                          },
+                      child: ChoiceChip(
+                        label: Text(model.displayName),
+                        selected: isSelected,
+                        selectedColor: providerColor.withValues(alpha: 0.3),
+                        side: BorderSide(
+                          color: isSelected
+                              ? providerColor.withValues(alpha: 0.6)
+                              : providerColor.withValues(alpha: 0.15),
                         ),
+                        labelStyle: TextStyle(
+                          color: isSelected ? providerColor : null,
+                          fontWeight: isSelected ? FontWeight.w600 : null,
+                          fontSize: 12,
+                        ),
+                        onSelected: (_) => ref
+                            .read(qaiProvider.notifier)
+                            .selectModel(model.id),
                       ),
                     );
                   }).toList(),
                 ),
               ),
             ),
-
-            // Download progress bar for on-device models
-            if (ref.watch(onDeviceProvider).isDownloading)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    LinearProgressIndicator(
-                      value: ref.watch(onDeviceProvider).downloadProgress,
-                      color: providerColor,
-                      backgroundColor: providerColor.withValues(alpha: 0.1),
-                      minHeight: 3,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Downloading model... ${(ref.watch(onDeviceProvider).downloadProgress * 100).toStringAsFixed(0)}%',
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                  ],
-                ),
-              ),
 
             // Comparison mode or Messages
             if (ref.watch(comparisonProvider).isActive)
@@ -336,7 +292,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                               iconColor: providerColor,
                             ),
                             Text(
-                              '7 providers, 19 models — on-device by default',
+                              '7 providers, 18 models — select above',
                               style: Theme.of(context).textTheme.bodySmall,
                             )
                                 .animate()
@@ -423,20 +379,17 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                     child: TextField(
                       controller: _controller,
                       decoration: InputDecoration(
-                        hintText: qai.hasApiKey
-                            ? 'Ask anything...'
-                            : 'Set API key in Settings first',
+                        hintText: _inputHint(qai),
                         border: InputBorder.none,
                         suffixText: qai.selectedModel.split('/').last,
                       ),
-                      enabled: qai.hasApiKey && !qai.isLoading,
+                      enabled: _canSend(qai),
                       onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
                   IconButton(
                     icon: Icon(Icons.send, color: providerColor),
-                    onPressed:
-                        qai.hasApiKey && !qai.isLoading ? _sendMessage : null,
+                    onPressed: _canSend(qai) ? _sendMessage : null,
                   ),
                 ],
               ),
@@ -448,41 +401,68 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
   }
 
   IconData _providerIcon(LLMProvider provider) => switch (provider) {
-        LLMProvider.onDevice => Icons.smartphone,
         LLMProvider.gemini => Icons.auto_awesome,
         LLMProvider.groq => Icons.bolt,
         LLMProvider.deepSeek => Icons.psychology,
         LLMProvider.mistral => Icons.air,
         LLMProvider.claude => Icons.diamond_outlined,
         LLMProvider.openRouter => Icons.router_outlined,
+        LLMProvider.ollama => Icons.computer,
       };
 
-  void _showModelActions(
-      BuildContext context, WidgetRef ref, LLMModel model) {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: Text(model.displayName),
-              subtitle: Text(
-                '${model.sizeLabel} · ${model.modalities.join(", ")}',
+  /// Whether the send button / text field should be enabled.
+  bool _canSend(QaiState qai) {
+    if (qai.isLoading) return false;
+    if (qai.selectedProvider == LLMProvider.ollama) return _ollamaAvailable;
+    return qai.hasApiKey;
+  }
+
+  /// Hint text for the input field based on provider state.
+  String _inputHint(QaiState qai) {
+    if (qai.selectedProvider == LLMProvider.ollama) {
+      return _ollamaAvailable
+          ? 'Ask anything (local)...'
+          : 'Start Ollama first: ollama serve';
+    }
+    return qai.hasApiKey ? 'Ask anything...' : 'Set API key in Settings first';
+  }
+}
+
+/// Green/red health indicator dot for the Ollama chip.
+class _OllamaHealthDot extends StatelessWidget {
+  final bool available;
+  final Color color;
+
+  const _OllamaHealthDot({required this.available, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 16,
+      height: 16,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(Icons.computer, size: 16, color: color),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 7,
+              height: 7,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: available
+                    ? QuantumTheme.quantumGreen
+                    : QuantumTheme.quantumRed,
+                border: Border.all(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  width: 1,
+                ),
               ),
             ),
-            ListTile(
-              leading: Icon(Icons.delete_outline,
-                  color: QuantumTheme.quantumRed),
-              title: const Text('Delete model'),
-              onTap: () {
-                ref.read(onDeviceProvider.notifier).deleteModel(model.id);
-                Navigator.pop(ctx);
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
