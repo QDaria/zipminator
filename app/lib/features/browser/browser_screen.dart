@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zipminator/core/providers/browser_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
@@ -19,8 +20,6 @@ class BrowserScreen extends ConsumerStatefulWidget {
 
 class _BrowserScreenState extends ConsumerState<BrowserScreen> {
   late TextEditingController _urlController;
-  bool _fingerprintProtection = true;
-  bool _cookieRotation = true;
 
   @override
   void initState() {
@@ -175,12 +174,16 @@ class _BrowserScreenState extends ConsumerState<BrowserScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_back, size: 20),
-            onPressed: browser.canGoBack ? () {} : null,
+            onPressed: browser.canGoBack
+                ? () => ref.read(browserProvider.notifier).goBack()
+                : null,
             tooltip: 'Back',
           ),
           IconButton(
             icon: const Icon(Icons.arrow_forward, size: 20),
-            onPressed: browser.canGoForward ? () {} : null,
+            onPressed: browser.canGoForward
+                ? () => ref.read(browserProvider.notifier).goForward()
+                : null,
             tooltip: 'Forward',
           ),
         ],
@@ -252,17 +255,18 @@ class _BrowserScreenState extends ConsumerState<BrowserScreen> {
                           _PrivacyChip(
                             icon: Icons.fingerprint,
                             label: 'FP',
-                            active: _fingerprintProtection,
-                            onTap: () => setState(() =>
-                                _fingerprintProtection =
-                                    !_fingerprintProtection),
+                            active: browser.fingerprintProtection,
+                            onTap: () => ref
+                                .read(browserProvider.notifier)
+                                .toggleFingerprint(),
                           ),
                           _PrivacyChip(
                             icon: Icons.cookie_outlined,
                             label: 'Cookie',
-                            active: _cookieRotation,
-                            onTap: () => setState(
-                                () => _cookieRotation = !_cookieRotation),
+                            active: browser.cookieRotation,
+                            onTap: () => ref
+                                .read(browserProvider.notifier)
+                                .toggleCookieRotation(),
                           ),
                           _PrivacyChip(
                             icon: Icons.block,
@@ -298,13 +302,29 @@ class _BrowserScreenState extends ConsumerState<BrowserScreen> {
                               size: 48, color: QuantumTheme.textSecondary),
                           const SizedBox(height: 12),
                           Text(
-                            'WebView not supported on this platform.\n'
-                            'Use the Tauri desktop browser for full PQC browsing.',
+                            'PQC proxy requires the Tauri desktop browser.\n'
+                            'You can open URLs in your system browser below.',
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
                                 ?.copyWith(color: QuantumTheme.textSecondary),
+                          ),
+                          const SizedBox(height: 16),
+                          FilledButton.icon(
+                            onPressed: () {
+                              final url = _urlController.text.trim();
+                              if (url.isNotEmpty) {
+                                launchUrl(Uri.parse(url),
+                                    mode: LaunchMode.externalApplication);
+                              }
+                            },
+                            icon: const Icon(Icons.open_in_browser),
+                            label: const Text('Open in System Browser'),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: QuantumTheme.quantumCyan,
+                              foregroundColor: Colors.black,
+                            ),
                           ),
                         ],
                       ),

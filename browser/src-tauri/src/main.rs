@@ -40,25 +40,34 @@ fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .manage(AppState::new())
-        .manage(ai::initial_state(None)) // AI sidebar state (proxy port set in setup)
         .setup(|app| {
             let app_handle = app.handle().clone();
 
             // ── Domain 2: Start PQC HTTPS Proxy ───────────────────────────
+            // Use a channel so the proxy port feeds back into AI sidebar state.
             let data_dir = app.path().app_data_dir().unwrap_or_else(|_| {
                 std::env::temp_dir().join("zipbrowser")
             });
             let proxy_data_dir = data_dir.clone();
+            let (port_tx, port_rx) = std::sync::mpsc::channel();
             tauri::async_runtime::spawn(async move {
                 match zipbrowser::start_proxy(proxy_data_dir).await {
                     Ok((host, port)) => {
                         tracing::info!(host, port, "PQC HTTPS proxy started");
+                        let _ = port_tx.send(Some(port));
                     }
                     Err(e) => {
                         tracing::error!(error = %e, "Failed to start PQC proxy");
+                        let _ = port_tx.send(None);
                     }
                 }
             });
+            // Wait briefly for proxy to start, then wire port into AI state.
+            let proxy_port = port_rx
+                .recv_timeout(std::time::Duration::from_secs(5))
+                .unwrap_or(None);
+            tracing::info!(?proxy_port, "AI sidebar proxy port configured");
+            app.manage(ai::initial_state(proxy_port));
 
             // ── Domain 3: Initialize the VPN manager ──────────────────────
             zipbrowser::init_vpn_manager();
