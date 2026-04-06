@@ -105,6 +105,13 @@ export default function SpareBank1PitchPage() {
         >
           Logg inn
         </button>
+
+        <p className="text-slate-500 text-xs mt-2">
+          Trenger tilgang?{' '}
+          <a href="mailto:mo@qdaria.com" className="text-cyan-400 hover:underline">
+            mo@qdaria.com
+          </a>
+        </p>
       </form>
     </div>
   )
