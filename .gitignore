@@ -410,3 +410,6 @@ _screenshots/
 docs/book/_build/
 .playwright-mcp/
 web/screenshots/
+
+# Session transcripts (contain conversation history, may include secrets)
+docs/guides/session-transcripts/
