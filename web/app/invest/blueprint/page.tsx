@@ -10,6 +10,7 @@ import { SectionPatentStack } from '@/components/blueprint/sections/SectionPaten
 import { SectionRegulatoryMoat } from '@/components/blueprint/sections/SectionRegulatoryMoat'
 import { SectionPatentDeepDives } from '@/components/blueprint/sections/SectionPatentDeepDives'
 import { SectionNovelty } from '@/components/blueprint/sections/SectionNovelty'
+import { SectionIPScoring } from '@/components/blueprint/sections/SectionIPScoring'
 import { SectionValuation } from '@/components/blueprint/sections/SectionValuation'
 import { SectionComparables } from '@/components/blueprint/sections/SectionComparables'
 import { SectionCompanyVal } from '@/components/blueprint/sections/SectionCompanyVal'
@@ -17,6 +18,9 @@ import { SectionUseCases } from '@/components/blueprint/sections/SectionUseCases
 import { SectionPillars } from '@/components/blueprint/sections/SectionPillars'
 import { SectionCompetitors } from '@/components/blueprint/sections/SectionCompetitors'
 import { SectionMarketSize } from '@/components/blueprint/sections/SectionMarketSize'
+import { SectionAddressableUniverse } from '@/components/blueprint/sections/SectionAddressableUniverse'
+import { SectionResearch } from '@/components/blueprint/sections/SectionResearch'
+import { SectionRoadmap } from '@/components/blueprint/sections/SectionRoadmap'
 import { SectionFloorMatters } from '@/components/blueprint/sections/SectionFloorMatters'
 
 const PASS = 'zip2026bp'
@@ -178,12 +182,19 @@ export default function BlueprintPage() {
             IP Valuation Blueprint
           </h1>
           <p
-            className="text-lg text-slate-400 max-w-2xl mx-auto mb-8"
+            className="text-lg text-slate-400 max-w-2xl mx-auto mb-4"
             style={{ fontFamily: 'var(--font-dm-sans), sans-serif' }}
           >
             Three-patent PQC portfolio analysis: complementarity, regulatory moat,
-            and pre-revenue valuation framework for the world's first quantum-certified
+            and pre-revenue valuation framework for the world&apos;s first quantum-certified
             encryption infrastructure.
+          </p>
+          <p
+            className="text-sm text-slate-500 max-w-xl mx-auto mb-8"
+            style={{ fontFamily: 'var(--font-dm-sans), sans-serif' }}
+          >
+            46 claims. 1,584 tests. 6.8 MB real quantum entropy from IBM Quantum (156 qubits).
+            Zero blocking prior art across 48 exhaustive patent searches.
           </p>
 
           {/* Mobile scenario toggle */}
@@ -192,17 +203,24 @@ export default function BlueprintPage() {
           </div>
 
           {/* Hero stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-3xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-4xl mx-auto">
             {[
-              { label: 'Patents', value: '3', sub: '1 filed, 2 drafted' },
-              { label: 'Claims', value: '40', sub: 'code-verified' },
-              { label: 'Regulations', value: '8', sub: 'compliance moat' },
-              { label: 'Platforms', value: '6', sub: 'single codebase' },
+              { label: 'Patents Filed', value: '3', sub: 'All at Patentstyret', accent: '#22D3EE' },
+              { label: 'Total Claims', value: '46', sub: '9 independent, 37 dependent', accent: '#F59E0B' },
+              { label: 'Regulations', value: '8', sub: 'GDPR, DORA, NIS2, CNSA 2.0...', accent: '#34D399' },
+              { label: 'Platforms', value: '6', sub: 'macOS, Win, Linux, iOS, Android, Web', accent: '#A78BFA' },
+              { label: 'Tests Passing', value: '1,584', sub: 'Rust + Python + Flutter + Browser', accent: '#FB7185' },
+              { label: 'Prior Art', value: '0', sub: '48 searches, zero results', accent: '#ef4444' },
+              { label: 'ePrint Papers', value: '3', sub: 'CCS 2026 + PoPETs 2027', accent: '#6366f1' },
+              { label: 'Portfolio Value', value: '$10B+', sub: 'Conservative floor', accent: '#f97316' },
             ].map((s) => (
               <div
                 key={s.label}
                 className="rounded-xl p-4"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                style={{
+                  background: `linear-gradient(135deg, ${s.accent}06, ${s.accent}02)`,
+                  border: `1px solid ${s.accent}20`,
+                }}
               >
                 <p className="text-2xl font-bold text-slate-50" style={{ fontFamily: 'var(--font-jetbrains)' }}>
                   {s.value}
@@ -231,35 +249,51 @@ export default function BlueprintPage() {
           <SectionNovelty />
         </BlueprintSection>
 
-        <BlueprintSection id="valuation" number={5} title="Valuation Analysis">
+        <BlueprintSection id="ip-scoring" number={5} title="IP Portfolio Scoring">
+          <SectionIPScoring />
+        </BlueprintSection>
+
+        <BlueprintSection id="valuation" number={6} title="Valuation Analysis">
           <SectionValuation scenario={scenario} />
         </BlueprintSection>
 
-        <BlueprintSection id="comparables" number={6} title="Comparable Transactions">
+        <BlueprintSection id="comparables" number={7} title="Comparable Transactions">
           <SectionComparables />
         </BlueprintSection>
 
-        <BlueprintSection id="company-valuation" number={7} title="Company Valuation">
+        <BlueprintSection id="company-valuation" number={8} title="Company Valuation">
           <SectionCompanyVal scenario={scenario} />
         </BlueprintSection>
 
-        <BlueprintSection id="use-cases" number={8} title="Use Cases">
+        <BlueprintSection id="use-cases" number={9} title="Use Cases">
           <SectionUseCases />
         </BlueprintSection>
 
-        <BlueprintSection id="pillars" number={9} title="9 Pillars">
+        <BlueprintSection id="pillars" number={10} title="9 Pillars">
           <SectionPillars />
         </BlueprintSection>
 
-        <BlueprintSection id="competitors" number={10} title="Competitor Analysis">
+        <BlueprintSection id="competitors" number={11} title="Competitor Analysis">
           <SectionCompetitors />
         </BlueprintSection>
 
-        <BlueprintSection id="market-size" number={11} title="Market Size">
+        <BlueprintSection id="market-size" number={12} title="Market Size">
           <SectionMarketSize scenario={scenario} />
         </BlueprintSection>
 
-        <BlueprintSection id="floor-matters" number={12} title="Why the Floor Matters">
+        <BlueprintSection id="addressable-universe" number={13} title="Addressable Universe">
+          <SectionAddressableUniverse />
+        </BlueprintSection>
+
+        <BlueprintSection id="research" number={14} title="Research & Publications">
+          <SectionResearch />
+        </BlueprintSection>
+
+        <BlueprintSection id="roadmap" number={15} title="Roadmap">
+          <SectionRoadmap />
+        </BlueprintSection>
+
+        <BlueprintSection id="floor-matters" number={16} title="Why the Floor Matters">
           <SectionFloorMatters />
         </BlueprintSection>
 
