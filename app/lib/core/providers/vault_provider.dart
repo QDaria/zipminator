@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zipminator/main.dart' show rustBridgeAvailable;
 import 'package:zipminator/src/rust/api/simple.dart' as rust;
 
 /// Metadata for a file encrypted in the PQC vault.
@@ -122,6 +123,16 @@ class VaultNotifier extends Notifier<VaultState> {
   /// Encrypt [sourceFile] with ML-KEM-768 envelope encryption and store
   /// the result in the vault directory as a `.pqc` file.
   Future<void> encryptFile(File sourceFile) async {
+    if (!rustBridgeAvailable) {
+      state = state.copyWith(
+        isProcessing: false,
+        error: 'PQC crypto engine not available. '
+            'The Rust bridge failed to initialize at startup. '
+            'Please restart the app or check that the native library is installed.',
+      );
+      return;
+    }
+
     state = state.copyWith(
       isProcessing: true,
       currentOperation: 'Reading file...',
@@ -188,6 +199,15 @@ class VaultNotifier extends Notifier<VaultState> {
   /// Decrypt a vault file and return a temporary [File] with the original
   /// plaintext content.
   Future<File?> decryptFile(VaultFile vaultFile) async {
+    if (!rustBridgeAvailable) {
+      state = state.copyWith(
+        isProcessing: false,
+        error: 'PQC crypto engine not available. '
+            'The Rust bridge failed to initialize at startup.',
+      );
+      return null;
+    }
+
     state = state.copyWith(
       isProcessing: true,
       currentOperation: 'Decrypting...',

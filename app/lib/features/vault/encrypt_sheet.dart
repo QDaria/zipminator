@@ -34,7 +34,16 @@ class _EncryptSheetState extends ConsumerState<EncryptSheet> {
       _error = null;
     });
 
-    await ref.read(vaultProvider.notifier).encryptFile(widget.file);
+    try {
+      await ref.read(vaultProvider.notifier).encryptFile(widget.file);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = 'Encryption failed: $e';
+        _started = false;
+      });
+      return;
+    }
 
     if (!mounted) return;
     final vaultState = ref.read(vaultProvider);

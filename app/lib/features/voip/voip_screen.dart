@@ -34,12 +34,20 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
     return '${d.inHours > 0 ? '${d.inHours}:' : ''}$m:$s';
   }
 
-  /// User tapped a contact: enter ringing, run KEM, then connect after 2s.
+  /// User tapped a contact: enter ringing, run KEM, derive SRTP keys.
+  ///
+  /// For **live** calls (signaling connected), the caller stays in `ringing`
+  /// until the remote peer sends `call_accept`. The VoipNotifier handles that
+  /// signal and transitions to `connected` + initiates the WebRTC offer.
+  ///
+  /// For **demo** calls (no signaling), a local timer simulates the remote
+  /// peer answering after 2 seconds.
   Future<void> _callContact(VoipContact contact) async {
     final notifier = ref.read(voipProvider.notifier);
     final messenger = ScaffoldMessenger.of(context);
+    final isLive = ref.read(ratchetProvider).isLive;
 
-    // 1. Ringing
+    // 1. Ringing (also sends call_offer via signaling when live)
     notifier.startRinging(contact);
 
     // 2. Generate keypair if needed (runs in background during ring)
@@ -56,7 +64,7 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
       return;
     }
 
-    // 3. Run KEM exchange
+    // 3. Run KEM exchange to derive SRTP keys
     final enc = await ref.read(cryptoProvider.notifier).encapsulate(pk);
     if (enc == null) {
       messenger.showSnackBar(
@@ -66,14 +74,21 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
       return;
     }
 
-    // 4. Wait for a minimum 2s ringing animation, then connect.
-    //    Timer is managed by the provider (survives tab navigation).
-    _ringTimer?.cancel();
-    _ringTimer = Timer(const Duration(seconds: 2), () async {
-      if (!mounted) return;
+    if (isLive) {
+      // Live mode: derive SRTP keys now so they are ready when the remote
+      // peer accepts. The actual connection transition happens in
+      // VoipNotifier._handleRemoteAccepted when the call_accept signal
+      // arrives from the signaling server.
       await notifier.connectCall(enc.sharedSecret);
-      HapticFeedback.heavyImpact();
-    });
+    } else {
+      // Demo mode: simulate a remote accept after a 2s ringing animation.
+      _ringTimer?.cancel();
+      _ringTimer = Timer(const Duration(seconds: 2), () async {
+        if (!mounted) return;
+        await notifier.connectCall(enc.sharedSecret);
+        HapticFeedback.heavyImpact();
+      });
+    }
   }
 
   void _endCall() {
@@ -120,6 +135,7 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
             ),
           CallPhase.ringing => _RingingView(
               contact: voip.contact!,
+              isLive: ref.watch(ratchetProvider).isLive,
               onHangup: _endCall,
             ),
           CallPhase.incomingRinging => _IncomingCallView(
@@ -134,6 +150,7 @@ class _VoipScreenState extends ConsumerState<VoipScreen> {
             ),
           CallPhase.connected => _ConnectedView(
               voip: voip,
+              isLive: ref.watch(ratchetProvider).isLive,
               formatDuration: _formatDuration,
               onEndCall: _endCall,
               onToggleMute: () =>
@@ -394,9 +411,14 @@ class _ContactCard extends StatelessWidget {
 
 class _RingingView extends StatelessWidget {
   final VoipContact contact;
+  final bool isLive;
   final VoidCallback onHangup;
 
-  const _RingingView({required this.contact, required this.onHangup});
+  const _RingingView({
+    required this.contact,
+    required this.isLive,
+    required this.onHangup,
+  });
 
   String get _initials {
     final parts = contact.name.split(' ');
@@ -410,9 +432,11 @@ class _RingingView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const PillarStatusBanner(
-            description: 'PQ-SRTP call in progress',
-            status: PillarStatus.ready,
+          PillarStatusBanner(
+            description: isLive
+                ? 'Calling via live signaling'
+                : 'Demo mode call (no remote peer)',
+            status: isLive ? PillarStatus.ready : PillarStatus.demo,
           ),
           const SizedBox(height: 32),
 
@@ -820,6 +844,7 @@ class _IncomingCallView extends StatelessWidget {
 
 class _ConnectedView extends StatelessWidget {
   final VoipState voip;
+  final bool isLive;
   final String Function(Duration) formatDuration;
   final VoidCallback onEndCall;
   final VoidCallback onToggleMute;
@@ -827,6 +852,7 @@ class _ConnectedView extends StatelessWidget {
 
   const _ConnectedView({
     required this.voip,
+    required this.isLive,
     required this.formatDuration,
     required this.onEndCall,
     required this.onToggleMute,
@@ -848,9 +874,11 @@ class _ConnectedView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const PillarStatusBanner(
-              description: 'PQ-SRTP secured call',
-              status: PillarStatus.ready,
+            PillarStatusBanner(
+              description: isLive
+                  ? 'PQ-SRTP secured call'
+                  : 'Demo mode (local simulation, no remote audio)',
+              status: isLive ? PillarStatus.ready : PillarStatus.demo,
             ),
             PillarHeader(
               icon: Icons.phone_in_talk,

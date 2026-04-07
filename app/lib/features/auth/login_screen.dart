@@ -94,7 +94,79 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  // Auth card
+                  // --- PRIMARY: OAuth buttons ---
+                  _PrimaryOAuthButton(
+                    icon: Icons.g_mobiledata,
+                    label: 'Continue with Google',
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF1F1F1F),
+                    onPressed: () => ref
+                        .read(authProvider.notifier)
+                        .signInWithOAuth(OAuthProvider.google),
+                  ),
+                  const SizedBox(height: 12),
+                  _PrimaryOAuthButton(
+                    icon: Icons.apple,
+                    label: 'Continue with Apple',
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    onPressed: () =>
+                        ref.read(authProvider.notifier).signInWithApple(),
+                  ),
+                  const SizedBox(height: 12),
+                  _PrimaryOAuthButton(
+                    icon: Icons.code,
+                    label: 'Continue with GitHub',
+                    backgroundColor: const Color(0xFF24292F),
+                    foregroundColor: Colors.white,
+                    onPressed: () => ref
+                        .read(authProvider.notifier)
+                        .signInWithOAuth(OAuthProvider.github),
+                  ),
+                  const SizedBox(height: 12),
+                  _PrimaryOAuthButton(
+                    icon: Icons.business,
+                    label: 'Continue with LinkedIn',
+                    backgroundColor: const Color(0xFF0A66C2),
+                    foregroundColor: Colors.white,
+                    onPressed: () => ref
+                        .read(authProvider.notifier)
+                        .signInWithOAuth(OAuthProvider.linkedinOidc),
+                  ),
+                  const SizedBox(height: 28),
+
+                  // --- Divider ---
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          color: QuantumTheme.textSecondary.withValues(
+                            alpha: 0.3,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'or continue with email',
+                          style: TextStyle(
+                            color: QuantumTheme.textSecondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                          color: QuantumTheme.textSecondary.withValues(
+                            alpha: 0.3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // --- SECONDARY: Email/password form card ---
                   QuantumCard(
                     padding: const EdgeInsets.all(24),
                     child: Form(
@@ -214,70 +286,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
-                  // Divider
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          color: QuantumTheme.textSecondary.withValues(
-                            alpha: 0.3,
-                          ),
-                        ),
+                  // --- Skip / Continue without account ---
+                  TextButton(
+                    onPressed: () {
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pushReplacementNamed('/vault');
+                      } else {
+                        Navigator.of(context).pushNamed('/vault');
+                      }
+                    },
+                    child: Text(
+                      'Continue without account',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: QuantumTheme.textSecondary,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'or continue with',
-                          style: TextStyle(
-                            color: QuantumTheme.textSecondary,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          color: QuantumTheme.textSecondary.withValues(
-                            alpha: 0.3,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-
-                  // OAuth buttons
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 12,
-                    runSpacing: 8,
-                    children: [
-                      _OAuthButton(
-                        icon: Icons.g_mobiledata,
-                        label: 'Google',
-                        onPressed: () =>
-                            ref.read(authProvider.notifier).signInWithOAuth(OAuthProvider.google),
-                      ),
-                      _OAuthButton(
-                        icon: Icons.apple,
-                        label: 'Apple',
-                        onPressed: () =>
-                            ref.read(authProvider.notifier).signInWithApple(),
-                      ),
-                      _OAuthButton(
-                        icon: Icons.code,
-                        label: 'GitHub',
-                        onPressed: () =>
-                            ref.read(authProvider.notifier).signInWithOAuth(OAuthProvider.github),
-                      ),
-                      _OAuthButton(
-                        icon: Icons.business,
-                        label: 'LinkedIn',
-                        onPressed: () =>
-                            ref.read(authProvider.notifier).signInWithOAuth(OAuthProvider.linkedinOidc),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -289,30 +315,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
-class _OAuthButton extends StatelessWidget {
+class _PrimaryOAuthButton extends StatelessWidget {
   final IconData icon;
   final String label;
+  final Color backgroundColor;
+  final Color foregroundColor;
   final VoidCallback onPressed;
 
-  const _OAuthButton({
+  const _PrimaryOAuthButton({
     required this.icon,
     required this.label,
+    required this.backgroundColor,
+    required this.foregroundColor,
     required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 20),
-      label: Text(label),
-      style: OutlinedButton.styleFrom(
-        foregroundColor: QuantumTheme.textPrimary,
-        side: BorderSide(
-          color: QuantumTheme.quantumCyan.withValues(alpha: 0.3),
+    return SizedBox(
+      width: double.infinity,
+      height: 48,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 22, color: foregroundColor),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: foregroundColor,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: foregroundColor,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+        ),
       ),
     );
   }

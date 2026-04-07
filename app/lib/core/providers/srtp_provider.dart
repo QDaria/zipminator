@@ -120,11 +120,16 @@ class VoipNotifier extends Notifier<VoipState> {
   ConferenceService? _conference;
   StreamSubscription<Map<String, dynamic>>? _signalSub;
   Timer? _callTimer;
+  Timer? _ringTimeoutTimer;
+
+  /// Maximum seconds to ring before giving up (live calls only).
+  static const _ringTimeoutSeconds = 30;
 
   @override
   VoipState build() {
     ref.onDispose(() {
       _callTimer?.cancel();
+      _ringTimeoutTimer?.cancel();
       _signalSub?.cancel();
       _conference?.dispose();
     });
@@ -149,31 +154,64 @@ class VoipNotifier extends Notifier<VoipState> {
   // ── 1:1 calls ─────────────────────────────────────────────────────
 
   /// Transition to ringing state and send call offer through signaling.
+  /// Starts a ring timeout for live calls (cancels after [_ringTimeoutSeconds]).
   void startRinging(VoipContact contact) {
+    _ringTimeoutTimer?.cancel();
     state = VoipState(
       phase: CallPhase.ringing,
       contact: contact,
     );
     ref.read(ratchetProvider.notifier).sendCallOffer(contact.id);
+
+    // Timeout: if the remote peer never answers within the limit, end the call.
+    final isLive = ref.read(ratchetProvider).isLive;
+    if (isLive) {
+      _ringTimeoutTimer = Timer(
+        const Duration(seconds: _ringTimeoutSeconds),
+        () {
+          if (state.phase == CallPhase.ringing) {
+            state = state.copyWith(
+              error: 'No answer (timed out after ${_ringTimeoutSeconds}s)',
+            );
+            endCall();
+          }
+        },
+      );
+    }
   }
 
-  /// Derive SRTP keys from a Kyber shared secret, set up WebRTC audio, and
-  /// move to connected. Starts the call duration timer.
+  /// Derive SRTP keys from a Kyber shared secret and set up local WebRTC
+  /// media. For demo calls this also transitions to `connected` immediately.
+  /// For live calls, the transition to `connected` happens when the remote
+  /// peer sends `call_accept` (handled by [_handleRemoteAccepted]).
   Future<void> connectCall(Uint8List sharedSecret) async {
     try {
       final keys = await rust.deriveSrtpKeys(sharedSecret: sharedSecret);
 
-      // Set up WebRTC for real audio (configures audio session internally)
+      // Set up WebRTC for real audio (configures audio session internally).
       await _ensureConference(audioOnly: true);
 
-      state = state.copyWith(
-        phase: CallPhase.connected,
-        isPqSecured: true,
-        isSpeaker: true,
-        srtpMasterKey: Uint8List.fromList(keys.masterKey),
-        srtpMasterSalt: Uint8List.fromList(keys.masterSalt),
-      );
-      _startCallTimer();
+      final isLive = ref.read(ratchetProvider).isLive;
+
+      if (isLive && state.phase == CallPhase.ringing) {
+        // Live mode: keys and media are ready, but stay in ringing until
+        // the remote peer accepts (call_accept signal).
+        state = state.copyWith(
+          isPqSecured: true,
+          srtpMasterKey: Uint8List.fromList(keys.masterKey),
+          srtpMasterSalt: Uint8List.fromList(keys.masterSalt),
+        );
+      } else {
+        // Demo mode or already accepted: transition to connected now.
+        state = state.copyWith(
+          phase: CallPhase.connected,
+          isPqSecured: true,
+          isSpeaker: true,
+          srtpMasterKey: Uint8List.fromList(keys.masterKey),
+          srtpMasterSalt: Uint8List.fromList(keys.masterSalt),
+        );
+        _startCallTimer();
+      }
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -183,6 +221,8 @@ class VoipNotifier extends Notifier<VoipState> {
 
   void endCall() {
     _stopCallTimer();
+    _ringTimeoutTimer?.cancel();
+    _ringTimeoutTimer = null;
     final contact = state.contact;
     if (contact != null) {
       ref.read(ratchetProvider.notifier).sendCallEnd(contact.id);
@@ -243,13 +283,19 @@ class VoipNotifier extends Notifier<VoipState> {
           _handleIncomingCall(from);
         }
       case 'call_accept':
-        // Remote peer accepted our call — initiate WebRTC offer.
-        if (state.phase == CallPhase.connected && _conference != null) {
-          _conference!.onPeerJoined(from);
+        // Remote peer accepted our call. This can arrive while we are still
+        // in the `ringing` phase (before the local timer fires) or after
+        // `connectCall` has already moved us to `connected`.
+        if (from.isNotEmpty &&
+            (state.phase == CallPhase.ringing ||
+                state.phase == CallPhase.connected)) {
+          _handleRemoteAccepted(from);
         }
       case 'call_end':
-        if (state.inCall || state.isIncomingRinging) {
+        if (state.inCall || state.isRinging || state.isIncomingRinging) {
           _stopCallTimer();
+          _ringTimeoutTimer?.cancel();
+          _ringTimeoutTimer = null;
           _conference?.dispose();
           _conference = null;
           state = const VoipState();
@@ -271,6 +317,35 @@ class VoipNotifier extends Notifier<VoipState> {
         }
       case 'offer' || 'answer' || 'ice-candidate':
         _conference?.handleSignal(from, type, msg);
+    }
+  }
+
+  /// The remote peer accepted our outgoing call. Set up WebRTC audio,
+  /// transition to connected, and send a WebRTC offer to the peer so
+  /// the audio path is established.
+  Future<void> _handleRemoteAccepted(String remotePeerUsername) async {
+    try {
+      _ringTimeoutTimer?.cancel();
+      _ringTimeoutTimer = null;
+
+      // Ensure local media is ready (no-op if already set up by connectCall).
+      await _ensureConference(audioOnly: true);
+
+      // If still ringing (answer arrived before the local timer), move to
+      // connected now. Keep existing SRTP keys if connectCall already set them.
+      if (state.phase == CallPhase.ringing) {
+        state = state.copyWith(
+          phase: CallPhase.connected,
+          isPqSecured: true,
+          isSpeaker: true,
+        );
+        _startCallTimer();
+      }
+
+      // Initiate WebRTC offer to the remote peer so audio flows.
+      _conference?.onPeerJoined(remotePeerUsername);
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to connect: $e');
     }
   }
 
