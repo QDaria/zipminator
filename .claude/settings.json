@@ -19,42 +19,95 @@
   "includeCoAuthoredBy": true,
   "permissions": {
     "allow": [
-      "Bash(npx claude-flow:*)",
-      "Bash(npx ruflo:*)",
-      "Bash(npx next:*)",
-      "Bash(npx expo:*)",
-      "Bash(cargo:*)",
-      "Bash(cargo test:*)",
-      "Bash(cargo clippy:*)",
-      "Bash(cargo fuzz:*)",
-      "Bash(maturin:*)",
-      "Bash(micromamba:*)",
-      "Bash(uv:*)",
-      "Bash(pytest:*)",
-      "Bash(python:*)",
-      "Bash(bash .claude/helpers:*)",
-      "Bash(npm run lint)",
-      "Bash(npm run test:*)",
-      "Bash(npm test:*)",
-      "Bash(git status)",
-      "Bash(git diff:*)",
-      "Bash(git log:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push)",
-      "Bash(git config:*)",
-      "Bash(git tag:*)",
-      "Bash(git branch:*)",
-      "Bash(git checkout:*)",
-      "Bash(git stash:*)",
-      "Bash(jq:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(pnpm:*)",
+      "Bash(bun:*)",
       "Bash(node:*)",
+      "Bash(cargo:*)",
+      "Bash(rustc:*)",
+      "Bash(rustup:*)",
+      "Bash(maturin:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pytest:*)",
+      "Bash(uv:*)",
+      "Bash(micromamba:*)",
+      "Bash(pip:*)",
+      "Bash(flutter:*)",
+      "Bash(dart:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(cd:*)",
+      "Bash(ls:*)",
+      "Bash(pwd:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm -rf .next:*)",
+      "Bash(rm -rf node_modules:*)",
+      "Bash(rm -rf dist:*)",
+      "Bash(rm -rf build:*)",
+      "Bash(rm -rf target:*)",
+      "Bash(rm:*)",
+      "Bash(kill:*)",
+      "Bash(lsof:*)",
+      "Bash(ps:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(jq:*)",
       "Bash(which:*)",
-      "Bash(pwd)",
-      "Bash(ls:*)"
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(xargs:*)",
+      "Bash(chmod:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(bash:*)",
+      "Bash(sh:*)",
+      "Bash(source:*)",
+      "Bash(export:*)",
+      "Bash(env:*)",
+      "Bash(PORT=:*)",
+      "Bash(NEXT_:*)",
+      "Bash(NODE_:*)",
+      "Bash(test:*)",
+      "Bash(diff:*)",
+      "Bash(true)",
+      "Bash(false)",
+      "Bash(sleep:*)",
+      "mcp__plugin_playwright_playwright:*",
+      "mcp__plugin_everything-claude-code_playwright:*",
+      "mcp__plugin_context7_context7:*",
+      "mcp__plugin_everything-claude-code_context7:*",
+      "mcp__plugin_episodic-memory_episodic-memory:*",
+      "mcp__plugin_everything-claude-code_github:*",
+      "mcp__plugin_everything-claude-code_memory:*",
+      "mcp__plugin_everything-claude-code_exa:*",
+      "mcp__plugin_everything-claude-code_sequential-thinking:*",
+      "mcp__claude-flow_alpha:*",
+      "mcp__ruflo:*",
+      "mcp__ruv-swarm:*",
+      "mcp__notebooklm-mcp:*",
+      "mcp__ios-simulator:*",
+      "mcp__claude_ai_Canva:*",
+      "mcp__claude_ai_Gamma:*",
+      "mcp__claude_ai_Hugging_Face_2:*",
+      "mcp__claude_ai_Mermaid_Chart:*",
+      "mcp__claude_ai_Sentry:*"
     ],
     "deny": [
-      "Bash(rm -rf /)"
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf /*)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)"
     ]
   },
   "enabledMcpjsonServers": [
@@ -64,81 +117,12 @@
     "playwright"
   ],
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cat | jq -r '.tool_input.command // empty' | tr '\\n' '\\0' | xargs -0 -I {} npx ruflo@latest hooks pre-command --command '{}' --validate-safety true --prepare-resources true"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cat | jq -r '.tool_input.file_path // .tool_input.path // empty' | tr '\\n' '\\0' | xargs -0 -I {} npx ruflo@latest hooks pre-edit --file '{}' --auto-assign-agents true --load-context true"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cat | jq -r '.tool_input.command // empty' | tr '\\n' '\\0' | xargs -0 -I {} npx ruflo@latest hooks post-command --command '{}' --track-metrics true --store-results true"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cat | jq -r '.tool_input.file_path // .tool_input.path // empty' | tr '\\n' '\\0' | xargs -0 -I {} npx ruflo@latest hooks post-edit --file '{}' --format true --update-memory true"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if command -v semgrep >/dev/null 2>&1; then semgrep --config=auto \"$CLAUDE_TOOL_FILE_PATH\" 2>/dev/null || true; fi; if command -v bandit >/dev/null 2>&1 && [[ \"$CLAUDE_TOOL_FILE_PATH\" == *.py ]]; then bandit \"$CLAUDE_TOOL_FILE_PATH\" 2>/dev/null || true; fi; if command -v gitleaks >/dev/null 2>&1; then gitleaks detect --source=\"$CLAUDE_TOOL_FILE_PATH\" --no-git 2>/dev/null || true; fi; if grep -qE '(password|secret|key|token)\\s*=\\s*[\"\\x27][^\"\\x27]{8,}' \"$CLAUDE_TOOL_FILE_PATH\" 2>/dev/null; then echo \"Warning: Potential hardcoded secrets detected in $CLAUDE_TOOL_FILE_PATH\" >&2; fi"
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "matcher": "manual",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/bin/bash -c 'INPUT=$(cat); CUSTOM=$(echo \"$INPUT\" | jq -r \".custom_instructions // \\\"\\\"\"); echo \"🔄 PreCompact Guidance:\"; echo \"📋 IMPORTANT: Review CLAUDE.md in project root for:\"; echo \"   • 85 available agents and concurrent usage patterns\"; echo \"   • Swarm coordination strategies (hierarchical, mesh, adaptive)\"; echo \"   • SPARC + RALPH methodology workflows\"; echo \"   • Critical concurrent execution rules (GOLDEN RULE: 1 MESSAGE = ALL OPERATIONS)\"; echo \"   • .claude/rules/ files survive compaction (auto-reloaded)\"; echo \"📌 PRESERVE: Current RALPH phase, failing tests, active worktree branches\"; if [ -n \"$CUSTOM\" ]; then echo \"🎯 Custom compact instructions: $CUSTOM\"; fi; echo \"✅ Ready for compact operation\"'"
-          }
-        ]
-      },
-      {
-        "matcher": "auto",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/bin/bash -c 'echo \"🔄 Auto-Compact Guidance (Context Window Full):\"; echo \"📋 CRITICAL: Before compacting, ensure you understand:\"; echo \"   • All 85 agents available in .claude/agents/ directory\"; echo \"   • Concurrent execution patterns from CLAUDE.md\"; echo \"   • RALPH loop phase and iteration count\"; echo \"   • Model routing rules in .claude/rules/model-routing.md\"; echo \"   • .claude/rules/ files survive compaction (auto-reloaded)\"; echo \"⚡ Apply GOLDEN RULE: Always batch operations in single messages\"; echo \"📌 PRESERVE: Failing test paths, worktree branches, RALPH state\"; echo \"✅ Auto-compact proceeding with full agent context\"'"
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/helpers/auto-commit.sh 2>/dev/null; bash .claude/helpers/feedback-loop.sh --report 2>/dev/null; npx ruflo@latest hooks session-end --generate-summary true --persist-state true --export-metrics true"
+            "command": "bash .claude/helpers/auto-commit.sh 2>/dev/null"
           }
         ]
       }

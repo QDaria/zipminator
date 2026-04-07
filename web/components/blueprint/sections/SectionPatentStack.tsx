@@ -287,10 +287,12 @@ export const SectionPatentStack = () => {
               className="text-slate-200 leading-relaxed"
               style={{ fontFamily: 'var(--font-dm-sans)' }}
             >
-              A competitor needs licenses to all three patents. Designing around one
-              is hard. Designing around all three simultaneously while still
-              delivering quantum-safe, auditable, multi-source entropy with provable
-              anonymization is practically impossible.
+              A competitor needs licenses to all three patents. The 9 independent claims
+              are each a separate chokepoint. The 37 dependent claims cover implementation
+              variants and extended algebraic domains. This is the same thicket strategy
+              used by Qualcomm (cellular), ARM (chip architecture), and Dolby (audio codecs).
+              Designing around all three simultaneously while delivering quantum-safe,
+              auditable, multi-source entropy with provable anonymization is practically impossible.
             </p>
           </div>
         </div>

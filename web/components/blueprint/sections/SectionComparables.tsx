@@ -179,22 +179,36 @@ export const SectionComparables = () => (
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: 0.2 }}
-      className="rounded-xl p-5"
+      className="rounded-xl p-6"
       style={{
         background: 'linear-gradient(135deg, rgba(34,211,238,0.08), rgba(245,158,11,0.06))',
         border: '1px solid rgba(34,211,238,0.2)',
       }}
     >
       <p
-        className="text-slate-200 leading-relaxed"
+        className="text-slate-200 leading-relaxed mb-4"
         style={{ fontFamily: 'var(--font-dm-sans), sans-serif' }}
       >
         <span className="font-semibold" style={{ color: '#22D3EE' }}>Positioning:</span>{' '}
-        QDaria&apos;s three-patent portfolio positions it between PQShield ($37M, single-domain IP)
+        QDaria&apos;s three-patent portfolio (46 claims, all filed) positions it between PQShield ($37M, single-domain IP)
         and SandboxAQ ($5.6B, broad quantum security platform). The combination of
         physics-proven anonymization, unilateral CSI entropy, and algebraic randomness
         extraction creates a defensible position with no direct comparable.
       </p>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-lg p-3 text-center" style={{ background: 'rgba(15,23,42,0.6)' }}>
+          <p className="text-xs text-slate-500">QDaria advantage</p>
+          <p className="text-sm font-semibold text-cyan-300">3 patents, 9 pillars</p>
+        </div>
+        <div className="rounded-lg p-3 text-center" style={{ background: 'rgba(15,23,42,0.6)' }}>
+          <p className="text-xs text-slate-500">Closest comparable</p>
+          <p className="text-sm font-semibold text-amber-400">SandboxAQ $5.6B</p>
+        </div>
+        <div className="rounded-lg p-3 text-center" style={{ background: 'rgba(15,23,42,0.6)' }}>
+          <p className="text-xs text-slate-500">Unique differentiator</p>
+          <p className="text-sm font-semibold text-emerald-400">Zero prior art</p>
+        </div>
+      </div>
     </motion.div>
   </div>
 )

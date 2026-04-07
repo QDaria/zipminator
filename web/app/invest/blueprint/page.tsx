@@ -225,16 +225,21 @@ export default function BlueprintPage() {
             ].map((s) => (
               <div
                 key={s.label}
-                className="rounded-xl p-4"
+                className="rounded-xl p-5 transition-all duration-300 hover:scale-[1.03]"
                 style={{
-                  background: `linear-gradient(135deg, ${s.accent}06, ${s.accent}02)`,
-                  border: `1px solid ${s.accent}20`,
+                  background: `linear-gradient(135deg, ${s.accent}12, rgba(15,23,42,0.8))`,
+                  border: `1px solid ${s.accent}40`,
+                  boxShadow: `0 0 24px ${s.accent}18, 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)`,
+                  backdropFilter: 'blur(12px)',
                 }}
               >
-                <p className="text-2xl font-bold text-slate-50" style={{ fontFamily: 'var(--font-jetbrains)' }}>
+                <p
+                  className="text-3xl font-bold text-slate-50 mb-1"
+                  style={{ fontFamily: 'var(--font-jetbrains)', textShadow: `0 0 20px ${s.accent}40` }}
+                >
                   {s.value}
                 </p>
-                <p className="text-xs text-slate-400 mt-1">{s.label}</p>
+                <p className="text-xs font-medium text-slate-300 mt-1">{s.label}</p>
                 <p className="text-[10px] text-slate-500 mt-0.5">{s.sub}</p>
               </div>
             ))}
@@ -313,7 +318,7 @@ export default function BlueprintPage() {
         {/* Footer */}
         <footer className="px-6 py-16 max-w-6xl mx-auto text-center border-t border-white/5">
           <p className="text-xs text-slate-500 font-mono">
-            QDaria AS · Oslo, Norway · mo@qdaria.com · {new Date().getFullYear()}
+            QDaria AS · Oslo, Norway · mo@qdaria.com · 2026
           </p>
           <p className="text-[10px] text-slate-600 mt-2">
             This document is confidential and intended for authorized recipients only.

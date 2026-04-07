@@ -54,10 +54,13 @@ export const SectionPillars = () => (
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.35, delay: i * 0.05 }}
-          className="rounded-xl p-5 transition-colors hover:bg-white/[0.03]"
+          className="rounded-xl p-5 transition-all duration-300 hover:scale-[1.02]"
           style={{
-            background: 'rgba(255,255,255,0.02)',
+            background: `linear-gradient(135deg, ${pillar.color}08, rgba(15,23,42,0.7))`,
+            border: `1px solid ${pillar.color}30`,
             borderLeft: `3px solid ${pillar.color}`,
+            boxShadow: `0 0 20px ${pillar.color}10, 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)`,
+            backdropFilter: 'blur(8px)',
           }}
         >
           {/* Name */}
@@ -133,7 +136,11 @@ export const SectionPillars = () => (
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: 0.15 }}
       className="rounded-xl p-6"
-      style={{ background: 'rgba(255,255,255,0.03)' }}
+      style={{
+        background: 'linear-gradient(135deg, rgba(34,211,238,0.04), rgba(15,23,42,0.6))',
+        border: '1px solid rgba(34,211,238,0.15)',
+        boxShadow: '0 0 30px rgba(34,211,238,0.08), 0 4px 20px rgba(0,0,0,0.3)',
+      }}
     >
       <h3 className="mb-6 text-sm font-mono uppercase tracking-wider text-slate-400">
         Platform Completion
