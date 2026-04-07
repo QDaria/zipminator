@@ -103,10 +103,12 @@ const FunnelTooltip = ({
 }
 
 const CALLOUT_ITEMS = [
-  { metric: '40-55 engineers x 2 years', detail: '$50-100M R&D replacement cost' },
-  { metric: '3 patents', detail: '3 independent design-around challenges' },
-  { metric: '2 regulatory deadlines', detail: 'DORA 2025, NIST 2030 = forced demand' },
-  { metric: '8 world\'s firsts', detail: 'Compounding into an unreplicable moat' },
+  { metric: '40-55 engineers x 2 years', detail: '$50-100M R&D replacement cost to replicate' },
+  { metric: '3 patents filed, 46 claims', detail: '9 independent claims = 9 separate chokepoints' },
+  { metric: '48 prior art searches', detail: 'Zero blocking results across 6 patent databases' },
+  { metric: '1,584 tests passing', detail: 'Rust + Python + Flutter + Browser; working code, not slides' },
+  { metric: '3 regulatory deadlines', detail: 'DORA 2025, CNSA 2.0 by 2027, NIST 2030 = forced demand' },
+  { metric: '18.2B WiFi devices', detail: 'Patent 2 covers every WiFi chip on Earth' },
 ]
 
 export const SectionFloorMatters = () => {

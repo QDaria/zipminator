@@ -70,18 +70,17 @@ export const SectionPillars = () => (
             {pillar.desc}
           </p>
 
-          {/* Progress bar */}
+          {/* Completion + Tests */}
           <div className="mb-3">
             <div className="mb-1 flex items-center justify-between">
               <span className="text-xs font-mono text-slate-500">
-                Completion
+                {pillar.completion}% complete
               </span>
-              <span
-                className="text-xs font-mono font-bold"
-                style={{ color: pillar.color }}
-              >
-                {pillar.completion}%
-              </span>
+              {'tests' in pillar && (
+                <span className="text-[10px] font-mono" style={{ color: pillar.color }}>
+                  {(pillar as typeof pillar & { tests: number }).tests} tests
+                </span>
+              )}
             </div>
             <div
               className="h-1.5 w-full overflow-hidden rounded-full"
@@ -97,6 +96,16 @@ export const SectionPillars = () => (
               />
             </div>
           </div>
+
+          {/* Comparable valuation */}
+          {'compVal' in pillar && (
+            <div className="mb-3 flex items-center justify-between text-[10px]">
+              <span className="text-slate-500">Comparable: {(pillar as typeof pillar & { comparable: string }).comparable}</span>
+              <span className="font-mono font-semibold" style={{ color: pillar.color }}>
+                {(pillar as typeof pillar & { compVal: string }).compVal}
+              </span>
+            </div>
+          )}
 
           {/* Tech tags */}
           <div className="flex flex-wrap gap-1.5">

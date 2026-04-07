@@ -97,10 +97,12 @@ export const SectionCompetitors = () => {
         className="text-slate-300 text-lg leading-relaxed max-w-3xl"
         style={{ fontFamily: 'var(--font-dm-sans)' }}
       >
-        Zipminator occupies a unique position in the security landscape. No competitor
-        covers all seven dimensions. Signal leads in open source but lacks PQC depth,
-        QRNG, and compliance tooling. NordVPN has reach but no quantum readiness. Wickr
-        has enterprise compliance but was acquired and shelved by AWS.
+        Zipminator is the only platform scoring 4+ across all seven security dimensions
+        simultaneously. No competitor covers more than two of our ten unique capabilities.
+        Signal leads in open source but has no PQC depth, QRNG, or compliance tooling.
+        NordVPN has reach but zero quantum readiness. Wickr was acquired and shelved by AWS.
+        QDaria is the only commercially available PQC company in Norway; NQCG shut down
+        in December 2024.
       </motion.p>
 
       {/* Radar Chart */}

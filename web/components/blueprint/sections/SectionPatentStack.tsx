@@ -87,12 +87,13 @@ export const SectionPatentStack = () => {
         className="text-slate-300 text-lg leading-relaxed max-w-3xl"
         style={{ fontFamily: 'var(--font-dm-sans)' }}
       >
-        The three patents form a vertical stack where each layer feeds the next.
-        P2 generates raw entropy from WiFi CSI and quantum sources. P3 certifies
-        and composes that entropy with algebraic extraction and Merkle provenance.
-        P1 consumes the certified entropy to produce information-theoretically
-        irreversible anonymization. Together they create a closed system that is
-        far harder to replicate than any single patent.
+        Three patents, 46 claims, all filed at Patentstyret. They form a vertical
+        entropy lifecycle: P2 generates raw entropy from WiFi CSI and quantum sources
+        (18.2B addressable devices). P3 certifies and composes that entropy with algebraic
+        extraction and Merkle provenance (first non-hash extractor since 2001). P1 consumes
+        the certified entropy to produce information-theoretically irreversible anonymization
+        (holds even if P=NP). Zero blocking prior art across 48 exhaustive searches. A competitor
+        must license all three or design around each independently.
       </motion.p>
 
       {/* Stacked patent cards with flow arrows */}

@@ -532,4 +532,5 @@ export const SECTION_LIST = [
   { id: 'research', title: 'Research & Publications' },
   { id: 'roadmap', title: 'Roadmap' },
   { id: 'floor-matters', title: 'Why the Floor Matters' },
+  { id: 'comprehensive-status', title: 'Platform Status Report' },
 ]

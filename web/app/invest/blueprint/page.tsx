@@ -22,6 +22,7 @@ import { SectionAddressableUniverse } from '@/components/blueprint/sections/Sect
 import { SectionResearch } from '@/components/blueprint/sections/SectionResearch'
 import { SectionRoadmap } from '@/components/blueprint/sections/SectionRoadmap'
 import { SectionFloorMatters } from '@/components/blueprint/sections/SectionFloorMatters'
+import { SectionComprehensiveStatus } from '@/components/blueprint/sections/SectionComprehensiveStatus'
 
 const PASS = 'zip2026bp'
 const STORAGE_KEY = 'blueprint-pitch-auth'
@@ -168,15 +169,23 @@ export default function BlueprintPage() {
 
       <main className="lg:ml-60">
         {/* Hero */}
-        <header className="relative px-6 pt-20 pb-16 lg:pt-28 lg:pb-24 max-w-6xl mx-auto text-center">
+        <header className="relative px-6 pt-20 pb-16 lg:pt-28 lg:pb-24 max-w-6xl mx-auto text-center overflow-hidden">
+          {/* Animated gradient background */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-30"
+            style={{
+              background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34,211,238,0.15), transparent 70%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167,139,250,0.1), transparent 60%)',
+            }}
+          />
+
           <p
-            className="text-xs font-mono tracking-[0.25em] uppercase mb-4"
+            className="relative text-xs font-mono tracking-[0.25em] uppercase mb-4"
             style={{ color: '#A78BFA', fontFamily: 'var(--font-jetbrains)' }}
           >
-            QDaria AS · Confidential
+            QDaria AS · Confidential · April 2026
           </p>
           <h1
-            className="text-4xl lg:text-6xl font-bold text-slate-50 mb-6"
+            className="relative text-4xl lg:text-6xl font-bold text-slate-50 mb-6"
             style={{ fontFamily: 'var(--font-fraunces), Georgia, serif' }}
           >
             IP Valuation Blueprint
@@ -295,6 +304,10 @@ export default function BlueprintPage() {
 
         <BlueprintSection id="floor-matters" number={16} title="Why the Floor Matters">
           <SectionFloorMatters />
+        </BlueprintSection>
+
+        <BlueprintSection id="comprehensive-status" number={17} title="Comprehensive Platform Status">
+          <SectionComprehensiveStatus />
         </BlueprintSection>
 
         {/* Footer */}
