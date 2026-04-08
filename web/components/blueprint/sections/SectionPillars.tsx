@@ -212,7 +212,11 @@ export const SectionPillars = () => (
         <div
           key={stat.label}
           className="rounded-xl p-5 text-center"
-          style={{ background: 'rgba(255,255,255,0.03)' }}
+          style={{
+            background: 'linear-gradient(135deg, rgba(167,139,250,0.06), rgba(15,23,42,0.6))',
+            border: '1px solid rgba(167,139,250,0.2)',
+            boxShadow: '0 0 20px rgba(167,139,250,0.08), 0 4px 16px rgba(0,0,0,0.3)',
+          }}
         >
           <p className="text-2xl font-bold text-slate-100 font-mono">
             {stat.value}

@@ -113,7 +113,7 @@ export const SectionRegulatoryMoat = () => {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.1 }}
         className="rounded-xl p-6 border"
-        style={{ background: 'rgba(15,23,42,0.5)', borderColor: 'rgba(255,255,255,0.05)' }}
+        style={{ background: 'rgba(15,23,42,0.6)', borderColor: 'rgba(34,211,238,0.15)', boxShadow: '0 0 24px rgba(34,211,238,0.06), 0 4px 20px rgba(0,0,0,0.3)' }}
       >
         <h3
           className="text-lg font-semibold text-slate-100 mb-1"
@@ -204,7 +204,7 @@ export const SectionRegulatoryMoat = () => {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.2 }}
         className="rounded-xl border overflow-hidden"
-        style={{ borderColor: 'rgba(255,255,255,0.05)' }}
+        style={{ borderColor: 'rgba(34,211,238,0.15)', boxShadow: '0 0 24px rgba(34,211,238,0.06), 0 4px 20px rgba(0,0,0,0.3)' }}
       >
         <div className="overflow-x-auto">
           <table className="w-full text-sm" style={{ fontFamily: 'var(--font-dm-sans)' }}>

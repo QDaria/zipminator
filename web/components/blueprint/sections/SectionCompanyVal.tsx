@@ -63,7 +63,7 @@ export const SectionCompanyVal = ({ scenario }: Props) => (
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
       className="rounded-xl p-6"
-      style={{ background: 'rgba(255,255,255,0.03)' }}
+      style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(167,139,250,0.15)', boxShadow: '0 0 20px rgba(167,139,250,0.06), 0 4px 16px rgba(0,0,0,0.3)' }}
     >
       <h3 className="mb-6 text-sm font-mono uppercase tracking-wider text-slate-400">
         Funding Trajectory
@@ -127,7 +127,7 @@ export const SectionCompanyVal = ({ scenario }: Props) => (
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: 0.1 }}
       className="overflow-x-auto rounded-xl"
-      style={{ background: 'rgba(255,255,255,0.03)' }}
+      style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(167,139,250,0.15)', boxShadow: '0 0 20px rgba(167,139,250,0.06), 0 4px 16px rgba(0,0,0,0.3)' }}
     >
       <table className="w-full text-sm">
         <thead>

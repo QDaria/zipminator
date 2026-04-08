@@ -243,7 +243,7 @@ export const SectionPatentDeepDives = ({ scenario }: SectionPatentDeepDivesProps
               className="rounded-xl p-5 border"
               style={{
                 background: 'rgba(15,23,42,0.5)',
-                borderColor: 'rgba(255,255,255,0.05)',
+                borderColor: 'rgba(34,211,238,0.15)', boxShadow: '0 0 24px rgba(34,211,238,0.06), 0 4px 20px rgba(0,0,0,0.3)',
               }}
             >
               <h4
@@ -263,7 +263,7 @@ export const SectionPatentDeepDives = ({ scenario }: SectionPatentDeepDivesProps
               className="rounded-xl p-5 border"
               style={{
                 background: 'rgba(15,23,42,0.5)',
-                borderColor: 'rgba(255,255,255,0.05)',
+                borderColor: 'rgba(34,211,238,0.15)', boxShadow: '0 0 24px rgba(34,211,238,0.06), 0 4px 20px rgba(0,0,0,0.3)',
               }}
             >
               <h4
@@ -286,7 +286,7 @@ export const SectionPatentDeepDives = ({ scenario }: SectionPatentDeepDivesProps
             className="rounded-xl p-6 border"
             style={{
               background: 'rgba(15,23,42,0.5)',
-              borderColor: 'rgba(255,255,255,0.05)',
+              borderColor: 'rgba(34,211,238,0.15)', boxShadow: '0 0 24px rgba(34,211,238,0.06), 0 4px 20px rgba(0,0,0,0.3)',
             }}
           >
             <h4
