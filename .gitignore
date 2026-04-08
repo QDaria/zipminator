@@ -413,3 +413,15 @@ web/screenshots/
 
 # Session transcripts (contain conversation history, may include secrets)
 docs/guides/session-transcripts/
+
+# Root directory cleanliness (screenshots moved to docs/screenshots/)
+/blueprint-*.png
+/bp-*.png
+/fig*_check.png
+/invest-*.png
+/login-*.png
+/paper-*.png
+/prod-*.png
+
+# Temporary working directory
+_tmp/
