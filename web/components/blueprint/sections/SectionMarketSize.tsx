@@ -20,6 +20,8 @@ import {
   MARKET_GROWTH,
   type BpScenario,
 } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import { ProseBlock, CalloutBlock, Subsection } from '@/components/blueprint/BlueprintSection'
 
 interface Props {
   scenario: BpScenario
@@ -149,6 +151,7 @@ const HeroMetric = ({
 export const SectionMarketSize = ({ scenario }: Props) => {
   const market = TAM_SAM_SOM[scenario]
   const scenarioColor = SCENARIO_COLOR[scenario]
+  const prose = SECTION_PROSE['market-size']
 
   const innerRingData = [
     { name: 'TAM', value: market.tam },
@@ -162,14 +165,41 @@ export const SectionMarketSize = ({ scenario }: Props) => {
     color: seg.color,
   }))
 
+  // Helper to render a subsection by id
+  const renderSub = (id: string) => {
+    const sub = prose?.subsections.find((s) => s.id === id)
+    if (!sub) return null
+    return (
+      <Subsection heading={sub.heading}>
+        <ProseBlock paragraphs={sub.body} />
+        {sub.callout && (
+          <CalloutBlock
+            type={sub.callout.type}
+            title={sub.callout.title}
+            text={sub.callout.text}
+          />
+        )}
+      </Subsection>
+    )
+  }
+
   return (
     <div className="space-y-10">
+      {/* Intro Prose */}
+      {prose?.intro && <ProseBlock paragraphs={prose.intro} />}
+
       {/* Hero Metrics */}
       <div className="flex flex-wrap gap-4">
         <HeroMetric label="TAM" value={market.tam} color="#6366f1" delay={0} />
         <HeroMetric label="SAM" value={market.sam} color={scenarioColor} delay={0.1} />
         <HeroMetric label="SOM" value={market.som} color="#34D399" delay={0.2} />
       </div>
+
+      {/* Subsection A: Segmentation Methodology */}
+      {renderSub('segmentation-methodology')}
+
+      {/* Subsection B: PQC Exponential Segment */}
+      {renderSub('pqc-exponential-segment')}
 
       {/* Nested Donut */}
       <motion.div
@@ -255,6 +285,12 @@ export const SectionMarketSize = ({ scenario }: Props) => {
           ))}
         </div>
       </motion.div>
+
+      {/* Subsection C: Data Privacy and Anonymization */}
+      {renderSub('data-privacy-anonymization')}
+
+      {/* Subsection D: WiFi Sensing and QRNG */}
+      {renderSub('wifi-sensing-qrng')}
 
       {/* Stacked Area Chart */}
       <motion.div
@@ -422,6 +458,19 @@ export const SectionMarketSize = ({ scenario }: Props) => {
           </table>
         </div>
       </motion.div>
+
+      {/* Subsection E: TAM/SAM/SOM Derivation */}
+      {renderSub('tam-sam-som-derivation')}
+
+      {/* Subsection F: The Norway Factor */}
+      {renderSub('norway-factor')}
+
+      {/* Conclusion */}
+      {prose?.conclusion && (
+        <Subsection heading="Market Size Summary">
+          <ProseBlock paragraphs={prose.conclusion} />
+        </Subsection>
+      )}
     </div>
   )
 }

@@ -283,7 +283,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                             const PillarStatusBanner(
                               description:
                                   'On-device AI with PQC-encrypted queries',
-                              status: PillarStatus.live,
+                              status: PillarStatus.ready,
                             ),
                             PillarHeader(
                               icon: Icons.psychology_outlined,

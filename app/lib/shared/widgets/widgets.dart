@@ -9,3 +9,4 @@ export 'pulsing_icon.dart';
 export 'quantum_button.dart';
 export 'status_orb.dart';
 export 'glass_app_bar.dart';
+export 'pillar_footer.dart';

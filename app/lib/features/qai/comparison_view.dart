@@ -8,6 +8,7 @@ import 'package:zipminator/shared/widgets/widgets.dart';
 
 /// Provider color mapping per [LLMProvider].
 Color _providerColor(LLMProvider provider) => switch (provider) {
+      LLMProvider.onDevice => QuantumTheme.quantumAmber,
       LLMProvider.ollama => QuantumTheme.quantumGreen,
       LLMProvider.gemini => QuantumTheme.quantumBlue,
       LLMProvider.groq => QuantumTheme.quantumGreen,
