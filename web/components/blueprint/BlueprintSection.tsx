@@ -179,6 +179,91 @@ interface EquationCardProps {
   accent?: string
 }
 
+/* ───────────────────────────────────────────────────────
+   Prose rendering primitives for expanded blueprint content
+   ─────────────────────────────────────────────────────── */
+
+interface ProseBlockProps {
+  paragraphs: string[]
+  accent?: string
+}
+
+/** Renders an array of body paragraphs in DM Sans with relaxed line-height */
+export const ProseBlock = ({ paragraphs, accent }: ProseBlockProps) => (
+  <div className="space-y-4">
+    {paragraphs.map((p, i) => (
+      <p
+        key={i}
+        className="text-[15px] leading-relaxed text-slate-300"
+        style={{ fontFamily: 'var(--font-dm-sans)' }}
+      >
+        {p}
+      </p>
+    ))}
+  </div>
+)
+
+interface CalloutBlockProps {
+  type: 'insight' | 'equation' | 'warning' | 'citation'
+  title: string
+  text: string
+  accent?: string
+}
+
+const CALLOUT_ACCENTS: Record<CalloutBlockProps['type'], string> = {
+  insight: '#22D3EE',
+  equation: '#A78BFA',
+  warning: '#F59E0B',
+  citation: '#34D399',
+}
+
+/** Left-bordered callout box for key insights, equations, warnings, citations */
+export const CalloutBlock = ({ type, title, text, accent }: CalloutBlockProps) => {
+  const color = accent ?? CALLOUT_ACCENTS[type]
+  return (
+    <div
+      className="rounded-xl p-5 my-6"
+      style={{
+        background: `linear-gradient(135deg, ${color}06, rgba(15,23,42,0.5))`,
+        borderLeft: `3px solid ${color}`,
+        boxShadow: `0 0 16px ${color}08, 0 4px 12px rgba(0,0,0,0.2)`,
+      }}
+    >
+      <p
+        className="text-xs font-bold uppercase tracking-wider mb-2"
+        style={{ color, fontFamily: 'var(--font-jetbrains)' }}
+      >
+        {title}
+      </p>
+      <p
+        className="text-[15px] leading-relaxed text-slate-200"
+        style={{ fontFamily: 'var(--font-dm-sans)' }}
+      >
+        {text}
+      </p>
+    </div>
+  )
+}
+
+interface SubsectionProps {
+  heading: string
+  children: ReactNode
+  accent?: string
+}
+
+/** H3 subsection heading with optional accent color, matching SectionComprehensiveStatus pattern */
+export const Subsection = ({ heading, children, accent = '#22D3EE' }: SubsectionProps) => (
+  <div className="mt-10">
+    <h3
+      className="text-lg font-semibold text-slate-100 mb-4"
+      style={{ fontFamily: 'var(--font-fraunces)' }}
+    >
+      {heading}
+    </h3>
+    {children}
+  </div>
+)
+
 /** LaTeX-style equation display card */
 export const EquationCard = ({ label, equation, description, accent = '#A78BFA' }: EquationCardProps) => (
   <div

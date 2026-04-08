@@ -49,11 +49,49 @@ SHORT_ID=$(echo "$SESSION_ID" | cut -c1-8)
 TODAY=$(date +%Y-%m-%d)
 
 # Check if an HTML file for this session already exists (handles date rollover)
-EXISTING=$(ls "$TRANSCRIPT_DIR"/*-"${SHORT_ID}.html" 2>/dev/null | head -1 || true)
+EXISTING=$(ls "$TRANSCRIPT_DIR"/*-"${SHORT_ID}-"*.html 2>/dev/null | head -1 || true)
 if [ -n "$EXISTING" ]; then
   HTML_FILE="$EXISTING"
 else
-  HTML_FILE="$TRANSCRIPT_DIR/${TODAY}-${SHORT_ID}.html"
+  # Extract 1-3 keyword slug from first user message in the transcript
+  SLUG=$(head -50 "$TRANSCRIPT_PATH" | python3 -c "
+import sys, json, re
+stop_words = {'the','a','an','is','are','was','were','be','been','being','have','has','had',
+  'do','does','did','will','would','shall','should','may','might','must','can','could',
+  'i','me','my','we','our','you','your','it','its','he','she','they','them','this','that',
+  'what','which','who','whom','how','where','when','why','and','or','but','if','then',
+  'so','no','not','of','in','to','for','with','on','at','by','from','as','into','about',
+  'please','just','also','very','really','some','all','any','each','every','hi','hello',
+  'hey','lets','let','want','need','like','get','make','use','go','see','know','think',
+  'take','give','tell','find','try','ask','work','call','run','come','look','help','start',
+  'could','would','should','dont','im','ive','cant','wont','its','thats','whats','heres',
+  'there','here','now','been','being','those','these','than','too','only','own','same','other'}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    try:
+        msg = json.loads(line)
+        role = msg.get('message', msg).get('role', '')
+        if role != 'user': continue
+        content = msg.get('message', msg).get('content', '')
+        if isinstance(content, list):
+            content = ' '.join(c.get('text','') for c in content if isinstance(c, dict) and c.get('type')=='text')
+        # Extract meaningful words
+        words = re.findall(r'[a-zA-Z]{3,}', content.lower())
+        keywords = [w for w in words if w not in stop_words][:3]
+        if keywords:
+            print('-'.join(keywords))
+        else:
+            print('session')
+        break
+    except: continue
+print('session')
+" 2>/dev/null | head -1)
+  SLUG="${SLUG:-session}"
+  # Sanitize: lowercase, hyphens only, max 40 chars
+  SLUG=$(echo "$SLUG" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9-' '-' | sed 's/^-//;s/-$//' | cut -c1-40)
+  [ -z "$SLUG" ] && SLUG="session"
+  HTML_FILE="$TRANSCRIPT_DIR/${TODAY}-${SHORT_ID}-${SLUG}.html"
 fi
 
 OFFSET_FILE="$OFFSET_DIR/${SESSION_ID}.transcript-html-offset"
@@ -179,22 +217,14 @@ if fragments:
 
 # ─── Create or append HTML ──────────────────────────────────────────
 if [ ! -f "$HTML_FILE" ]; then
-  # Extract first user message for title (first 80 chars)
-  FIRST_MSG=$(echo "$FRAGMENT" | python3 -c "
-import sys, re
-for line in sys.stdin:
-    m = re.search(r'class=\"role\">You</div>(.*?)</div>', line)
-    if m:
-        text = re.sub(r'<[^>]+>', '', m.group(1))[:80]
-        print(text)
-        break
-" 2>/dev/null || echo "Session $SHORT_ID")
+  # Use SLUG (already extracted above) for title
+  TITLE_SLUG=$(echo "$SLUG" | tr '-' ' ')
 
   # Write full HTML document
   cat > "$HTML_FILE" << HTMLEOF
 <!DOCTYPE html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>${TODAY} | ${FIRST_MSG}</title><style>
+<title>${TODAY} | ${TITLE_SLUG}</title><style>
 body{font-family:'DM Sans',-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:20px;background:#0a0a0f;color:#e0e0e0}
 h1{color:#22d3ee;font-size:1.4em;border-bottom:1px solid #333;padding-bottom:10px}
 .meta{color:#888;font-size:.85em;margin-bottom:20px}
@@ -213,7 +243,7 @@ code{font-family:'JetBrains Mono',monospace}
 a{color:#22d3ee}
 @media print{body{background:#fff;color:#000}.msg{border:1px solid #ccc}}
 </style></head><body>
-<h1>${TODAY} — ${FIRST_MSG}</h1>
+<h1>${TODAY} — ${TITLE_SLUG}</h1>
 <div class="meta">Session: <code>${SESSION_ID}</code><br>Started: $(date '+%Y-%m-%d %H:%M')<br>
 Resume: <code>claude --resume ${SESSION_ID}</code></div>
 ${FRAGMENT}

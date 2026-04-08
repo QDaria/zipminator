@@ -153,7 +153,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={cn("dark scroll-smooth", "font-sans", geist.variable)}>
+    <html lang="en" suppressHydrationWarning className={cn("dark scroll-smooth", "font-sans", geist.variable)}>
       <head>
         <meta name="theme-color" content="#6366f1" />
         <meta name="color-scheme" content="dark light" />
