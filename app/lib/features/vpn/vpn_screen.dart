@@ -447,6 +447,9 @@ class VpnScreen extends ConsumerWidget {
                     .animate()
                     .fadeIn(delay: 600.ms, duration: 300.ms)
                     .slideY(begin: 0.05),
+                const SizedBox(height: 24),
+                const PillarFooter(pillarName: 'VPN'),
+                const SizedBox(height: 32),
               ],
             ),
           ),

@@ -290,6 +290,9 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
                         begin: const Offset(0.95, 0.95),
                         end: const Offset(1, 1),
                       ),
+
+                const SizedBox(height: 24),
+                const PillarFooter(pillarName: 'Anonymizer'),
               ],
             ),
           ),

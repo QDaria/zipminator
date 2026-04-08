@@ -12,6 +12,8 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { REGULATIONS, REGULATORY_TIMELINE } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import { ProseBlock, CalloutBlock, Subsection } from '@/components/blueprint/BlueprintSection'
 
 /* -------------------------------------------------------------------------- */
 /*  Build cumulative stacked-area data from REGULATORY_TIMELINE               */
@@ -87,24 +89,167 @@ const CustomTooltip = ({
 /*  Component                                                                  */
 /* -------------------------------------------------------------------------- */
 export const SectionRegulatoryMoat = () => {
+  const prose = SECTION_PROSE['regulatory-moat']
+
+  // Helper to find a prose subsection by id
+  const sub = (id: string) => prose?.subsections.find((s) => s.id === id)
+
   return (
     <div className="space-y-10">
-      {/* Intro */}
-      <motion.p
+      {/* Intro prose */}
+      {prose && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="max-w-3xl"
+        >
+          <ProseBlock paragraphs={prose.intro} />
+        </motion.div>
+      )}
+
+      {/* Regulation table */}
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="text-slate-300 text-lg leading-relaxed max-w-3xl"
-        style={{ fontFamily: 'var(--font-dm-sans)' }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="rounded-xl border overflow-hidden"
+        style={{ borderColor: 'rgba(34,211,238,0.15)', boxShadow: '0 0 24px rgba(34,211,238,0.06), 0 4px 20px rgba(0,0,0,0.3)' }}
       >
-        The regulatory landscape is not optional context; it is the demand engine.
-        Eight overlapping regulations across privacy, security, post-quantum
-        cryptography, and compliance create a monotonically increasing pressure
-        curve. Every deadline that passes without action raises the penalty floor
-        for non-compliant organizations and deepens the moat around solutions that
-        already satisfy those requirements.
-      </motion.p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+            <thead>
+              <tr style={{ background: 'rgba(15,23,42,0.8)' }}>
+                {['Regulation', 'Citation', 'Requirement', 'Deadline', 'Patent', 'Penalty'].map(
+                  (h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400"
+                      style={{ fontFamily: 'var(--font-jetbrains)' }}
+                    >
+                      {h}
+                    </th>
+                  ),
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {REGULATIONS.map((reg, i) => (
+                <tr
+                  key={reg.id}
+                  className="transition-colors hover:bg-white/[0.02]"
+                  style={{
+                    background: i % 2 === 0 ? 'rgba(15,23,42,0.4)' : 'rgba(15,23,42,0.2)',
+                    borderLeft: `3px solid ${reg.color}`,
+                  }}
+                >
+                  <td className="px-4 py-3 font-semibold text-slate-100 whitespace-nowrap">
+                    {reg.name}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-slate-300 font-mono whitespace-nowrap"
+                    style={{ fontFamily: 'var(--font-jetbrains)' }}
+                  >
+                    {reg.citation}
+                  </td>
+                  <td className="px-4 py-3 text-slate-400 max-w-xs">{reg.requirement}</td>
+                  <td
+                    className="px-4 py-3 text-slate-300 font-mono whitespace-nowrap"
+                    style={{ fontFamily: 'var(--font-jetbrains)' }}
+                  >
+                    {reg.deadline}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span
+                      className="text-xs font-bold font-mono px-2 py-0.5 rounded"
+                      style={{
+                        background: 'rgba(34,211,238,0.12)',
+                        color: '#22D3EE',
+                        fontFamily: 'var(--font-jetbrains)',
+                      }}
+                    >
+                      {reg.patent}
+                    </span>
+                  </td>
+                  <td
+                    className="px-4 py-3 text-slate-300 font-mono whitespace-nowrap"
+                    style={{ fontFamily: 'var(--font-jetbrains)' }}
+                  >
+                    {reg.penalty}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </motion.div>
+
+      {/* A. GDPR and the Anonymization Threshold */}
+      {sub('gdpr-anonymization-threshold') && (
+        <Subsection heading={sub('gdpr-anonymization-threshold')!.heading}>
+          <ProseBlock paragraphs={sub('gdpr-anonymization-threshold')!.body} />
+          {sub('gdpr-anonymization-threshold')!.callout && (
+            <CalloutBlock {...sub('gdpr-anonymization-threshold')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* GDPR Recital 26 callout */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+        className="rounded-xl p-6 border"
+        style={{
+          background: 'rgba(99,102,241,0.06)',
+          borderColor: 'rgba(99,102,241,0.2)',
+        }}
+      >
+        <div className="flex gap-3">
+          <span className="flex-none text-2xl mt-0.5" aria-hidden>
+            &#xA7;
+          </span>
+          <div>
+            <h4
+              className="text-sm font-bold text-indigo-400 uppercase tracking-wider mb-2"
+              style={{ fontFamily: 'var(--font-jetbrains)' }}
+            >
+              GDPR Recital 26
+            </h4>
+            <blockquote
+              className="text-slate-200 leading-relaxed italic"
+              style={{ fontFamily: 'var(--font-dm-sans)' }}
+            >
+              &ldquo;The principles of data protection should therefore not apply
+              to anonymous information, namely information which does not relate to
+              an identified or identifiable natural person or to personal data
+              rendered anonymous in such a manner that the data subject is not or
+              no longer identifiable.&rdquo;
+            </blockquote>
+            <p
+              className="mt-3 text-sm text-slate-400"
+              style={{ fontFamily: 'var(--font-dm-sans)' }}
+            >
+              P1&apos;s quantum-OTP anonymization produces data that satisfies this
+              definition by physics, not computation. The mapping cannot be
+              reversed because the QRNG source bits no longer exist.
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* B. DORA: The Financial Sector Mandate */}
+      {sub('dora-financial-mandate') && (
+        <Subsection heading={sub('dora-financial-mandate')!.heading}>
+          <ProseBlock paragraphs={sub('dora-financial-mandate')!.body} />
+          {sub('dora-financial-mandate')!.callout && (
+            <CalloutBlock {...sub('dora-financial-mandate')!.callout!} />
+          )}
+        </Subsection>
+      )}
 
       {/* Area chart: regulatory pressure over time */}
       <motion.div
@@ -119,7 +264,7 @@ export const SectionRegulatoryMoat = () => {
           className="text-lg font-semibold text-slate-100 mb-1"
           style={{ fontFamily: 'var(--font-fraunces)' }}
         >
-          Cumulative Regulatory Pressure (2018\u20132035)
+          Cumulative Regulatory Pressure (2018{'\u2013'}2035)
         </h3>
         <p
           className="text-sm text-slate-400 mb-6"
@@ -197,127 +342,59 @@ export const SectionRegulatoryMoat = () => {
         </div>
       </motion.div>
 
-      {/* Regulation table */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="rounded-xl border overflow-hidden"
-        style={{ borderColor: 'rgba(34,211,238,0.15)', boxShadow: '0 0 24px rgba(34,211,238,0.06), 0 4px 20px rgba(0,0,0,0.3)' }}
-      >
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm" style={{ fontFamily: 'var(--font-dm-sans)' }}>
-            <thead>
-              <tr style={{ background: 'rgba(15,23,42,0.8)' }}>
-                {['Regulation', 'Citation', 'Requirement', 'Deadline', 'Patent', 'Penalty'].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400"
-                      style={{ fontFamily: 'var(--font-jetbrains)' }}
-                    >
-                      {h}
-                    </th>
-                  ),
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {REGULATIONS.map((reg, i) => (
-                <tr
-                  key={reg.id}
-                  className="transition-colors hover:bg-white/[0.02]"
-                  style={{
-                    background: i % 2 === 0 ? 'rgba(15,23,42,0.4)' : 'rgba(15,23,42,0.2)',
-                    borderLeft: `3px solid ${reg.color}`,
-                  }}
-                >
-                  <td className="px-4 py-3 font-semibold text-slate-100 whitespace-nowrap">
-                    {reg.name}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-slate-300 font-mono whitespace-nowrap"
-                    style={{ fontFamily: 'var(--font-jetbrains)' }}
-                  >
-                    {reg.citation}
-                  </td>
-                  <td className="px-4 py-3 text-slate-400 max-w-xs">{reg.requirement}</td>
-                  <td
-                    className="px-4 py-3 text-slate-300 font-mono whitespace-nowrap"
-                    style={{ fontFamily: 'var(--font-jetbrains)' }}
-                  >
-                    {reg.deadline}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <span
-                      className="text-xs font-bold font-mono px-2 py-0.5 rounded"
-                      style={{
-                        background: 'rgba(34,211,238,0.12)',
-                        color: '#22D3EE',
-                        fontFamily: 'var(--font-jetbrains)',
-                      }}
-                    >
-                      {reg.patent}
-                    </span>
-                  </td>
-                  <td
-                    className="px-4 py-3 text-slate-300 font-mono whitespace-nowrap"
-                    style={{ fontFamily: 'var(--font-jetbrains)' }}
-                  >
-                    {reg.penalty}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </motion.div>
+      {/* C. NIST PQC Timeline: The Deprecation Cliff */}
+      {sub('nist-pqc-deprecation-cliff') && (
+        <Subsection heading={sub('nist-pqc-deprecation-cliff')!.heading}>
+          <ProseBlock paragraphs={sub('nist-pqc-deprecation-cliff')!.body} />
+          {sub('nist-pqc-deprecation-cliff')!.callout && (
+            <CalloutBlock {...sub('nist-pqc-deprecation-cliff')!.callout!} />
+          )}
+        </Subsection>
+      )}
 
-      {/* GDPR Recital 26 callout */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="rounded-xl p-6 border"
-        style={{
-          background: 'rgba(99,102,241,0.06)',
-          borderColor: 'rgba(99,102,241,0.2)',
-        }}
-      >
-        <div className="flex gap-3">
-          <span className="flex-none text-2xl mt-0.5" aria-hidden>
-            &#xA7;
-          </span>
-          <div>
-            <h4
-              className="text-sm font-bold text-indigo-400 uppercase tracking-wider mb-2"
-              style={{ fontFamily: 'var(--font-jetbrains)' }}
-            >
-              GDPR Recital 26
-            </h4>
-            <blockquote
-              className="text-slate-200 leading-relaxed italic"
-              style={{ fontFamily: 'var(--font-dm-sans)' }}
-            >
-              &ldquo;The principles of data protection should therefore not apply
-              to anonymous information, namely information which does not relate to
-              an identified or identifiable natural person or to personal data
-              rendered anonymous in such a manner that the data subject is not or
-              no longer identifiable.&rdquo;
-            </blockquote>
-            <p
-              className="mt-3 text-sm text-slate-400"
-              style={{ fontFamily: 'var(--font-dm-sans)' }}
-            >
-              P1&apos;s quantum-OTP anonymization produces data that satisfies this
-              definition by physics, not computation. The mapping cannot be
-              reversed because the QRNG source bits no longer exist.
-            </p>
-          </div>
-        </div>
-      </motion.div>
+      {/* D. NSA CNSA 2.0 and Military Procurement */}
+      {sub('cnsa-military-procurement') && (
+        <Subsection heading={sub('cnsa-military-procurement')!.heading}>
+          <ProseBlock paragraphs={sub('cnsa-military-procurement')!.body} />
+          {sub('cnsa-military-procurement')!.callout && (
+            <CalloutBlock {...sub('cnsa-military-procurement')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* E. The Penalty Calculus */}
+      {sub('penalty-calculus') && (
+        <Subsection heading={sub('penalty-calculus')!.heading}>
+          <ProseBlock paragraphs={sub('penalty-calculus')!.body} />
+          {sub('penalty-calculus')!.callout && (
+            <CalloutBlock {...sub('penalty-calculus')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* F. Regulatory Convergence as Demand Engine */}
+      {sub('regulatory-convergence-demand-engine') && (
+        <Subsection heading={sub('regulatory-convergence-demand-engine')!.heading}>
+          <ProseBlock paragraphs={sub('regulatory-convergence-demand-engine')!.body} />
+          {sub('regulatory-convergence-demand-engine')!.callout && (
+            <CalloutBlock {...sub('regulatory-convergence-demand-engine')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* Conclusion */}
+      {prose?.conclusion && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-10 pt-8 max-w-3xl"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+        >
+          <ProseBlock paragraphs={prose.conclusion} />
+        </motion.div>
+      )}
     </div>
   )
 }

@@ -11,6 +11,8 @@ import {
   Cell,
 } from 'recharts'
 import { PILLARS } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import { ProseBlock, CalloutBlock, Subsection } from '@/components/blueprint/BlueprintSection'
 
 const completePillars = PILLARS.filter((p) => p.completion === 100).length
 const avgCompletion = Math.round(
@@ -43,8 +45,23 @@ const CustomTooltip = ({ active, payload }: any) => {
   )
 }
 
-export const SectionPillars = () => (
+export const SectionPillars = () => {
+  const prose = SECTION_PROSE['pillars']
+
+  return (
   <div className="space-y-10">
+    {/* --- Prose Introduction --- */}
+    {prose && (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <ProseBlock paragraphs={prose.intro} />
+      </motion.div>
+    )}
+
     {/* --- 3x3 Pillar Grid --- */}
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {PILLARS.map((pillar, i) => (
@@ -225,5 +242,42 @@ export const SectionPillars = () => (
         </div>
       ))}
     </motion.div>
+
+    {/* --- Detailed Pillar Analysis (prose subsections) --- */}
+    {prose?.subsections?.map((sub, i) => (
+      <motion.div
+        key={sub.id}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.05 }}
+      >
+        <Subsection heading={sub.heading}>
+          <ProseBlock paragraphs={sub.body} />
+          {sub.callout && (
+            <CalloutBlock
+              type={sub.callout.type}
+              title={sub.callout.title}
+              text={sub.callout.text}
+            />
+          )}
+        </Subsection>
+      </motion.div>
+    ))}
+
+    {/* --- Prose Conclusion --- */}
+    {prose?.conclusion && (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <Subsection heading="Platform Integration Premium">
+          <ProseBlock paragraphs={prose.conclusion} />
+        </Subsection>
+      </motion.div>
+    )}
   </div>
-)
+  )
+}

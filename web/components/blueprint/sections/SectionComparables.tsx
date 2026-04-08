@@ -12,6 +12,8 @@ import {
   Cell,
 } from 'recharts'
 import { COMPARABLES } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import { ProseBlock, Subsection, CalloutBlock } from '@/components/blueprint/BlueprintSection'
 
 const TOOLTIP_STYLE = {
   backgroundColor: 'rgba(17,24,39,0.95)',
@@ -40,22 +42,24 @@ const fmtVal = (v: number) => {
   return `$${v}M`
 }
 
+const prose = SECTION_PROSE['comparables']
+
+// Helper to get a subsection by id
+const sub = (id: string) => prose?.subsections.find((s) => s.id === id)
+
 export const SectionComparables = () => (
   <div className="space-y-12">
-    {/* Intro */}
-    <motion.p
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4 }}
-      className="text-slate-300 leading-relaxed max-w-3xl"
-      style={{ fontFamily: 'var(--font-dm-sans), sans-serif' }}
-    >
-      Comparable transaction analysis benchmarks QDaria&apos;s IP portfolio against recent
-      fundraising rounds and acquisitions in post-quantum cryptography, data privacy,
-      and compliance technology. Valuations are drawn from publicly reported rounds
-      between 2021 and 2024.
-    </motion.p>
+    {/* Intro prose */}
+    {prose?.intro && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4 }}
+      >
+        <ProseBlock paragraphs={prose.intro} />
+      </motion.div>
+    )}
 
     {/* Horizontal BarChart */}
     <motion.div
@@ -122,6 +126,50 @@ export const SectionComparables = () => (
       </div>
     </motion.div>
 
+    {/* Subsection A: Transaction Analysis Framework */}
+    {(() => {
+      const s = sub('transaction-analysis-framework')
+      return s ? (
+        <Subsection heading={s.heading}>
+          <ProseBlock paragraphs={s.body} />
+          {s.callout && <CalloutBlock type={s.callout.type} title={s.callout.title} text={s.callout.text} />}
+        </Subsection>
+      ) : null
+    })()}
+
+    {/* Subsection B: SandboxAQ */}
+    {(() => {
+      const s = sub('sandboxaq-closest-comparable')
+      return s ? (
+        <Subsection heading={s.heading}>
+          <ProseBlock paragraphs={s.body} />
+          {s.callout && <CalloutBlock type={s.callout.type} title={s.callout.title} text={s.callout.text} />}
+        </Subsection>
+      ) : null
+    })()}
+
+    {/* Subsection C: OneTrust */}
+    {(() => {
+      const s = sub('onetrust-privacy-proxy')
+      return s ? (
+        <Subsection heading={s.heading}>
+          <ProseBlock paragraphs={s.body} />
+          {s.callout && <CalloutBlock type={s.callout.type} title={s.callout.title} text={s.callout.text} />}
+        </Subsection>
+      ) : null
+    })()}
+
+    {/* Subsection D: Pure-Play PQC Comparables */}
+    {(() => {
+      const s = sub('pure-play-pqc-comparables')
+      return s ? (
+        <Subsection heading={s.heading}>
+          <ProseBlock paragraphs={s.body} />
+          {s.callout && <CalloutBlock type={s.callout.type} title={s.callout.title} text={s.callout.text} />}
+        </Subsection>
+      ) : null
+    })()}
+
     {/* Comparables Table */}
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -173,6 +221,17 @@ export const SectionComparables = () => (
       </div>
     </motion.div>
 
+    {/* Subsection E: QDaria's Position in the Landscape */}
+    {(() => {
+      const s = sub('qdaria-landscape-position')
+      return s ? (
+        <Subsection heading={s.heading}>
+          <ProseBlock paragraphs={s.body} />
+          {s.callout && <CalloutBlock type={s.callout.type} title={s.callout.title} text={s.callout.text} />}
+        </Subsection>
+      ) : null
+    })()}
+
     {/* Callout */}
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -210,5 +269,17 @@ export const SectionComparables = () => (
         </div>
       </div>
     </motion.div>
+
+    {/* Conclusion prose */}
+    {prose?.conclusion && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
+        <ProseBlock paragraphs={prose.conclusion} />
+      </motion.div>
+    )}
   </div>
 )

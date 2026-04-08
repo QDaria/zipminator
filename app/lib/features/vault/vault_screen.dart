@@ -144,8 +144,19 @@ class VaultScreen extends ConsumerWidget {
                 ),
               ),
 
-            // Bottom padding
-            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+            // Bottom padding + footer
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 24),
+                    const PillarFooter(pillarName: 'Vault'),
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

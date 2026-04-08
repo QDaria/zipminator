@@ -604,6 +604,8 @@ class _EmailScreenState extends ConsumerState<EmailScreen>
           ],
 
           const SizedBox(height: 24),
+          const PillarFooter(pillarName: 'Q-Mail'),
+          const SizedBox(height: 16),
         ],
       ),
     );

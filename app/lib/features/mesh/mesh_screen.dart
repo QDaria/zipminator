@@ -101,6 +101,8 @@ class _MeshScreenState extends State<MeshScreen>
               // 6. Entropy Flow
               _buildEntropyFlowCard(context),
 
+              const SizedBox(height: 24),
+              const PillarFooter(pillarName: 'Q-Mesh'),
               const SizedBox(height: 32),
             ],
           ),

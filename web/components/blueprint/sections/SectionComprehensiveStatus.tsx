@@ -1,7 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { GlowCard, MetricCard, DataTable, EquationCard } from '../BlueprintSection'
+import { GlowCard, MetricCard, DataTable, EquationCard, ProseBlock, CalloutBlock, Subsection } from '../BlueprintSection'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
 
 /* ═══════════════════════════════════════════════════════════════════════
    SECTION: Comprehensive Platform Status
@@ -517,6 +518,34 @@ export const SectionComprehensiveStatus = () => (
         </div>
       </GlowCard>
     </div>
+
+    {/* ─── Part L: Seven-Layer System Architecture ─── */}
+    {(() => {
+      const prose = SECTION_PROSE['comprehensive-status']
+      if (!prose) return null
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="space-y-6"
+        >
+          {prose.subsections.map((sub) => (
+            <Subsection key={sub.id} heading={`L. ${sub.heading}`}>
+              <ProseBlock paragraphs={sub.body} />
+              {sub.callout && (
+                <CalloutBlock
+                  type={sub.callout.type}
+                  title={sub.callout.title}
+                  text={sub.callout.text}
+                />
+              )}
+            </Subsection>
+          ))}
+        </motion.div>
+      )
+    })()}
 
   </div>
 )

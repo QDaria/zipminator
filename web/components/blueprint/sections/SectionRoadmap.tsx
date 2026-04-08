@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { ROADMAP_ITEMS } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import { ProseBlock, CalloutBlock, Subsection } from '@/components/blueprint/BlueprintSection'
 
 const STATUS_STYLES: Record<string, { bg: string; label: string; dot: string }> = {
   active: { bg: 'rgba(239,68,68,0.08)', label: 'In Progress', dot: '#ef4444' },
@@ -9,21 +11,22 @@ const STATUS_STYLES: Record<string, { bg: string; label: string; dot: string }> 
   planned: { bg: 'rgba(100,116,139,0.06)', label: 'Planned', dot: '#64748b' },
 }
 
-export const SectionRoadmap = () => (
+export const SectionRoadmap = () => {
+  const prose = SECTION_PROSE.roadmap
+
+  return (
   <div className="space-y-10">
-    {/* Intro */}
-    <motion.p
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-      className="text-slate-300 text-lg leading-relaxed max-w-3xl"
-      style={{ fontFamily: 'var(--font-dm-sans)' }}
-    >
-      QDaria's roadmap from academic validation through enterprise adoption to
-      global licensing. The regulatory timeline (DORA 2025, CNSA 2.0 by 2027, NIST RSA
-      deprecation 2030) creates non-optional demand windows that coincide with key milestones.
-    </motion.p>
+    {/* Prose intro */}
+    {prose && prose.intro.length > 0 && (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <ProseBlock paragraphs={prose.intro} />
+      </motion.div>
+    )}
 
     {/* Timeline */}
     <div className="relative">
@@ -155,5 +158,36 @@ export const SectionRoadmap = () => (
         </div>
       </div>
     </motion.div>
+
+    {/* Prose subsections */}
+    {prose && (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        {prose.subsections.map((sub) => (
+          <Subsection key={sub.id} heading={sub.heading}>
+            <ProseBlock paragraphs={sub.body} />
+            {sub.callout && (
+              <CalloutBlock
+                type={sub.callout.type}
+                title={sub.callout.title}
+                text={sub.callout.text}
+              />
+            )}
+          </Subsection>
+        ))}
+
+        {/* Conclusion */}
+        {prose.conclusion && (
+          <div className="mt-10 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <ProseBlock paragraphs={prose.conclusion} />
+          </div>
+        )}
+      </motion.div>
+    )}
   </div>
-)
+  )
+}

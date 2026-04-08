@@ -330,6 +330,10 @@ class _BrowserScreenState extends ConsumerState<BrowserScreen> {
                       ),
                     ),
                   ),
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 24),
+                    child: PillarFooter(pillarName: 'ZipBrowser'),
+                  ),
                 ],
               ),
             ),

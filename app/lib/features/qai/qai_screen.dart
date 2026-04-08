@@ -313,6 +313,8 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                             )
                                 .animate()
                                 .fadeIn(delay: 700.ms, duration: 400.ms),
+                            const SizedBox(height: 24),
+                            const PillarFooter(pillarName: 'Q-AI Personal Assistant'),
                           ],
                         ),
                       ),

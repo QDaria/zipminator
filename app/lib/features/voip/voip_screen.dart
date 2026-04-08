@@ -312,6 +312,8 @@ class _ContactListView extends ConsumerWidget {
               .animate()
               .fadeIn(delay: 600.ms, duration: 300.ms)
               .slideX(begin: -0.05),
+          const SizedBox(height: 24),
+          const PillarFooter(pillarName: 'VoIP'),
         ],
       ),
     );

@@ -13,6 +13,8 @@ import {
   Cell,
 } from 'recharts'
 import { ADDRESSABLE_SECTORS, CHIPMAKER_REVENUE } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import { ProseBlock, CalloutBlock, Subsection } from '@/components/blueprint/BlueprintSection'
 
 const CustomTooltip = ({ active, payload }: {
   active?: boolean
@@ -34,22 +36,21 @@ const CustomTooltip = ({ active, payload }: {
 
 export const SectionAddressableUniverse = () => {
   const [activeSector, setActiveSector] = useState(0)
+  const prose = SECTION_PROSE['addressable-universe']
 
   return (
     <div className="space-y-10">
-      {/* Intro */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="text-slate-300 text-lg leading-relaxed max-w-3xl"
-        style={{ fontFamily: 'var(--font-dm-sans)' }}
-      >
-        The QDaria patent portfolio addresses organizations across seven sectors,
-        from intelligence agencies to WiFi chipmakers. Patent 2 alone covers 18.2 billion
-        WiFi-enabled devices. At $0.05 per chip, that is $300M per year from chipmakers alone.
-      </motion.p>
+      {/* Intro prose */}
+      {prose && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <ProseBlock paragraphs={prose.intro} />
+        </motion.div>
+      )}
 
       {/* Chipmaker Revenue Chart */}
       <motion.div
@@ -175,6 +176,35 @@ export const SectionAddressableUniverse = () => {
           First-mover advantage in a market with NOK 1.75B in government quantum funding.
         </p>
       </motion.div>
+
+      {/* Expanded prose subsections */}
+      {prose && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          {prose.subsections.map((sub) => (
+            <Subsection key={sub.id} heading={sub.heading}>
+              <ProseBlock paragraphs={sub.body} />
+              {sub.callout && (
+                <CalloutBlock
+                  type={sub.callout.type}
+                  title={sub.callout.title}
+                  text={sub.callout.text}
+                />
+              )}
+            </Subsection>
+          ))}
+
+          {prose.conclusion && (
+            <div className="mt-10 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <ProseBlock paragraphs={prose.conclusion} />
+            </div>
+          )}
+        </motion.div>
+      )}
     </div>
   )
 }

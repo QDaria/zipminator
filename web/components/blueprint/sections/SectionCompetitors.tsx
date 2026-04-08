@@ -11,6 +11,8 @@ import {
   Tooltip,
 } from 'recharts'
 import { COMPETITORS, COMPETITOR_FEATURES } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import { ProseBlock, CalloutBlock, Subsection } from '@/components/blueprint/BlueprintSection'
 
 const DIMENSIONS = [
   { key: 'pqc', label: 'PQC' },
@@ -86,24 +88,25 @@ const featureCell = (val: boolean | string) => {
 }
 
 export const SectionCompetitors = () => {
+  const prose = SECTION_PROSE['competitors']
+
+  // Helper to find a prose subsection by id
+  const sub = (id: string) => prose?.subsections.find((s) => s.id === id)
+
   return (
     <div className="space-y-10">
-      {/* Intro */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="text-slate-300 text-lg leading-relaxed max-w-3xl"
-        style={{ fontFamily: 'var(--font-dm-sans)' }}
-      >
-        Zipminator is the only platform scoring 4+ across all seven security dimensions
-        simultaneously. No competitor covers more than two of our ten unique capabilities.
-        Signal leads in open source but has no PQC depth, QRNG, or compliance tooling.
-        NordVPN has reach but zero quantum readiness. Wickr was acquired and shelved by AWS.
-        QDaria is the only commercially available PQC company in Norway; NQCG shut down
-        in December 2024.
-      </motion.p>
+      {/* Intro prose */}
+      {prose && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="max-w-3xl"
+        >
+          <ProseBlock paragraphs={prose.intro} />
+        </motion.div>
+      )}
 
       {/* Radar Chart */}
       <motion.div
@@ -181,6 +184,56 @@ export const SectionCompetitors = () => {
         </div>
       </motion.div>
 
+      {/* A. Competitive Landscape Overview */}
+      {sub('competitive-landscape-overview') && (
+        <Subsection heading={sub('competitive-landscape-overview')!.heading}>
+          <ProseBlock paragraphs={sub('competitive-landscape-overview')!.body} />
+          {sub('competitive-landscape-overview')!.callout && (
+            <CalloutBlock {...sub('competitive-landscape-overview')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* B. Signal Analysis */}
+      {sub('signal-analysis') && (
+        <Subsection heading={sub('signal-analysis')!.heading}>
+          <ProseBlock paragraphs={sub('signal-analysis')!.body} />
+          {sub('signal-analysis')!.callout && (
+            <CalloutBlock {...sub('signal-analysis')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* C. ProtonMail Analysis */}
+      {sub('protonmail-analysis') && (
+        <Subsection heading={sub('protonmail-analysis')!.heading}>
+          <ProseBlock paragraphs={sub('protonmail-analysis')!.body} />
+          {sub('protonmail-analysis')!.callout && (
+            <CalloutBlock {...sub('protonmail-analysis')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* D. NordVPN Analysis */}
+      {sub('nordvpn-analysis') && (
+        <Subsection heading={sub('nordvpn-analysis')!.heading}>
+          <ProseBlock paragraphs={sub('nordvpn-analysis')!.body} />
+          {sub('nordvpn-analysis')!.callout && (
+            <CalloutBlock {...sub('nordvpn-analysis')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* E. Wickr Analysis */}
+      {sub('wickr-analysis') && (
+        <Subsection heading={sub('wickr-analysis')!.heading}>
+          <ProseBlock paragraphs={sub('wickr-analysis')!.body} />
+          {sub('wickr-analysis')!.callout && (
+            <CalloutBlock {...sub('wickr-analysis')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
       {/* Feature Comparison Table */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -257,6 +310,29 @@ export const SectionCompetitors = () => {
           </table>
         </div>
       </motion.div>
+
+      {/* F. The Breadth Moat */}
+      {sub('breadth-moat') && (
+        <Subsection heading={sub('breadth-moat')!.heading}>
+          <ProseBlock paragraphs={sub('breadth-moat')!.body} />
+          {sub('breadth-moat')!.callout && (
+            <CalloutBlock {...sub('breadth-moat')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* Conclusion */}
+      {prose?.conclusion && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="max-w-3xl mt-10"
+        >
+          <ProseBlock paragraphs={prose.conclusion} />
+        </motion.div>
+      )}
     </div>
   )
 }

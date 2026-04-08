@@ -338,6 +338,8 @@ class _EmptyConversations extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
             ),
+            const SizedBox(height: 24),
+            const PillarFooter(pillarName: 'Messenger'),
           ],
         ),
       ),
