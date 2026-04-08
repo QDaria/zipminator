@@ -16,6 +16,7 @@ class ShellScaffold extends ConsumerWidget {
   const ShellScaffold({super.key, required this.child});
 
   static const _tabs = [
+    _NavTab('/home', Icons.home_outlined, Icons.home, 'Home', 'Dashboard'),
     _NavTab('/vault', Icons.lock_outline, Icons.lock, 'Vault', 'Encrypted storage'),
     _NavTab('/messenger', Icons.chat_bubble_outline, Icons.chat_bubble, 'Messenger', 'PQC messaging'),
     _NavTab('/voip', Icons.phone_outlined, Icons.phone, 'VoIP', 'Quantum-safe calls'),
@@ -27,7 +28,7 @@ class ShellScaffold extends ConsumerWidget {
     _NavTab('/mesh', Icons.hub_outlined, Icons.hub, 'Q-Mesh', 'Mesh networking'),
   ];
 
-  /// Number of primary tabs shown in mobile bottom nav (5th is "More").
+  /// Number of primary tabs shown in mobile bottom nav (last is "More").
   static const _mobileTabCount = 4;
 
   int _currentIndex(BuildContext context) {

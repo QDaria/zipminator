@@ -13,6 +13,8 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { PATENT_DETAILS, PATENT_STACK, type BpScenario } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import { ProseBlock, CalloutBlock, Subsection } from '@/components/blueprint/BlueprintSection'
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                      */
@@ -36,6 +38,12 @@ const SCENARIO_COLORS: Record<BpScenario, string> = {
   conservative: '#94a3b8',
   moderate: '#60a5fa',
   optimistic: '#34d399',
+}
+
+const PATENT_PROSE_PREFIX: Record<PatentId, string> = {
+  P1: 'p1-',
+  P2: 'p2-',
+  P3: 'p3-',
 }
 
 /* -------------------------------------------------------------------------- */
@@ -130,6 +138,11 @@ export const SectionPatentDeepDives = ({ scenario }: SectionPatentDeepDivesProps
     moderate: m.value.moderate,
     optimistic: m.value.optimistic,
   }))
+
+  // Filter prose subsections for the active patent tab
+  const prose = SECTION_PROSE['patent-deep-dives']
+  const prefix = PATENT_PROSE_PREFIX[activeTab]
+  const patentSubsections = prose?.subsections.filter((s) => s.id.startsWith(prefix)) ?? []
 
   return (
     <div className="space-y-8">
@@ -362,6 +375,25 @@ export const SectionPatentDeepDives = ({ scenario }: SectionPatentDeepDivesProps
               </ResponsiveContainer>
             </div>
           </div>
+
+          {/* Deep-dive prose for the active patent */}
+          {patentSubsections.length > 0 && (
+            <div className="space-y-2">
+              {patentSubsections.map((sub) => (
+                <Subsection key={sub.id} heading={sub.heading} accent={color}>
+                  <ProseBlock paragraphs={sub.body} />
+                  {sub.callout && (
+                    <CalloutBlock
+                      type={sub.callout.type}
+                      title={sub.callout.title}
+                      text={sub.callout.text}
+                      accent={color}
+                    />
+                  )}
+                </Subsection>
+              ))}
+            </div>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>

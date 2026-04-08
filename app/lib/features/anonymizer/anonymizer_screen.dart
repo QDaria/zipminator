@@ -20,6 +20,29 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
       'John Smith, SSN 123-45-6789, john@acme.com, '
       '555-0123, CC 4111-1111-1111-1111';
 
+  /// Per-level example texts showing what each level catches.
+  static const _levelExamples = <int, String>{
+    1: 'Meeting with John Smith and Sarah Johnson at 3pm.',
+    2: 'Contact John Smith at john.smith@acme.com for the report.',
+    3: 'John Smith, john@acme.com, phone: +1-555-867-5309.',
+    4: 'John Smith, john@acme.com, +1-555-867-5309, '
+        '123 Main Street, Apt 4B, New York, NY 10001.',
+    5: 'John Smith, SSN 987-65-4321, born 1985-03-15, '
+        'john@acme.com, +1-555-867-5309.',
+    6: 'John Smith, SSN 987-65-4321, CC 4532-1234-5678-9012, '
+        'IBAN NO9386011117947, salary: \$125,000.',
+    7: 'John Smith, SSN 987-65-4321, CC 4532-1234-5678-9012, '
+        'IP 192.168.1.42, MAC AA:BB:CC:DD:EE:FF, Device: iPhone 16 Pro.',
+    8: 'Patient: John Smith, SSN 987-65-4321, blood type O+, '
+        'diagnosis: Type 2 diabetes, fingerprint hash: 0xAB3F...',
+    9: 'John Smith, SSN 987-65-4321, browsing: quantum-computing.org, '
+        'purchases: VPN subscription, location: 59.91N 10.75E, '
+        'login pattern: weekdays 08:00-09:00.',
+    10: 'CLASSIFIED: Agent codename AURORA, asset ID QD-7749, '
+        'coordinates 59.9139N 10.7522E, dead drop: Oslo Central Station '
+        'locker 42. Quantum OTP applied — data destroyed irreversibly.',
+  };
+
   final _controller = TextEditingController();
   String? _uploadedFileName;
 
@@ -218,6 +241,10 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
 
                 // ── 1. 10-Level Slider ─────────────────────────────────
                 _buildLevelSlider(context, pii, anonNotifier, level, color),
+                const SizedBox(height: 12),
+
+                // ── 1b. Try Example for current level ─────────────────
+                _buildTryLevelExample(context, piiNotifier, anonNotifier, level, color),
                 const SizedBox(height: 12),
 
                 // ── 2. Use-case chips ──────────────────────────────────
@@ -459,6 +486,73 @@ class _AnonymizerScreenState extends ConsumerState<AnonymizerScreen> {
         ],
       ),
     ).animate().fadeIn(delay: 200.ms, duration: 300.ms);
+  }
+
+  // ── 1b. Try Example per level ─────────────────────────────────────────
+
+  Widget _buildTryLevelExample(
+    BuildContext context,
+    PiiNotifier piiNotifier,
+    AnonymizerNotifier anonNotifier,
+    int level,
+    Color color,
+  ) {
+    final example = _levelExamples[level] ?? '';
+    return QuantumCard(
+      glowColor: color.withValues(alpha: 0.3),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.science_outlined, size: 18, color: color),
+              const SizedBox(width: 8),
+              Text(
+                'L$level Example',
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: () {
+                  _controller.text = example;
+                  setState(() {
+                    _uploadedFileName = null;
+                    _scannerContentVisible = false;
+                  });
+                  piiNotifier.scan(example);
+                },
+                icon: Icon(Icons.play_arrow, size: 16, color: color),
+                label: Text('Try Example',
+                    style: TextStyle(color: color, fontSize: 12)),
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  side: BorderSide(color: color.withValues(alpha: 0.4)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            example,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontFamily: 'JetBrains Mono',
+                  fontSize: 11,
+                  color: QuantumTheme.textSecondary,
+                ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 300.ms);
   }
 
   // ── 2. Use-case chips ────────────────────────────────────────────────

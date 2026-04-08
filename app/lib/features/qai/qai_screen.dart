@@ -23,6 +23,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
   final _scrollController = ScrollController();
 
   static const _providerColors = {
+    LLMProvider.onDevice: QuantumTheme.quantumAmber,
     LLMProvider.gemini: QuantumTheme.quantumBlue,
     LLMProvider.groq: QuantumTheme.quantumGreen,
     LLMProvider.deepSeek: QuantumTheme.quantumCyan,
@@ -111,7 +112,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
     return GestureDetector(onTap: () => FocusScope.of(context).unfocus(), child: Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: const Text('Q-AI Assistant'),
+        title: const Text('QDaria Q-AI Personal Assistant'),
         actions: [
           IconButton(
             icon: Icon(
@@ -281,22 +282,37 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
                           children: [
                             const PillarStatusBanner(
                               description:
-                                  'AI assistant with PQC-encrypted queries',
-                              status: PillarStatus.demo,
+                                  'On-device AI with PQC-encrypted queries',
+                              status: PillarStatus.live,
                             ),
                             PillarHeader(
                               icon: Icons.psychology_outlined,
-                              title: 'Q-AI Assistant',
+                              title: 'QDaria Q-AI',
                               subtitle:
-                                  'Multi-Provider Model Routing',
+                                  'Personal Assistant',
                               iconColor: providerColor,
                             ),
-                            Text(
-                              '7 providers, 18 models — select above',
-                              style: Theme.of(context).textTheme.bodySmall,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: Text(
+                                'Your private AI assistant powered by Gemma 4. '
+                                'Runs on-device by default; no API key needed. '
+                                'Switch providers above for cloud models.',
+                                style: Theme.of(context).textTheme.bodySmall,
+                                textAlign: TextAlign.center,
+                              ),
                             )
                                 .animate()
                                 .fadeIn(delay: 500.ms, duration: 400.ms),
+                            const SizedBox(height: 8),
+                            Text(
+                              '8 providers, 21 models — select above',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: QuantumTheme.textSecondary,
+                                  ),
+                            )
+                                .animate()
+                                .fadeIn(delay: 700.ms, duration: 400.ms),
                           ],
                         ),
                       ),
@@ -401,6 +417,7 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
   }
 
   IconData _providerIcon(LLMProvider provider) => switch (provider) {
+        LLMProvider.onDevice => Icons.phone_android,
         LLMProvider.gemini => Icons.auto_awesome,
         LLMProvider.groq => Icons.bolt,
         LLMProvider.deepSeek => Icons.psychology,
@@ -413,12 +430,16 @@ class _QaiScreenState extends ConsumerState<QaiScreen> {
   /// Whether the send button / text field should be enabled.
   bool _canSend(QaiState qai) {
     if (qai.isLoading) return false;
+    if (qai.selectedProvider == LLMProvider.onDevice) return true;
     if (qai.selectedProvider == LLMProvider.ollama) return _ollamaAvailable;
     return qai.hasApiKey;
   }
 
   /// Hint text for the input field based on provider state.
   String _inputHint(QaiState qai) {
+    if (qai.selectedProvider == LLMProvider.onDevice) {
+      return 'Ask anything (on-device, private)...';
+    }
     if (qai.selectedProvider == LLMProvider.ollama) {
       return _ollamaAvailable
           ? 'Ask anything (local)...'

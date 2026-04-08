@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zipminator/core/providers/auth_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/shared/widgets/widgets.dart';
@@ -37,7 +38,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       if (auth.error != null) {
         setState(() => _saving = false);
       } else {
-        context.go('/vault');
+        // Check if welcome tour has been completed
+        final prefs = await SharedPreferences.getInstance();
+        final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+        if (mounted) {
+          context.go(onboardingComplete ? '/home' : '/welcome');
+        }
       }
     }
   }

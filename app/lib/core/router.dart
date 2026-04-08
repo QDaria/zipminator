@@ -6,6 +6,8 @@ import 'package:zipminator/core/services/supabase_service.dart';
 import 'package:zipminator/features/auth/login_screen.dart';
 import 'package:zipminator/features/auth/onboarding_screen.dart';
 import 'package:zipminator/features/auth/profile_screen.dart';
+import 'package:zipminator/features/auth/welcome_screen.dart';
+import 'package:zipminator/features/home/home_screen.dart';
 import 'package:zipminator/features/vault/vault_screen.dart';
 import 'package:zipminator/features/messenger/messenger_screen.dart';
 import 'package:zipminator/features/voip/voip_screen.dart';
@@ -49,7 +51,7 @@ ChangeNotifier _authRefreshListenable() {
 
 /// Auth-reactive GoRouter. Re-evaluates redirect on every auth state change.
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/vault',
+  initialLocation: '/home',
   refreshListenable: _authRefreshListenable(),
   redirect: (context, state) {
     final path = state.matchedLocation;
@@ -75,7 +77,7 @@ final GoRouter appRouter = GoRouter(
     if (loggedIn && isLoginRoute) {
       final username = SupabaseService.currentUsername;
       if (username == null || username.isEmpty) return '/onboarding';
-      return '/vault';
+      return '/home';
     }
 
     // Logged in but still need username: keep on onboarding.
@@ -103,9 +105,19 @@ final GoRouter appRouter = GoRouter(
       name: 'onboarding',
       builder: (context, state) => const OnboardingScreen(),
     ),
+    GoRoute(
+      path: '/welcome',
+      name: 'welcome',
+      builder: (context, state) => const WelcomeScreen(),
+    ),
     ShellRoute(
       builder: (context, state, child) => ShellScaffold(child: child),
       routes: [
+        GoRoute(
+          path: '/home',
+          name: 'home',
+          builder: (context, state) => const HomeScreen(),
+        ),
         GoRoute(
           path: '/vault',
           name: 'vault',

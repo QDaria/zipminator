@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'on_device_service.dart';
 import 'openai_compatible_service.dart';
 
 /// Supported LLM providers.
 enum LLMProvider {
+  onDevice('On-Device (Gemma 4)', 'Google AI Edge'),
   gemini('Gemini', 'Google'),
   groq('Groq', 'Groq'),
   deepSeek('DeepSeek', 'DeepSeek'),
@@ -17,7 +19,35 @@ enum LLMProvider {
   const LLMProvider(this.displayName, this.company);
 
   /// Whether this provider runs locally and needs no API key.
-  bool get isLocal => this == LLMProvider.ollama;
+  bool get isLocal => this == LLMProvider.ollama || this == LLMProvider.onDevice;
+
+  /// URL where users can obtain an API key for this provider.
+  String? get apiKeyUrl => switch (this) {
+        LLMProvider.gemini => 'https://aistudio.google.com/apikey',
+        LLMProvider.groq => 'https://console.groq.com/keys',
+        LLMProvider.deepSeek => 'https://platform.deepseek.com/api_keys',
+        LLMProvider.mistral => 'https://console.mistral.ai/api-keys',
+        LLMProvider.claude => 'https://console.anthropic.com/settings/keys',
+        LLMProvider.openRouter => 'https://openrouter.ai/settings/keys',
+        _ => null,
+      };
+
+  /// Short help text explaining how to get the API key.
+  String? get apiKeyHelp => switch (this) {
+        LLMProvider.gemini =>
+          'Sign in to Google AI Studio, click "Get API key", and copy it.',
+        LLMProvider.groq =>
+          'Create a free Groq Cloud account, go to API Keys, and generate one.',
+        LLMProvider.deepSeek =>
+          'Sign up at DeepSeek Platform, navigate to API Keys, and create one.',
+        LLMProvider.mistral =>
+          'Register at Mistral Console, go to API Keys section.',
+        LLMProvider.claude =>
+          'Sign in to Anthropic Console, go to Settings > API Keys.',
+        LLMProvider.openRouter =>
+          'Create an OpenRouter account, go to Settings > Keys.',
+        _ => null,
+      };
 }
 
 /// Model metadata for UI display.
@@ -35,9 +65,25 @@ class LLMModel {
   });
 }
 
-/// All available models grouped by provider. Free-tier models listed first.
+/// All available models grouped by provider. On-device first, then free-tier.
 const kAvailableModels = <LLMModel>[
-  // Gemini (free tier, very capable)
+  // On-Device (Gemma 4 via Google AI Edge — no API key, fully private)
+  LLMModel(
+      id: 'gemma-4-e4b',
+      displayName: 'Gemma 4 E4B',
+      provider: LLMProvider.onDevice,
+      freeTier: true),
+  LLMModel(
+      id: 'gemma-4-e2b',
+      displayName: 'Gemma 4 E2B',
+      provider: LLMProvider.onDevice,
+      freeTier: true),
+  // Gemini (free tier, very capable — includes cloud Gemma 4 31B)
+  LLMModel(
+      id: 'gemma-4-31b-it',
+      displayName: 'Gemma 4 31B IT',
+      provider: LLMProvider.gemini,
+      freeTier: true),
   LLMModel(
       id: 'gemini-2.5-flash',
       displayName: 'Gemini 2.5 Flash',
@@ -133,9 +179,12 @@ const kAvailableModels = <LLMModel>[
 
 /// System prompt so Q-AI identifies correctly regardless of backend model.
 String qaiSystemPrompt(String modelName) =>
-    'You are Q-AI, Zipminator\'s quantum-safe AI assistant. '
+    'You are QDaria Q-AI Personal Assistant, the AI built into Zipminator, '
+    'the world\'s first post-quantum cyber security super-app. '
     'You are powered by $modelName. '
-    'Help users with privacy, encryption, and security questions.';
+    'Help users with privacy, encryption, security, and general questions. '
+    'Be concise, helpful, and privacy-conscious. '
+    'Never store or transmit user data beyond this conversation.';
 
 /// Abstract LLM service interface.
 abstract class LLMService {
@@ -353,6 +402,7 @@ class OpenRouterService extends OpenAICompatibleService {
 /// Factory to create the right service for a provider.
 LLMService createLLMService(LLMProvider provider, String apiKey) =>
     switch (provider) {
+      LLMProvider.onDevice => OnDeviceService(),
       LLMProvider.claude => ClaudeService(apiKey: apiKey),
       LLMProvider.gemini => GeminiService(apiKey: apiKey),
       LLMProvider.groq => GroqService(apiKey: apiKey),

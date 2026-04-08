@@ -12,6 +12,8 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { PATENT_STACK, STACK_FLOW } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import { ProseBlock, CalloutBlock, Subsection } from '@/components/blueprint/BlueprintSection'
 
 const COVERAGE_DATA = [
   { layer: 'Data Layer', P1: 90, P2: 30, P3: 60 },
@@ -76,6 +78,8 @@ const ArrowDown = () => (
 )
 
 export const SectionPatentStack = () => {
+  const prose = SECTION_PROSE['patent-stack']
+
   return (
     <div className="space-y-10">
       {/* Intro */}
@@ -95,6 +99,18 @@ export const SectionPatentStack = () => {
         (holds even if P=NP). Zero blocking prior art across 48 exhaustive searches. A competitor
         must license all three or design around each independently.
       </motion.p>
+
+      {/* Expanded prose intro */}
+      {prose && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.05 }}
+        >
+          <ProseBlock paragraphs={prose.intro} />
+        </motion.div>
+      )}
 
       {/* Stacked patent cards with flow arrows */}
       <motion.div
@@ -188,6 +204,28 @@ export const SectionPatentStack = () => {
           })}
       </motion.div>
 
+      {/* Subsections A-B: Entropy Lifecycle & Thicket Strategy */}
+      {prose?.subsections.slice(0, 2).map((sub) => (
+        <motion.div
+          key={sub.id}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <Subsection heading={sub.heading}>
+            <ProseBlock paragraphs={sub.body} />
+            {sub.callout && (
+              <CalloutBlock
+                type={sub.callout.type}
+                title={sub.callout.title}
+                text={sub.callout.text}
+              />
+            )}
+          </Subsection>
+        </motion.div>
+      ))}
+
       {/* Security coverage bar chart */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -261,6 +299,61 @@ export const SectionPatentStack = () => {
           </ResponsiveContainer>
         </div>
       </motion.div>
+
+      {/* Subsections C-D: Claim Structure & PCT Strategy */}
+      {prose?.subsections.slice(2, 4).map((sub) => (
+        <motion.div
+          key={sub.id}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <Subsection heading={sub.heading}>
+            <ProseBlock paragraphs={sub.body} />
+            {sub.callout && (
+              <CalloutBlock
+                type={sub.callout.type}
+                title={sub.callout.title}
+                text={sub.callout.text}
+              />
+            )}
+          </Subsection>
+        </motion.div>
+      ))}
+
+      {/* Subsection E: Cross-Patent Dependencies (conclusion) */}
+      {prose?.subsections[4] && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <Subsection heading={prose.subsections[4].heading}>
+            <ProseBlock paragraphs={prose.subsections[4].body} />
+            {prose.subsections[4].callout && (
+              <CalloutBlock
+                type={prose.subsections[4].callout.type}
+                title={prose.subsections[4].callout.title}
+                text={prose.subsections[4].callout.text}
+              />
+            )}
+          </Subsection>
+        </motion.div>
+      )}
+
+      {/* Prose conclusion */}
+      {prose?.conclusion && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <ProseBlock paragraphs={prose.conclusion} />
+        </motion.div>
+      )}
 
       {/* Key insight box */}
       <motion.div

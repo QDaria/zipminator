@@ -10,6 +10,8 @@ class QuantumTheme {
   static const Color quantumBlue = Color(0xFF2979FF);
   static const Color quantumPurple = Color(0xFF7C4DFF);
   static const Color quantumGreen = Color(0xFF00E676);
+  static const Color quantumAmber = Color(0xFFFFC107);
+  static const Color quantumRose = Color(0xFFFB7185);
   static const Color quantumOrange = Color(0xFFFF9100);
   static const Color quantumRed = Color(0xFFFF5252);
 

@@ -18,6 +18,12 @@ import {
   fmt,
   type BpScenario,
 } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import {
+  ProseBlock,
+  CalloutBlock,
+  Subsection,
+} from '@/components/blueprint/BlueprintSection'
 
 const TOOLTIP_STYLE = {
   backgroundColor: 'rgba(17,24,39,0.95)',
@@ -102,8 +108,28 @@ export const SectionValuation = ({ scenario }: Props) => {
   const lifetimeRow = VALUATION_METHODS.find((r) => r.method.startsWith('Lifetime'))
   const patentRows = VALUATION_METHODS.filter((r) => !r.method.startsWith('Lifetime'))
 
+  const prose = SECTION_PROSE['valuation']
+  const sub = (id: string) => prose?.subsections.find((s) => s.id === id)
+
   return (
     <div className="space-y-12">
+      {/* Intro prose */}
+      {prose && <ProseBlock paragraphs={prose.intro} />}
+
+      {/* A. Valuation Methodology */}
+      {sub('methodology') && (
+        <Subsection heading={sub('methodology')!.heading}>
+          <ProseBlock paragraphs={sub('methodology')!.body} />
+          {sub('methodology')!.callout && (
+            <CalloutBlock
+              type={sub('methodology')!.callout!.type}
+              title={sub('methodology')!.callout!.title}
+              text={sub('methodology')!.callout!.text}
+            />
+          )}
+        </Subsection>
+      )}
+
       {/* Hero metric cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {HERO_METRICS.map((m, i) => {
@@ -138,6 +164,20 @@ export const SectionValuation = ({ scenario }: Props) => {
           )
         })}
       </div>
+
+      {/* B. R&D Replacement Cost prose */}
+      {sub('rd-replacement') && (
+        <Subsection heading={sub('rd-replacement')!.heading}>
+          <ProseBlock paragraphs={sub('rd-replacement')!.body} />
+          {sub('rd-replacement')!.callout && (
+            <CalloutBlock
+              type={sub('rd-replacement')!.callout!.type}
+              title={sub('rd-replacement')!.callout!.title}
+              text={sub('rd-replacement')!.callout!.text}
+            />
+          )}
+        </Subsection>
+      )}
 
       {/* Lifetime callout (separate from chart to avoid scale distortion) */}
       {lifetimeRow && (
@@ -175,6 +215,34 @@ export const SectionValuation = ({ scenario }: Props) => {
             If any patent becomes standard-essential (e.g., NIST PQC mandates). Shown separately due to order-of-magnitude difference.
           </p>
         </motion.div>
+      )}
+
+      {/* C. Standard-Essential Lifetime Value prose */}
+      {sub('standard-essential') && (
+        <Subsection heading={sub('standard-essential')!.heading}>
+          <ProseBlock paragraphs={sub('standard-essential')!.body} />
+          {sub('standard-essential')!.callout && (
+            <CalloutBlock
+              type={sub('standard-essential')!.callout!.type}
+              title={sub('standard-essential')!.callout!.title}
+              text={sub('standard-essential')!.callout!.text}
+            />
+          )}
+        </Subsection>
+      )}
+
+      {/* D. Per-Patent Valuation Rationale prose */}
+      {sub('per-patent') && (
+        <Subsection heading={sub('per-patent')!.heading}>
+          <ProseBlock paragraphs={sub('per-patent')!.body} />
+          {sub('per-patent')!.callout && (
+            <CalloutBlock
+              type={sub('per-patent')!.callout!.type}
+              title={sub('per-patent')!.callout!.title}
+              text={sub('per-patent')!.callout!.text}
+            />
+          )}
+        </Subsection>
       )}
 
       {/* Grouped BarChart (without Lifetime outlier) */}
@@ -273,6 +341,34 @@ export const SectionValuation = ({ scenario }: Props) => {
           ))}
         </div>
       </motion.div>
+
+      {/* E. Pre-Revenue Portfolio Benchmarks prose */}
+      {sub('benchmarks') && (
+        <Subsection heading={sub('benchmarks')!.heading}>
+          <ProseBlock paragraphs={sub('benchmarks')!.body} />
+          {sub('benchmarks')!.callout && (
+            <CalloutBlock
+              type={sub('benchmarks')!.callout!.type}
+              title={sub('benchmarks')!.callout!.title}
+              text={sub('benchmarks')!.callout!.text}
+            />
+          )}
+        </Subsection>
+      )}
+
+      {/* F. Combined Portfolio Value prose */}
+      {sub('combined') && (
+        <Subsection heading={sub('combined')!.heading}>
+          <ProseBlock paragraphs={sub('combined')!.body} />
+          {sub('combined')!.callout && (
+            <CalloutBlock
+              type={sub('combined')!.callout!.type}
+              title={sub('combined')!.callout!.title}
+              text={sub('combined')!.callout!.text}
+            />
+          )}
+        </Subsection>
+      )}
     </div>
   )
 }

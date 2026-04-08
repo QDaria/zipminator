@@ -15,6 +15,8 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { DESIGN_AROUND_DIFFICULTY, THICKET_FUNNEL } from '@/lib/blueprint-data'
+import { SECTION_PROSE } from '@/lib/blueprint-prose'
+import { ProseBlock, CalloutBlock, Subsection } from '@/components/blueprint/BlueprintSection'
 
 const PATENT_COLORS: Record<string, string> = {
   'P1: Quantum Anonymization': '#22D3EE',
@@ -112,6 +114,8 @@ const CALLOUT_ITEMS = [
 ]
 
 export const SectionFloorMatters = () => {
+  const prose = SECTION_PROSE['floor-matters']
+
   // Prepare bar chart data (horizontal) -- each patent as a row with total score
   const barData = DESIGN_AROUND_DIFFICULTY.map((d) => ({
     patent: d.patent.replace(/^P\d: /, ''),
@@ -128,22 +132,50 @@ export const SectionFloorMatters = () => {
     originalValue: item.value,
   }))
 
+  // Helper to find a prose subsection by id
+  const sub = (id: string) => prose?.subsections.find((s) => s.id === id)
+
   return (
     <div className="space-y-10">
-      {/* Intro */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="text-slate-300 text-lg leading-relaxed max-w-3xl"
-        style={{ fontFamily: 'var(--font-dm-sans)' }}
-      >
-        The floor valuation is what matters for seed conversations. It represents the
-        minimum defensible value even under pessimistic assumptions. Everything above
-        the floor is upside from regulatory tailwinds, enterprise adoption, and standard
-        essentiality.
-      </motion.p>
+      {/* Intro prose */}
+      {prose && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="max-w-3xl"
+        >
+          <ProseBlock paragraphs={prose.intro} />
+        </motion.div>
+      )}
+
+      {/* A. Floor Valuation Philosophy */}
+      {sub('floor-valuation-philosophy') && (
+        <Subsection heading={sub('floor-valuation-philosophy')!.heading}>
+          <ProseBlock paragraphs={sub('floor-valuation-philosophy')!.body} />
+          {sub('floor-valuation-philosophy')!.callout && (
+            <CalloutBlock {...sub('floor-valuation-philosophy')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* B. R&D Replacement Floor */}
+      {sub('rd-replacement-floor') && (
+        <Subsection heading={sub('rd-replacement-floor')!.heading}>
+          <ProseBlock paragraphs={sub('rd-replacement-floor')!.body} />
+          {sub('rd-replacement-floor')!.callout && (
+            <CalloutBlock {...sub('rd-replacement-floor')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* C. Design-Around Analysis (prose + charts) */}
+      {sub('design-around-analysis') && (
+        <Subsection heading={sub('design-around-analysis')!.heading}>
+          <ProseBlock paragraphs={sub('design-around-analysis')!.body} />
+        </Subsection>
+      )}
 
       {/* Horizontal Bar Chart: Design-Around Difficulty */}
       <motion.div
@@ -308,6 +340,16 @@ export const SectionFloorMatters = () => {
         </div>
       </motion.div>
 
+      {/* D. Patent Thicket Effect (prose) */}
+      {sub('patent-thicket-effect') && (
+        <Subsection heading={sub('patent-thicket-effect')!.heading}>
+          <ProseBlock paragraphs={sub('patent-thicket-effect')!.body} />
+          {sub('patent-thicket-effect')!.callout && (
+            <CalloutBlock {...sub('patent-thicket-effect')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
       {/* Patent Thicket Funnel */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -370,7 +412,27 @@ export const SectionFloorMatters = () => {
         </div>
       </motion.div>
 
-      {/* Callout Box */}
+      {/* E. Three Regulatory Deadlines as Floor Supports */}
+      {sub('regulatory-deadlines') && (
+        <Subsection heading={sub('regulatory-deadlines')!.heading}>
+          <ProseBlock paragraphs={sub('regulatory-deadlines')!.body} />
+          {sub('regulatory-deadlines')!.callout && (
+            <CalloutBlock {...sub('regulatory-deadlines')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* F. The Working Code Premium */}
+      {sub('working-code-premium') && (
+        <Subsection heading={sub('working-code-premium')!.heading}>
+          <ProseBlock paragraphs={sub('working-code-premium')!.body} />
+          {sub('working-code-premium')!.callout && (
+            <CalloutBlock {...sub('working-code-premium')!.callout!} />
+          )}
+        </Subsection>
+      )}
+
+      {/* Callout Box: The Floor in Numbers */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -414,6 +476,19 @@ export const SectionFloorMatters = () => {
           ))}
         </div>
       </motion.div>
+
+      {/* Conclusion */}
+      {prose?.conclusion && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.35 }}
+          className="max-w-3xl"
+        >
+          <ProseBlock paragraphs={prose.conclusion} />
+        </motion.div>
+      )}
     </div>
   )
 }

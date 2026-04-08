@@ -12,6 +12,8 @@ import 'package:zipminator/core/providers/theme_provider.dart';
 import 'package:zipminator/core/services/llm_provider.dart';
 import 'package:zipminator/core/theme/quantum_theme.dart';
 import 'package:zipminator/src/rust/api/simple.dart' as rust;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ---------------------------------------------------------------------------
 // Self-Destruct Timer — local state management
@@ -161,6 +163,7 @@ class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   static const _providerColors = {
+    LLMProvider.onDevice: QuantumTheme.quantumAmber,
     LLMProvider.gemini: QuantumTheme.quantumBlue,
     LLMProvider.groq: QuantumTheme.quantumGreen,
     LLMProvider.deepSeek: QuantumTheme.quantumCyan,
@@ -237,6 +240,18 @@ class SettingsScreen extends ConsumerWidget {
 
           // Biometric lock
           _BiometricTile(),
+
+          // Replay welcome tour
+          ListTile(
+            leading: Icon(Icons.tour_outlined, color: QuantumTheme.quantumPurple),
+            title: const Text('Replay Welcome Tour'),
+            subtitle: const Text('See the intro walkthrough again'),
+            onTap: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('onboarding_complete', false);
+              if (context.mounted) context.go('/welcome');
+            },
+          ),
 
           // Signaling status
           ListTile(
@@ -324,9 +339,11 @@ class SettingsScreen extends ConsumerWidget {
 
           // On-device status (no API key needed)
           ListTile(
-            leading: Icon(Icons.smartphone, color: QuantumTheme.quantumGreen),
-            title: const Text('On-Device (Google AI Edge)'),
-            subtitle: const Text('No API key needed. Models run locally.'),
+            leading: Icon(Icons.phone_android, color: QuantumTheme.quantumAmber),
+            title: const Text('On-Device (Gemma 4)'),
+            subtitle: const Text(
+              'Default. No API key needed. Runs privately on your device.',
+            ),
             trailing: Icon(Icons.check_circle,
                 color: QuantumTheme.quantumGreen, size: 20),
           ),
@@ -448,8 +465,50 @@ class _ProviderApiKeyTileState extends ConsumerState<_ProviderApiKeyTile> {
     super.dispose();
   }
 
+  void _showHelp(BuildContext context) {
+    final help = widget.provider.apiKeyHelp;
+    final url = widget.provider.apiKeyUrl;
+    if (help == null) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('${widget.provider.displayName} API Key'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(help),
+            if (url != null) ...[
+              const SizedBox(height: 16),
+              InkWell(
+                onTap: () => launchUrl(Uri.parse(url),
+                    mode: LaunchMode.externalApplication),
+                child: Text(
+                  'Open ${widget.provider.displayName} Console',
+                  style: TextStyle(
+                    color: widget.color,
+                    decoration: TextDecoration.underline,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Got it'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final url = widget.provider.apiKeyUrl;
+
     if (!_editing) {
       return ListTile(
         leading: Icon(
@@ -458,8 +517,39 @@ class _ProviderApiKeyTileState extends ConsumerState<_ProviderApiKeyTile> {
               ? QuantumTheme.quantumGreen
               : widget.color.withValues(alpha: 0.5),
         ),
-        title: Text('${widget.provider.displayName} API Key'),
-        subtitle: Text(widget.isConfigured ? 'Configured' : 'Not set'),
+        title: Row(
+          children: [
+            Expanded(child: Text('${widget.provider.displayName} API Key')),
+            if (widget.provider.apiKeyHelp != null)
+              GestureDetector(
+                onTap: () => _showHelp(context),
+                child: Icon(Icons.help_outline,
+                    size: 18, color: QuantumTheme.textSecondary),
+              ),
+          ],
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(widget.isConfigured ? 'Configured' : 'Not set'),
+            if (url != null && !widget.isConfigured)
+              GestureDetector(
+                onTap: () => launchUrl(Uri.parse(url),
+                    mode: LaunchMode.externalApplication),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    'Get API key →',
+                    style: TextStyle(
+                      color: widget.color,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
         trailing: TextButton(
           onPressed: () => setState(() => _editing = true),
           child: Text(widget.isConfigured ? 'Change' : 'Set'),
