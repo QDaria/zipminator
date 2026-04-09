@@ -1,0 +1,460 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{35}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{} and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showURL}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showURL #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[Albrecht et~al\mbox{.}(2025)]%
+        {albrecht2025gaussian}
+\bibfield{author}{\bibinfo{person}{Martin~R. Albrecht}, \bibinfo{person}{Joel
+  Felderhoff}, \bibinfo{person}{Russell W.~F. Lai}, \bibinfo{person}{Oleksandra
+  Lapiha}, {and} \bibinfo{person}{Ivy K.~Y. Woo}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{A {Gaussian} Leftover Hash Lemma for Modules over
+  Number Fields}.
+\newblock
+\newblock
+\shownote{IACR ePrint 2025/1852}.
+
+
+\bibitem[Amer et~al\mbox{.}(2025)]%
+        {amer2025applications}
+\bibfield{author}{\bibinfo{person}{Omar Amer}, \bibinfo{person}{Shouvanik
+  Chakrabarti}, {et~al\mbox{.}}} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Applications of Certified Randomness}.
+\newblock \bibinfo{journal}{\emph{Nature Reviews Physics}}
+  (\bibinfo{year}{2025}).
+\newblock
+\href{https://doi.org/10.1038/s42254-025-00845-1}{doi:\nolinkurl{10.1038/s42254-025-00845-1}}
+\newblock
+\shownote{arXiv:2503.19759}.
+
+
+\bibitem[Anonymous(2026a)]%
+        {anon2026quantum}
+\bibfield{author}{\bibinfo{person}{Anonymous}.}
+  \bibinfo{year}{2026}\natexlab{a}.
+\newblock \bibinfo{title}{Quantum-Entropy Anonymization: One-Time Pad with
+  Provable Destruction for GDPR-Compliant Data Processing}.
+  (\bibinfo{year}{2026}).
+\newblock
+\newblock
+\shownote{Manuscript. [Anonymous Institution]}.
+
+
+\bibitem[Anonymous(2026b)]%
+        {anon2026csi}
+\bibfield{author}{\bibinfo{person}{Anonymous}.}
+  \bibinfo{year}{2026}\natexlab{b}.
+\newblock \bibinfo{title}{Unilateral {WiFi} {CSI} as a {NIST}-Validated Entropy
+  Source: From Bilateral Key Agreement to Single-Device Randomness}.
+  (\bibinfo{year}{2026}).
+\newblock
+\newblock
+\shownote{Manuscript. [Anonymous Institution]}.
+
+
+\bibitem[Aslan et~al\mbox{.}(2025)]%
+        {aslan2025observations}
+\bibfield{author}{\bibinfo{person}{Melih Aslan}, \bibinfo{person}{Ali
+  Doganaksoy}, {and} \bibinfo{person}{Zubeyde Saygi}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Observations on {NIST SP 800-90B} Entropy
+  Estimators}.
+\newblock \bibinfo{journal}{\emph{Cryptography and Communications}}
+  (\bibinfo{year}{2025}).
+\newblock
+\href{https://doi.org/10.1007/s12095-025-00778-7}{doi:\nolinkurl{10.1007/s12095-025-00778-7}}
+
+
+\bibitem[Barker and Kelsey(2025)]%
+        {nist2025sp80090c}
+\bibfield{author}{\bibinfo{person}{Elaine Barker} {and} \bibinfo{person}{John
+  Kelsey}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Recommendation for Random Bit Generator
+  ({RBG}) Constructions}}.
+\newblock \bibinfo{type}{{T}echnical {R}eport} SP 800-90C.
+  \bibinfo{institution}{NIST}.
+\newblock
+
+
+\bibitem[Boudgoust and Lapiha(2025)]%
+        {boudgoust2025lhl}
+\bibfield{author}{\bibinfo{person}{Katharina Boudgoust} {and}
+  \bibinfo{person}{Oleksandra Lapiha}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{Leftover Hash Lemma(s) Over Cyclotomic Rings}.
+\newblock
+\newblock
+\shownote{IACR ePrint 2025/1080}.
+
+
+\bibitem[Carter and Wegman(1979)]%
+        {carter1979universal}
+\bibfield{author}{\bibinfo{person}{J.~Lawrence Carter} {and}
+  \bibinfo{person}{Mark~N. Wegman}.} \bibinfo{year}{1979}\natexlab{}.
+\newblock \showarticletitle{Universal Classes of Hash Functions}.
+\newblock \bibinfo{journal}{\emph{J.\ Comput.\ Syst.\ Sci.}}
+  \bibinfo{volume}{18}, \bibinfo{number}{2} (\bibinfo{year}{1979}),
+  \bibinfo{pages}{143--154}.
+\newblock
+\href{https://doi.org/10.1016/0022-0000(79)90044-8}{doi:\nolinkurl{10.1016/0022-0000(79)90044-8}}
+
+
+\bibitem[Chattopadhyay and Goodman(2025)]%
+        {chattopadhyay2025leakage}
+\bibfield{author}{\bibinfo{person}{Eshan Chattopadhyay} {and}
+  \bibinfo{person}{Jesse Goodman}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Leakage-Resilient Extractors against
+  Number-on-Forehead Protocols}. In \bibinfo{booktitle}{\emph{STOC 2025}}.
+\newblock
+\newblock
+\shownote{arXiv:2506.12595}.
+
+
+\bibitem[Coretti et~al\mbox{.}(2025)]%
+        {coretti2025multisource}
+\bibfield{author}{\bibinfo{person}{Sandro Coretti}, \bibinfo{person}{Pooya
+  Farshim}, \bibinfo{person}{Patrick Harasser}, {and} \bibinfo{person}{Luke
+  Southern}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Multi-Source Randomness Extraction and Generation
+  in the Random-Oracle Model}. In \bibinfo{booktitle}{\emph{ITC 2025}}.
+\newblock
+\href{https://doi.org/10.4230/LIPIcs.ITC.2025.10}{doi:\nolinkurl{10.4230/LIPIcs.ITC.2025.10}}
+
+
+\bibitem[Dang et~al\mbox{.}(2025)]%
+        {dang2025tches}
+\bibfield{author}{\bibinfo{person}{Vo~Thi~Anh Dang} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Entropy Extractor Based High-Throughput
+  Post-Processings for {TRNGs}}.
+\newblock \bibinfo{journal}{\emph{IACR TCHES}} \bibinfo{volume}{2025},
+  \bibinfo{number}{4} (\bibinfo{year}{2025}), \bibinfo{pages}{145--171}.
+\newblock
+
+
+\bibitem[Dinur(2024)]%
+        {dinur2024xor}
+\bibfield{author}{\bibinfo{person}{Itai Dinur}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Tight Indistinguishability Bounds for the {XOR} of
+  Independent Random Permutations by {Fourier} Analysis}. In
+  \bibinfo{booktitle}{\emph{EUROCRYPT 2024}}.
+\newblock
+\newblock
+\shownote{IACR ePrint 2024/338}.
+
+
+\bibitem[Dodis et~al\mbox{.}(2008)]%
+        {dodis2008fuzzy}
+\bibfield{author}{\bibinfo{person}{Yevgeniy Dodis}, \bibinfo{person}{Rafail
+  Ostrovsky}, \bibinfo{person}{Leonid Reyzin}, {and} \bibinfo{person}{Adam
+  Smith}.} \bibinfo{year}{2008}\natexlab{}.
+\newblock \showarticletitle{Fuzzy Extractors: How to Generate Strong Keys from
+  Biometrics and Other Noisy Data}.
+\newblock \bibinfo{journal}{\emph{SIAM J.\ Computing}} \bibinfo{volume}{38},
+  \bibinfo{number}{1} (\bibinfo{year}{2008}), \bibinfo{pages}{97--139}.
+\newblock
+\href{https://doi.org/10.1137/060651380}{doi:\nolinkurl{10.1137/060651380}}
+
+
+\bibitem[Doron and Ribeiro(2024)]%
+        {doron2024linear}
+\bibfield{author}{\bibinfo{person}{Dean Doron} {and} \bibinfo{person}{Jo{\~a}o
+  Ribeiro}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \bibinfo{title}{Nearly-Linear Time Seeded Extractors with Short
+  Seeds}.
+\newblock
+\newblock
+\shownote{arXiv:2411.07473}.
+
+
+\bibitem[Dworkin(2015)]%
+        {nist2015sha3}
+\bibfield{author}{\bibinfo{person}{Morris~J. Dworkin}.}
+  \bibinfo{year}{2015}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{{SHA-3} Standard: Permutation-Based Hash
+  and Extendable-Output Functions}}.
+\newblock \bibinfo{type}{{T}echnical {R}eport} FIPS 202.
+  \bibinfo{institution}{NIST}.
+\newblock
+\href{https://doi.org/10.6028/NIST.FIPS.202}{doi:\nolinkurl{10.6028/NIST.FIPS.202}}
+
+
+\bibitem[{European Parliament and Council}(2022)]%
+        {dora2022}
+\bibfield{author}{\bibinfo{person}{{European Parliament and Council}}.}
+  \bibinfo{year}{2022}\natexlab{}.
+\newblock \bibinfo{title}{Regulation ({EU}) 2022/2554 on Digital Operational
+  Resilience for the Financial Sector ({DORA})}.
+\newblock
+\newblock
+\shownote{Official Journal of the European Union, L~333, 27 Dec 2022. Effective
+  17 Jan 2025 (Norway: 1 July 2025)}.
+
+
+\bibitem[Foreman and Masanes(2025)]%
+        {foreman2025seedless}
+\bibfield{author}{\bibinfo{person}{Cameron Foreman} {and}
+  \bibinfo{person}{Ll{\'u}{\'\i}s Masanes}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Seedless Extractors for Device-Independent Quantum
+  Cryptography}.
+\newblock \bibinfo{journal}{\emph{Quantum}}  \bibinfo{volume}{9}
+  (\bibinfo{year}{2025}), \bibinfo{pages}{1654}.
+\newblock
+\newblock
+\shownote{arXiv:2403.04713}.
+
+
+\bibitem[Foreman et~al\mbox{.}(2024)]%
+        {foreman2024cryptomite}
+\bibfield{author}{\bibinfo{person}{Cameron Foreman}, \bibinfo{person}{Richie
+  Yeung}, \bibinfo{person}{Alec Edgington}, {and} \bibinfo{person}{Florian~J.
+  Curchod}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \bibinfo{title}{Cryptomite: A Versatile and User-Friendly Library of
+  Randomness Extractors}.
+\newblock
+\newblock
+\shownote{arXiv:2402.09481}.
+
+
+\bibitem[Golowich(2024)]%
+        {golowich2024expanders}
+\bibfield{author}{\bibinfo{person}{Louis Golowich}.}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{New Explicit Constant-Degree Lossless Expanders}.
+  In \bibinfo{booktitle}{\emph{SODA 2024}}.
+\newblock
+\href{https://doi.org/10.1137/1.9781611977912.177}{doi:\nolinkurl{10.1137/1.9781611977912.177}}
+\newblock
+\shownote{arXiv:2306.07551}.
+
+
+\bibitem[Goodman et~al\mbox{.}(2024)]%
+        {goodman2024condensers}
+\bibfield{author}{\bibinfo{person}{Jesse Goodman}, \bibinfo{person}{Xin Li},
+  {and} \bibinfo{person}{David Zuckerman}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Improved Condensers for {Chor--Goldreich} Sources}.
+  In \bibinfo{booktitle}{\emph{FOCS 2024}}.
+\newblock
+\newblock
+\shownote{arXiv:2410.08142}.
+
+
+\bibitem[Gringoli et~al\mbox{.}(2019)]%
+        {gringoli2019csidata}
+\bibfield{author}{\bibinfo{person}{Francesco Gringoli},
+  \bibinfo{person}{Matthias Schulz}, \bibinfo{person}{Jakob Link}, {and}
+  \bibinfo{person}{Matthias Hollick}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \bibinfo{title}{{CSI-Data}: Public {WiFi} Channel State Information
+  Datasets}.
+\newblock \bibinfo{howpublished}{\url{https://github.com/Gi-z/CSI-Data}}.
+\newblock
+\newblock
+\shownote{TU Darmstadt / University of Brescia. Nexmon captures from
+  Broadcom/Cypress chips.}.
+
+
+\bibitem[Grujic and Verbauwhede(2024)]%
+        {grujic2024linear}
+\bibfield{author}{\bibinfo{person}{Milos Grujic} {and} \bibinfo{person}{Ingrid
+  Verbauwhede}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Optimizing Linear Correctors: A Tight Output
+  Min-Entropy Bound and Selection Technique}.
+\newblock \bibinfo{journal}{\emph{IEEE Trans.\ Information Forensics and
+  Security}} (\bibinfo{year}{2024}).
+\newblock
+\newblock
+\shownote{arXiv:2304.05306}.
+
+
+\bibitem[Guruswami et~al\mbox{.}(2009)]%
+        {guruswami2009unbalanced}
+\bibfield{author}{\bibinfo{person}{Venkatesan Guruswami},
+  \bibinfo{person}{Christopher Umans}, {and} \bibinfo{person}{Salil Vadhan}.}
+  \bibinfo{year}{2009}\natexlab{}.
+\newblock \showarticletitle{Unbalanced Expanders and Randomness Extractors from
+  {Parvaresh--Vardy} Codes}. In \bibinfo{booktitle}{\emph{J.\ ACM}},
+  Vol.~\bibinfo{volume}{56}.
+\newblock
+\href{https://doi.org/10.1145/1538902.1538904}{doi:\nolinkurl{10.1145/1538902.1538904}}
+
+
+\bibitem[Impagliazzo et~al\mbox{.}(1989)]%
+        {impagliazzo1989one}
+\bibfield{author}{\bibinfo{person}{Russell Impagliazzo},
+  \bibinfo{person}{Leonid~A. Levin}, {and} \bibinfo{person}{Michael Luby}.}
+  \bibinfo{year}{1989}\natexlab{}.
+\newblock \showarticletitle{Pseudo-Random Generation from One-Way Functions}.
+  In \bibinfo{booktitle}{\emph{Proc.\ 21st ACM Symp.\ Theory of Computing
+  (STOC)}}. \bibinfo{pages}{12--24}.
+\newblock
+\href{https://doi.org/10.1145/73007.73009}{doi:\nolinkurl{10.1145/73007.73009}}
+
+
+\bibitem[Jiang et~al\mbox{.}(2025)]%
+        {jiang2025group}
+\bibfield{author}{\bibinfo{person}{Hanjun Jiang}, \bibinfo{person}{Yongge
+  Wang}, \bibinfo{person}{Song Luo}, \bibinfo{person}{Jintai Liu},
+  \bibinfo{person}{Yue Gang}, \bibinfo{person}{Yanbin Pan}, {and}
+  \bibinfo{person}{Yuyu Wang}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Re-Randomize and Extract: Novel Commitment
+  Construction Based on Group Actions}. In \bibinfo{booktitle}{\emph{Eurocrypt
+  2025}}.
+\newblock
+\href{https://doi.org/10.1007/978-3-031-91124-8_5}{doi:\nolinkurl{10.1007/978-3-031-91124-8_5}}
+
+
+\bibitem[Liu et~al\mbox{.}(2025)]%
+        {aaronson2025certified}
+\bibfield{author}{\bibinfo{person}{Minzhao Liu}, \bibinfo{person}{Ruslan
+  Shaydulin}, \bibinfo{person}{Pradeep Niroula}, \bibinfo{person}{Matthew
+  DeCross}, \bibinfo{person}{Shih-Han Hung}, \bibinfo{person}{Scott Aaronson},
+  {et~al\mbox{.}}} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Certified Randomness Using a Trapped-Ion Quantum
+  Processor}.
+\newblock \bibinfo{journal}{\emph{Nature}}  \bibinfo{volume}{640}
+  (\bibinfo{year}{2025}), \bibinfo{pages}{343--348}.
+\newblock
+\href{https://doi.org/10.1038/s41586-025-08737-1}{doi:\nolinkurl{10.1038/s41586-025-08737-1}}
+\newblock
+\shownote{arXiv:2503.20498}.
+
+
+\bibitem[Lou et~al\mbox{.}(2025)]%
+        {lou2025qpp}
+\bibfield{author}{\bibinfo{person}{Dafu Lou} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Raw {QPP-RNG} Randomness via System Jitter Across
+  Platforms: A {NIST SP 800-90B} Evaluation}.
+\newblock \bibinfo{journal}{\emph{Scientific Reports}} (\bibinfo{year}{2025}).
+\newblock
+\href{https://doi.org/10.1038/s41598-025-13135-8}{doi:\nolinkurl{10.1038/s41598-025-13135-8}}
+
+
+\bibitem[Ma et~al\mbox{.}(2016)]%
+        {ma2016qrng}
+\bibfield{author}{\bibinfo{person}{Xiongfeng Ma}, \bibinfo{person}{Xiao Yuan},
+  \bibinfo{person}{Zhu Cao}, \bibinfo{person}{Bing Qi}, {and}
+  \bibinfo{person}{Zhen Zhang}.} \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{Quantum Random Number Generation}.
+\newblock \bibinfo{journal}{\emph{npj Quantum Information}}
+  \bibinfo{volume}{2} (\bibinfo{year}{2016}), \bibinfo{pages}{16021}.
+\newblock
+\href{https://doi.org/10.1038/npjqi.2016.21}{doi:\nolinkurl{10.1038/npjqi.2016.21}}
+
+
+\bibitem[McKay et~al\mbox{.}(2026)]%
+        {nist2026ir8446}
+\bibfield{author}{\bibinfo{person}{Kerry McKay}, \bibinfo{person}{Werner
+  Schindler}, {and} \bibinfo{person}{Meltem~S{\"o}nmez Turan}.}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Bridging the Gap between Standards on
+  Random Number Generation}}.
+\newblock \bibinfo{type}{{T}echnical {R}eport} NIST IR 8446.
+  \bibinfo{institution}{NIST/BSI}.
+\newblock
+
+
+\bibitem[Merkle(1989)]%
+        {merkle1989certified}
+\bibfield{author}{\bibinfo{person}{Ralph~C. Merkle}.}
+  \bibinfo{year}{1989}\natexlab{}.
+\newblock \showarticletitle{A Certified Digital Signature}.
+\newblock \bibinfo{journal}{\emph{Advances in Cryptology (CRYPTO)}}
+  (\bibinfo{year}{1989}), \bibinfo{pages}{218--238}.
+\newblock
+\href{https://doi.org/10.1007/0-387-34805-0_21}{doi:\nolinkurl{10.1007/0-387-34805-0_21}}
+
+
+\bibitem[{National Institute of Standards and Technology}(2024)]%
+        {nist2024fips203}
+\bibfield{author}{\bibinfo{person}{{National Institute of Standards and
+  Technology}}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Module-Lattice-Based Key-Encapsulation
+  Mechanism Standard}}.
+\newblock \bibinfo{type}{{T}echnical {R}eport} FIPS 203.
+  \bibinfo{institution}{NIST}.
+\newblock
+\href{https://doi.org/10.6028/NIST.FIPS.203}{doi:\nolinkurl{10.6028/NIST.FIPS.203}}
+
+
+\bibitem[Sandfuchs et~al\mbox{.}(2025)]%
+        {renner2025causal}
+\bibfield{author}{\bibinfo{person}{Michael Sandfuchs}, \bibinfo{person}{Marco
+  Ferradini}, {and} \bibinfo{person}{Renato Renner}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{Randomness from Causally Independent Processes}.
+\newblock
+\newblock
+\shownote{arXiv:2510.05203}.
+
+
+\bibitem[Schindler and Peter(2024)]%
+        {bsi2024ais31}
+\bibfield{author}{\bibinfo{person}{Werner Schindler} {and}
+  \bibinfo{person}{Matthias Peter}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{A Proposal for Functionality Classes for
+  Random Number Generators, Version 3.0}}.
+\newblock \bibinfo{type}{{T}echnical {R}eport}. \bibinfo{institution}{BSI}.
+\newblock
+
+
+\bibitem[Trevisan(2001)]%
+        {trevisan2001extractors}
+\bibfield{author}{\bibinfo{person}{Luca Trevisan}.}
+  \bibinfo{year}{2001}\natexlab{}.
+\newblock \showarticletitle{Extractors and Pseudorandom Generators}. In
+  \bibinfo{booktitle}{\emph{J.\ ACM}}, Vol.~\bibinfo{volume}{48}.
+  \bibinfo{pages}{860--879}.
+\newblock
+\href{https://doi.org/10.1145/502090.502099}{doi:\nolinkurl{10.1145/502090.502099}}
+
+
+\bibitem[Turan et~al\mbox{.}(2018)]%
+        {nist2018sp80090b}
+\bibfield{author}{\bibinfo{person}{Meltem~S\"onmez Turan},
+  \bibinfo{person}{Elaine Barker}, \bibinfo{person}{John Kelsey},
+  \bibinfo{person}{Kerry~A. McKay}, \bibinfo{person}{Mary~L. Baish}, {and}
+  \bibinfo{person}{Mike Boyle}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Recommendation for the Entropy Sources Used
+  for Random Bit Generation}}.
+\newblock \bibinfo{type}{{T}echnical {R}eport} SP 800-90B.
+  \bibinfo{institution}{NIST}.
+\newblock
+\href{https://doi.org/10.6028/NIST.SP.800-90B}{doi:\nolinkurl{10.6028/NIST.SP.800-90B}}
+
+
+\end{thebibliography}

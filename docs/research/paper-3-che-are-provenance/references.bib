@@ -1,0 +1,319 @@
+% references.bib — Paper 3: CHE/ARE Provenance
+% All DOIs must be verified via WebFetch before final submission.
+% [VERIFIED] = DOI resolves. [VERIFIED] = needs WebFetch check.
+
+%% ─── CSI Data Source ───
+
+@misc{gringoli2019csidata,
+  author       = {Gringoli, Francesco and Schulz, Matthias and Link, Jakob and Hollick, Matthias},
+  title        = {{CSI-Data}: Public {WiFi} Channel State Information Datasets},
+  year         = {2019},
+  howpublished = {\url{https://github.com/Gi-z/CSI-Data}},
+  note         = {TU Darmstadt / University of Brescia. Nexmon captures from Broadcom/Cypress chips.},
+}
+
+%% ─── Our Prior Work (Papers 1 and 2) ───
+
+@unpublished{anon2026quantum,
+  author = {Anonymous},
+  title  = {Quantum-Entropy Anonymization: One-Time Pad with Provable Destruction for GDPR-Compliant Data Processing},
+  year   = {2026},
+  note   = {Manuscript. [Anonymous Institution]},
+}
+
+@unpublished{anon2026csi,
+  author = {Anonymous},
+  title  = {Unilateral {WiFi} {CSI} as a {NIST}-Validated Entropy Source: From Bilateral Key Agreement to Single-Device Randomness},
+  year   = {2026},
+  note   = {Manuscript. [Anonymous Institution]},
+}
+
+%% ─── Randomness Extractors ───
+
+@inproceedings{trevisan2001extractors,
+  author    = {Trevisan, Luca},
+  title     = {Extractors and Pseudorandom Generators},
+  booktitle = {J.\ ACM},
+  year      = {2001},
+  volume    = {48},
+  number    = {4},
+  pages     = {860--879},
+  doi       = {10.1145/502090.502099},
+}
+
+@inproceedings{guruswami2009unbalanced,
+  author    = {Guruswami, Venkatesan and Umans, Christopher and Vadhan, Salil},
+  title     = {Unbalanced Expanders and Randomness Extractors from {Parvaresh--Vardy} Codes},
+  booktitle = {J.\ ACM},
+  year      = {2009},
+  volume    = {56},
+  number    = {4},
+  doi       = {10.1145/1538902.1538904},
+}
+
+@inproceedings{impagliazzo1989one,
+  author    = {Impagliazzo, Russell and Levin, Leonid A. and Luby, Michael},
+  title     = {Pseudo-Random Generation from One-Way Functions},
+  booktitle = {Proc.\ 21st ACM Symp.\ Theory of Computing (STOC)},
+  year      = {1989},
+  pages     = {12--24},
+  doi       = {10.1145/73007.73009},
+}
+
+@article{carter1979universal,
+  author  = {Carter, J. Lawrence and Wegman, Mark N.},
+  title   = {Universal Classes of Hash Functions},
+  journal = {J.\ Comput.\ Syst.\ Sci.},
+  year    = {1979},
+  volume  = {18},
+  number  = {2},
+  pages   = {143--154},
+  doi     = {10.1016/0022-0000(79)90044-8},
+}
+
+%% ─── NIST Standards ───
+
+@techreport{nist2018sp80090b,
+  author      = {Turan, Meltem S\"onmez and Barker, Elaine and Kelsey, John and McKay, Kerry A. and Baish, Mary L. and Boyle, Mike},
+  title       = {Recommendation for the Entropy Sources Used for Random Bit Generation},
+  institution = {NIST},
+  year        = {2018},
+  number      = {SP 800-90B},
+  doi         = {10.6028/NIST.SP.800-90B},
+}
+
+@techreport{nist2015sha3,
+  author      = {Dworkin, Morris J.},
+  title       = {{SHA-3} Standard: Permutation-Based Hash and Extendable-Output Functions},
+  institution = {NIST},
+  year        = {2015},
+  number      = {FIPS 202},
+  doi         = {10.6028/NIST.FIPS.202},
+}
+
+@techreport{nist2024fips203,
+  author      = {{National Institute of Standards and Technology}},
+  title       = {Module-Lattice-Based Key-Encapsulation Mechanism Standard},
+  institution = {NIST},
+  year        = {2024},
+  number      = {FIPS 203},
+  doi         = {10.6028/NIST.FIPS.203},
+}
+
+%% ─── Quantum Randomness ───
+
+@article{ma2016qrng,
+  author  = {Ma, Xiongfeng and Yuan, Xiao and Cao, Zhu and Qi, Bing and Zhang, Zhen},
+  title   = {Quantum Random Number Generation},
+  journal = {npj Quantum Information},
+  year    = {2016},
+  volume  = {2},
+  pages   = {16021},
+  doi     = {10.1038/npjqi.2016.21},
+}
+
+%% ─── DORA and Regulatory ───
+
+@misc{dora2022,
+  author = {{European Parliament and Council}},
+  title  = {Regulation ({EU}) 2022/2554 on Digital Operational Resilience for the Financial Sector ({DORA})},
+  year   = {2022},
+  note   = {Official Journal of the European Union, L~333, 27 Dec 2022. Effective 17 Jan 2025 (Norway: 1 July 2025)},
+}
+
+%% ─── Merkle Trees ───
+
+@article{merkle1989certified,
+  author  = {Merkle, Ralph C.},
+  title   = {A Certified Digital Signature},
+  journal = {Advances in Cryptology (CRYPTO)},
+  year    = {1989},
+  pages   = {218--238},
+  doi     = {10.1007/0-387-34805-0_21},
+}
+
+%% ─── Min-Entropy and Information Theory ───
+
+@article{dodis2008fuzzy,
+  author  = {Dodis, Yevgeniy and Ostrovsky, Rafail and Reyzin, Leonid and Smith, Adam},
+  title   = {Fuzzy Extractors: How to Generate Strong Keys from Biometrics and Other Noisy Data},
+  journal = {SIAM J.\ Computing},
+  year    = {2008},
+  volume  = {38},
+  number  = {1},
+  pages   = {97--139},
+  doi     = {10.1137/060651380},
+}
+
+%% ─── 2024-2026 Literature Search Results ───
+
+@misc{doron2024linear,
+  author = {Doron, Dean and Ribeiro, Jo{\~a}o},
+  title  = {Nearly-Linear Time Seeded Extractors with Short Seeds},
+  year   = {2024},
+  note   = {arXiv:2411.07473},
+}
+
+@inproceedings{goodman2024condensers,
+  author    = {Goodman, Jesse and Li, Xin and Zuckerman, David},
+  title     = {Improved Condensers for {Chor--Goldreich} Sources},
+  booktitle = {FOCS 2024},
+  year      = {2024},
+  note      = {arXiv:2410.08142},
+}
+
+@inproceedings{golowich2024expanders,
+  author    = {Golowich, Louis},
+  title     = {New Explicit Constant-Degree Lossless Expanders},
+  booktitle = {SODA 2024},
+  year      = {2024},
+  doi       = {10.1137/1.9781611977912.177},
+  note      = {arXiv:2306.07551},
+}
+
+@misc{foreman2024cryptomite,
+  author = {Foreman, Cameron and Yeung, Richie and Edgington, Alec and Curchod, Florian J.},
+  title  = {Cryptomite: A Versatile and User-Friendly Library of Randomness Extractors},
+  year   = {2024},
+  note   = {arXiv:2402.09481},
+}
+
+@article{foreman2025seedless,
+  author  = {Foreman, Cameron and Masanes, Ll{\'u}{\'\i}s},
+  title   = {Seedless Extractors for Device-Independent Quantum Cryptography},
+  journal = {Quantum},
+  year    = {2025},
+  volume  = {9},
+  pages   = {1654},
+  note    = {arXiv:2403.04713},
+}
+
+@misc{boudgoust2025lhl,
+  author = {Boudgoust, Katharina and Lapiha, Oleksandra},
+  title  = {Leftover Hash Lemma(s) Over Cyclotomic Rings},
+  year   = {2025},
+  note   = {IACR ePrint 2025/1080},
+}
+
+@misc{albrecht2025gaussian,
+  author = {Albrecht, Martin R. and Felderhoff, Joel and Lai, Russell W. F. and Lapiha, Oleksandra and Woo, Ivy K. Y.},
+  title  = {A {Gaussian} Leftover Hash Lemma for Modules over Number Fields},
+  year   = {2025},
+  note   = {IACR ePrint 2025/1852},
+}
+
+@inproceedings{chattopadhyay2025leakage,
+  author    = {Chattopadhyay, Eshan and Goodman, Jesse},
+  title     = {Leakage-Resilient Extractors against Number-on-Forehead Protocols},
+  booktitle = {STOC 2025},
+  year      = {2025},
+  note      = {arXiv:2506.12595},
+}
+
+@inproceedings{dinur2024xor,
+  author    = {Dinur, Itai},
+  title     = {Tight Indistinguishability Bounds for the {XOR} of Independent Random Permutations by {Fourier} Analysis},
+  booktitle = {EUROCRYPT 2024},
+  year      = {2024},
+  note      = {IACR ePrint 2024/338},
+}
+
+@article{grujic2024linear,
+  author  = {Grujic, Milos and Verbauwhede, Ingrid},
+  title   = {Optimizing Linear Correctors: A Tight Output Min-Entropy Bound and Selection Technique},
+  journal = {IEEE Trans.\ Information Forensics and Security},
+  year    = {2024},
+  note    = {arXiv:2304.05306},
+}
+
+@article{dang2025tches,
+  author  = {Dang, Vo Thi Anh and others},
+  title   = {Entropy Extractor Based High-Throughput Post-Processings for {TRNGs}},
+  journal = {IACR TCHES},
+  year    = {2025},
+  volume  = {2025},
+  number  = {4},
+  pages   = {145--171},
+}
+
+@article{lou2025qpp,
+  author  = {Lou, Dafu and others},
+  title   = {Raw {QPP-RNG} Randomness via System Jitter Across Platforms: A {NIST SP 800-90B} Evaluation},
+  journal = {Scientific Reports},
+  year    = {2025},
+  doi     = {10.1038/s41598-025-13135-8},
+}
+
+@article{aaronson2025certified,
+  author  = {Liu, Minzhao and Shaydulin, Ruslan and Niroula, Pradeep and DeCross, Matthew and Hung, Shih-Han and Aaronson, Scott and others},
+  title   = {Certified Randomness Using a Trapped-Ion Quantum Processor},
+  journal = {Nature},
+  year    = {2025},
+  volume  = {640},
+  pages   = {343--348},
+  doi     = {10.1038/s41586-025-08737-1},
+  note    = {arXiv:2503.20498},
+}
+
+@article{amer2025applications,
+  author  = {Amer, Omar and Chakrabarti, Shouvanik and others},
+  title   = {Applications of Certified Randomness},
+  journal = {Nature Reviews Physics},
+  year    = {2025},
+  doi     = {10.1038/s42254-025-00845-1},
+  note    = {arXiv:2503.19759},
+}
+
+@techreport{nist2025sp80090c,
+  author      = {Barker, Elaine and Kelsey, John},
+  title       = {Recommendation for Random Bit Generator ({RBG}) Constructions},
+  institution = {NIST},
+  year        = {2025},
+  number      = {SP 800-90C},
+}
+
+@techreport{nist2026ir8446,
+  author      = {McKay, Kerry and Schindler, Werner and Turan, Meltem S{\"o}nmez},
+  title       = {Bridging the Gap between Standards on Random Number Generation},
+  institution = {NIST/BSI},
+  year        = {2026},
+  number      = {NIST IR 8446},
+}
+
+@techreport{bsi2024ais31,
+  author      = {Schindler, Werner and Peter, Matthias},
+  title       = {A Proposal for Functionality Classes for Random Number Generators, Version 3.0},
+  institution = {BSI},
+  year        = {2024},
+}
+
+@inproceedings{coretti2025multisource,
+  author    = {Coretti, Sandro and Farshim, Pooya and Harasser, Patrick and Southern, Luke},
+  title     = {Multi-Source Randomness Extraction and Generation in the Random-Oracle Model},
+  booktitle = {ITC 2025},
+  year      = {2025},
+  doi       = {10.4230/LIPIcs.ITC.2025.10},
+}
+
+@inproceedings{jiang2025group,
+  author    = {Jiang, Hanjun and Wang, Yongge and Luo, Song and Liu, Jintai and Gang, Yue and Pan, Yanbin and Wang, Yuyu},
+  title     = {Re-Randomize and Extract: Novel Commitment Construction Based on Group Actions},
+  booktitle = {Eurocrypt 2025},
+  year      = {2025},
+  doi       = {10.1007/978-3-031-91124-8_5},
+}
+
+@misc{renner2025causal,
+  author = {Sandfuchs, Michael and Ferradini, Marco and Renner, Renato},
+  title  = {Randomness from Causally Independent Processes},
+  year   = {2025},
+  note   = {arXiv:2510.05203},
+}
+
+@article{aslan2025observations,
+  author  = {Aslan, Melih and Doganaksoy, Ali and Saygi, Zubeyde},
+  title   = {Observations on {NIST SP 800-90B} Entropy Estimators},
+  journal = {Cryptography and Communications},
+  year    = {2025},
+  doi     = {10.1007/s12095-025-00778-7},
+}

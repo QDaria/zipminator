@@ -1,0 +1,92 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: ACM-Reference-Format.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Database file #1: references.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Warning--no number and no volume in amer2025applications
+Warning--page numbers missing in both pages and numpages fields in amer2025applications
+Warning--no number and no volume in aslan2025observations
+Warning--page numbers missing in both pages and numpages fields in aslan2025observations
+Warning--empty publisher in chattopadhyay2025leakage
+Warning--empty address in chattopadhyay2025leakage
+Warning--page numbers missing in both pages and numpages fields in chattopadhyay2025leakage
+Warning--empty publisher in coretti2025multisource
+Warning--empty address in coretti2025multisource
+Warning--page numbers missing in both pages and numpages fields in coretti2025multisource
+Warning--empty publisher in dinur2024xor
+Warning--empty address in dinur2024xor
+Warning--page numbers missing in both pages and numpages fields in dinur2024xor
+Warning--empty publisher in golowich2024expanders
+Warning--empty address in golowich2024expanders
+Warning--page numbers missing in both pages and numpages fields in golowich2024expanders
+Warning--empty publisher in goodman2024condensers
+Warning--empty address in goodman2024condensers
+Warning--page numbers missing in both pages and numpages fields in goodman2024condensers
+Warning--no number and no volume in grujic2024linear
+Warning--page numbers missing in both pages and numpages fields in grujic2024linear
+Warning--can't use both volume and number fields in guruswami2009unbalanced
+Warning--empty publisher in guruswami2009unbalanced
+Warning--empty address in guruswami2009unbalanced
+Warning--page numbers missing in both pages and numpages fields in guruswami2009unbalanced
+Warning--empty publisher in impagliazzo1989one
+Warning--empty address in impagliazzo1989one
+Warning--empty publisher in jiang2025group
+Warning--empty address in jiang2025group
+Warning--page numbers missing in both pages and numpages fields in jiang2025group
+Warning--no number and no volume in lou2025qpp
+Warning--page numbers missing in both pages and numpages fields in lou2025qpp
+Warning--no number and no volume in merkle1989certified
+Warning--can't use both volume and number fields in trevisan2001extractors
+Warning--empty publisher in trevisan2001extractors
+Warning--empty address in trevisan2001extractors
+You've used 35 entries,
+            6056 wiz_defined-function locations,
+            1674 strings with 23855 characters,
+and the built_in function-call counts, 34521 in all, are:
+= -- 4387
+> -- 1109
+< -- 5
++ -- 370
+- -- 403
+* -- 2389
+:= -- 3415
+add.period$ -- 187
+call.type$ -- 35
+change.case$ -- 233
+chr.to.int$ -- 34
+cite$ -- 71
+duplicate$ -- 3050
+empty$ -- 2153
+format.name$ -- 499
+if$ -- 8274
+int.to.chr$ -- 3
+int.to.str$ -- 1
+missing$ -- 89
+newline$ -- 353
+num.names$ -- 244
+pop$ -- 1193
+preamble$ -- 1
+purify$ -- 510
+quote$ -- 0
+skip$ -- 1142
+stack$ -- 0
+substring$ -- 2286
+swap$ -- 236
+text.length$ -- 5
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 890
+warning$ -- 36
+while$ -- 203
+width$ -- 0
+write$ -- 715
+(There were 36 warnings)

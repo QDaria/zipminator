@@ -1,0 +1,50 @@
+% Figure 2: ARE Algebraic Construction - 5 domains x 6 operations
+\documentclass[tikz,border=5pt]{standalone}
+\usepackage{tikz}
+\usepackage{amsmath,amssymb}
+\usetikzlibrary{matrix}
+
+\begin{document}
+\begin{tikzpicture}[
+  cell/.style={minimum width=1.4cm, minimum height=0.7cm, align=center, font=\scriptsize},
+  header/.style={cell, font=\scriptsize\bfseries},
+  domcell/.style={cell, font=\scriptsize\bfseries},
+  yes/.style={cell, fill=green!15},
+  special/.style={cell, fill=yellow!15},
+]
+
+\matrix (m) [matrix of nodes, nodes in empty cells,
+  column sep=-\pgflinewidth, row sep=-\pgflinewidth,
+  column 1/.style={nodes={domcell}},
+  row 1/.style={nodes={header}},
+] {
+  & $+$ & $-$ & $\times$ & $\div$ & $\bmod$ & $\mathbin{**}$ \\
+  $\mathbb{N}_n$ & |[yes]| wrap & |[yes]| wrap & |[yes]| wrap & |[yes]| $\lfloor\rfloor$ & |[yes]| std & |[special]| cap 64 \\
+  $\mathbb{Z}_n$ & |[yes]| signed & |[yes]| signed & |[yes]| signed & |[yes]| $\lfloor\rfloor$ & |[yes]| std & |[special]| sgn \\
+  $\mathbb{Q}_n$ & |[yes]| scaled & |[yes]| scaled & |[yes]| scaled & |[special]| $b \neq 0$ & |[special]| $\lfloor\rfloor$ & |[special]| cap 64 \\
+  $\mathbb{R}_n$ & |[yes]| fixed & |[yes]| fixed & |[yes]| fixed & |[yes]| $\lfloor\rfloor$ & |[yes]| std & |[special]| cap 64 \\
+  $\mathbb{C}_n$ & |[yes]| Re & |[yes]| Re & |[yes]| Re & |[special]| conj & |[special]| Re & |[special]| Re \\
+};
+
+% Draw grid
+\foreach \i in {1,...,7} {
+  \draw (m-1-\i.north west) -- (m-6-\i.south west);
+}
+\draw (m-1-7.north east) -- (m-6-7.south east);
+\foreach \i in {1,...,6} {
+  \draw (m-\i-1.north west) -- (m-\i-7.north east);
+}
+\draw (m-6-1.south west) -- (m-6-7.south east);
+
+% Title
+\node[above=0.3cm of m-1-4, font=\small\bfseries] {Operations};
+\node[left=0.3cm of m-4-1, font=\small\bfseries, rotate=90] {Domains};
+
+% Legend
+\node[yes, minimum width=0.8cm, minimum height=0.4cm] at (7.5, -0.5) {};
+\node[right, font=\scriptsize] at (7.9, -0.5) {Standard};
+\node[special, minimum width=0.8cm, minimum height=0.4cm] at (7.5, -1.1) {};
+\node[right, font=\scriptsize] at (7.9, -1.1) {Special handling};
+
+\end{tikzpicture}
+\end{document}

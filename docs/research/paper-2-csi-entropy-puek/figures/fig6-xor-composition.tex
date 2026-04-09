@@ -1,0 +1,40 @@
+% Fig 6: XOR composition defense-in-depth architecture
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=0.7cm and 1.2cm,
+  source/.style={draw, rounded corners=3pt, minimum height=0.7cm, minimum width=2cm,
+                 font=\small, thick, align=center},
+  op/.style={draw, circle, minimum size=0.7cm, font=\small\bfseries, thick, fill=yellow!12},
+  monitor/.style={draw, dashed, rounded corners=3pt, minimum height=0.6cm, minimum width=2cm,
+                  font=\scriptsize, thick, fill=gray!5, align=center},
+  arr/.style={-{Stealth[length=4pt]}, thick},
+  lbl/.style={font=\scriptsize, text=black!60}
+]
+
+\node[source, fill=blue!10] (csi) {CSI Pool\\(5.50 bpb)};
+\node[source, fill=purple!10, below=of csi] (qrng) {QRNG Pool\\(6.35 bpb)};
+\node[source, fill=green!10, below=of qrng] (os) {\texttt{os.urandom}\\(6.36 bpb)};
+
+\node[op, right=1.8cm of qrng] (xor) {$\oplus$};
+\node[source, fill=orange!10, right=1.5cm of xor, minimum width=2.2cm] (out) {Composed\\Output};
+
+\draw[arr] (csi.east) -| (xor);
+\draw[arr] (qrng) -- (xor);
+\draw[arr] (os.east) -| (xor);
+\draw[arr] (xor) -- (out);
+
+% Health monitor
+\node[monitor] (hm) at ([yshift=1.2cm]xor) {Health Monitor};
+\draw[arr, dashed, gray] (hm) -- (xor);
+
+% Guarantee
+\node[lbl, below=0.4cm of out, align=center] {$\minentropy(E_{\mathrm{out}}) \geq$\\$\max_i \minentropy(E_i)$};
+
+% Failure annotation
+\node[lbl, right=0.3cm of csi, text=red!60, align=left] {\texttimes\ compromised?\\$\to$ output still safe};
+
+\end{tikzpicture}
+\caption{XOR composition for defense in depth. Three provenance-clean entropy pools are fused byte-by-byte at consumption time. By Lemma~\ref{lem:xor}, the output min-entropy is at least that of the strongest individual source, even if other sources are fully compromised. A health monitor flags per-source degradation.}
+\label{fig:xor-composition}
+\end{figure}

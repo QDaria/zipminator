@@ -1,0 +1,53 @@
+% Figure 3: SHAKE-256 Program Generation Flow
+\documentclass[tikz,border=5pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc}
+
+\begin{document}
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners, minimum width=2cm, minimum height=0.7cm, align=center, font=\small},
+  io/.style={box, fill=blue!10},
+  proc/.style={box, fill=orange!15},
+  out/.style={box, fill=green!10},
+  arr/.style={-{Stealth[length=3mm]}, thick},
+  lbl/.style={font=\scriptsize, text=gray},
+]
+
+% Input
+\node[io] (seed) at (0, 0) {Seed $\sigma$};
+
+% SHAKE-256
+\node[proc, minimum width=3cm] (shake) at (4, 0) {SHAKE-256\\XOF};
+
+% Stream
+\node[out, minimum width=3.5cm] (stream) at (8.5, 0) {$34k$ bytes};
+
+% Parse arrows
+\node[out, minimum width=2cm] (s1) at (6, -2) {Step 1};
+\node[out, minimum width=2cm] (s2) at (8.5, -2) {Step 2};
+\node[out, minimum width=2cm] (sk) at (11, -2) {Step $k$};
+\node[font=\large] at (9.75, -2) {$\cdots$};
+
+% Step detail
+\node[draw, fill=yellow!10, minimum width=5.5cm, minimum height=2cm, align=left, font=\scriptsize] (detail) at (8.5, -4.5) {
+  \textbf{34 bytes per step:}\\[2pt]
+  1B: domain ($\bmod\,5 \to \mathbb{N},\mathbb{Z},\mathbb{Q},\mathbb{R},\mathbb{C}$)\\
+  16B: value $v_i$ (signed 128-bit)\\
+  16B: value\_imag $w_i$ (signed 128-bit)\\
+  1B: operation ($\bmod\,6 \to +,-,\times,\div,\bmod,**$)
+};
+
+% Arrows
+\draw[arr] (seed) -- (shake);
+\draw[arr] (shake) -- node[above, lbl] {expand} (stream);
+\draw[arr] (stream.south) -- ++(0,-0.5) -| (s1.north);
+\draw[arr] (stream.south) -- ++(0,-0.5) -| (s2.north);
+\draw[arr] (stream.south) -- ++(0,-0.5) -| (sk.north);
+\draw[arr] (s1.south) -- ++(0,-0.5) -| (detail.north west);
+
+% Output
+\node[proc, minimum width=3cm] (program) at (3, -4.5) {ARE Program\\$\mathcal{P} = (s_1,\ldots,s_k)$};
+\draw[arr, dashed] (detail.west) -- (program.east);
+
+\end{tikzpicture}
+\end{document}

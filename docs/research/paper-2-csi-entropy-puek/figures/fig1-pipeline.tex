@@ -1,0 +1,31 @@
+% Fig 1: Unilateral CSI entropy extraction pipeline
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=1.4cm,
+  box/.style={draw, rounded corners=3pt, minimum height=1cm, minimum width=2cm,
+              font=\small, align=center, fill=blue!5, thick},
+  data/.style={font=\scriptsize, text=black!70, align=center},
+  arr/.style={-{Stealth[length=5pt]}, thick, blue!60!black}
+]
+\node[box] (rx) {WiFi Rx\\(passive)};
+\node[box, right=of rx] (csi) {CSI\\Extraction};
+\node[box, right=of csi] (phase) {Phase\\Quantization};
+\node[box, right=of phase] (lsb) {LSB\\Selection};
+\node[box, right=of lsb] (vn) {Von Neumann\\Debiasing};
+\node[box, right=of vn, fill=green!8] (pool) {CSI Entropy\\Pool};
+
+\draw[arr] (rx) -- node[data, above] {343 frames} (csi);
+\draw[arr] (csi) -- node[data, above] {$256 \times 343$} (phase);
+\draw[arr] (phase) -- node[data, above] {$[0,255]$} (lsb);
+\draw[arr] (lsb) -- node[data, above] {87{,}808 bits} (vn);
+\draw[arr] (vn) -- node[data, above] {2{,}690 bytes} (pool);
+
+\node[data, below=0.2cm of rx] {No transmit};
+\node[data, below=0.2cm of phase] {$\lfloor(\angle H_k + \pi)\!/(2\pi) \cdot 256\rfloor$};
+\node[data, below=0.2cm of vn] {24.5\% ratio};
+\node[data, below=0.2cm of pool] {5.50 bpb};
+\end{tikzpicture}
+\caption{Unilateral CSI entropy extraction pipeline. A single device passively receives WiFi frames, extracts per-subcarrier CSI, quantizes phase to 8~bits, selects LSBs, and debiases via Von~Neumann pairing. The 24.5\% extraction ratio is consistent with near-unbiased input ($p \approx 0.51$).}
+\label{fig:pipeline}
+\end{figure*}

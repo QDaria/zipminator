@@ -1,0 +1,59 @@
+% Figure 9: DORA Art. 7 Audit Trail Timeline
+\documentclass[tikz,border=5pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,decorations.pathreplacing}
+
+\begin{document}
+\begin{tikzpicture}[
+  event/.style={draw, rounded corners=2pt, fill=blue!10, minimum width=2cm, minimum height=0.6cm, align=center, font=\scriptsize},
+  cert/.style={draw, rounded corners=2pt, fill=green!10, minimum width=2cm, minimum height=0.6cm, align=center, font=\scriptsize},
+  audit/.style={draw, rounded corners=2pt, fill=yellow!15, minimum width=2cm, minimum height=0.6cm, align=center, font=\scriptsize},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  lbl/.style={font=\tiny, text=gray},
+]
+
+% Timeline
+\draw[thick, gray] (0, 0) -- (13, 0);
+\foreach \x/\t in {1/t_0, 3/t_1, 5/t_2, 7.5/t_3, 10/t_4, 12/t_5} {
+  \draw[gray] (\x, -0.15) -- (\x, 0.15);
+  \node[below, lbl] at (\x, -0.2) {$\t$};
+}
+
+% Events
+\node[event] (gen) at (1, 1.2) {Key\\generation};
+\node[event] (harvest) at (3, 1.2) {Entropy\\harvest};
+\node[cert] (certify) at (5, 1.2) {Provenance\\certificate};
+\node[event] (compose) at (7.5, 1.2) {XOR\\composition};
+\node[audit] (query) at (10, 1.2) {Auditor\\query};
+\node[audit] (response) at (12, 1.2) {Certificate\\response};
+
+% Arrows down to timeline
+\foreach \n in {gen,harvest,certify,compose,query,response} {
+  \draw[arr, gray!50] (\n.south) -- (\n.south |- 0,0);
+}
+
+% Flow arrows
+\draw[arr] (gen) -- (harvest);
+\draw[arr] (harvest) -- (certify);
+\draw[arr] (certify) -- (compose);
+\draw[arr, dashed] (query) -- (response);
+
+% DORA article references
+\node[lbl, above=0.1cm] at (1, 1.7) {Art.~7};
+\node[lbl, above=0.1cm] at (3, 1.7) {Art.~6.1};
+\node[lbl, above=0.1cm] at (5, 1.7) {Art.~7};
+\node[lbl, above=0.1cm] at (7.5, 1.7) {Art.~6.4};
+\node[lbl, above=0.1cm] at (10, 1.7) {Art.~50};
+
+% Certificate detail
+\node[draw, fill=green!5, minimum width=4cm, align=left, font=\tiny, rounded corners] (detail) at (8.5, -1.8) {
+  \textbf{Merkle root:} \texttt{17d53b93...}\\
+  \textbf{Sources:} quantum, csi, os\\
+  \textbf{Health:} all HEALTHY\\
+  \textbf{Min-entropy:} 6.36 bpb\\
+  \textbf{Timestamp:} $t_2$
+};
+\draw[arr, dashed, gray] (certify.south) -- ++(0,-0.5) -| (detail.north);
+
+\end{tikzpicture}
+\end{document}

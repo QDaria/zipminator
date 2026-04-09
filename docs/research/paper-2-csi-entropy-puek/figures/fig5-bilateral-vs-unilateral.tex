@@ -1,0 +1,53 @@
+% Fig 5: Bilateral vs unilateral CSI (KEY NOVELTY VISUALIZATION)
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=0.8cm,
+  device/.style={draw, rounded corners=3pt, minimum height=1cm, minimum width=1.6cm,
+                 font=\small, thick, align=center},
+  signal/.style={-{Stealth[length=4pt]}, thick, gray!60},
+  darr/.style={{Stealth[length=5pt]}-{Stealth[length=5pt]}, thick},
+  lbl/.style={font=\scriptsize, text=black!70, align=center}
+]
+
+% === Left panel: Bilateral ===
+\begin{scope}[shift={(-4.2,0)}]
+  \node[font=\small\bfseries] at (0, 2.8) {Prior Work: Bilateral};
+
+  \node[device, fill=blue!10] (alice) at (-1.6, 1.0) {Alice};
+  \node[device, fill=blue!10] (bob) at (1.6, 1.0) {Bob};
+  \node[device, fill=red!8, dashed] (eve) at (0, -0.8) {Eve};
+
+  \draw[darr, blue!60] (alice) -- node[lbl, above] {$H_{A\!\to\!B} \approx H_{B\!\to\!A}$} (bob);
+  \draw[signal, red!40, dashed] (alice) -- node[lbl, left, xshift=-2pt] {$H_{A\!\to\!E} \neq H_{A\!\to\!B}$} (eve);
+  \draw[signal, red!40, dashed] (bob) -- (eve);
+
+  \node[lbl, font=\scriptsize] at (0, -2.0) {Requires: 2 endpoints,\\reconciliation, privacy amplification};
+\end{scope}
+
+% === Right panel: Unilateral ===
+\begin{scope}[shift={(4.2,0)}]
+  \node[font=\small\bfseries] at (0, 2.8) {\textbf{This Work: Unilateral}};
+
+  \node[device, fill=green!12] (dev) at (0, 1.0) {Single\\Device};
+
+  % Ambient WiFi signals
+  \foreach \y in {1.6, 1.0, 0.4} {
+    \draw[signal] (-3.0, \y) -- (dev.west);
+  }
+  \node[lbl, font=\scriptsize] at (-3.0, 2.1) {Ambient\\WiFi};
+
+  % Output to pool
+  \node[device, fill=green!6, minimum width=2.2cm] (pool) at (0, -1.0) {Local Entropy Pool};
+  \draw[-{Stealth[length=5pt]}, thick, green!60!black] (dev) -- node[lbl, right] {phase LSBs} (pool);
+
+  \node[lbl, font=\scriptsize\bfseries] at (0, -2.0) {No cooperation required.\\No reconciliation. No reciprocity.};
+\end{scope}
+
+% Divider
+\draw[thick, dashed, gray!40] (0, -2.5) -- (0, 3.1);
+
+\end{tikzpicture}
+\caption{Bilateral key agreement (left) vs.\ unilateral entropy extraction (right). All prior CSI randomness work requires two cooperating endpoints exploiting channel reciprocity. Our approach extracts local entropy at a single device from ambient WiFi, eliminating the need for a partner, reconciliation protocol, and privacy amplification.}
+\label{fig:bilateral-vs-unilateral}
+\end{figure*}

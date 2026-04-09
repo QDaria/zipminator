@@ -1,0 +1,77 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: ACM-Reference-Format.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Database file #1: references.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Warning--no number and no volume in anonymous2026b
+Warning--page numbers missing in both pages and numpages fields in anonymous2026b
+Warning--empty publisher in avrahami2023csi
+Warning--empty address in avrahami2023csi
+Warning--page numbers missing in both pages and numpages fields in avrahami2023csi
+Warning--empty publisher in gringoli2019freeCSI
+Warning--empty address in gringoli2019freeCSI
+Warning--empty publisher in gutmann1998secure
+Warning--empty address in gutmann1998secure
+Warning--empty publisher in jana2009effectiveness
+Warning--empty address in jana2009effectiveness
+Warning--empty publisher in mathur2008radio
+Warning--empty address in mathur2008radio
+Warning--no number and no volume in ruotsalainen2023shake
+Warning--page numbers missing in both pages and numpages fields in ruotsalainen2023shake
+Warning--empty publisher in schulz2018nexmon
+Warning--empty address in schulz2018nexmon
+Warning--page numbers missing in both pages and numpages fields in schulz2018nexmon
+Warning--no number and no volume in suh2007puf
+Warning--empty address in vonneumann1951various
+Warning--page numbers missing in both pages and numpages fields in xiao2024securing
+You've used 27 entries,
+            6056 wiz_defined-function locations,
+            1649 strings with 23428 characters,
+and the built_in function-call counts, 30441 in all, are:
+= -- 4191
+> -- 974
+< -- 4
++ -- 326
+- -- 326
+* -- 2177
+:= -- 2887
+add.period$ -- 142
+call.type$ -- 27
+change.case$ -- 200
+chr.to.int$ -- 26
+cite$ -- 48
+duplicate$ -- 2601
+empty$ -- 1815
+format.name$ -- 413
+if$ -- 7555
+int.to.chr$ -- 3
+int.to.str$ -- 1
+missing$ -- 87
+newline$ -- 276
+num.names$ -- 188
+pop$ -- 963
+preamble$ -- 1
+purify$ -- 414
+quote$ -- 0
+skip$ -- 953
+stack$ -- 0
+substring$ -- 2224
+swap$ -- 264
+text.length$ -- 4
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 608
+warning$ -- 21
+while$ -- 155
+width$ -- 0
+write$ -- 567
+(There were 21 warnings)

@@ -1,0 +1,75 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main-anonymous.aux
+The style file: ACM-Reference-Format.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Database file #1: references.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Warning--empty publisher in avrahami2023csi
+Warning--empty address in avrahami2023csi
+Warning--page numbers missing in both pages and numpages fields in avrahami2023csi
+Warning--empty publisher in gringoli2019freeCSI
+Warning--empty address in gringoli2019freeCSI
+Warning--empty publisher in gutmann1998secure
+Warning--empty address in gutmann1998secure
+Warning--empty publisher in jana2009effectiveness
+Warning--empty address in jana2009effectiveness
+Warning--empty publisher in mathur2008radio
+Warning--empty address in mathur2008radio
+Warning--no number and no volume in ruotsalainen2023shake
+Warning--page numbers missing in both pages and numpages fields in ruotsalainen2023shake
+Warning--empty publisher in schulz2018nexmon
+Warning--empty address in schulz2018nexmon
+Warning--page numbers missing in both pages and numpages fields in schulz2018nexmon
+Warning--no number and no volume in suh2007puf
+Warning--empty address in vonneumann1951various
+Warning--page numbers missing in both pages and numpages fields in xiao2024securing
+You've used 26 entries,
+            6056 wiz_defined-function locations,
+            1643 strings with 23331 characters,
+and the built_in function-call counts, 29508 in all, are:
+= -- 4035
+> -- 957
+< -- 4
++ -- 322
+- -- 319
+* -- 2127
+:= -- 2808
+add.period$ -- 136
+call.type$ -- 26
+change.case$ -- 195
+chr.to.int$ -- 25
+cite$ -- 45
+duplicate$ -- 2518
+empty$ -- 1754
+format.name$ -- 406
+if$ -- 7299
+int.to.chr$ -- 3
+int.to.str$ -- 1
+missing$ -- 83
+newline$ -- 266
+num.names$ -- 181
+pop$ -- 928
+preamble$ -- 1
+purify$ -- 401
+quote$ -- 0
+skip$ -- 930
+stack$ -- 0
+substring$ -- 2168
+swap$ -- 260
+text.length$ -- 4
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 592
+warning$ -- 19
+while$ -- 148
+width$ -- 0
+write$ -- 547
+(There were 19 warnings)

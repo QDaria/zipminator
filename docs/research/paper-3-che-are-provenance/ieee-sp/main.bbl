@@ -1,0 +1,203 @@
+\begin{thebibliography}{10}
+
+\bibitem{albrecht2025gaussian}
+Martin~R. Albrecht, Joel Felderhoff, Russell W.~F. Lai, Oleksandra Lapiha, and
+  Ivy K.~Y. Woo.
+\newblock A {Gaussian} leftover hash lemma for modules over number fields,
+  2025.
+\newblock IACR ePrint 2025/1852.
+
+\bibitem{amer2025applications}
+Omar Amer, Shouvanik Chakrabarti, et~al.
+\newblock Applications of certified randomness.
+\newblock {\em Nature Reviews Physics}, 2025.
+\newblock arXiv:2503.19759.
+
+\bibitem{anon2026quantum}
+Anonymous.
+\newblock Quantum-entropy anonymization: One-time pad with provable destruction
+  for gdpr-compliant data processing.
+\newblock Manuscript. [Anonymous Institution], Oslo, Norway, 2026.
+
+\bibitem{anon2026csi}
+Anonymous.
+\newblock Unilateral {WiFi} {CSI} as a {NIST}-validated entropy source: From
+  bilateral key agreement to single-device randomness.
+\newblock Manuscript. [Anonymous Institution], Oslo, Norway. Target: ACM WiSec
+  2026, 2026.
+
+\bibitem{aslan2025observations}
+Melih Aslan, Ali Doganaksoy, and Zubeyde Saygi.
+\newblock Observations on {NIST SP 800-90B} entropy estimators.
+\newblock {\em Cryptography and Communications}, 2025.
+
+\bibitem{nist2025sp80090c}
+Elaine Barker and John Kelsey.
+\newblock Recommendation for random bit generator ({RBG}) constructions.
+\newblock Technical Report SP 800-90C, NIST, 2025.
+
+\bibitem{boudgoust2025lhl}
+Katharina Boudgoust and Oleksandra Lapiha.
+\newblock Leftover hash lemma(s) over cyclotomic rings, 2025.
+\newblock IACR ePrint 2025/1080.
+
+\bibitem{carter1979universal}
+J.~Lawrence Carter and Mark~N. Wegman.
+\newblock Universal classes of hash functions.
+\newblock {\em J.\ Comput.\ Syst.\ Sci.}, 18(2):143--154, 1979.
+
+\bibitem{chattopadhyay2025leakage}
+Eshan Chattopadhyay and Jesse Goodman.
+\newblock Leakage-resilient extractors against number-on-forehead protocols.
+\newblock In {\em STOC 2025}, 2025.
+\newblock arXiv:2506.12595.
+
+\bibitem{coretti2025multisource}
+Sandro Coretti, Pooya Farshim, Patrick Harasser, and Luke Southern.
+\newblock Multi-source randomness extraction and generation in the
+  random-oracle model.
+\newblock In {\em ITC 2025}, 2025.
+
+\bibitem{dang2025tches}
+Vo~Thi~Anh Dang et~al.
+\newblock Entropy extractor based high-throughput post-processings for {TRNGs}.
+\newblock {\em IACR TCHES}, 2025(4):145--171, 2025.
+
+\bibitem{dinur2024xor}
+Itai Dinur.
+\newblock Tight indistinguishability bounds for the {XOR} of independent random
+  permutations by {Fourier} analysis.
+\newblock In {\em EUROCRYPT 2024}, 2024.
+\newblock IACR ePrint 2024/338.
+
+\bibitem{dodis2008fuzzy}
+Yevgeniy Dodis, Rafail Ostrovsky, Leonid Reyzin, and Adam Smith.
+\newblock Fuzzy extractors: How to generate strong keys from biometrics and
+  other noisy data.
+\newblock {\em SIAM J.\ Computing}, 38(1):97--139, 2008.
+
+\bibitem{doron2024linear}
+Dean Doron and Jo{\~a}o Ribeiro.
+\newblock Nearly-linear time seeded extractors with short seeds, 2024.
+\newblock arXiv:2411.07473.
+
+\bibitem{nist2015sha3}
+Morris~J. Dworkin.
+\newblock {SHA-3} standard: Permutation-based hash and extendable-output
+  functions.
+\newblock Technical Report FIPS 202, NIST, 2015.
+
+\bibitem{dora2022}
+{European Parliament and Council}.
+\newblock Regulation ({EU}) 2022/2554 on digital operational resilience for the
+  financial sector ({DORA}), 2022.
+\newblock Official Journal of the European Union, L~333, 27 Dec 2022. Effective
+  17 Jan 2025 (Norway: 1 July 2025).
+
+\bibitem{foreman2025seedless}
+Cameron Foreman and Ll{\'u}{\'\i}s Masanes.
+\newblock Seedless extractors for device-independent quantum cryptography.
+\newblock {\em Quantum}, 9:1654, 2025.
+\newblock arXiv:2403.04713.
+
+\bibitem{foreman2024cryptomite}
+Cameron Foreman, Richie Yeung, Alec Edgington, and Florian~J. Curchod.
+\newblock Cryptomite: A versatile and user-friendly library of randomness
+  extractors, 2024.
+\newblock arXiv:2402.09481.
+
+\bibitem{golowich2024expanders}
+Louis Golowich.
+\newblock New explicit constant-degree lossless expanders.
+\newblock In {\em SODA 2024}, 2024.
+\newblock arXiv:2306.07551.
+
+\bibitem{goodman2024condensers}
+Jesse Goodman, Xin Li, and David Zuckerman.
+\newblock Improved condensers for {Chor--Goldreich} sources.
+\newblock In {\em FOCS 2024}, 2024.
+\newblock arXiv:2410.08142.
+
+\bibitem{grujic2024linear}
+Milos Grujic and Ingrid Verbauwhede.
+\newblock Optimizing linear correctors: A tight output min-entropy bound and
+  selection technique.
+\newblock {\em IEEE Trans.\ Information Forensics and Security}, 2024.
+\newblock arXiv:2304.05306.
+
+\bibitem{guruswami2009unbalanced}
+Venkatesan Guruswami, Christopher Umans, and Salil Vadhan.
+\newblock Unbalanced expanders and randomness extractors from
+  {Parvaresh--Vardy} codes.
+\newblock In {\em J.\ ACM}, volume~56, 2009.
+
+\bibitem{impagliazzo1989one}
+Russell Impagliazzo, Leonid~A. Levin, and Michael Luby.
+\newblock Pseudo-random generation from one-way functions.
+\newblock In {\em Proc.\ 21st ACM Symp.\ Theory of Computing (STOC)}, pages
+  12--24, 1989.
+
+\bibitem{jiang2025group}
+Hanjun Jiang, Yongge Wang, Song Luo, Jintai Liu, Yue Gang, Yanbin Pan, and Yuyu
+  Wang.
+\newblock Re-randomize and extract: Novel commitment construction based on
+  group actions.
+\newblock In {\em Eurocrypt 2025}, 2025.
+
+\bibitem{aaronson2025certified}
+Minzhao Liu, Ruslan Shaydulin, Pradeep Niroula, Matthew DeCross, Shih-Han Hung,
+  Scott Aaronson, et~al.
+\newblock Certified randomness using a trapped-ion quantum processor.
+\newblock {\em Nature}, 640:343--348, 2025.
+\newblock arXiv:2503.20498.
+
+\bibitem{lou2025qpp}
+Dafu Lou et~al.
+\newblock Raw {QPP-RNG} randomness via system jitter across platforms: A {NIST
+  SP 800-90B} evaluation.
+\newblock {\em Scientific Reports}, 2025.
+
+\bibitem{ma2016qrng}
+Xiongfeng Ma, Xiao Yuan, Zhu Cao, Bing Qi, and Zhen Zhang.
+\newblock Quantum random number generation.
+\newblock {\em npj Quantum Information}, 2:16021, 2016.
+
+\bibitem{nist2026ir8446}
+Kerry McKay, Werner Schindler, and Meltem~S{\"o}nmez Turan.
+\newblock Bridging the gap between standards on random number generation.
+\newblock Technical Report NIST IR 8446, NIST/BSI, 2026.
+
+\bibitem{merkle1989certified}
+Ralph~C. Merkle.
+\newblock A certified digital signature.
+\newblock {\em Advances in Cryptology (CRYPTO)}, pages 218--238, 1989.
+
+\bibitem{nist2024fips203}
+{National Institute of Standards and Technology}.
+\newblock Module-lattice-based key-encapsulation mechanism standard.
+\newblock Technical Report FIPS 203, NIST, 2024.
+
+\bibitem{renner2025causal}
+Michael Sandfuchs, Marco Ferradini, and Renato Renner.
+\newblock Randomness from causally independent processes, 2025.
+\newblock arXiv:2510.05203.
+
+\bibitem{bsi2024ais31}
+Werner Schindler and Matthias Peter.
+\newblock A proposal for functionality classes for random number generators,
+  version 3.0.
+\newblock Technical report, BSI, 2024.
+
+\bibitem{trevisan2001extractors}
+Luca Trevisan.
+\newblock Extractors and pseudorandom generators.
+\newblock In {\em J.\ ACM}, volume~48, pages 860--879, 2001.
+
+\bibitem{nist2018sp80090b}
+Meltem~S\"onmez Turan, Elaine Barker, John Kelsey, Kerry~A. McKay, Mary~L.
+  Baish, and Mike Boyle.
+\newblock Recommendation for the entropy sources used for random bit
+  generation.
+\newblock Technical Report SP 800-90B, NIST, 2018.
+
+\end{thebibliography}

@@ -1,0 +1,263 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{gutmann1998secure,wallace2016sensortrng}
+\citation{mathur2008radio}
+\citation{jana2009effectiveness}
+\citation{liu2012exploiting}
+\citation{zhang2016csikey}
+\citation{avrahami2023csi}
+\citation{nist2018sp80090b}
+\citation{gringoli2019csidata}
+\@writefile{toc}{\contentsline {section}{Abstract}{1}{section*.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:intro}{{1}{1}{Introduction}{section.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Contributions.}{1}{section*.5}\protected@file@percent }
+\citation{schulz2018nexmon}
+\citation{espressif2023csi}
+\citation{mathur2008radio}
+\citation{jana2009effectiveness}
+\citation{zhang2016csikey}
+\citation{avrahami2023csi}
+\citation{nist2018sp80090b}
+\citation{vonneumann1951various}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Notation used throughout this paper.}}{2}{table.caption.6}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:notation}{{1}{2}{Notation used throughout this paper}{table.caption.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background}{2}{section.2}\protected@file@percent }
+\newlabel{sec:background}{{2}{2}{Background}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}WiFi Channel State Information}{2}{subsection.2.1}\protected@file@percent }
+\newlabel{subsec:csi-bg}{{2.1}{2}{WiFi Channel State Information}{subsection.2.1}{}}
+\newlabel{eq:ofdm}{{1}{2}{WiFi Channel State Information}{equation.1}{}}
+\newlabel{eq:csi}{{2}{2}{WiFi Channel State Information}{equation.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Bilateral CSI Key Agreement}{2}{subsection.2.2}\protected@file@percent }
+\newlabel{subsec:bilateral}{{2.2}{2}{Bilateral CSI Key Agreement}{subsection.2.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}NIST SP 800-90B Entropy Assessment}{2}{subsection.2.3}\protected@file@percent }
+\newlabel{subsec:sp800-90b}{{2.3}{2}{NIST SP 800-90B Entropy Assessment}{subsection.2.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Von Neumann Debiasing}{2}{subsection.2.4}\protected@file@percent }
+\newlabel{subsec:vonneumann}{{2.4}{2}{Von Neumann Debiasing}{subsection.2.4}{}}
+\newlabel{eq:vonneumann}{{3}{2}{Von Neumann Debiasing}{equation.3}{}}
+\citation{espressif2023csi}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Min-Entropy vs.\ Shannon Entropy}{3}{subsection.2.5}\protected@file@percent }
+\newlabel{subsec:minentropy-vs-shannon}{{2.5}{3}{Min-Entropy vs.\ Shannon Entropy}{subsection.2.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Threat Model and Assumptions}{3}{section.3}\protected@file@percent }
+\newlabel{sec:threat}{{3}{3}{Threat Model and Assumptions}{section.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{System model.}{3}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Adversary capabilities.}{3}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Security argument.}{3}{section*.9}\protected@file@percent }
+\newlabel{prop:decorrelation}{{3.1}{3}{Spatial decorrelation bound}{theorem.3.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Bilateral key agreement vs.\ unilateral entropy extraction.}}{3}{table.caption.11}\protected@file@percent }
+\newlabel{tab:paradigm}{{2}{3}{Bilateral key agreement vs.\ unilateral entropy extraction}{table.caption.11}{}}
+\@writefile{toc}{\contentsline {paragraph}{Limitations.}{3}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Unilateral CSI Entropy Extraction}{3}{section.4}\protected@file@percent }
+\newlabel{sec:unilateral}{{4}{3}{Unilateral CSI Entropy Extraction}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}From Key Agreement to Entropy Harvesting}{3}{subsection.4.1}\protected@file@percent }
+\newlabel{subsec:paradigm}{{4.1}{3}{From Key Agreement to Entropy Harvesting}{subsection.4.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Phase LSB Extraction}{3}{subsection.4.2}\protected@file@percent }
+\newlabel{subsec:phase-lsb}{{4.2}{3}{Phase LSB Extraction}{subsection.4.2}{}}
+\newlabel{eq:phase-lsb}{{4}{3}{Phase LSB Extraction}{equation.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Bilateral key agreement (left) vs.\ unilateral entropy extraction (right). All prior CSI randomness work requires two cooperating endpoints exploiting channel reciprocity. Our approach extracts local entropy at a single device from ambient WiFi, eliminating the need for a partner, reconciliation protocol, and privacy amplification.}}{4}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:bilateral-vs-unilateral}{{1}{4}{Bilateral key agreement (left) vs.\ unilateral entropy extraction (right). All prior CSI randomness work requires two cooperating endpoints exploiting channel reciprocity. Our approach extracts local entropy at a single device from ambient WiFi, eliminating the need for a partner, reconciliation protocol, and privacy amplification}{figure.caption.12}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Unilateral CSI entropy extraction}}{4}{algorithm.1}\protected@file@percent }
+\newlabel{alg:extraction}{{1}{4}{Unilateral CSI entropy extraction}{algorithm.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Why phase, not amplitude?}{4}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Von Neumann Debiasing}{4}{subsection.4.3}\protected@file@percent }
+\newlabel{subsec:vn-impl}{{4.3}{4}{Von Neumann Debiasing}{subsection.4.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Pool Architecture}{4}{subsection.4.4}\protected@file@percent }
+\newlabel{subsec:pool}{{4.4}{4}{Pool Architecture}{subsection.4.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Heterogeneous Entropy Composition}{4}{subsection.4.5}\protected@file@percent }
+\newlabel{subsec:compositor}{{4.5}{4}{Heterogeneous Entropy Composition}{subsection.4.5}{}}
+\newlabel{eq:xor-composition}{{5}{4}{Heterogeneous Entropy Composition}{equation.5}{}}
+\newlabel{lem:xor}{{4.1}{4}{XOR composition guarantee}{theorem.4.1}{}}
+\citation{suh2007puf}
+\citation{chatterjee2019rfpuf}
+\citation{dodis2008fuzzy}
+\citation{rfc5869}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Unilateral CSI entropy extraction pipeline. A single device passively receives WiFi frames, extracts per-subcarrier CSI, quantizes phase to 8\nonbreakingspace bits, selects LSBs, and debiases via Von\nonbreakingspace Neumann pairing. The 24.5\% extraction ratio is consistent with near-unbiased input ($p \approx 0.51$).}}{5}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:pipeline}{{2}{5}{Unilateral CSI entropy extraction pipeline. A single device passively receives WiFi frames, extracts per-subcarrier CSI, quantizes phase to 8~bits, selects LSBs, and debiases via Von~Neumann pairing. The 24.5\% extraction ratio is consistent with near-unbiased input ($p \approx 0.51$)}{figure.caption.14}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces XOR composition for defense in depth. Three provenance-clean entropy pools are fused byte-by-byte at consumption time. By Lemma\nonbreakingspace \ref {lem:xor}, the output min-entropy is at least that of the strongest individual source, even if other sources are fully compromised. A health monitor flags per-source degradation.}}{5}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:xor-composition}{{3}{5}{XOR composition for defense in depth. Three provenance-clean entropy pools are fused byte-by-byte at consumption time. By Lemma~\ref {lem:xor}, the output min-entropy is at least that of the strongest individual source, even if other sources are fully compromised. A health monitor flags per-source degradation}{figure.caption.15}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Physical Unclonable Environment Key}{5}{section.5}\protected@file@percent }
+\newlabel{sec:puek}{{5}{5}{Physical Unclonable Environment Key}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Intuition}{5}{subsection.5.1}\protected@file@percent }
+\newlabel{subsec:puek-intuition}{{5.1}{5}{Intuition}{subsection.5.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}CSI Eigenstructure via SVD}{5}{subsection.5.2}\protected@file@percent }
+\newlabel{subsec:svd}{{5.2}{5}{CSI Eigenstructure via SVD}{subsection.5.2}{}}
+\newlabel{eq:svd}{{6}{5}{CSI Eigenstructure via SVD}{equation.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Enrollment and Verification}{5}{subsection.5.3}\protected@file@percent }
+\newlabel{subsec:enrollment}{{5.3}{5}{Enrollment and Verification}{subsection.5.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Enrollment.}{5}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Verification.}{5}{section*.17}\protected@file@percent }
+\newlabel{eq:subspace-similarity}{{7}{5}{Verification}{equation.7}{}}
+\@writefile{toc}{\contentsline {paragraph}{Key derivation.}{5}{section*.18}\protected@file@percent }
+\newlabel{eq:hkdf}{{8}{5}{Key derivation}{equation.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Security Argument for PUEK}{5}{subsection.5.4}\protected@file@percent }
+\newlabel{subsec:puek-security}{{5.4}{5}{Security Argument for PUEK}{subsection.5.4}{}}
+\newlabel{def:puek-ind}{{5.1}{5}{\puek -IND Game}{theorem.5.1}{}}
+\citation{wang2020csibehavior}
+\citation{rfc5869}
+\citation{chatterjee2019rfpuf}
+\citation{gringoli2019csidata,gringoli2019freeCSI}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces PUEK security profiles.}}{6}{table.caption.20}\protected@file@percent }
+\newlabel{tab:puek-profiles}{{3}{6}{PUEK security profiles}{table.caption.20}{}}
+\newlabel{asm:esd}{{1}{6}{Environmental Spatial Decorrelation (ESD)}{assumption.1}{}}
+\newlabel{prop:puek-security}{{5.2}{6}{\puek -IND Security}{theorem.5.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Limitations.}{6}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Security Profiles}{6}{subsection.5.5}\protected@file@percent }
+\newlabel{subsec:security-profiles}{{5.5}{6}{Security Profiles}{subsection.5.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces PUEK vs.\ RF-PUF comparison.}}{6}{table.caption.22}\protected@file@percent }
+\newlabel{tab:puek-vs-rfpuf}{{4}{6}{PUEK vs.\ RF-PUF comparison}{table.caption.22}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces CSI entropy extraction statistics (Nexmon walk capture).}}{6}{table.caption.23}\protected@file@percent }
+\newlabel{tab:extraction}{{5}{6}{CSI entropy extraction statistics (Nexmon walk capture)}{table.caption.23}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Comparison with RF-PUF}{6}{subsection.5.6}\protected@file@percent }
+\newlabel{subsec:rfpuf-comparison}{{5.6}{6}{Comparison with RF-PUF}{subsection.5.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Evaluation}{6}{section.6}\protected@file@percent }
+\newlabel{sec:evaluation}{{6}{6}{Evaluation}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Dataset}{6}{subsection.6.1}\protected@file@percent }
+\newlabel{subsec:dataset}{{6.1}{6}{Dataset}{subsection.6.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Extraction Results}{6}{subsection.6.2}\protected@file@percent }
+\newlabel{subsec:extraction-results}{{6.2}{6}{Extraction Results}{subsection.6.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}NIST SP 800-90B Assessment}{6}{subsection.6.3}\protected@file@percent }
+\newlabel{subsec:nist-results}{{6.3}{6}{NIST SP 800-90B Assessment}{subsection.6.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Interpreting the gap between per-byte and final estimates.}{6}{section*.25}\protected@file@percent }
+\expandafter \gdef \csname pgfplots@labelstyle@pgf:ratio\endcsname {thick={\pgfkeysnovalue },blue!70={\pgfkeysnovalue },mark={*},mark size={2pt}}
+\expandafter \gdef \csname pgfplots@show@ref@pgf:ratio\endcsname {\begingroup \def \pgfplots@draw@image {\def \tikz@plot@handler {\pgfkeys {/pgf/plots/@handler options/.cd, start=\relax , end macro=\relax , point macro=\pgfutil@gobble , jump macro=\relax , special macro=\pgfutil@gobble , point macro=\pgf@plot@line@handler , jump=\global \let \pgf@plotstreampoint \pgf@plot@line@handler@move }\begingroup \escapechar =-1 \edef \pgfplotsplothandlername {\string \pgfplothandlerlineto }\pgfmath@smuggleone \pgfplotsplothandlername \endgroup \def \pgfplotsplothandlerLUAfactory {function(axis, pointmetainputhandler) return pgfplots.GenericPlothandler.new("\pgfplotsplothandlername ", axis,pointmetainputhandler) end}\def \pgfplotsplothandlerLUAvisualizerfactory {pgfplots.defaultPlotVisualizerFactory}}\pgfkeysdef {/pgfplots/legend image code}{\draw [/pgfplots/mesh=false,bar width=3pt,bar shift=0pt,mark repeat=2,mark phase=2,] plot coordinates { (0cm,0cm) (0.3cm,0cm) (0.6cm,0cm)};}\pgfkeysdef {/pgfplots/every legend image post}{}\pgfkeyssetvalue {/pgfplots/mark list fill}{.!80!black}\pgfkeysdef {/pgfplots/every crossref picture}{\pgfkeysalso {baseline,yshift=0.3em}}\pgfplots@show@small@legendplots {thick={\pgfkeysnovalue },blue!70={\pgfkeysnovalue },mark={*},mark size={2pt}}{}}\ifpgfpicture \scope [/pgfplots/every crossref picture]\pgfplots@draw@image \endscope \else \expandafter \ifx \csname tikzappendtofigurename\endcsname \relax \else \begingroup \tikzappendtofigurename {_crossref}\fi \tikz [/pgfplots/every crossref picture]{\pgfplots@draw@image }\expandafter \ifx \csname tikzappendtofigurename\endcsname \relax \else \endgroup \fi \fi \endgroup }
+\expandafter \gdef \csname pgfplots@labelstyle@pgf:entropy\endcsname {thick={\pgfkeysnovalue },red!70={\pgfkeysnovalue },mark={square*},mark size={2pt},densely dashed={\pgfkeysnovalue }}
+\expandafter \gdef \csname pgfplots@show@ref@pgf:entropy\endcsname {\begingroup \def \pgfplots@draw@image {\def \tikz@plot@handler {\pgfkeys {/pgf/plots/@handler options/.cd, start=\relax , end macro=\relax , point macro=\pgfutil@gobble , jump macro=\relax , special macro=\pgfutil@gobble , point macro=\pgf@plot@line@handler , jump=\global \let \pgf@plotstreampoint \pgf@plot@line@handler@move }\begingroup \escapechar =-1 \edef \pgfplotsplothandlername {\string \pgfplothandlerlineto }\pgfmath@smuggleone \pgfplotsplothandlername \endgroup \def \pgfplotsplothandlerLUAfactory {function(axis, pointmetainputhandler) return pgfplots.GenericPlothandler.new("\pgfplotsplothandlername ", axis,pointmetainputhandler) end}\def \pgfplotsplothandlerLUAvisualizerfactory {pgfplots.defaultPlotVisualizerFactory}}\pgfkeysdef {/pgfplots/legend image code}{\draw [/pgfplots/mesh=false,bar width=3pt,bar shift=0pt,mark repeat=2,mark phase=2,] plot coordinates { (0cm,0cm) (0.3cm,0cm) (0.6cm,0cm)};}\pgfkeysdef {/pgfplots/every legend image post}{}\pgfkeyssetvalue {/pgfplots/mark list fill}{.!80!black}\pgfkeysdef {/pgfplots/every crossref picture}{\pgfkeysalso {baseline,yshift=0.3em}}\pgfplots@show@small@legendplots {thick={\pgfkeysnovalue },red!70={\pgfkeysnovalue },mark={square*},mark size={2pt},densely dashed={\pgfkeysnovalue }}{}}\ifpgfpicture \scope [/pgfplots/every crossref picture]\pgfplots@draw@image \endscope \else \expandafter \ifx \csname tikzappendtofigurename\endcsname \relax \else \begingroup \tikzappendtofigurename {_crossref}\fi \tikz [/pgfplots/every crossref picture]{\pgfplots@draw@image }\expandafter \ifx \csname tikzappendtofigurename\endcsname \relax \else \endgroup \fi \fi \endgroup }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces PUEK enrollment and verification. (a)\nonbreakingspace At enrollment, $M$\nonbreakingspace CSI snapshots are decomposed via SVD; the top-$d$ right singular vectors form the location fingerprint. (b)\nonbreakingspace At verification, fresh snapshots yield $\mathbf  {V}_{\mathrm  {new}}$; subspace similarity $s$ is compared against threshold\nonbreakingspace $\tau $. On success, HKDF derives a location-locked key\nonbreakingspace $K$.}}{7}{figure.caption.21}\protected@file@percent }
+\newlabel{fig:puek-protocol}{{4}{7}{PUEK enrollment and verification. (a)~At enrollment, $M$~CSI snapshots are decomposed via SVD; the top-$d$ right singular vectors form the location fingerprint. (b)~At verification, fresh snapshots yield $\mathbf {V}_{\mathrm {new}}$; subspace similarity $s$ is compared against threshold~$\tau $. On success, HKDF derives a location-locked key~$K$}{figure.caption.21}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces NIST SP 800-90B min-entropy assessment (\texttt  {ea\_non\_iid -a <file> 8}). The ``Final'' column is $\min (H_{\infty }, 8 \times H_{\text  {bitstring}})$, the security-relevant bound.}}{7}{table.caption.24}\protected@file@percent }
+\newlabel{tab:nist}{{6}{7}{NIST SP 800-90B min-entropy assessment (\texttt {ea\_non\_iid -a <file> 8}). The ``Final'' column is $\min (\minentropy , 8 \times H_{\text {bitstring}})$, the security-relevant bound}{table.caption.24}{}}
+\@writefile{toc}{\contentsline {paragraph}{CSI vs.\ QRNG vs.\ OS entropy.}{7}{section*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Why \texttt  {os.urandom} scores below maximum.}{7}{section*.27}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Shannon entropy vs.\ min-entropy (bits per byte).}}{7}{table.caption.28}\protected@file@percent }
+\newlabel{tab:shannon}{{7}{7}{Shannon entropy vs.\ min-entropy (bits per byte)}{table.caption.28}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Shannon Entropy Comparison}{7}{subsection.6.4}\protected@file@percent }
+\newlabel{subsec:shannon-comparison}{{6.4}{7}{Shannon Entropy Comparison}{subsection.6.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}Throughput}{7}{subsection.6.5}\protected@file@percent }
+\newlabel{subsec:throughput}{{6.5}{7}{Throughput}{subsection.6.5}{}}
+\newlabel{eq:raw-rate}{{9}{7}{Throughput}{equation.9}{}}
+\newlabel{eq:debiased-rate}{{10}{7}{Throughput}{equation.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces NIST SP\nonbreakingspace 800-90B final min-entropy assessment (\texttt  {ea\_non\_iid}, byte-level, 99\% confidence). WiFi CSI achieves 5.50\nonbreakingspace bpb (69\% of theoretical maximum), compared to 6.35 for IBM Quantum (ibm\_kingston, 156\nonbreakingspace qubits) and 6.36 for \texttt  {os.urandom}. The CSI result is the first SP\nonbreakingspace 800-90B assessment of WiFi CSI data.}}{8}{figure.caption.29}\protected@file@percent }
+\newlabel{fig:minentropy-bars}{{5}{8}{NIST SP~800-90B final min-entropy assessment (\texttt {ea\_non\_iid}, byte-level, 99\% confidence). WiFi CSI achieves 5.50~bpb (69\% of theoretical maximum), compared to 6.35 for IBM Quantum (ibm\_kingston, 156~qubits) and 6.36 for \texttt {os.urandom}. The CSI result is the first SP~800-90B assessment of WiFi CSI data}{figure.caption.29}{}}
+\newlabel{pgf:ratio}{{\expandafter\protect\csname pgfplots@show@ref@pgf:ratio\endcsname}{8}{Throughput}{pgfplotslink.6.0}{}}
+\newlabel{pgf:entropy}{{\expandafter\protect\csname pgfplots@show@ref@pgf:entropy\endcsname}{8}{Throughput}{pgfplotslink.6.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Extraction quality vs.\ number of input frames. Both extraction ratio (solid, left axis) and min-entropy (dashed, right axis) converge with increasing sample size. Our measurement (343\nonbreakingspace frames, circled) yields 24.5\% and 5.50\nonbreakingspace bpb. Extrapolation to 1{,}000 frames suggests marginal improvement to $\approx $5.65\nonbreakingspace bpb, still below quantum and OS sources.}}{8}{figure.caption.30}\protected@file@percent }
+\newlabel{fig:extraction-sensitivity}{{6}{8}{Extraction quality vs.\ number of input frames. Both extraction ratio (solid, left axis) and min-entropy (dashed, right axis) converge with increasing sample size. Our measurement (343~frames, circled) yields 24.5\% and 5.50~bpb. Extrapolation to 1{,}000 frames suggests marginal improvement to $\approx $5.65~bpb, still below quantum and OS sources}{figure.caption.30}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Economic Analysis}{8}{section.7}\protected@file@percent }
+\newlabel{sec:economics}{{7}{8}{Economic Analysis}{section.7}{}}
+\@writefile{toc}{\contentsline {paragraph}{Cost per MB.}{8}{section*.32}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Cost comparison of entropy sources.}}{8}{table.caption.31}\protected@file@percent }
+\newlabel{tab:economics}{{8}{8}{Cost comparison of entropy sources}{table.caption.31}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Cost--throughput tradeoff. CSI entropy from a \$5 ESP32-S3 produces 45--90\nonbreakingspace MB/month of genuine physical randomness at zero marginal cost, occupying a unique niche between free-but-deterministic OS entropy and high-quality-but-expensive quantum entropy. Bubble annotations show NIST SP\nonbreakingspace 800-90B min-entropy.}}{8}{figure.caption.34}\protected@file@percent }
+\newlabel{fig:cost-benefit}{{7}{8}{Cost--throughput tradeoff. CSI entropy from a \$5 ESP32-S3 produces 45--90~MB/month of genuine physical randomness at zero marginal cost, occupying a unique niche between free-but-deterministic OS entropy and high-quality-but-expensive quantum entropy. Bubble annotations show NIST SP~800-90B min-entropy}{figure.caption.34}{}}
+\newlabel{eq:cost-per-mb}{{11}{8}{Cost per MB}{equation.11}{}}
+\@writefile{toc}{\contentsline {paragraph}{Deployment scenario.}{8}{section*.33}\protected@file@percent }
+\citation{mathur2008radio}
+\citation{jana2009effectiveness}
+\citation{liu2012exploiting}
+\citation{zhang2016csikey}
+\citation{ruotsalainen2023shake}
+\citation{avrahami2023csi}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Security Analysis}{9}{section.8}\protected@file@percent }
+\newlabel{sec:security}{{8}{9}{Security Analysis}{section.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Thermal Noise as Entropy Foundation}{9}{subsection.8.1}\protected@file@percent }
+\newlabel{subsec:thermal}{{8.1}{9}{Thermal Noise as Entropy Foundation}{subsection.8.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Adversary Analysis}{9}{subsection.8.2}\protected@file@percent }
+\newlabel{subsec:adversary}{{8.2}{9}{Adversary Analysis}{subsection.8.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Attack 1: Passive observation.}{9}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Attack 2: Channel prediction.}{9}{section*.36}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Attack 3: Environment control.}{9}{section*.37}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Attack 4: Replay.}{9}{section*.38}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Static Environment Degradation}{9}{subsection.8.3}\protected@file@percent }
+\newlabel{subsec:static}{{8.3}{9}{Static Environment Degradation}{subsection.8.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Static environment degradation. When human movement ceases, CSI phase variance drops below $\sigma ^2_{\min }$, and the system pauses extraction. In static conditions, only thermal noise provides entropy, at a reduced rate. The variance monitor triggers a switch to fallback sources (QRNG or OS entropy).}}{9}{figure.caption.39}\protected@file@percent }
+\newlabel{fig:static-degradation}{{8}{9}{Static environment degradation. When human movement ceases, CSI phase variance drops below $\sigma ^2_{\min }$, and the system pauses extraction. In static conditions, only thermal noise provides entropy, at a reduced rate. The variance monitor triggers a switch to fallback sources (QRNG or OS entropy)}{figure.caption.39}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}XOR Composition as Defense in Depth}{9}{subsection.8.4}\protected@file@percent }
+\newlabel{subsec:xor-defense}{{8.4}{9}{XOR Composition as Defense in Depth}{subsection.8.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Related Work}{9}{section.9}\protected@file@percent }
+\newlabel{sec:related}{{9}{9}{Related Work}{section.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Bilateral CSI Key Agreement}{9}{subsection.9.1}\protected@file@percent }
+\newlabel{subsec:related-bilateral}{{9.1}{9}{Bilateral CSI Key Agreement}{subsection.9.1}{}}
+\citation{xiao2024securing}
+\citation{du2024keycome}
+\citation{suh2007puf}
+\citation{chatterjee2019rfpuf}
+\citation{wallace2016sensortrng}
+\citation{marghescu2019fmtrng}
+\citation{ma2016qrng}
+\citation{herrero2017qrng}
+\citation{nist2018sp80090b}
+\citation{nist2010sp80022}
+\citation{mathur2008radio}
+\citation{jana2009effectiveness}
+\citation{liu2012exploiting}
+\citation{zhang2016csikey}
+\citation{avrahami2023csi}
+\citation{xiao2024securing}
+\citation{du2024keycome}
+\citation{nist2018sp80090b}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}RF Fingerprinting and PUFs}{10}{subsection.9.2}\protected@file@percent }
+\newlabel{subsec:related-puf}{{9.2}{10}{RF Fingerprinting and PUFs}{subsection.9.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}Sensor-Based TRNGs}{10}{subsection.9.3}\protected@file@percent }
+\newlabel{subsec:related-trng}{{9.3}{10}{Sensor-Based TRNGs}{subsection.9.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}Quantum Random Number Generation}{10}{subsection.9.4}\protected@file@percent }
+\newlabel{subsec:related-qrng}{{9.4}{10}{Quantum Random Number Generation}{subsection.9.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}Entropy Standards}{10}{subsection.9.5}\protected@file@percent }
+\newlabel{subsec:related-standards}{{9.5}{10}{Entropy Standards}{subsection.9.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Comparison with prior CSI key agreement systems. All prior work operates in the bilateral mode with two cooperating endpoints and no NIST entropy assessment.}}{10}{table.caption.40}\protected@file@percent }
+\newlabel{tab:comparison}{{9}{10}{Comparison with prior CSI key agreement systems. All prior work operates in the bilateral mode with two cooperating endpoints and no NIST entropy assessment}{table.caption.40}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {10}Discussion}{10}{section.10}\protected@file@percent }
+\newlabel{sec:discussion}{{10}{10}{Discussion}{section.10}{}}
+\@writefile{toc}{\contentsline {paragraph}{Limitations of the current evaluation.}{10}{section*.41}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Adjacent-subcarrier correlation.}{10}{section*.42}\protected@file@percent }
+\citation{anonymous2026b}
+\citation{nist2024fips203}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Schematic subcarrier correlation structure. Phase LSB correlation $|\rho _{k,k'}| \approx e^{-|k-k'|/B_c}$ decays with subcarrier spacing, where $B_c \approx 15$ subcarriers is the coherence bandwidth at 20\nonbreakingspace MHz indoors. The near-diagonal banding drives the gap between per-byte (6.36) and final (5.50\nonbreakingspace bpb) min-entropy. Mitigations: extract every $n$-th subcarrier or apply whitening.}}{11}{figure.caption.43}\protected@file@percent }
+\newlabel{fig:correlation-heatmap}{{9}{11}{Schematic subcarrier correlation structure. Phase LSB correlation $|\rho _{k,k'}| \approx e^{-|k-k'|/B_c}$ decays with subcarrier spacing, where $B_c \approx 15$ subcarriers is the coherence bandwidth at 20~MHz indoors. The near-diagonal banding drives the gap between per-byte (6.36) and final (5.50~bpb) min-entropy. Mitigations: extract every $n$-th subcarrier or apply whitening}{figure.caption.43}{}}
+\@writefile{toc}{\contentsline {paragraph}{PUEK stability and aging.}{11}{section*.44}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Algebraic Randomness Extraction as enhanced conditioner.}{11}{section*.45}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Post-quantum integration.}{11}{section*.46}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {11}Conclusion}{11}{section.11}\protected@file@percent }
+\newlabel{sec:conclusion}{{11}{11}{Conclusion}{section.11}{}}
+\citation{gringoli2019csidata}
+\bibstyle{ACM-Reference-Format}
+\bibdata{references}
+\bibcite{anonymous2026b}{{1}{2026}{{Anonymous}}{{}}}
+\bibcite{avrahami2023csi}{{2}{2023}{{Avrahami et~al\mbox  {.}}}{{}}}
+\bibcite{chatterjee2019rfpuf}{{3}{2019}{{Chatterjee et~al\mbox  {.}}}{{}}}
+\bibcite{dodis2008fuzzy}{{4}{2008}{{Dodis et~al\mbox  {.}}}{{}}}
+\bibcite{du2024keycome}{{5}{2024}{{Du et~al\mbox  {.}}}{{}}}
+\bibcite{espressif2023csi}{{6}{2023}{{Espressif Systems}}{{}}}
+\bibcite{gringoli2019csidata}{{7}{2019a}{{Gringoli et~al\mbox  {.}}}{{}}}
+\bibcite{gringoli2019freeCSI}{{8}{2019b}{{Gringoli et~al\mbox  {.}}}{{}}}
+\bibcite{gutmann1998secure}{{9}{1998}{{Gutmann}}{{}}}
+\bibcite{herrero2017qrng}{{10}{2017}{{Herrero-Collantes and Garcia-Escartin}}{{}}}
+\bibcite{jana2009effectiveness}{{11}{2009}{{Jana et~al\mbox  {.}}}{{}}}
+\bibcite{rfc5869}{{12}{2010}{{Krawczyk and Eronen}}{{}}}
+\bibcite{liu2012exploiting}{{13}{2014}{{Liu et~al\mbox  {.}}}{{}}}
+\bibcite{ma2016qrng}{{14}{2016}{{Ma et~al\mbox  {.}}}{{}}}
+\bibcite{marghescu2019fmtrng}{{15}{2019}{{Marghescu et~al\mbox  {.}}}{{}}}
+\bibcite{mathur2008radio}{{16}{2008}{{Mathur et~al\mbox  {.}}}{{}}}
+\bibcite{nist2024fips203}{{17}{2024}{{National Institute of Standards and Technology}}{{}}}
+\bibcite{nist2010sp80022}{{18}{2010}{{Rukhin et~al\mbox  {.}}}{{}}}
+\bibcite{ruotsalainen2023shake}{{19}{2023}{{Ruotsalainen et~al\mbox  {.}}}{{}}}
+\bibcite{schulz2018nexmon}{{20}{2017}{{Schulz et~al\mbox  {.}}}{{}}}
+\bibcite{suh2007puf}{{21}{2007}{{Suh and Devadas}}{{}}}
+\bibcite{nist2018sp80090b}{{22}{2018}{{Turan et~al\mbox  {.}}}{{}}}
+\bibcite{vonneumann1951various}{{23}{1951}{{von Neumann}}{{}}}
+\bibcite{wallace2016sensortrng}{{24}{2016}{{Wallace et~al\mbox  {.}}}{{}}}
+\bibcite{wang2020csibehavior}{{25}{2020}{{Wang et~al\mbox  {.}}}{{}}}
+\bibcite{xiao2024securing}{{26}{2024}{{Xiao et~al\mbox  {.}}}{{}}}
+\bibcite{zhang2016csikey}{{27}{2016}{{Zhang et~al\mbox  {.}}}{{}}}
+\newlabel{tocindent-1}{0pt}
+\newlabel{tocindent0}{0pt}
+\newlabel{tocindent1}{8.37pt}
+\newlabel{tocindent2}{10.34999pt}
+\newlabel{tocindent3}{0pt}
+\newlabel{tocindent4}{0pt}
+\newlabel{tocindent5}{0pt}
+\@writefile{toc}{\contentsline {section}{References}{12}{section*.51}\protected@file@percent }
+\newlabel{TotPages}{{12}{12}{}{page.12}{}}
+\gdef \@abspage@last{12}

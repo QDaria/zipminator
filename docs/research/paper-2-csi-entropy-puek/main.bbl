@@ -1,0 +1,374 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{26}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{} and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showURL}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showURL #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[Avrahami et~al\mbox{.}(2023)]%
+        {avrahami2023csi}
+\bibfield{author}{\bibinfo{person}{Raz Avrahami}, \bibinfo{person}{Ofer
+  Amrani}, {and} \bibinfo{person}{Avishai Wool}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Let's Shake on It: Extracting Secure Shared Keys
+  from {Wi-Fi} {CSI}}. In \bibinfo{booktitle}{\emph{Proc.\ IEEE 20th Int.\
+  Conf.\ Mobile Ad-Hoc and Smart Systems (MASS)}}.
+\newblock
+\href{https://doi.org/10.1109/mass58611.2023.00065}{doi:\nolinkurl{10.1109/mass58611.2023.00065}}
+
+
+\bibitem[Chatterjee et~al\mbox{.}(2019)]%
+        {chatterjee2019rfpuf}
+\bibfield{author}{\bibinfo{person}{Baibhab Chatterjee},
+  \bibinfo{person}{Debayan Das}, \bibinfo{person}{Shovan Maity}, {and}
+  \bibinfo{person}{Shreyas Sen}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{{RF-PUF}: Enhancing {IoT} Security Through
+  Authentication of Wireless Nodes Using In-Situ Machine Learning}.
+\newblock \bibinfo{journal}{\emph{IEEE Internet of Things Journal}}
+  \bibinfo{volume}{6}, \bibinfo{number}{5} (\bibinfo{year}{2019}),
+  \bibinfo{pages}{7671--7684}.
+\newblock
+\href{https://doi.org/10.1109/jiot.2018.2849324}{doi:\nolinkurl{10.1109/jiot.2018.2849324}}
+
+
+\bibitem[Dodis et~al\mbox{.}(2008)]%
+        {dodis2008fuzzy}
+\bibfield{author}{\bibinfo{person}{Yevgeniy Dodis}, \bibinfo{person}{Rafail
+  Ostrovsky}, \bibinfo{person}{Leonid Reyzin}, {and} \bibinfo{person}{Adam
+  Smith}.} \bibinfo{year}{2008}\natexlab{}.
+\newblock \showarticletitle{Fuzzy Extractors: How to Generate Strong Keys from
+  Biometrics and Other Noisy Data}.
+\newblock \bibinfo{journal}{\emph{SIAM J. Comput.}} \bibinfo{volume}{38},
+  \bibinfo{number}{1} (\bibinfo{year}{2008}), \bibinfo{pages}{97--139}.
+\newblock
+\href{https://doi.org/10.1137/060651380}{doi:\nolinkurl{10.1137/060651380}}
+
+
+\bibitem[Du et~al\mbox{.}(2024)]%
+        {du2024keycome}
+\bibfield{author}{\bibinfo{person}{Yicong Du}, \bibinfo{person}{Hongbo Liu},
+  \bibinfo{person}{Ziyu Shao}, {et~al\mbox{.}}}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Secure and Controllable Secret Key Generation
+  Through {CSI} Obfuscation Matrix Encapsulation}.
+\newblock \bibinfo{journal}{\emph{IEEE Trans.\ Mobile Computing}}
+  \bibinfo{volume}{23} (\bibinfo{year}{2024}), \bibinfo{pages}{12313--12326}.
+\newblock
+\href{https://doi.org/10.1109/TMC.2024.3407062}{doi:\nolinkurl{10.1109/TMC.2024.3407062}}
+
+
+\bibitem[{Espressif Systems}(2023)]%
+        {espressif2023csi}
+\bibfield{author}{\bibinfo{person}{{Espressif Systems}}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \bibinfo{title}{{Wi-Fi} Channel State Information ({CSI}) in
+  {ESP-IDF}}.
+\newblock
+  \bibinfo{howpublished}{\url{https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-guides/wifi.html}}.
+\newblock
+\newblock
+\shownote{ESP-IDF v5.1, ESP32-S3 CSI extraction API}.
+
+
+\bibitem[Gringoli et~al\mbox{.}(2019a)]%
+        {gringoli2019csidata}
+\bibfield{author}{\bibinfo{person}{Francesco Gringoli},
+  \bibinfo{person}{Matthias Schulz}, \bibinfo{person}{Jakob Link}, {and}
+  \bibinfo{person}{Matthias Hollick}.} \bibinfo{year}{2019}\natexlab{a}.
+\newblock \bibinfo{title}{{CSI-Data}: Public {WiFi} Channel State Information
+  Datasets}.
+\newblock \bibinfo{howpublished}{\url{https://github.com/Gi-z/CSI-Data}}.
+\newblock
+\newblock
+\shownote{TU Darmstadt / University of Brescia. Nexmon captures from
+  Broadcom/Cypress chips.}.
+
+
+\bibitem[Gringoli et~al\mbox{.}(2019b)]%
+        {gringoli2019freeCSI}
+\bibfield{author}{\bibinfo{person}{Francesco Gringoli},
+  \bibinfo{person}{Matthias Schulz}, \bibinfo{person}{Jakob Link}, {and}
+  \bibinfo{person}{Matthias Hollick}.} \bibinfo{year}{2019}\natexlab{b}.
+\newblock \showarticletitle{Free Your {CSI}: A Channel State Information
+  Extraction Platform for Modern {Wi-Fi} Chipsets}. In
+  \bibinfo{booktitle}{\emph{Proc.\ 13th Int.\ Workshop on Wireless Network
+  Testbeds, Experimental Evaluation \& Characterization (WiNTECH)}}.
+  \bibinfo{pages}{21--28}.
+\newblock
+\href{https://doi.org/10.1145/3349623.3355477}{doi:\nolinkurl{10.1145/3349623.3355477}}
+
+
+\bibitem[Gutmann(1998)]%
+        {gutmann1998secure}
+\bibfield{author}{\bibinfo{person}{Peter Gutmann}.}
+  \bibinfo{year}{1998}\natexlab{}.
+\newblock \showarticletitle{Software Generation of Practically Strong Random
+  Numbers}. In \bibinfo{booktitle}{\emph{Proc.\ 7th USENIX Security
+  Symposium}}. \bibinfo{pages}{243--257}.
+\newblock
+
+
+\bibitem[Herrero-Collantes and Garcia-Escartin(2017)]%
+        {herrero2017qrng}
+\bibfield{author}{\bibinfo{person}{Miguel Herrero-Collantes} {and}
+  \bibinfo{person}{Juan~Carlos Garcia-Escartin}.}
+  \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Quantum Random Number Generators}.
+\newblock \bibinfo{journal}{\emph{Reviews of Modern Physics}}
+  \bibinfo{volume}{89}, \bibinfo{number}{1} (\bibinfo{year}{2017}),
+  \bibinfo{pages}{015004}.
+\newblock
+\href{https://doi.org/10.1103/RevModPhys.89.015004}{doi:\nolinkurl{10.1103/RevModPhys.89.015004}}
+
+
+\bibitem[Jana et~al\mbox{.}(2009)]%
+        {jana2009effectiveness}
+\bibfield{author}{\bibinfo{person}{Suman Jana}, \bibinfo{person}{Sriram~Nandha
+  Prashant}, \bibinfo{person}{Andrew Clark}, \bibinfo{person}{Sneha~Kumar
+  Kasera}, \bibinfo{person}{Neal Patwari}, {and} \bibinfo{person}{Srikanth~V.
+  Krishnamurthy}.} \bibinfo{year}{2009}\natexlab{}.
+\newblock \showarticletitle{On the effectiveness of secret key extraction from
+  wireless signal strength in real environments}. In
+  \bibinfo{booktitle}{\emph{Proc.\ 15th ACM Int.\ Conf.\ Mobile Computing and
+  Networking (MobiCom)}}. \bibinfo{pages}{321--332}.
+\newblock
+\href{https://doi.org/10.1145/1614320.1614356}{doi:\nolinkurl{10.1145/1614320.1614356}}
+
+
+\bibitem[Krawczyk and Eronen(2010)]%
+        {rfc5869}
+\bibfield{author}{\bibinfo{person}{Hugo Krawczyk} {and} \bibinfo{person}{Pasi
+  Eronen}.} \bibinfo{year}{2010}\natexlab{}.
+\newblock \bibinfo{title}{{HMAC}-Based Extract-and-Expand Key Derivation
+  Function ({HKDF})}.
+\newblock \bibinfo{howpublished}{RFC 5869}.
+\newblock
+\href{https://doi.org/10.17487/RFC5869}{doi:\nolinkurl{10.17487/RFC5869}}
+
+
+\bibitem[Liu et~al\mbox{.}(2014)]%
+        {liu2012exploiting}
+\bibfield{author}{\bibinfo{person}{Hongbo Liu}, \bibinfo{person}{Yang Wang},
+  \bibinfo{person}{Jie Liu}, \bibinfo{person}{Jian Yang},
+  \bibinfo{person}{Yingying Chen}, {and} \bibinfo{person}{H.~Vincent Poor}.}
+  \bibinfo{year}{2014}\natexlab{}.
+\newblock \showarticletitle{Authenticating Users Through Fine-Grained Channel
+  Information}.
+\newblock \bibinfo{journal}{\emph{IEEE Trans.\ Mobile Computing}}
+  \bibinfo{volume}{13}, \bibinfo{number}{8} (\bibinfo{year}{2014}),
+  \bibinfo{pages}{1709--1721}.
+\newblock
+\href{https://doi.org/10.1109/TMC.2013.81}{doi:\nolinkurl{10.1109/TMC.2013.81}}
+
+
+\bibitem[Ma et~al\mbox{.}(2016)]%
+        {ma2016qrng}
+\bibfield{author}{\bibinfo{person}{Xiongfeng Ma}, \bibinfo{person}{Xiao Yuan},
+  \bibinfo{person}{Zhu Cao}, \bibinfo{person}{Bing Qi}, {and}
+  \bibinfo{person}{Zhen Zhang}.} \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{Quantum Random Number Generation}.
+\newblock \bibinfo{journal}{\emph{npj Quantum Information}}
+  \bibinfo{volume}{2} (\bibinfo{year}{2016}), \bibinfo{pages}{16021}.
+\newblock
+\href{https://doi.org/10.1038/npjqi.2016.21}{doi:\nolinkurl{10.1038/npjqi.2016.21}}
+
+
+\bibitem[Marghescu et~al\mbox{.}(2019)]%
+        {marghescu2019fmtrng}
+\bibfield{author}{\bibinfo{person}{Alin Marghescu}, \bibinfo{person}{Robert
+  Chindris}, {and} \bibinfo{person}{Iulian Bancioiu}.}
+  \bibinfo{year}{2019}\natexlab{}.
+\newblock \showarticletitle{True Random Number Generator ({TRNG}) Utilizing
+  {FM} Radio Signals for Mobile and Embedded Devices in Multi-Access Edge
+  Computing}.
+\newblock \bibinfo{journal}{\emph{Sensors}} \bibinfo{volume}{19},
+  \bibinfo{number}{19} (\bibinfo{year}{2019}), \bibinfo{pages}{4130}.
+\newblock
+\href{https://doi.org/10.3390/s19194130}{doi:\nolinkurl{10.3390/s19194130}}
+
+
+\bibitem[Mathur et~al\mbox{.}(2008)]%
+        {mathur2008radio}
+\bibfield{author}{\bibinfo{person}{Suhas Mathur}, \bibinfo{person}{Wade
+  Trappe}, \bibinfo{person}{Narayan Mandayam}, \bibinfo{person}{Chunxuan Ye},
+  {and} \bibinfo{person}{Alex Reznik}.} \bibinfo{year}{2008}\natexlab{}.
+\newblock \showarticletitle{Radio-Telepathy: Extracting a Secret Key from an
+  Unauthenticated Wireless Channel}. In \bibinfo{booktitle}{\emph{Proc.\ 14th
+  ACM Int.\ Conf.\ Mobile Computing and Networking (MobiCom)}}.
+  \bibinfo{pages}{128--139}.
+\newblock
+\href{https://doi.org/10.1145/1409944.1409960}{doi:\nolinkurl{10.1145/1409944.1409960}}
+
+
+\bibitem[{National Institute of Standards and Technology}(2024)]%
+        {nist2024fips203}
+\bibfield{author}{\bibinfo{person}{{National Institute of Standards and
+  Technology}}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Module-Lattice-Based Key-Encapsulation
+  Mechanism Standard}}.
+\newblock \bibinfo{type}{{T}echnical {R}eport} FIPS 203.
+  \bibinfo{institution}{NIST}.
+\newblock
+\href{https://doi.org/10.6028/NIST.FIPS.203}{doi:\nolinkurl{10.6028/NIST.FIPS.203}}
+
+
+\bibitem[Rukhin et~al\mbox{.}(2010)]%
+        {nist2010sp80022}
+\bibfield{author}{\bibinfo{person}{Andrew Rukhin}, \bibinfo{person}{Juan Soto},
+  \bibinfo{person}{James Nechvatal}, {et~al\mbox{.}}}
+  \bibinfo{year}{2010}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{A Statistical Test Suite for Random and
+  Pseudorandom Number Generators for Cryptographic Applications}}.
+\newblock \bibinfo{type}{{T}echnical {R}eport} SP 800-22 Rev.~1a.
+  \bibinfo{institution}{NIST}.
+\newblock
+
+
+\bibitem[Ruotsalainen et~al\mbox{.}(2023)]%
+        {ruotsalainen2023shake}
+\bibfield{author}{\bibinfo{person}{Henri Ruotsalainen},
+  \bibinfo{person}{Georgios Tsiatis}, {and} \bibinfo{person}{Sushmita Ruj}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Let's Shake on It: Extracting Secure Shared Keys
+  from {Wi-Fi} {CSI}}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2307.05423}}
+  (\bibinfo{year}{2023}).
+\newblock
+
+
+\bibitem[Schulz et~al\mbox{.}(2017)]%
+        {schulz2018nexmon}
+\bibfield{author}{\bibinfo{person}{Matthias Schulz}, \bibinfo{person}{Daniel
+  Wegemer}, {and} \bibinfo{person}{Matthias Hollick}.}
+  \bibinfo{year}{2017}\natexlab{}.
+\newblock \showarticletitle{Nexmon: The {C}-Based Firmware Patching Framework}.
+  \bibinfo{howpublished}{\url{https://nexmon.org}}. In
+  \bibinfo{booktitle}{\emph{Technical Report}}.
+\newblock
+\newblock
+\shownote{TU Darmstadt SEEMOO Lab}.
+
+
+\bibitem[Suh and Devadas(2007)]%
+        {suh2007puf}
+\bibfield{author}{\bibinfo{person}{G.~Edward Suh} {and}
+  \bibinfo{person}{Srinivas Devadas}.} \bibinfo{year}{2007}\natexlab{}.
+\newblock \showarticletitle{Physical Unclonable Functions for Device
+  Authentication and Secret Key Generation}.
+\newblock \bibinfo{journal}{\emph{Proc.\ 44th ACM/IEEE Design Automation Conf.\
+  (DAC)}} (\bibinfo{year}{2007}), \bibinfo{pages}{9--14}.
+\newblock
+\href{https://doi.org/10.1145/1278480.1278484}{doi:\nolinkurl{10.1145/1278480.1278484}}
+
+
+\bibitem[Turan et~al\mbox{.}(2018)]%
+        {nist2018sp80090b}
+\bibfield{author}{\bibinfo{person}{Meltem~S\"onmez Turan},
+  \bibinfo{person}{Elaine Barker}, \bibinfo{person}{John Kelsey},
+  \bibinfo{person}{Kerry~A. McKay}, \bibinfo{person}{Mary~L. Baish}, {and}
+  \bibinfo{person}{Mike Boyle}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Recommendation for the Entropy Sources Used
+  for Random Bit Generation}}.
+\newblock \bibinfo{type}{{T}echnical {R}eport} SP 800-90B.
+  \bibinfo{institution}{NIST}.
+\newblock
+\href{https://doi.org/10.6028/NIST.SP.800-90B}{doi:\nolinkurl{10.6028/NIST.SP.800-90B}}
+
+
+\bibitem[von Neumann(1951)]%
+        {vonneumann1951various}
+\bibfield{author}{\bibinfo{person}{John von Neumann}.}
+  \bibinfo{year}{1951}\natexlab{}.
+\newblock \showarticletitle{Various Techniques Used in Connection with Random
+  Digits}.
+\newblock In \bibinfo{booktitle}{\emph{Monte Carlo Method}}. Number~12 in
+  \bibinfo{series}{National Bureau of Standards Applied Mathematics Series}.
+  \bibinfo{publisher}{U.S.\ Government Printing Office},
+  \bibinfo{pages}{36--38}.
+\newblock
+
+
+\bibitem[Wallace et~al\mbox{.}(2016)]%
+        {wallace2016sensortrng}
+\bibfield{author}{\bibinfo{person}{Kevin Wallace}, \bibinfo{person}{Kevin
+  Moran}, \bibinfo{person}{Ed Novak}, \bibinfo{person}{Gang Zhou}, {and}
+  \bibinfo{person}{Kun Sun}.} \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{Toward Sensor-Based Random Number Generation for
+  Mobile and {IoT} Devices}.
+\newblock \bibinfo{journal}{\emph{IEEE Internet of Things Journal}}
+  \bibinfo{volume}{3}, \bibinfo{number}{6} (\bibinfo{year}{2016}),
+  \bibinfo{pages}{1189--1201}.
+\newblock
+\href{https://doi.org/10.1109/JIOT.2016.2572638}{doi:\nolinkurl{10.1109/JIOT.2016.2572638}}
+
+
+\bibitem[Wang et~al\mbox{.}(2020)]%
+        {wang2020csibehavior}
+\bibfield{author}{\bibinfo{person}{Fangxin Wang}, \bibinfo{person}{Shaowu
+  Zhou}, \bibinfo{person}{Srdjan Panev}, \bibinfo{person}{Jinsong Han}, {and}
+  \bibinfo{person}{Dong Huang}.} \bibinfo{year}{2020}\natexlab{}.
+\newblock \showarticletitle{A Survey on Human Behavior Recognition Using
+  Channel State Information}.
+\newblock \bibinfo{journal}{\emph{IEEE Access}}  \bibinfo{volume}{8}
+  (\bibinfo{year}{2020}), \bibinfo{pages}{85740--85757}.
+\newblock
+\href{https://doi.org/10.1109/ACCESS.2020.2992089}{doi:\nolinkurl{10.1109/ACCESS.2020.2992089}}
+
+
+\bibitem[Xiao et~al\mbox{.}(2024)]%
+        {xiao2024securing}
+\bibfield{author}{\bibinfo{person}{Qingjiang Xiao}, \bibinfo{person}{Jinrong
+  Zhao}, \bibinfo{person}{Sheng Feng}, \bibinfo{person}{Guyue Li}, {and}
+  \bibinfo{person}{Aiqun Hu}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Securing {NextG} Networks with Physical-Layer Key
+  Generation: A Survey}.
+\newblock \bibinfo{journal}{\emph{Security and Safety}}  \bibinfo{volume}{3}
+  (\bibinfo{year}{2024}).
+\newblock
+\href{https://doi.org/10.1051/sands/2023021}{doi:\nolinkurl{10.1051/sands/2023021}}
+
+
+\bibitem[Zhang et~al\mbox{.}(2016)]%
+        {zhang2016csikey}
+\bibfield{author}{\bibinfo{person}{Junqing Zhang}, \bibinfo{person}{Trung~Q.
+  Duong}, \bibinfo{person}{Alan Marshall}, {and} \bibinfo{person}{Roger
+  Woods}.} \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{Key Generation from Wireless Channels: A Review}.
+\newblock \bibinfo{journal}{\emph{IEEE Access}}  \bibinfo{volume}{4}
+  (\bibinfo{year}{2016}), \bibinfo{pages}{614--626}.
+\newblock
+\href{https://doi.org/10.1109/ACCESS.2016.2521718}{doi:\nolinkurl{10.1109/ACCESS.2016.2521718}}
+
+
+\end{thebibliography}

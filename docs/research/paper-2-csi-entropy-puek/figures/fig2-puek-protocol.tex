@@ -1,0 +1,50 @@
+% Fig 2: PUEK enrollment and verification protocol
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=0.7cm and 1.5cm,
+  box/.style={draw, rounded corners=3pt, minimum height=0.8cm, minimum width=2.2cm,
+              font=\small, align=center, thick},
+  enroll/.style={box, fill=blue!8},
+  verify/.style={box, fill=orange!8},
+  decision/.style={draw, diamond, aspect=2.2, minimum width=1.8cm, font=\small, thick, fill=yellow!8},
+  result/.style={box, minimum width=1.5cm},
+  arr/.style={-{Stealth[length=5pt]}, thick},
+  lbl/.style={font=\scriptsize\itshape, text=black!60}
+]
+
+% --- Enrollment panel ---
+\node[font=\small\bfseries] at (0, 3.5) {(a) Enrollment};
+\node[enroll] (e1) at (0, 2.6) {Capture $M{=}100$\\CSI snapshots};
+\node[enroll, below=of e1] (e2) {Build $\mathbf{C} \in \mathbb{C}^{M \times K}$};
+\node[enroll, below=of e2] (e3) {SVD: $\mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^H$};
+\node[enroll, below=of e3] (e4) {Store $\mathbf{V}_{\mathrm{ref}}$,\\threshold $\tau$,\\helper data};
+
+\draw[arr] (e1) -- (e2);
+\draw[arr] (e2) -- (e3);
+\draw[arr] (e3) -- (e4);
+
+% --- Verification panel ---
+\node[font=\small\bfseries] at (6, 3.5) {(b) Verification};
+\node[verify] (v1) at (6, 2.6) {Capture $M'{=}50$\\fresh snapshots};
+\node[verify, below=of v1] (v2) {Compute fresh SVD\\$\to \mathbf{V}_{\mathrm{new}}$};
+\node[decision, below=0.8cm of v2] (v3) {$s \geq \tau$\,?};
+\node[result, below left=0.9cm and 0.5cm of v3, fill=green!15] (yes) {HKDF $\to K$\\(key derived)};
+\node[result, below right=0.9cm and 0.5cm of v3, fill=red!10] (no) {Reject};
+
+\draw[arr] (v1) -- (v2);
+\draw[arr] (v2) -- (v3);
+\draw[arr] (v3) -| node[lbl, above left=-1pt] {yes} (yes);
+\draw[arr] (v3) -| node[lbl, above right=-1pt] {no} (no);
+
+% Similarity formula
+\node[font=\scriptsize, text=black!70] at (6, -1.8)
+  {$s = \tfrac{1}{d}\sum_{i=1}^{d}|\langle \mathbf{v}_{\mathrm{ref},i},\, \mathbf{v}_{\mathrm{new},i}\rangle|^2$};
+
+% Divider
+\draw[thick, dashed, gray!40] (3, -2.1) -- (3, 3.8);
+
+\end{tikzpicture}
+\caption{PUEK enrollment and verification. (a)~At enrollment, $M$~CSI snapshots are decomposed via SVD; the top-$d$ right singular vectors form the location fingerprint. (b)~At verification, fresh snapshots yield $\mathbf{V}_{\mathrm{new}}$; subspace similarity $s$ is compared against threshold~$\tau$. On success, HKDF derives a location-locked key~$K$.}
+\label{fig:puek-protocol}
+\end{figure*}

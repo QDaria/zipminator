@@ -1,0 +1,85 @@
+% main-ieee.tex — Paper 2: Unilateral WiFi CSI as NIST-Validated Entropy Source
+% IEEE format for IACR ePrint submission
+% Converted from ACM sigconf (main.tex)
+% Author: Daniel Mo Houshmand, QDaria Quantum Research
+
+\documentclass[conference]{IEEEtran}
+
+%% ─── Packages ───
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{subcaption}
+\usepackage{xspace}
+\usepackage{balance}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc,decorations.pathreplacing}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+%% ─── Theorem-like environments ───
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem*{remark}{Remark}
+
+%% ─── Custom commands ───
+\newcommand{\zipminator}{\textsc{Zipminator}\xspace}
+\newcommand{\puek}{\textsc{PUEK}\xspace}
+\newcommand{\minentropy}{H_{\infty}}
+\newcommand{\shannon}{H}
+\newcommand{\bpb}{\text{bits/byte}}
+\newcommand{\eg}{e.g.,\xspace}
+\newcommand{\ie}{i.e.,\xspace}
+\newcommand{\etal}{et~al.\xspace}
+
+\graphicspath{{./figures/}}
+
+\begin{document}
+
+\title{Unilateral WiFi CSI as a NIST-Validated Entropy Source: \\
+From Bilateral Key Agreement to Single-Device Randomness}
+
+\author{\IEEEauthorblockN{Daniel Mo Houshmand}
+\IEEEauthorblockA{QDaria Quantum Research, Oslo, Norway\\
+\texttt{mo@qdaria.com}\\
+ORCID: 0009-0008-2270-5454}}
+
+\maketitle
+
+\begin{abstract}
+Every prior system that extracts randomness from WiFi Channel State Information (CSI) requires two cooperating endpoints exploiting channel reciprocity for bilateral key agreement.
+We present the first system, measurement, and NIST SP~800-90B validation of WiFi CSI as a \emph{unilateral} entropy source: a single device passively measuring ambient CSI to harvest genuine physical randomness with no cooperating partner.
+Using the public Gi-z/CSI-Data corpus (TU~Darmstadt Nexmon captures, Broadcom BCM4339), we extract phase least-significant bits from 343~frames across 256~OFDM subcarriers, apply Von~Neumann debiasing, and obtain 2,690~bytes of entropy at a 24.5\% extraction ratio.
+The NIST SP~800-90B \texttt{ea\_non\_iid} assessment yields a final min-entropy of \textbf{5.50~bits/byte} (MCV estimator, 99\% confidence), compared to 6.35 for IBM Quantum (ibm\_kingston, 156~qubits) and 6.36 for \texttt{os.urandom}.
+We introduce the Physical Unclonable Environment Key (PUEK), which derives location-locked cryptographic keys from the SVD eigenstructure of CSI measurements, with security profiles from $\tau=0.75$ (office) to $\tau=0.98$ (military).
+The method is hardware-agnostic, working with any IEEE~802.11n/ac/ax device; a \$5 ESP32-S3 reference implementation produces 45--90~MB/month at zero marginal cost, compared to IBM~Quantum at \$1.60/second.
+We provide a formal indistinguishability game and proof sketch for PUEK security under a spatial decorrelation assumption.
+All code, data references, and the full extraction pipeline are open-source.
+\end{abstract}
+
+\begin{IEEEkeywords}
+WiFi CSI, entropy source, NIST SP 800-90B, unilateral randomness, physical unclonable environment key, post-quantum cryptography, IoT security
+\end{IEEEkeywords}
+
+%% Body: include from the ACM version via input
+%% All \section through \section*{Reproducibility} are format-agnostic
+\input{body-ieee}
+
+\section*{Acknowledgments}
+The author thanks the TU~Darmstadt SEEMOO Lab and the University of Brescia for the public Gi-z/CSI-Data corpus, IBM Quantum for access to ibm\_kingston (156-qubit Heron~r2) via the IBM Quantum open plan, and Rigetti Computing for access to Ankaa-class processors used in entropy harvesting. Norwegian Patent Application filed April 2026 (Patentstyret) covers the CSI entropy extraction method and PUEK construction.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
