@@ -4,7 +4,8 @@ import { motion } from 'framer-motion'
 import {
   Code2, Terminal, Shield, Layers, FlaskConical,
   Notebook, Rocket, Key, FileCode, Lock, Server, Building2,
-  ArrowRight, Copy, Check, BookOpen, ExternalLink
+  ArrowRight, Copy, Check, BookOpen, ExternalLink,
+  FileText, Award, Wifi
 } from 'lucide-react'
 import { SITE_CONFIG } from '@/lib/constants'
 
@@ -163,6 +164,42 @@ export default function DocsPage() {
         </motion.a>
       </section>
 
+      {/* Releases & Research */}
+      <section id="releases-research" className="container-custom py-12">
+        <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+          <motion.h2 variants={fadeUp} className="text-3xl font-bold mb-2">Releases, Research & IP</motion.h2>
+          <motion.p variants={fadeUp} className="text-gray-400 mb-8">
+            April 2026 shipping state. Click through to the JupyterBook for full technical detail.
+          </motion.p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: Rocket, title: 'Releases', desc: 'SDK v0.5.0, Flutter Build 43, signaling server, Mesh Wave 1. All April 2026 shipping cadence in one place.', href: `${JUPYTER_BOOK}content/releases.html`, color: 'text-green-400' },
+              { icon: FileText, title: 'Research Papers', desc: 'Three papers covering certified anonymisation, CSI entropy, and heterogeneous entropy. Targets: PoPETs 2027, CCS 2026.', href: `${JUPYTER_BOOK}content/papers.html`, color: 'text-blue-400' },
+              { icon: Award, title: 'Patent Portfolio', desc: 'Three patents filed at Patentstyret, 46 claims total. Quantum OTP, CSI entropy, heterogeneous mixing.', href: `${JUPYTER_BOOK}content/patents.html`, color: 'text-amber-400' },
+              { icon: Wifi, title: 'Q-Mesh Wave 1', desc: 'Six physical-crypto modules: CSI entropy, PUEK, EM canary, vital-auth, topo-auth, spatiotemporal non-repudiation.', href: `${JUPYTER_BOOK}content/mesh_wave1.html`, color: 'text-cyan-400' },
+            ].map((s) => (
+              <motion.a
+                key={s.title}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                variants={fadeUp}
+                className="card-quantum group flex flex-col"
+              >
+                <s.icon className={`w-8 h-8 mb-4 ${s.color}`} />
+                <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-quantum-400 transition-colors">
+                  {s.title}
+                </h3>
+                <p className="text-sm text-gray-400 flex-1">{s.desc}</p>
+                <span className="mt-4 text-sm text-quantum-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read more <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </motion.a>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
       {/* Quick Start */}
       <section id="quickstart" className="container-custom py-16">
         <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
@@ -217,7 +254,7 @@ export default function DocsPage() {
         <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
           <motion.h2 variants={fadeUp} className="text-3xl font-bold mb-2">10-Level Anonymization</motion.h2>
           <motion.p variants={fadeUp} className="text-gray-400 mb-8">
-            Progressive anonymization from basic redaction to quantum-secure differential privacy.
+            Progressive anonymisation from regex masking to Quantum OTP. All 10 levels are production-verified (64 unit tests, 45 integration tests).
           </motion.p>
           <motion.div variants={fadeUp} className="card-quantum overflow-hidden">
             <div className="grid grid-cols-[auto_1fr_1fr] gap-px bg-white/5 text-sm">
@@ -225,16 +262,16 @@ export default function DocsPage() {
               <div className="bg-gray-900 px-4 py-3 font-semibold text-gray-300">Technique</div>
               <div className="bg-gray-900 px-4 py-3 font-semibold text-gray-300">Use Case</div>
               {[
-                ['0', 'Passthrough', 'Development / testing'],
-                ['1', 'Basic Redaction', 'Internal logs'],
-                ['2', 'Pattern Masking', 'Support tickets'],
-                ['3', 'Tokenization', 'Payment processing'],
-                ['4', 'Format-Preserving Encryption', 'Legacy systems'],
-                ['5', 'k-Anonymity', 'Analytics datasets'],
-                ['6', 'l-Diversity', 'Medical records'],
-                ['7', 't-Closeness', 'Research data sharing'],
-                ['8', 'Differential Privacy', 'Public datasets'],
-                ['9', 'Quantum-Secure DP', 'Government / defense'],
+                ['1', 'Regex masking', 'Quick redaction, internal logs'],
+                ['2', 'SHA-3 deterministic hashing', 'Consistent pseudonyms across datasets'],
+                ['3', 'PQC-salted hashing', 'Quantum-resistant pseudonyms'],
+                ['4', 'Reversible tokenization', 'SQLite TokenStore; detokenize on authorised replay'],
+                ['5', 'k-Anonymity (k>=5)', 'Analytics datasets, generalisation of quasi-IDs'],
+                ['6', 'l-Diversity', 'Medical records, sensitive attribute diversity'],
+                ['7', 'Quantum noise jitter (QRNG)', 'Numerical perturbation for regulated analytics'],
+                ['8', 'Differential privacy (Laplace)', 'Public datasets, configurable epsilon'],
+                ['9', 'k-Anonymity + DP combined', 'Government datasets requiring both'],
+                ['10', 'Quantum OTP (patent pending)', 'Defence, irreversible with real QRNG'],
               ].map(([level, tech, use]) => (
                 <Fragment key={level}>
                   <div className="bg-gray-900/50 px-4 py-2.5 text-quantum-400 font-mono font-bold">{level}</div>

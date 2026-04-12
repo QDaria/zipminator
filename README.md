@@ -21,12 +21,29 @@
 
 ---
 
+## Latest Releases (April 2026)
+
+- **2026-04-08** — Investor Blueprint expanded to 50K-word IP valuation document (live at [/blueprint](https://www.zipminator.zip/blueprint))
+- **2026-04-06** — Flutter super-app shipped to TestFlight as Build 43 (v0.5.0+43)
+- **2026-04-02** — Python SDK v0.5.0 shipped to PyPI: `pip install zipminator==0.5.0`
+- **2026-03-26** — Signaling server live on Fly.io: `wss://zipminator-signaling.fly.dev`
+- **2026-03-20** — Physical Cryptography Wave 1 landed (6 new mesh modules: CSI entropy, PUEK, EM canary, vital-auth, topo-auth, spatiotemporal non-repudiation)
+
+### Research & IP
+
+- **3 research papers** public on GitHub: [quantum-certified-anonymization](https://github.com/QDaria/quantum-certified-anonymization), [unilateral-csi-entropy](https://github.com/QDaria/unilateral-csi-entropy), [certified-heterogeneous-entropy](https://github.com/QDaria/certified-heterogeneous-entropy)
+- **3 patents filed** with Patentstyret (Norwegian IP Office), March 2026. 46 claims across the portfolio.
+
+See the full [CHANGELOG.md](CHANGELOG.md) for per-release detail.
+
+---
+
 ## What This Is
 
 Zipminator is the open-source cryptographic core of the [Zipminator PQC Platform](https://www.zipminator.zip). It provides:
 
 - **Rust Kyber768 engine** with constant-time arithmetic, NIST KAT validation, and fuzz testing
-- **Python SDK** (v0.5.0b1) with PyO3 bindings, 10-level anonymization, PII scanning, and CLI
+- **Python SDK** (v0.5.0) with PyO3 bindings, 10-level anonymization, PII scanning, and CLI
 - **Quantum entropy harvester** that continuously collects real entropy from IBM Quantum (Fez, Marrakesh) via qBraid
 - **Subscription-gated access** with freemium L1-3 and API-key-gated L4-10
 
@@ -164,7 +181,7 @@ zipminator entropy --bits 256
 
 ```
                     +-----------------+
-                    |   Python SDK    |  zipminator v0.5.0b1
+                    |   Python SDK    |  zipminator v0.5.0
                     |  CLI / Jupyter  |
                     +--------+--------+
                              |  PyO3

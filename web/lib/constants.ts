@@ -27,6 +27,14 @@ export const SITE_CONFIG = {
     qdaria: 'https://qdaria.com',
     qdariaProducts: '/technology',
     qdariaZipminator: '/',
+    // Release milestone links (April 2026)
+    pypi: 'https://pypi.org/project/zipminator/',
+    testflight: 'https://testflight.apple.com/join/XXXXXXXX',  // user to fill
+    signaling: 'wss://zipminator-signaling.fly.dev',
+    paper1: 'https://github.com/QDaria/quantum-certified-anonymization',
+    paper2: 'https://github.com/QDaria/unilateral-csi-entropy',
+    paper3: 'https://github.com/QDaria/certified-heterogeneous-entropy',
+    patentstyret: 'https://www.patentstyret.no/',
   },
   company: {
     name: 'QDaria',

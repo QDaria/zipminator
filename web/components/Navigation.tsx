@@ -56,6 +56,11 @@ const Navigation = () => {
       href: '/docs',
       description: 'Jupyter Book guides & API reference',
     },
+    {
+      name: 'Blueprint',
+      href: '/blueprint',
+      description: '50K-word IP valuation, pillar status, patents, roadmap',
+    },
   ]
 
   const navLinks = [

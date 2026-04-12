@@ -1,9 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowRight, Shield, Zap, Book, Cpu } from 'lucide-react'
+import { ArrowRight, Shield, Zap, Book, Cpu, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import QuantumBackground from './QuantumBackground'
+import { SITE_CONFIG } from '@/lib/constants'
 
 const Hero = () => {
   const containerVariants = {
@@ -80,6 +81,36 @@ const Hero = () => {
             </span>
           </motion.h1>
 
+          {/* Release Badges Row */}
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8"
+          >
+            <Link
+              href="/blueprint#roadmap"
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-gray-300 hover:border-green-400/40 hover:text-white transition-colors"
+            >
+              <span className="w-2 h-2 rounded-full bg-green-400" aria-hidden="true" />
+              TestFlight Build 43
+            </Link>
+            <a
+              href={SITE_CONFIG.links.pypi}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-gray-300 hover:border-blue-400/40 hover:text-white transition-colors"
+            >
+              <span className="w-2 h-2 rounded-full bg-blue-400" aria-hidden="true" />
+              SDK v0.5.0 on PyPI
+            </a>
+            <Link
+              href="/blueprint#patents"
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-gray-300 hover:border-amber-400/40 hover:text-white transition-colors"
+            >
+              <span className="w-2 h-2 rounded-full bg-amber-400" aria-hidden="true" />
+              3 patents, 46 claims
+            </Link>
+          </motion.div>
+
           {/* Subheadline */}
           <motion.p
             variants={itemVariants}
@@ -111,6 +142,13 @@ const Hero = () => {
             >
               <Book className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
               <span>Explore Features</span>
+            </Link>
+            <Link
+              href="/docs"
+              className="btn-secondary flex items-center space-x-2 group px-8 py-4 text-lg font-semibold hover:border-quantum-400 transition-all duration-300"
+            >
+              <BookOpen className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
+              <span>Read the docs</span>
             </Link>
           </motion.div>
 

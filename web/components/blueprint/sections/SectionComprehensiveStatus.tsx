@@ -547,6 +547,56 @@ export const SectionComprehensiveStatus = () => (
       )
     })()}
 
+    {/* ─── Part M: Further Reading (JupyterBook cross-links) ─── */}
+    <div className="space-y-6">
+      <h3
+        className="text-xl font-semibold text-slate-100"
+        style={{ fontFamily: 'var(--font-fraunces)' }}
+      >
+        M. Further Reading
+      </h3>
+      <GlowCard accent="#A78BFA">
+        <p className="text-slate-300 leading-relaxed text-[15px] mb-4" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+          Every pillar and milestone has a dedicated chapter in the Zipminator JupyterBook.
+          Source code + runnable notebooks + theory, maintained alongside the implementation.
+        </p>
+        <ul className="grid md:grid-cols-2 gap-3 text-sm" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+          {[
+            { label: 'Releases & shipping cadence', href: 'https://qdaria.github.io/zipminator/content/releases.html' },
+            { label: 'Research papers (3)', href: 'https://qdaria.github.io/zipminator/content/papers.html' },
+            { label: 'Patent portfolio (3 filed, 46 claims)', href: 'https://qdaria.github.io/zipminator/content/patents.html' },
+            { label: 'Q-Mesh Physical Crypto Wave 1', href: 'https://qdaria.github.io/zipminator/content/mesh_wave1.html' },
+            { label: 'Flutter super-app', href: 'https://qdaria.github.io/zipminator/content/flutter_app.html' },
+            { label: 'Core cryptography (ML-KEM-768)', href: 'https://qdaria.github.io/zipminator/content/core_crypto.html' },
+            { label: 'Quantum entropy sources', href: 'https://qdaria.github.io/zipminator/content/entropy.html' },
+            { label: '10-Level anonymisation', href: 'https://qdaria.github.io/zipminator/content/anonymization.html' },
+            { label: 'Self-destruct storage', href: 'https://qdaria.github.io/zipminator/content/self_destruct.html' },
+            { label: 'Compliance (FIPS 203)', href: 'https://qdaria.github.io/zipminator/content/compliance.html' },
+          ].map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-violet-300 hover:text-cyan-300 underline-offset-2 hover:underline transition-colors"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div
+          className="mt-4 px-4 py-3 rounded-lg"
+          style={{ background: 'rgba(167,139,250,0.06)', borderLeft: '3px solid #A78BFA' }}
+        >
+          <p className="text-sm text-violet-200">
+            JupyterBook is rebuilt on every push via GitHub Actions and served from GitHub Pages. Custom domain
+            <span className="font-mono"> docs.zipminator.zip</span> is CNAME-ready pending DNS cutover.
+          </p>
+        </div>
+      </GlowCard>
+    </div>
+
   </div>
 )
 

@@ -55,13 +55,22 @@ parts:
 
   - caption: "Part VIII: Advanced Topics"
     chapters:
-      - file: notebooks/07_monte_carlo_prng_vs_qrng
+      - file: notebooks/09_monte_carlo_prng_vs_qrng
       - file: notebooks/10_quantum_anonymization
+      - file: notebooks/10_quantum_entropy_harvester
 
   - caption: "Part IX: CLI Reference"
     chapters:
       - file: content/cli
       - file: content/cli_reference
+
+  - caption: "Part X: Releases, Research & IP"
+    chapters:
+      - file: content/releases
+      - file: content/papers
+      - file: content/patents
+      - file: content/mesh_wave1
+      - file: content/flutter_app
 
   - caption: "Appendix"
     chapters:

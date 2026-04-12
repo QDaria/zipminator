@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Shield, Award, Lock, GitBranch, Cpu, Globe } from 'lucide-react'
+import { Shield, Award, Lock, GitBranch, Cpu, Globe, Radio } from 'lucide-react'
 
 const ProviderShowcase = () => {
   const providers = [
@@ -45,6 +45,14 @@ const ProviderShowcase = () => {
       description: 'VPN Protocol Base',
       icon: Globe,
       color: 'from-green-500 to-emerald-500',
+      verified: true
+    },
+    {
+      name: 'Fly.io Signaling',
+      description: 'wss://zipminator-signaling.fly.dev',
+      subLabel: 'Live since 2026-03-26 · WebSocket relay for messenger and VoIP',
+      icon: Radio,
+      color: 'from-indigo-500 to-violet-500',
       verified: true
     }
   ]
@@ -154,9 +162,14 @@ const ProviderShowcase = () => {
                   <h3 className="text-lg font-bold text-white mb-2 group-hover:text-quantum-400 transition-colors">
                     {provider.name}
                   </h3>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-400 break-all">
                     {provider.description}
                   </p>
+                  {'subLabel' in provider && provider.subLabel && (
+                    <p className="mt-2 text-[11px] leading-snug text-gray-500">
+                      {provider.subLabel}
+                    </p>
+                  )}
                 </div>
 
                 {/* Glow effect on hover */}

@@ -6,6 +6,7 @@ import DeviceShield from '@/components/DeviceShield'
 import KeyFeatures from '@/components/KeyFeatures'
 import EncryptionStack from '@/components/EncryptionStack'
 import ProjectScale from '@/components/ProjectScale'
+import ReleaseHighlights from '@/components/ReleaseHighlights'
 import StatsBar from '@/components/StatsBar'
 import WorldFirst from '@/components/WorldFirst'
 import IndustryImpact from '@/components/IndustryImpact'
@@ -20,6 +21,7 @@ export default function Home() {
     <>
       <Hero />
       <WorldFirst />
+      <ReleaseHighlights />
       <ProjectScale />
       <ProviderShowcase />
       <SS7Killer />

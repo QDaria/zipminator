@@ -14,17 +14,26 @@ import {
   Users,
   Clock,
   DollarSign,
+  FlaskConical,
+  Wifi,
+  ScrollText,
+  ShieldCheck,
+  Smartphone,
 } from 'lucide-react'
 
 const stats = [
-  { icon: Code2, value: 300000, suffix: '+', label: 'Total Project Lines', format: true },
-  { icon: FileCode, value: 1902, suffix: '+', label: 'Project Files', format: true },
-  { icon: Lock, value: 16, suffix: '', label: 'Security Technologies', format: false },
-  { icon: Layers, value: 10, suffix: '', label: 'Anonymization Levels', format: false },
-  { icon: Cpu, value: 156, suffix: '-qubit', label: 'Quantum Hardware', format: false },
-  { icon: Monitor, value: 6, suffix: '', label: 'Platforms', format: false },
-  { icon: Puzzle, value: 8, suffix: '', label: 'Security Modules', format: false },
-  { icon: Terminal, value: 5, suffix: '', label: 'Programming Languages', format: false },
+  { icon: FlaskConical, value: 556, suffix: '', label: 'Rust tests', format: false },
+  { icon: Code2, value: 429, suffix: '', label: 'Python SDK tests (17 skipped)', format: false },
+  { icon: Wifi, value: 106, suffix: '', label: 'Mesh tests', format: false },
+  { icon: Lock, value: 513, suffix: '', label: 'Total workspace tests', format: false },
+  { icon: Smartphone, value: 11, suffix: '', label: 'Flutter screens', format: false },
+  { icon: Layers, value: 17, suffix: '', label: 'Riverpod providers', format: false },
+  { icon: Puzzle, value: 6, suffix: '', label: 'Mesh Wave 1 modules', format: false },
+  { icon: ScrollText, value: 3, suffix: '', label: 'Public research papers', format: false },
+  { icon: ShieldCheck, value: 3, suffix: '', label: 'Patents filed (46 claims)', format: false },
+  { icon: Cpu, value: 156, suffix: '-qubit', label: 'IBM Quantum (ibm_kingston)', format: false },
+  { icon: FileCode, value: 35, suffix: '', label: 'IBM Quantum jobs (6.8 MB entropy)', format: false },
+  { icon: Monitor, value: 6, suffix: '', label: 'iOS, Android, macOS, Windows, Linux, Web', format: false },
 ]
 
 function AnimatedNumber({

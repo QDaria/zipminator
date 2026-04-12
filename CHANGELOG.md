@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-04-02
+
+### Added
+- Python SDK v0.5.0 general availability on PyPI: `pip install zipminator` (extras: `data`, `anonymization`, `cli`, `quantum`, `jupyter`, `email`, `benchmark`, `dev`, `all`)
+- API-key gating: L1-L3 anonymisation free; L4+ requires `ZIPMINATOR_API_KEY`
+- 429 passing tests (17 skipped for optional backends)
+
+### Changed
+- Graduated from `0.5.0b1` beta to stable. All public APIs frozen for 0.5.x.
+
+## [flutter-build-43] - 2026-04-06
+
+### Added
+- Flutter super-app published to TestFlight as Build 43 (`v0.5.0+43`)
+- 11 feature screens (Vault, Messenger, VoIP, Q-VPN, Anonymiser, Q-AI, Mail, Browser, Mesh, Settings, Dashboard)
+- 17 Riverpod 3 providers wiring the Rust bridge to the UI layer
+- Supabase OAuth (GitHub / Google / LinkedIn / Apple) verified on physical iOS device
+
+### Fixed
+- iPhone messenger routing (live- prefix mismatch)
+- VoIP answer detection and WebRTC audio path
+- macOS deployment target set to 13.0 with camera/mic entitlements
+
+## [mesh-wave-1] - 2026-03-20
+
+### Added
+- `crates/zipminator-mesh/` six physical-cryptography modules:
+  - `csi_entropy.rs` — Von Neumann debiased CSI entropy harvester
+  - `puek.rs` — Physical Unclonable Environment Key via SVD eigenstructure
+  - `em_canary.rs` — 4-level electromagnetic threat escalation
+  - `vital_auth.rs` — WiFi-derived biometric continuous authentication
+  - `topo_auth.rs` — Graph-topology-invariant mesh authentication
+  - `spatiotemporal.rs` — Presence-proof non-repudiation signatures
+- 106 mesh tests (90 unit + 16 integration)
+- Total workspace test count: 513
+
+## [paper-1-eprint-cycle] - 2026-04-06
+
+### Changed
+- Paper 1 "Quantum-Certified Anonymization" strengthened after first ePrint cycle with IND-ANON definition, composition theorem, and UC-security treatment. Target venue: PoPETs 2027 (deadline 2026-05-31).
+
 ## [0.5.0b1] - 2026-03-16
 
 ### Added
