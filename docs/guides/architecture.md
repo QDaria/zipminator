@@ -517,3 +517,55 @@ Cargo-fuzz targets for:
 - `fuzz_keygen` -- Key generation with arbitrary seeds
 - `fuzz_encapsulate` -- Encapsulation with arbitrary public keys
 - `fuzz_decapsulate` -- Decapsulation with arbitrary ciphertext/key pairs
+
+---
+
+## Q-Mesh Physical Cryptography (`crates/zipminator-mesh`)
+
+Shipped 2026-03-20 as Wave 1. Six physical-layer crypto primitives that turn WiFi CSI signals into authenticated sensing mesh keys. Integrates with the external [RuView](https://github.com/MoHoushmand/RuView) ESP32-S3 mesh network.
+
+| Module | File | Purpose |
+|--------|------|---------|
+| CSI Entropy Harvester | `csi_entropy.rs` | Von Neumann debiased CSI phase data, implements `PoolEntropySource` trait, XOR-mixed with QRNG for defence-in-depth |
+| PUEK (Physical Unclonable Environment Key) | `puek.rs` | Location-as-key via SVD eigenstructure of CSI snapshots, SCIF/Office/Home security profiles |
+| EM Canary Session Controller | `em_canary.rs` | 4-level threat escalation (Normal, Elevated, High, Critical), policy-driven key rotation on electromagnetic anomaly |
+| Vital-Sign Continuous Auth | `vital_auth.rs` | WiFi-derived biometric session authentication with rolling HMAC, drift detection for liveness |
+| Topological Mesh Authentication | `topo_auth.rs` | Network key derived from graph topology invariants via `petgraph`, topology changes trigger re-authentication |
+| Spatiotemporal Non-Repudiation | `spatiotemporal.rs` | Presence-proof signatures combining CSI fingerprint, vital signs, and timestamp |
+
+Test counts: 106 mesh tests (90 unit, 16 integration) inside the crate. Total workspace tests: 513.
+
+See the JupyterBook chapter `content/mesh_wave1.md` and notebook `notebooks/08_qmesh_physical_crypto.ipynb` for runnable examples.
+
+---
+
+## Signaling Server
+
+Deployed 2026-03-26 on Fly.io. Public WebSocket endpoint `wss://zipminator-signaling.fly.dev` relays messenger and VoIP signalling (offer / answer / candidate / hangup). Stateless; no message content crosses the server, only post-quantum-ciphertext handshake frames.
+
+| Attribute | Value |
+|-----------|-------|
+| Runtime | Fly.io Machines, 2 regions |
+| Framework | FastAPI + `websockets` |
+| Transport | WebSocket over TLS 1.3 (hybrid X25519 + ML-KEM-768 on supported clients) |
+| Rate limiting | Per-peer token bucket, 30 msg/s |
+| Observability | Fly.io logs + structured JSON lines |
+| Test coverage | 10 WebSocket-ratchet tests, 6/6 E2E signalling tests |
+
+Client wiring lives in `app/lib/core/providers/signaling_provider.dart` (Flutter) and `mobile/src/services/SignalingService.ts` (Expo legacy). The desktop browser uses the same endpoint via the messenger component.
+
+---
+
+## Deployment Topology (April 2026)
+
+```mermaid
+graph LR
+    USER[End user] -->|TLS 1.3 + PQ handshake| WEB[web.zipminator.zip<br/>Next.js 16 on Vercel]
+    USER -->|WebSocket| SIG[zipminator-signaling.fly.dev<br/>Fly.io]
+    USER -->|TestFlight / Play Store| FLUTTER[Flutter super-app<br/>Build 43, v0.5.0+43]
+    USER -->|HTTPS| DOCS[qdaria.github.io/zipminator<br/>JupyterBook on GitHub Pages]
+    FLUTTER --> SIG
+    FLUTTER --> API[FastAPI backend<br/>PostgreSQL + Redis]
+    WEB --> API
+    DOCS -.CNAME pending.-> DOCSZIP[docs.zipminator.zip]
+```

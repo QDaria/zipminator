@@ -85,15 +85,20 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 * [x] Initialize Expo cross-platform project (`mobile/`).
 * [x] Build the "Expertise Mode" Context API and Vault UI.
 
-### Phase 2: Quantum Secure Messenger 🟡
+### Phase 2: Quantum Secure Messenger ✅ 100% code / 85% integration
 
 * [x] Build WebRTC signaling endpoints and React Native Chat UI.
-* [/] Complete PQC Double Ratchet integration with native bridge.
+* [x] Complete PQC Double Ratchet integration with native bridge (Flutter + FRB v2.11.1).
+* [x] Deploy signalling server to Fly.io (`wss://zipminator-signaling.fly.dev`, live 2026-03-26).
+* [x] Messenger round-trip verified on physical iPhone (2026-03-29).
 
-### Phase 3: VoIP, Video, & Q-VPN 🟡
+### Phase 3: VoIP, Video, & Q-VPN ✅ 90% code
 
-* [/] Integrate React Native WebRTC for camera/mic with PQ-SRTP.
-* [ ] Build PQ-WireGuard extensions for iOS/Android.
+* [x] Integrate `flutter_webrtc` for camera/mic with PQ-SRTP (2026-03-30).
+* [x] Wire Q-VPN to native iOS `NEVPNManager` via platform channel (2026-03-29).
+* [x] VoIP audio verified on device (2026-04-01).
+* [ ] PQ-WireGuard server deployment (bridge created, not hosted).
+* [ ] Android VPN service integration (planned).
 
 ### Phase 4: Big Data, AI, & Anonymization ✅
 
@@ -129,45 +134,57 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 * [x] Build mobile email client component (`ZipMail.tsx`) in the Expo app.
 * [x] QRNG-seeded session tokens and per-message encryption keys.
 
-### Phase 8: ZipBrowser — PQC AI Browser 🟡 75%
+### Phase 8: ZipBrowser — PQC AI Browser ✅ 85%
 
 * [x] Build Tauri 2.x desktop browser shell (`browser/src-tauri/`). *(compiles, DMG at target/release/bundle/dmg/)*
 * [x] Integrate PQC TLS (ML-KEM-768 key exchange for all HTTPS connections). *(proxy layer with ML-KEM-768)*
 * [x] Embed Q-VPN (PQ-WireGuard) as always-on tunnel for all browser traffic. *(state machine + kill switch, packet wrapping has shortcuts)*
-* [ ] Integrate Q-AI Assistant sidebar (page summarization, agentic tasks, writing assist). *(not yet integrated into browser)*
+* [x] Integrate Q-AI Assistant sidebar (page summarization, agentic tasks, writing assist). *(Recipe W: Tauri command + React component in SidebarSlot; 157 Rust tests)*
 * [x] QRNG-seeded session tokens and cookie rotation for fingerprint resistance.
 * [x] Zero telemetry architecture — no data leaves device unless PQC-tunneled.
 * [x] Build extension system for PQC password manager and form autofill. *(Argon2 vault implemented)*
 * [ ] Mobile browser component via WebView with PQC proxy. *(planned)*
 * **103 Rust tests passing** | 7 privacy subsystems implemented | DMG 5.7MB aarch64
 
-### Phase 9: Production & Go-to-Market 🟡 60%
+### Phase 9: Production & Go-to-Market 🟡 75%
 
-* [x] Deploy web landing at `https://zipminator.zip` (Vercel). *(22 routes, 0 errors)*
-* [x] Build 21-slide investor pitch deck at `/invest`.
-* [x] Configure OAuth (GitHub, Google, LinkedIn) with next-auth v5 beta. *(all 3 callback URLs registered)*
+* [x] Deploy web landing at `https://zipminator.zip` (Vercel). *(39 routes, 0 errors)*
+* [x] Build investor pitch deck at `/invest`, expanded to 50K-word IP valuation blueprint at `/blueprint` (2026-04-08).
+* [x] Configure OAuth (GitHub, Google, LinkedIn, Apple) with next-auth v5 beta. *(all callback URLs registered)*
 * [x] Set up Supabase waitlist with rate limiting and Zod validation.
 * [x] Create grant templates for 10 institutions.
 * [x] SVG gradient wordmark branding across pitch deck.
-* [x] og:image, sitemap.xml, robots.txt for SEO. *(Session 1 complete)*
-* [x] Production deploy with AUTH_URL fix. *(Session 2 complete)*
-* [ ] Blog posts for qdaria.com (3 posts). *(Session 3)*
-* [ ] LinkedIn + social launch content. *(Session 4)*
-* [ ] GitHub Release v1.0.0-beta.1 tag. *(Session 5)*
-* [ ] FIPS 140-3 certification process initiation.
+* [x] og:image, sitemap.xml, robots.txt for SEO.
+* [x] Production deploy with AUTH_URL fix.
+* [x] Python SDK v0.5.0 shipped to PyPI (2026-04-02).
+* [x] Flutter super-app shipped to TestFlight as Build 43 (2026-04-06).
+* [x] Three patents filed at Patentstyret, March 2026 (46 claims total).
+* [x] Three research papers public on GitHub (quantum-certified-anonymization, unilateral-csi-entropy, certified-heterogeneous-entropy).
+* [ ] Play Store AAB submission (Android).
+* [ ] Blog posts for qdaria.com.
+* [ ] LinkedIn + social launch content.
+* [ ] GitHub Release v1.0.0 tag.
+* [ ] FIPS 140-3 CMVP certification process initiation. *(currently implements FIPS 203 algorithms only, no validation certificate)*
 * [ ] SOC 2 readiness assessment.
 * [ ] Enterprise pilot deployments.
-* [ ] App Store / Play Store submissions for mobile.
 
-### Phase 9b: Q-Mesh — Quantum-Secured WiFi Sensing (RuView) 🔴 15%
+### Phase 9b: Q-Mesh — Quantum-Secured WiFi Sensing (RuView) ✅ 90% (Wave 1 shipped 2026-03-20)
 
-* [ ] Create entropy bridge crate linking `zipminator-core` QRNG to RuView mesh key derivation.
-* [ ] Extend RuView `scripts/provision.py` to accept QRNG-seeded mesh keys via `--qrng-source` flag.
-* [ ] Implement shared NVS key management: quantum-random 16-byte mesh key provisioned to all ESP32-S3 nodes.
-* [ ] Build QRNG key rotation protocol: coordinator broadcasts new quantum-seeded key (signed with old key).
-* [ ] Integration tests: verify HMAC-SHA256 beacon auth and SipHash-2-4 frame integrity with QRNG-derived keys.
-* [ ] Healthcare demo: vital sign monitoring (breathing + heartbeat) with quantum-secured mesh.
-* [ ] Defense demo: through-wall personnel tracking with tamper-proof beacon authentication.
+* [x] Create entropy bridge crate linking `zipminator-core` QRNG to mesh key derivation.
+* [x] HKDF-SHA256 key derivation from quantum pool; `MeshKey` (16-byte PSK) and `SipHashKey` types with zeroize-on-drop.
+* [x] `MeshProvisioner` with `provision_nvs_binary()` generating ESP32-S3-compatible blobs (magic header, mesh_id, PSK, SipHash key, SHA-256 checksum).
+* [x] Physical Cryptography Wave 1: six new modules in `crates/zipminator-mesh/`:
+  - [x] `csi_entropy.rs` — CSI entropy harvester (Von Neumann debias + QRNG XOR)
+  - [x] `puek.rs` — Physical Unclonable Environment Key via SVD eigenstructure
+  - [x] `em_canary.rs` — 4-level electromagnetic threat escalation
+  - [x] `vital_auth.rs` — WiFi-derived biometric continuous authentication
+  - [x] `topo_auth.rs` — Graph-topology-invariant mesh authentication
+  - [x] `spatiotemporal.rs` — Presence-proof non-repudiation signatures
+* [x] 106 mesh tests (90 unit + 16 integration); total workspace 513 tests.
+* [x] Wave 2 attestation types in progress (`PresenceProof`, `VitalAuth`, `EmCanary`).
+* [ ] Cross-repo integration script linking Zipminator QRNG output to RuView `scripts/provision.py`.
+* [ ] Healthcare demo (vital sign monitoring) on real ESP32-S3 hardware.
+* [ ] Defence demo (through-wall personnel tracking) on real ESP32-S3 hardware.
 * **External repo**: [MoHoushmand/RuView](https://github.com/MoHoushmand/RuView) | ADR-032 mesh security ready | 1300+ tests
 
 ### Phase 10: Flutter Super-App — Single Codebase ✅ (NEW)
@@ -202,8 +219,19 @@ Zipminator is no longer just a file vault or key generator. It is the world's fi
 * [x] `flutter analyze`: 0 issues
 
 #### Platform Toolchain ✅
-* [x] Android SDK 36 + build-tools 36.0.0 + Java 21 (OpenJDK) — `flutter doctor` green
-* [x] Xcode installed — macOS/iOS builds ready
+* [x] Android SDK 36 + build-tools 36.0.0 + Java 21 (OpenJDK), `flutter doctor` green
+* [x] Xcode installed, macOS/iOS builds ready
+* [x] Code signing live (Apple Developer Program enrolled)
+* [x] TestFlight submission live as **Build 43 (v0.5.0+43)** on 2026-04-06
 * [ ] Rust NDK cross-compilation for Android APK (armv7/aarch64 targets)
-* [ ] Code signing (Apple Developer Program enrolled, TestFlight submission pending)
 * [ ] Play Store submission
+
+#### Wave 4: Feature Completeness ✅ (2026-04)
+* [x] Anonymiser L7-L10 real implementations wired to provider
+* [x] Email PII scan before send with anonymise/send/cancel dialog
+* [x] Email attachment picker with anonymisation
+* [x] Messenger demo auto-reply gated behind `isLive`
+* [x] Browser proxy port wired to AI sidebar
+* [x] Q-AI Ollama local LLM integrated into Flutter screen
+* [x] Supabase OAuth (GitHub / Google / LinkedIn / Apple) verified on physical iOS device
+* [x] `.env` bundled in IPA with `SUPABASE_URL` + `SUPABASE_ANON_KEY`
