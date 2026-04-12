@@ -163,10 +163,10 @@ const ProjectScale = () => {
                   <Users className="w-7 h-7 text-quantum-400" />
                 </div>
                 <div className="text-3xl font-bold text-white mb-1">
-                  35-50
+                  50-75
                 </div>
                 <div className="text-sm text-gray-400">
-                  Senior engineers needed
+                  Senior engineers, cryptographers, researchers, auditors
                 </div>
               </div>
 
@@ -175,7 +175,7 @@ const ProjectScale = () => {
                   <Clock className="w-7 h-7 text-quantum-400" />
                 </div>
                 <div className="text-3xl font-bold text-white mb-1">
-                  18-24
+                  24-36
                 </div>
                 <div className="text-sm text-gray-400">Months of development</div>
               </div>
@@ -185,10 +185,10 @@ const ProjectScale = () => {
                   <DollarSign className="w-7 h-7 text-quantum-400" />
                 </div>
                 <div className="text-3xl font-bold text-white mb-1">
-                  $15-25M+
+                  $30-60M+
                 </div>
                 <div className="text-sm text-gray-400">
-                  Estimated development cost
+                  Engineering, PQC talent, patents, papers, audits, quantum hardware
                 </div>
               </div>
             </div>
@@ -196,7 +196,7 @@ const ProjectScale = () => {
             <div className="mt-8 text-center">
               <p className="text-gray-400 text-sm">
                 Zipminator delivers all of this in a single, install-and-go
-                application.
+                application. Built by one founder.
               </p>
             </div>
           </div>

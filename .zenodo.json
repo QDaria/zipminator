@@ -1,0 +1,39 @@
+{
+  "title": "Zipminator-PQC: Post-Quantum Cryptography Platform with Quantum Entropy",
+  "description": "NIST FIPS 203 ML-KEM-768 implementation with quantum entropy harvesting from IBM Quantum hardware, Rigetti, and qBraid. Includes Python SDK, Rust cryptographic core, PII scanning for 15 jurisdictions, and 10-level data anonymization. Implements methods described in IACR ePrint 2026/108710, 108711, 108712 and covered by three filed patents at Patentstyret (Norwegian Patent Office).",
+  "creators": [
+    {
+      "name": "Houshmand, Daniel Mo",
+      "affiliation": "QDaria AS"
+    }
+  ],
+  "license": "Apache-2.0",
+  "access_right": "open",
+  "upload_type": "software",
+  "keywords": [
+    "post-quantum-cryptography",
+    "kyber768",
+    "ml-kem-768",
+    "nist-fips-203",
+    "quantum-entropy",
+    "pii-scanning",
+    "data-anonymization",
+    "cryptography",
+    "pqc"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://pypi.org/project/zipminator/",
+      "relation": "isDerivedFrom",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://github.com/QDaria/zipminator",
+      "relation": "isAlternateIdentifier",
+      "resource_type": "software"
+    }
+  ],
+  "communities": [
+    {"identifier": "open-science"}
+  ]
+}

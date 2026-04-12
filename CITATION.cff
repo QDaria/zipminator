@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+title: "Zipminator-PQC: Post-Quantum Cryptography Platform with Quantum Entropy"
+type: software
+authors:
+  - family-names: Houshmand
+    given-names: Daniel Mo
+    affiliation: "QDaria AS"
+    email: dmo.houshmand@gmail.com
+repository-code: "https://github.com/MoHoushmand/zipminator-pqc"
+url: "https://github.com/QDaria/zipminator"
+license: Apache-2.0
+keywords:
+  - post-quantum-cryptography
+  - kyber768
+  - ml-kem-768
+  - nist-fips-203
+  - quantum-entropy
+  - pii-scanning
+  - data-anonymization
+version: "0.5.0"
+date-released: "2026-04-02"
+identifiers:
+  - type: other
+    value: "IACR ePrint 2026/108710"
+    description: "Paper 1: Quantum-Certified Anonymization"
+  - type: other
+    value: "IACR ePrint 2026/108711"
+    description: "Paper 2: CSI Entropy + Unilateral PUEK"
+  - type: other
+    value: "IACR ePrint 2026/108712"
+    description: "Paper 3: Certified Heterogeneous Entropy + ARE"
+  - type: other
+    value: "Patentstyret 20260384"
+    description: "Patent 1: Quantum-Certified Anonymization (filed 2026-03-24)"

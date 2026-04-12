@@ -1,0 +1,43 @@
+Zipminator-PQC
+Copyright 2023-2026 Daniel Mo Houshmand and QDaria AS
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this product except in compliance with the License.
+You may obtain a copy of the License in the LICENSE file distributed
+with this product or at http://www.apache.org/licenses/LICENSE-2.0.
+
+This product includes software developed by Daniel Mo Houshmand
+(https://github.com/MoHoushmand) and QDaria AS (https://qdaria.com).
+
+The original development repository is:
+  https://github.com/MoHoushmand/zipminator-pqc  (created 2025-11-04)
+
+The public distribution repository is:
+  https://github.com/QDaria/zipminator           (created 2023-01-08)
+
+Third-party cryptographic primitives:
+- NIST FIPS 203 ML-KEM-768 (Kyber768) reference implementation
+- Rust `pqcrypto-kyber` crate (dual-licensed MIT / Apache-2.0)
+- Python SDK via PyO3 / maturin bindings
+
+Quantum entropy sources:
+- IBM Quantum hardware via Qiskit IBM Runtime
+- Rigetti Computing quantum cloud
+- qBraid quantum compute platform
+
+Patent notice:
+Methods and systems described in this software are covered by the
+following patent applications filed at Patentstyret (Norwegian Patent
+Office):
+
+- Application 20260384 (priority 2026-03-24): Quantum-Certified
+  Anonymization via QRNG-OTP-Destroy (15 claims)
+- Application filed 2026-04-05 (Altinn ef95b9a26a3e): Unilateral CSI
+  Entropy + PUEK (14 claims)
+- Application filed 2026-04-05 (Altinn 870867694a06): Certified
+  Heterogeneous Entropy via Algebraic Randomness Extraction (17 claims)
+
+Use of this software under the Apache License, Version 2.0 grants the
+rights stated in Section 3 of that License, including any patent
+grants from the copyright holder. Nothing in this notice modifies the
+License terms.

@@ -1,0 +1,47 @@
+name: OpenTimestamps
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '.ots/**'
+  workflow_dispatch:
+
+jobs:
+  stamp:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install OpenTimestamps client
+        run: pip install opentimestamps-client
+
+      - name: Stamp current HEAD commit
+        run: |
+          mkdir -p .ots
+          HASH=$(git rev-parse HEAD)
+          SHORT=$(git rev-parse --short HEAD)
+          echo "$HASH" > ".ots/${HASH}.txt"
+          ots stamp ".ots/${HASH}.txt"
+          echo "Stamped commit ${SHORT}"
+
+      - name: Commit timestamp proof
+        run: |
+          git config user.name "opentimestamps-bot"
+          git config user.email "ots-bot@zipminator.zip"
+          git add .ots/
+          if ! git diff --cached --quiet; then
+            git commit -m "ots: bitcoin timestamp proof for $(git rev-parse --short HEAD^)"
+            git push
+          else
+            echo "No new timestamp to commit"
+          fi
